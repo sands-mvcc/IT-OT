@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT/OT Convergence Study Guide - Part 1</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --dark-green: #1B5E20;
+            --black: #000000;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --medium-gray: #E0E0E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--black);
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .objectives-section {
+            background: var(--white);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .objectives-header {
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .objectives-header:hover {
+            background: var(--dark-green);
+        }
+
+        .objectives-header h2 {
+            font-size: 1.8em;
+        }
+
+        .chevron {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+
+        .objectives-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .objectives-content.active {
+            display: block;
+        }
+
+        .objective-item {
+            background: var(--light-gray);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-green);
+            transition: transform 0.2s ease;
+        }
+
+        .objective-item:hover {
+            transform: translateX(5px);
+        }
+
+        .objective-verb {
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .section {
+            background: var(--white);
+            margin: 30px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background: var(--light-green);
+            color: var(--white);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: var(--primary-green);
+        }
+
+        .section-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .subsection {
+            margin: 25px 0;
+        }
+
+        .subsection h4 {
+            color: var(--primary-green);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--medium-gray);
+            padding-bottom: 5px;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: var(--white);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 5px solid var(--dark-green);
+        }
+
+        .analogy-box h5 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .example-box {
+            background: var(--light-gray);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary-green);
+        }
+
+        .example-box h5 {
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .tech-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tech-item {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--medium-gray);
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tech-item h6 {
+            color: var(--primary-green);
+            margin-bottom: 8px;
+        }
+
+        .interactive-quiz {
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .quiz-button {
+            background: var(--white);
+            color: var(--primary-green);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-button:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .progress-bar {
+            background: var(--medium-gray);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: var(--primary-green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .key-concept {
+            background: var(--dark-green);
+            color: var(--white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .tech-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>IT/OT Convergence Study Guide</h1>
+            <div class="subtitle">Part 1: Understanding IT/OT Convergence</div>
+            <div class="subtitle">Faculty Workshop Interactive Learning Resource</div>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="objectives-section">
+            <div class="objectives-header" onclick="toggleSection('objectives')">
+                <h2>Learning Objectives for Part 1</h2>
+                <span class="chevron" id="objectives-chevron">▼</span>
+            </div>
+            <div class="objectives-content" id="objectives-content">
+                <div class="objective-item">
+                    <span class="objective-verb">Define</span> IT and OT systems with precise technical terminology and explain their historical development paths
+                </div>
+                <div class="objective-item">
+                    <span class="objective-verb">Compare and contrast</span> the fundamental principles, priorities, and operational constraints of IT versus OT environments
+                </div>
+                <div class="objective-item">
+                    <span class="objective-verb">Analyze</span> the business drivers and economic factors compelling organizations toward IT/OT convergence
+                </div>
+                <div class="objective-item">
+                    <span class="objective-verb">Evaluate</span> the benefits and challenges of convergence from both technical and organizational perspectives
+                </div>
+                <div class="objective-item">
+                    <span class="objective-verb">Identify</span> key components and technologies within each domain and their integration points
+                </div>
+                <div class="objective-item">
+                    <span class="objective-verb">Create</span> visual representations of IT/OT system architectures for use in student instruction
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('section1')">
+                <h3>1.1 Understanding the Convergence Imperative</h3>
+                <span class="chevron" id="section1-chevron">▼</span>
+            </div>
+            <div class="section-content" id="section1-content">
+                <p>Imagine two separate kingdoms that have operated independently for decades. One kingdom specializes in managing information and communication (IT), while the other controls physical processes and machinery (OT). Today, these kingdoms are merging to create a more powerful, unified realm. This convergence isn't just a technological trend—it's a fundamental shift reshaping how organizations operate in the digital age.</p>
+
+                <div class="subsection">
+                    <h4>Digital Transformation Drivers</h4>
+                    <p>The convergence of IT and OT systems is being driven by several powerful forces that are reshaping the industrial landscape. Think of these drivers as the economic and technological currents that are pushing organizations toward integration.</p>
+
+                    <div class="analogy-box">
+                        <h5>🏭 Analogy: The Smart Factory Revolution</h5>
+                        <p>Consider a traditional factory like a well-orchestrated symphony where each musician (machine) plays their part independently. Industry 4.0 is like giving each musician a smartphone connected to the conductor—now they can receive real-time instructions, share their performance data, and coordinate more effectively than ever before.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Industry 4.0 & IIoT</h6>
+                            <p>The <span class="key-concept">Industrial Internet of Things (IIoT)</span> connects previously isolated machines and systems, creating a network of intelligent devices that can communicate, analyze, and optimize operations autonomously.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Predictive Maintenance</h6>
+                            <p>Instead of waiting for equipment to break down, sensors continuously monitor machine health and predict failures before they occur, much like a fitness tracker monitoring your heart rate.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Real-time Analytics</h6>
+                            <p>Data flows from the factory floor to executive dashboards in real-time, enabling instant decision-making and process optimization.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Remote Monitoring</h6>
+                            <p>Operations can be monitored and controlled from anywhere in the world, similar to how you can control your home's temperature from your smartphone.</p>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h5>📊 Real-World Example: Automotive Manufacturing</h5>
+                        <p>A modern automotive plant uses thousands of sensors to monitor everything from robotic arm movements to paint booth temperature. This data is analyzed in real-time to optimize production speed, reduce waste, and predict when maintenance is needed. The result? 20% increase in efficiency and 30% reduction in unexpected downtime.</p>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h4>Business Benefits and Challenges</h4>
+                    <p>The convergence of IT and OT systems offers significant advantages, but it also presents unique challenges that organizations must navigate carefully.</p>
+
+                    <div class="analogy-box">
+                        <h5>🏢 Analogy: Merging Two Companies</h5>
+                        <p>IT/OT convergence is like merging two successful companies with different cultures. One company (IT) values flexibility and rapid change, while the other (OT) prioritizes stability and reliability. The merger can create powerful synergies, but it requires careful planning to blend these different approaches successfully.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Cost Reduction</h6>
+                            <p>Unified systems eliminate duplicate infrastructure, reduce maintenance costs, and streamline operations. Organizations typically see 15-25% reduction in operational costs.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Enhanced Compliance</h6>
+                            <p>Integrated systems provide comprehensive audit trails and real-time compliance monitoring, making regulatory reporting more accurate and efficient.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Innovation Opportunities</h6>
+                            <p>Convergence enables new business models, from predictive services to outcome-based contracts that weren't possible with isolated systems.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Cultural Integration Challenges</h6>
+                            <p>IT and OT teams often have different priorities, timelines, and risk tolerances. Successfully merging these cultures requires strong leadership and clear communication.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interactive-quiz">
+                    <h4>Quick Knowledge Check</h4>
+                    <p>Test your understanding of convergence drivers</p>
+                    <button class="quiz-button" onclick="showQuizResult('correct')">Industry 4.0 focuses on connecting machines and systems</button>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">IT/OT convergence only benefits large corporations</button>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">Predictive maintenance is less effective than reactive repairs</button>
+                    <div id="quiz-result" style="margin-top: 15px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('section2')">
+                <h3>1.2 Defining Information Technology (IT) Systems</h3>
+                <span class="chevron" id="section2-chevron">▼</span>
+            </div>
+            <div class="section-content" id="section2-content">
+                <p>Information Technology (IT) systems are the digital backbone of modern organizations, designed to process, store, and transmit information efficiently and securely. Think of IT systems as the nervous system of a business—they carry information throughout the organization, enabling communication, decision-making, and coordination.</p>
+
+                <div class="subsection">
+                    <h4>Core Principles and Architecture</h4>
+                    <p>IT systems are built around fundamental principles that prioritize information security, network connectivity, and user accessibility. These principles have evolved over decades of computing innovation.</p>
+
+                    <div class="analogy-box">
+                        <h5>🏛️ Analogy: The CIA Triad as Building Security</h5>
+                        <p>Think of the CIA Triad like a high-security building: <strong>Confidentiality</strong> is like having restricted access (only authorized people can enter), <strong>Integrity</strong> is like having security cameras and alarms to detect any unauthorized changes, and <strong>Availability</strong> is like having backup power and multiple entrances to ensure the building is always accessible to authorized users.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Confidentiality</h6>
+                            <p>Ensures that sensitive information is only accessible to authorized users. Implemented through encryption, access controls, and user authentication.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Integrity</h6>
+                            <p>Guarantees that data remains accurate and unchanged during storage and transmission. Protected by checksums, digital signatures, and audit logs.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Availability</h6>
+                            <p>Ensures that systems and data are accessible when needed. Achieved through redundancy, backup systems, and disaster recovery plans.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Network-Centric Design</h6>
+                            <p>IT systems are designed around network connectivity, enabling resource sharing, remote access, and distributed computing across multiple locations.</p>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h5>💼 Example: Corporate Email System</h5>
+                        <p>A corporate email system demonstrates all IT principles: emails are encrypted for confidentiality, digital signatures ensure integrity, and multiple servers provide availability. The system connects users across different locations through network protocols, enabling global communication and collaboration.</p>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h4>Key Components and Technologies</h4>
+                    <p>IT systems comprise various interconnected components that work together to provide comprehensive information services. Each component plays a specific role in the overall ecosystem.</p>
+
+                    <div class="analogy-box">
+                        <h5>🌐 Analogy: IT Infrastructure as a City</h5>
+                        <p>Think of IT infrastructure like a modern city: servers are like office buildings housing various businesses (applications), the network is like the road system connecting everything, routers and switches are like traffic control systems, and firewalls are like security checkpoints protecting the city's borders.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Computing Devices</h6>
+                            <p><strong>Servers:</strong> Centralized computers that provide services to other devices<br>
+                            <strong>Workstations:</strong> High-performance computers for specialized tasks<br>
+                            <strong>Mobile Devices:</strong> Smartphones and tablets for portable access</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Network Infrastructure</h6>
+                            <p><strong>Routers:</strong> Direct data between different networks<br>
+                            <strong>Switches:</strong> Connect devices within the same network<br>
+                            <strong>Firewalls:</strong> Filter and control network traffic for security</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Communication Protocols</h6>
+                            <p><strong>TCP/IP:</strong> The fundamental protocol suite for internet communication<br>
+                            <strong>HTTP/HTTPS:</strong> Web communication protocols<br>
+                            <strong>DNS:</strong> Translates domain names to IP addresses</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Enterprise Applications</h6>
+                            <p><strong>ERP Systems:</strong> Integrate business processes<br>
+                            <strong>CRM Systems:</strong> Manage customer relationships<br>
+                            <strong>Cloud Services:</strong> Provide scalable, on-demand resources</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interactive-quiz">
+                    <h4>IT Systems Knowledge Check</h4>
+                    <p>Which principle ensures data accuracy?</p>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">Confidentiality</button>
+                    <button class="quiz-button" onclick="showQuizResult('correct')">Integrity</button>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">Availability</button>
+                    <div id="quiz-result-it" style="margin-top: 15px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('section3')">
+                <h3>1.3 Defining Operational Technology (OT) Systems</h3>
+                <span class="chevron" id="section3-chevron">▼</span>
+            </div>
+            <div class="section-content" id="section3-content">
+                <p>Operational Technology (OT) systems are the specialized computing systems that monitor and control physical processes, machinery, and infrastructure. Unlike IT systems that focus on information processing, OT systems directly interact with the physical world, controlling everything from manufacturing equipment to power grids.</p>
+
+                <div class="subsection">
+                    <h4>Core Principles and Architecture</h4>
+                    <p>OT systems are built around fundamentally different principles than IT systems. While IT prioritizes information security and flexibility, OT emphasizes safety, reliability, and real-time performance.</p>
+
+                    <div class="analogy-box">
+                        <h5>🏭 Analogy: OT as an Orchestra Conductor</h5>
+                        <p>Think of an OT system like a skilled orchestra conductor who must coordinate dozens of musicians (machines) in perfect timing. The conductor (OT system) must respond instantly to changes, ensure every musician plays their part safely, and maintain perfect timing throughout the performance. There's no room for delays or mistakes that could disrupt the entire symphony.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Safety First</h6>
+                            <p>OT systems prioritize human safety and equipment protection above all else. Safety systems can override operational commands to prevent accidents or damage.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Reliability & Uptime</h6>
+                            <p>OT systems are designed to run continuously for years without interruption. Planned downtime is carefully scheduled and minimized.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Real-time Performance</h6>
+                            <p>OT systems must respond to events in milliseconds or microseconds. Delays can result in production losses, equipment damage, or safety hazards.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Deterministic Behavior</h6>
+                            <p>OT systems must provide predictable, consistent responses to inputs. Variability in timing or behavior can disrupt controlled processes.</p>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h5>⚡ Example: Power Grid Control</h5>
+                        <p>A power grid control system must maintain electrical frequency at exactly 60 Hz (in North America). If the frequency deviates by even 0.1 Hz, the system must respond within seconds to prevent cascading failures that could black out entire regions. This requires deterministic, real-time control that IT systems aren't designed to provide.</p>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <h4>Industrial Control Systems (ICS) Components</h4>
+                    <p>OT systems consist of specialized industrial control components that have evolved specifically for monitoring and controlling physical processes. These systems often use proprietary protocols and have much longer lifecycles than typical IT equipment.</p>
+
+                    <div class="analogy-box">
+                        <h5>🎛️ Analogy: ICS as a Multi-level Command Structure</h5>
+                        <p>Think of Industrial Control Systems like a military command structure: Field devices (sensors/actuators) are like soldiers gathering intelligence and executing orders, PLCs are like field commanders making tactical decisions, SCADA systems are like generals coordinating overall strategy, and HMIs are like command centers where human operators oversee everything.</p>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Programmable Logic Controllers (PLCs)</h6>
+                            <p>Ruggedized computers that control specific processes or equipment. PLCs execute control logic in real-time and can operate in harsh industrial environments with extreme temperatures, vibration, and electrical interference.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Distributed Control Systems (DCS)</h6>
+                            <p>Comprehensive control systems that manage entire industrial processes. DCS provides coordinated control across multiple PLCs and process areas, often used in continuous processes like chemical manufacturing or power generation.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>SCADA Systems</h6>
+                            <p>Supervisory Control and Data Acquisition systems that provide centralized monitoring and control of distributed assets. SCADA systems can manage infrastructure spread across vast geographic areas, like pipelines or electrical grids.</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Human-Machine Interfaces (HMIs)</h6>
+                            <p>Specialized user interfaces that allow operators to monitor processes and control equipment. HMIs are designed for industrial environments and focus on clarity and rapid response rather than aesthetic appeal.</p>
+                        </div>
+                    </div>
+
+                    <div class="tech-list">
+                        <div class="tech-item">
+                            <h6>Field Devices</h6>
+                            <p><strong>Sensors:</strong> Measure physical parameters like temperature, pressure, flow, and position<br>
+                            <strong>Actuators:</strong> Control physical processes by opening valves, starting motors, or adjusting equipment<br>
+                            <strong>Smart Instruments:</strong> Combine sensing and processing capabilities for complex measurements</p>
+                        </div>
+                        <div class="tech-item">
+                            <h6>Industrial Protocols</h6>
+                            <p><strong>Modbus:</strong> Simple, robust protocol for industrial communication<br>
+                            <strong>DNP3:</strong> Protocol designed for utility and infrastructure applications<br>
+                            <strong>OPC-UA:</strong> Modern protocol enabling secure, interoperable communication</p>
+                        </div>
+                    </div>
+
+                    <div class="example-box">
+                        <h5>🏭 Example: Automotive Assembly Line</h5>
+                        <p>A modern automotive assembly line uses hundreds of PLCs to control robotic welding stations, each PLC managing multiple sensors and actuators. A DCS coordinates the entire line, ensuring parts move smoothly between stations. SCADA systems monitor the overall production process, while HMIs allow operators to visualize production status and make adjustments. Smart sensors continuously monitor weld quality and automatically adjust parameters for optimal results.</p>
+                    </div>
+                </div>
+
+                <div class="interactive-quiz">
+                    <h4>OT Systems Knowledge Check</h4>
+                    <p>What is the primary difference between IT and OT systems?</p>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">OT systems are newer than IT systems</button>
+                    <button class="quiz-button" onclick="showQuizResult('correct')">OT systems control physical processes while IT systems manage information</button>
+                    <button class="quiz-button" onclick="showQuizResult('incorrect')">OT systems are more secure than IT systems</button>
+                    <div id="quiz-result-ot" style="margin-top: 15px; display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-quiz">
+            <h4>🎯 Final Assessment</h4>
+            <p>Ready to test your overall understanding of IT/OT convergence?</p>
+            <button class="quiz-button" onclick="startFinalQuiz()">Take the Complete Assessment</button>
+            <div id="final-quiz-result" style="margin-top: 15px; display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let sectionsOpened = 0;
+        const totalSections = 4; // objectives + 3 main sections
+
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const chevron = document.getElementById(sectionId + '-chevron');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                chevron.textContent = '▼';
+                sectionsOpened--;
+            } else {
+                content.classList.add('active');
+                chevron.textContent = '▲';
+                sectionsOpened++;
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = (sectionsOpened / totalSections) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showQuizResult(result) {
+            const resultDiv = document.getElementById('quiz-result');
+            if (result === 'correct') {
+                resultDiv.innerHTML = '<div style="color: white; font-weight: bold;">✅ Correct! Industry 4.0 focuses on connecting machines and systems to create intelligent, automated processes.</div>';
+                resultDiv.style.display = 'block';
+            } else {
+                resultDiv.innerHTML = '<div style="color: #ffcccc; font-weight: bold;">❌ Not quite right. Try again and think about the core concept of Industry 4.0.</div>';
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        function startFinalQuiz() {
+            const questions = [
+                {
+                    question: "Which principle is most important in OT systems?",
+                    options: ["Data encryption", "Real-time performance and safety", "User interface design"],
+                    correct: 1
+                },
+                {
+                    question: "What does the CIA Triad represent in IT systems?",
+                    options: ["Central Intelligence Agency standards", "Confidentiality, Integrity, Availability", "Computer, Internet, Application"],
+                    correct: 1
+                },
+                {
+                    question: "Which protocol is commonly used in OT systems?",
+                    options: ["HTTP", "Modbus", "SMTP"],
+                    correct: 1
+                }
+            ];
+
+            let currentQuestion = 0;
+            let score = 0;
+            const resultDiv = document.getElementById('final-quiz-result');
+            
+            function showQuestion() {
+                if (currentQuestion < questions.length) {
+                    const q = questions[currentQuestion];
+                    let html = `<div style="background: white; color: black; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                        <h4>${q.question}</h4>`;
+                    
+                    for (let i = 0; i < q.options.length; i++) {
+                        html += `<button class="quiz-button" onclick="checkAnswer(${i}, ${q.correct})">${q.options[i]}</button>`;
+                    }
+                    html += '</div>';
+                    resultDiv.innerHTML = html;
+                    resultDiv.style.display = 'block';
+                } else {
+                    const percentage = Math.round((score / questions.length) * 100);
+                    let message = '';
+                    if (percentage >= 80) {
+                        message = '🎉 Excellent! You have a strong understanding of IT/OT convergence concepts.';
+                    } else if (percentage >= 60) {
+                        message = '✅ Good job! Review the sections where you had questions for deeper understanding.';
+                    } else {
+                        message = '📚 Keep studying! Go back through the sections and focus on the key concepts.';
+                    }
+                    
+                    resultDiv.innerHTML = `<div style="background: white; color: black; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                        <h4>Quiz Complete!</h4>
+                        <p>Your score: ${score}/${questions.length} (${percentage}%)</p>
+                        <p>${message}</p>
+                        <button class="quiz-button" onclick="startFinalQuiz()">Retake Quiz</button>
+                    </div>`;
+                }
+            }
+
+            window.checkAnswer = function(selected, correct) {
+                if (selected === correct) {
+                    score++;
+                    resultDiv.innerHTML += '<div style="color: green; font-weight: bold; margin-top: 10px;">✅ Correct!</div>';
+                } else {
+                    resultDiv.innerHTML += '<div style="color: red; font-weight: bold; margin-top: 10px;">❌ Incorrect</div>';
+                }
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    showQuestion();
+                }, 1500);
+            };
+
+            showQuestion();
+        }
+
+        // Auto-open objectives section on load
+        window.onload = function() {
+            toggleSection('objectives');
+        };
+    </script>
+</body>
+</html>
