@@ -1,291 +1,1304 @@
-IT/OT Convergence Cybersecurity Faculty Development Workshop
-Executive Summary
-This comprehensive faculty development workshop addresses the critical and rapidly evolving field of IT/OT (Information Technology/Operational Technology) convergence in cybersecurity. As digital transformation accelerates across industries, the integration of traditional IT systems with operational technology creates both opportunities and significant security challenges. This workshop equips faculty with the knowledge, practical skills, and teaching materials needed to educate the next generation of cybersecurity professionals.
-Workshop Overview
-Duration: (2 days)
-Format: Online - Interactive, hands-on learning with theory and practical applications
-Target Audience: Community College faculty teaching cybersecurity, networking, or industrial technology courses
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT/OT Convergence Cybersecurity Workshop - Interactive Outline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-Workshop Learning Outcomes
-By the end of this workshop, participants will be able to:
-1.	Define and Differentiate: Clearly articulate the differences between IT and OT systems and explain the significance of their convergence
-2.	Analyze Threats: Identify and assess cybersecurity risks specific to IT/OT converged environments
-3.	Apply Security Frameworks: Implement appropriate security controls and best practices for IT/OT environments
-4.	Design Practical Exercises: Create hands-on learning experiences using Cisco Packet Tracer for IT/OT scenarios
-5.	Teach Industry Cases: Effectively present real-world case studies from manufacturing, wastewater treatment, and logistics sectors
-6.	Develop Curriculum: Design course modules that integrate IT/OT convergence topics into existing cybersecurity curricula
- 
- 
-Part 1 - Understanding IT/OT Convergence
-Introduction to IT/OT Convergence
-Understanding the need and drivers for integrating IT and OT environments.
-Differences Between IT and OT
-Exploring the unique characteristics, priorities, and challenges of each domain.
-Smart Manufacturing & Industry 4.0
-The impact of digital transformation and automation on industrial operations.
-Defining Information Technology (IT)
-•	Principals - confidentiality, integrity, availability (CIA triad)
-•	Media
-•	Communication Protocols: TCP/IP, HTTP/HTTPS, DNS, DHCP
-•	Network and Devices Addressing
-•	Communication Technologies
-•	Communication Devices: servers, workstations, databases, business applications
-•	Network Services Services
-Defining Operational Technology (OT)
-•	Physical process control and monitoring systems
-•	Principles - focus on safety, reliability, and uptime
-•	Industrial protocols: Modbus, DNP3, IEC 61850, OPC-UA
-•	Typical components: SCADA, PLCs, HMIs, DCS, industrial sensors
-•	Management focus: operational continuity, safety, real-time response
-The Convergence Imperative
-•	Digital transformation drivers: efficiency, data analytics, remote monitoring
-•	Industry 4.0 and IIoT (Industrial Internet of Things) adoption
-•	Business benefits: predictive maintenance, supply chain optimization, energy efficiency
-•	Economic impact: $4 trillion projected digital transformation spending by 2027
-Cybersecurity Implications
-•	Expanded attack surface from previously air-gapped systems
-•	Skills gap between IT and OT security teams
-•	Regulatory compliance challenges
-•	Risk of cascading failures across interconnected systems
- 
-Part 2 – Information Technology (IT) Devices, Media, Addresses, Protocols, and Technologies
-When addressing the IT side of IT/OT convergence, it’s essential to include a comprehensive range of devices, technologies and services that form the backbone of modern information technology environments. Below is a structured overview:
-1. Core IT Devices
-•	Servers
-Centralized systems for data processing, hosting applications, and managing network resources.
-•	Desktops and Laptops
-End-user computing devices for daily business operations.
-•	Tablets and Smartphones
-Mobile devices for communication, remote access, and productivity.
-•	Workstations
-High-performance computers for specialized tasks such as design, engineering, or analytics.
-•	Thin Clients
-Lightweight terminals that connect to centralized servers for processing.
-2. Networking Devices and Technologies
-•	Cabling and Communication Media
-Ethernet, Bluetooth, WIFI, 802.11, ZigbeeNet
-•	Addressing
-MAC, IP, IPv6, TCP Ports
-•	Routers
-Direct data traffic between networks and manage internet connectivity.
-•	Switches
-Connect multiple devices within a local network for efficient data transfer.
-•	Firewalls
-Protect networks by controlling incoming and outgoing traffic based on security rules.
-•	Access Points
-Provide wireless connectivity for devices within a network.
-•	Network Interface Cards (NICs)
-Hardware that connects computers to networks.
-3. Core Network Services
-•	Dynamic Host Configuration Protocol (DHCP)
-•	Automatically assigns IP addresses to devices, simplifying network management and reducing configuration errors1.
-•	Domain Name System (DNS)
-•	Translates human-readable domain names into IP addresses, enabling seamless access to network resources1.
-•	Network Time Protocol (NTP)
-•	Synchronizes clocks across network devices, which is vital for accurate logging, troubleshooting, and security event correlation1.
-•	Simple Network Management Protocol (SNMP)
-•	Monitors and manages network devices, providing visibility into network health and performance.
-•	File Transfer Protocol (FTP)/Secure FTP (SFTP)
-•	Facilitates secure file transfers between devices and systems.
-•	Hypertext Transfer Protocol (HTTP/HTTPS)
-•	Enables web-based access to device interfaces, dashboards, and management tools.
-4. Security and Access Services
-•	IEEE 802.1X (Network Access Control)
-•	Provides authentication for devices and users before granting network access, enhancing security1.
-•	Virtual Private Network (VPN) Services
-•	Secures remote access to OT and IT networks, supporting safe remote operations and maintenance.
-•	Firewalls and Access Control Lists (ACLs)
-•	Control and filter network traffic to protect critical assets and segment IT/OT environments.
-•	Intrusion Detection/Prevention Systems (IDS/IPS)
-•	Monitor network traffic for suspicious activity and help prevent cyber threats.
-5. Device and Network Discovery
-•	Cisco Discovery Protocol (CDP) and Link Layer Discovery Protocol (LLDP)
-•	Identify and map network-connected devices, aiding in network management and troubleshooting1.
-•	Network Telemetry (e.g., NetFlow)
-•	Collects and analyzes network traffic data for performance monitoring and security analysis2.
-6. Industrial and Operational Services
-•	Supervisory Control and Data Acquisition (SCADA) Protocols
-•	Enable communication between control systems and field devices in OT environments.
-•	Manufacturing Execution System (MES) Integration
-•	Connects production data with enterprise systems for real-time monitoring and optimization3.
-•	Remote Monitoring and Management
-•	Allows proactive oversight of network health and rapid response to issues3.
-7.	Additional Services
-•	Email and Messaging Services
-•	Support communication and alerting within enterprise and industrial networks3.
-•	Patch Management and Update Services
-•	Ensure systems are up-to-date and protected against vulnerabilities3.
-•	Backup and Disaster Recovery Services
-•	Protect critical data and ensure business continuity in case of failures.
-8. Storage Technologies
-•	Hard Disk Drives (HDDs) & Solid State Drives (SSDs)
-Primary storage for operating systems, applications, and data.
-•	Network Attached Storage (NAS) & Storage Area Networks (SAN)
-Centralized storage solutions for enterprise environments.
-•	Cloud Storage
-Off-premises, scalable storage solutions provided via the internet.
-•	External Drives
-Portable storage for backup and data transfer.
-9. Security Devices and Technologies
-•	Intrusion Detection/Prevention Systems (IDS/IPS)
-Monitor and protect networks from malicious activities.
-•	Unified Threat Management (UTM) Appliances
-All-in-one security solutions combining firewall, antivirus, and other protections.
-•	Antivirus/Antimalware Software
-Protect endpoints from viruses and malicious software.
-•	Encryption Technologies
-Secure data at rest and in transit.
-•	Identity and Access Management (IAM)
-Control user access to systems and data.
-10. Peripheral Devices
-•	Printers and Scanners
-For document management and digitization.
-•	Webcams and Microphones
-Enable video conferencing and communication.
-•	Monitors and Projectors
-Display information for users and presentations.
-•	Docking Stations
-Expand connectivity for laptops and tablets.
-11. Enterprise Software and Platforms
-•	Operating Systems
-Windows, Linux, macOS for desktops and servers,
-•	Virtualization Platforms
-Enable multiple virtual machines on a single physical server (e.g., VMware, Hyper-V) 
-•	Enterprise Resource Planning (ERP) Systems
-Integrate business processes across departments,
-•	Customer Relationship Management (CRM) Systems
-Manage customer data and interactions.
-•	Business Intelligence (BI) and Analytics Tools
-Analyze and visualize data for decision-making.
-•	Project Management and Collaboration Tools
-Facilitate teamwork and workflow management.
-12. Emerging and Advanced IT Technologies
-•	Cloud Computing
-Infrastructure as a Service (IaaS), Platform as a Service (PaaS), Software as a Service (SaaS). 
-•	Artificial Intelligence (AI) and Machine Learning (ML)
-For automation, analytics, and predictive insights.
-•	Big Data Analytics
-Tools and platforms for processing and analyzing large datasets.
-•	Edge Computing
-Processing data closer to the source for faster response times.
-•	Blockchain
-For secure, transparent transactions and data integrity.
-•	5G, 6G and Advanced Networking
-High-speed, low-latency connectivity for modern applications.
- IT Service Management (ITSM) Tools
-•	Incident, Change, and Problem Management Platforms
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #1a1a1a;
+        }
 
- 
-Part 3 - OT Technologies, Devices, Protocols Services and Processes
-Industrial Internet of Things (IIoT)
-Common IIoT Device Categories
-•	Smart Sensors
-•	Temperature sensors
-•	Humidity sensors
-•	Vibration sensors
-•	Pressure sensors
-•	Proximity sensors
-•	Gas sensors
-•	Air quality sensors
-•	Chemical sensors
-•	Flood detection sensors
-•	Fire detection sensors
-Actuators - Devices that convert digital signals into physical actions (e.g., opening valves, adjusting pressure, rotating shafts)
-•	RFID Trackers - Used for asset tracking, inventory management, and quality control
-•	Edge Devices - Local computing units that process data near the source before sending it to the cloud, enabling real-time decision-making
-•	Industrial Gateways - Protocol translators and security buffers that connect legacy systems to modern IIoT networks
-•	Programmable Logic Controllers (PLCs) - Embedded control systems for automating machinery and processes
-•	Human-Machine Interfaces (HMIs) - Visual dashboards for operators to monitor and control equipment, sometimes with AR or voice integration
-•	Condition Monitoring Systems - Integrated systems using sensors to track equipment health and flag issues
-•	Asset Tracking & RTLS (Real-Time Location Systems)
-•	Monitor the location and status of tools, materials, and vehicles within facilities and across supply chains
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-Industrial Control Systems (ICS) Basics
-•	Analog to digital conversion
-•	Counters
-•	Measurements
-•	Controls
-•	PLCs
-•	Overview of ICS, SCADA, and their roles in OT.
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #1e3a20 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(44, 85, 48, 0.3);
+        }
 
-Cyber-Physical Systems
-Understanding the intersection of physical processes and digital control.
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
 
-Cybersecurity for IT/OT Environments
-Addressing unique security challenges in converged environments.
+        .header p {
+            font-size: 1.1rem;
+            text-align: center;
+            opacity: 0.9;
+        }
 
-Data Collection and Analytics
-Leveraging OT data for business intelligence and operational insight.
+        .progress-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #2c5530;
+        }
 
-Convergence
-Process Convergence
-Aligning workflows and business processes across IT and OT.
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
 
-Software and Data Convergence
-Integrating software platforms and data flows between IT and OT.
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2c5530 0%, #4a7c59 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
 
-Physical Convergence
-Retrofitting and upgrading hardware for IT/OT compatibility.
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            color: #2c5530;
+        }
 
- 
+        .navigation {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
 
-Part 4 - Current Threat Landscape 
-Threat Actor Landscape
-•	Nation-state actors: Russia, China, Iran, North Korea
-•	Cybercriminal groups: ransomware-as-a-service operators
-•	Hacktivists: targeting critical infrastructure for political messaging
-•	Insider threats: privileged access abuse, negligent actions
-Common Attack Vectors
-•	IT network breaches leading to OT compromise (48% of OT incidents)
-•	Phishing attacks targeting OT personnel
-•	Supply chain compromises affecting industrial equipment
-•	Remote access vulnerabilities in converged environments
-•	Legacy system exploitation due to unpatched vulnerabilities
-Real-World Impact Statistics
-•	80% of manufacturing firms experienced increased security incidents in 2024
-•	$70 million cost from Norsk Hydro ransomware attack (2019)
-•	93% of firms globally affected by cybersecurity incidents at planning level
-•	Water treatment facility attacks affecting public health and safety
- 
-Part 5 – Cybersecurity Control in IT/OT Converged Environments
-KPMG IT/OT Cybersecurity Convergence Framework
-This framework, based on leading standards (NIST SP 800-82, IEC 62443, ISO 27001, NERC CIP, etc.), defines nine key security domains for IT/OT convergence3:
-•	Leadership & Governance: Risk management ownership and governance mechanisms
-•	Security Operations: Proactive identification and prevention of cyber threats
-•	Information Risk Management: Assessment and monitoring of information risks
-•	Security Architecture: Secure design of information systems
-•	Human Factors: Security culture, skills, and awareness
-•	Technical Security: Implementation of technical controls to mitigate risks
-•	Third Parties: Managing supplier and third-party risks
-•	Compliance: Demonstrating adherence to regulatory and certification standards
-•	Resilience: Ensuring the ability to defend and recover from cyberattacks
-These domains are tailored to the realities of IT/OT integration, emphasizing both technical and organizational controls.
-IEC 62443 and NIST SP 800-82
-•	IEC 62443: Focuses on industrial automation and control systems, with domains covering policies, procedures, technical requirements, and lifecycle management.
-•	NIST SP 800-82: Provides guidance for securing industrial control systems, mapping controls to similar domains as NIST SP 800-171 but with OT-specific considerations.
-Part 6 - Governance, Risk Management and Compliance
-Governance and Compliance
-Navigating regulatory requirements and industry standards (e.g., ISA-95, NERC CIP). 
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
 
-Roles and Responsibilities
-Defining clear roles for IT and OT teams in a converged environment.
+        .nav-btn {
+            background: #2c5530;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-Asset Inventory and Management
-Maintaining visibility and control over IT and OT assets.
+        .nav-btn:hover {
+            background: #4a7c59;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 85, 48, 0.3);
+        }
 
-Collaboration and Communication
-Building trust and effective communication between IT and OT personnel.
+        .workshop-part {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-left: 6px solid #2c5530;
+            transition: all 0.3s ease;
+        }
 
-Change Management
-Managing organizational change during IT/OT integration.
+        .workshop-part:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
 
-Incident Response and Recovery
-Developing joint playbooks for cyber incident response.
+        .part-header {
+            background: linear-gradient(135deg, #2c5530 0%, #1e3a20 100%);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
 
-Vulnerability Assessment
-Identifying and addressing vulnerabilities in converged systems864.
+        .part-header:hover {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+        }
 
-Threat Detection and Monitoring
-Implementing tools and processes for real-time threat monitoring64.
- 
+        .part-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
 
+        .part-duration {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .part-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .part-content.active {
+            max-height: 2000px;
+            padding: 30px;
+        }
+
+        .learning-objectives {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2c5530;
+        }
+
+        .objectives-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .objectives-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 10px;
+        }
+
+        .objectives-list {
+            display: none;
+        }
+
+        .objectives-list.show {
+            display: block;
+        }
+
+        .objective-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .objective-item:hover {
+            background: #f0f8f0;
+            transform: translateX(5px);
+        }
+
+        .objective-checkbox {
+            margin-right: 12px;
+            margin-top: 3px;
+            cursor: pointer;
+            accent-color: #2c5530;
+        }
+
+        .objective-text {
+            flex: 1;
+            color: #1a1a1a;
+        }
+
+        .section-content {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #2c5530;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .subsection {
+            margin-bottom: 20px;
+        }
+
+        .subsection h4 {
+            color: #1e3a20;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .subsection ul {
+            padding-left: 20px;
+        }
+
+        .subsection li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .activity-box {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #2c5530;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 8px;
+        }
+
+        .summary-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid #2c5530;
+        }
+
+        .completion-tracker {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .completion-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c5530;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .print-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .print-btn:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .part-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .completion-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media print {
+            .navigation, .completion-tracker, .print-btn {
+                display: none;
+            }
+            
+            .part-content {
+                max-height: none !important;
+                padding: 20px !important;
+            }
+            
+            .workshop-part {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>IT/OT Convergence Cybersecurity Workshop</h1>
+            <p>Enhanced Professional Development Program - Interactive Outline</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Workshop Progress: 0% Complete</div>
+        </div>
+
+        <div class="completion-tracker">
+            <h3>Learning Progress</h3>
+            <div class="completion-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="completedObjectives">0</div>
+                    <div class="stat-label">Objectives Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalObjectives">36</div>
+                    <div class="stat-label">Total Objectives</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="partsCompleted">0</div>
+                    <div class="stat-label">Parts Completed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <div class="nav-buttons">
+                <a href="#part1" class="nav-btn">Part 1: Foundations</a>
+                <a href="#part2" class="nav-btn">Part 2: IT Infrastructure</a>
+                <a href="#part3" class="nav-btn">Part 3: OT Deep Dive</a>
+                <a href="#part4" class="nav-btn">Part 4: Threat Landscape</a>
+                <a href="#part5" class="nav-btn">Part 5: Security Frameworks</a>
+                <a href="#part6" class="nav-btn">Part 6: Governance</a>
+                <button onclick="window.print()" class="print-btn">Print Outline</button>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <h2>Workshop Overview</h2>
+            <p><strong>Duration:</strong> 2 Days (16 contact hours)</p>
+            <p><strong>Format:</strong> Hybrid Online/Hands-on Learning</p>
+            <p><strong>Target Audience:</strong> Community college faculty teaching cybersecurity, networking, industrial technology, or related courses</p>
+            
+            <h3 style="margin-top: 20px;">Enhanced Learning Outcomes</h3>
+            <p>Upon successful completion of this workshop, participants will be able to analyze and differentiate IT/OT systems, evaluate threat landscapes, apply security frameworks, design practical learning experiences, teach current industry practice, develop integrated curriculum, and assess student learning effectively.</p>
+        </div>
+
+        <!-- Part 1 -->
+        <div class="workshop-part" id="part1">
+            <div class="part-header" onclick="togglePart('part1')">
+                <div>
+                    <div class="part-title">Part 1: Foundations of IT/OT Convergence</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 1 Morning</div>
+                </div>
+                <div class="part-duration">4 hours</div>
+                <div class="toggle-icon" id="icon-part1">▼</div>
+            </div>
+            <div class="part-content" id="content-part1">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives1')">
+                        <div class="objectives-title">Learning Objectives for Part 1 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives1">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Define</strong> IT and OT systems with precise technical terminology and explain their historical development paths</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Compare and contrast</strong> the fundamental principles, priorities, and operational constraints of IT versus OT environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Analyze</strong> the business drivers and economic factors compelling organizations toward IT/OT convergence</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Evaluate</strong> the benefits and challenges of convergence from both technical and organizational perspectives</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Identify</strong> key components and technologies within each domain and their integration points</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Create</strong> visual representations of IT/OT system architectures for use in student instruction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">1.1 Understanding the Convergence Imperative</div>
+                    <div class="subsection">
+                        <h4>Digital Transformation Drivers</h4>
+                        <ul>
+                            <li>Industry 4.0 and Industrial Internet of Things (IIoT) adoption</li>
+                            <li>Improved efficiency and productivity through predictive maintenance, real-time analytics, and optimized operations</li>
+                            <li>Economic impact: Enhanced competitiveness and operational resilience</li>
+                            <li>Remote monitoring and data-driven decision making</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Business Benefits and Challenges</h4>
+                        <ul>
+                            <li>Cost reduction through unified systems, streamlined processes, and lower operational costs</li>
+                            <li>Enhanced regulatory compliance and audit capabilities</li>
+                            <li>Innovation opportunities and competitive advantages</li>
+                            <li>Cultural and operational integration challenges</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">1.2 Defining Information Technology (IT) Systems</div>
+                    <div class="subsection">
+                        <h4>Core Principles and Architecture</h4>
+                        <ul>
+                            <li>CIA Triad: Confidentiality, Integrity, Availability</li>
+                            <li>Network-centric design and connectivity paradigms</li>
+                            <li>Standardized communication protocols and interfaces</li>
+                            <li>Scalability and flexibility considerations</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Key Components and Technologies</h4>
+                        <ul>
+                            <li>Computing devices: servers, workstations, mobile devices</li>
+                            <li>Network infrastructure: routers, switches, firewalls, wireless access points</li>
+                            <li>Communication protocols: TCP/IP stack, HTTP/HTTPS, DNS, DHCP</li>
+                            <li>Enterprise applications and cloud services</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">1.3 Defining Operational Technology (OT) Systems</div>
+                    <div class="subsection">
+                        <h4>Core Principles and Architecture</h4>
+                        <ul>
+                            <li>Safety, reliability, and uptime as primary concerns</li>
+                            <li>Real-time performance requirements and deterministic behavior</li>
+                            <li>Physical process control and monitoring focus</li>
+                            <li>Legacy system considerations and long lifecycle management</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Industrial Control Systems (ICS) Components</h4>
+                        <ul>
+                            <li>Programmable Logic Controllers (PLCs) and Distributed Control Systems (DCS)</li>
+                            <li>Supervisory Control and Data Acquisition (SCADA) systems</li>
+                            <li>Human-Machine Interfaces (HMIs) and operator workstations</li>
+                            <li>Field devices: sensors, actuators, and smart instruments</li>
+                            <li>Industrial protocols: Modbus, DNP3, IEC 61850, OPC-UA, Profibus</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">1.4 The Convergence Reality</div>
+                    <div class="subsection">
+                        <h4>Current State Assessment</h4>
+                        <ul>
+                            <li>Historical "air-gapped" OT networks versus modern connectivity requirements</li>
+                            <li>Three accepted approaches: separate networks, unified networks, and hybrid architectures</li>
+                            <li>Integration challenges and technical hurdles</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Hands-on Activity:</div>
+                    Network Topology Analysis Exercise using Cisco Packet Tracer
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2 -->
+        <div class="workshop-part" id="part2">
+            <div class="part-header" onclick="togglePart('part2')">
+                <div>
+                    <div class="part-title">Part 2: Modern IT Infrastructure in Converged Environments</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 1 Afternoon</div>
+                </div>
+                <div class="part-duration">4 hours</div>
+                <div class="toggle-icon" id="icon-part2">▼</div>
+            </div>
+            <div class="part-content" id="content-part2">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives2')">
+                        <div class="objectives-title">Learning Objectives for Part 2 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives2">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Categorize</strong> modern IT infrastructure components and their roles in supporting OT integration</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Configure</strong> essential network services (DHCP, DNS, NTP) in simulation environments for teaching purposes</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Design</strong> network architectures that accommodate both IT and OT requirements and constraints</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Apply</strong> security services and access control mechanisms appropriate for converged environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Demonstrate</strong> hands-on configuration of IT services using industry-standard tools and simulators</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Develop</strong> lab exercises that illustrate IT infrastructure concepts for student learning</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">2.1 Core IT Infrastructure Components</div>
+                    <div class="subsection">
+                        <h4>Computing and Processing Systems</h4>
+                        <ul>
+                            <li>Servers: physical, virtual, and cloud-based architectures</li>
+                            <li>Edge computing devices for distributed processing</li>
+                            <li>Workstations and endpoint devices</li>
+                            <li>Mobile and tablet integration strategies</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Network Infrastructure and Services</h4>
+                        <ul>
+                            <li>Network devices: enterprise switches, routers, and security appliances</li>
+                            <li>Wireless technologies: 802.11 standards, 5G/6G integration</li>
+                            <li>Communication media: fiber optic, copper, and wireless transmission</li>
+                            <li>Network addressing: IPv4, IPv6, and port management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">2.2 Essential Network Services for IT/OT Integration</div>
+                    <div class="subsection">
+                        <h4>Core Infrastructure Services</h4>
+                        <ul>
+                            <li>Dynamic Host Configuration Protocol (DHCP) for automated addressing</li>
+                            <li>Domain Name System (DNS) for name resolution</li>
+                            <li>Network Time Protocol (NTP) for synchronization</li>
+                            <li>Simple Network Management Protocol (SNMP) for monitoring</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Security and Access Services</h4>
+                        <ul>
+                            <li>IEEE 802.1X for network access control</li>
+                            <li>Virtual Private Network (VPN) services for secure remote access</li>
+                            <li>Intrusion Detection/Prevention Systems (IDS/IPS)</li>
+                            <li>Network segmentation and micro-segmentation strategies</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">2.3 Enterprise Software and Emerging Technologies</div>
+                    <div class="subsection">
+                        <h4>Business Applications</h4>
+                        <ul>
+                            <li>Enterprise Resource Planning (ERP) systems</li>
+                            <li>Manufacturing Execution Systems (MES)</li>
+                            <li>Customer Relationship Management (CRM) platforms</li>
+                            <li>Business Intelligence (BI) and analytics tools</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Emerging Technology Integration</h4>
+                        <ul>
+                            <li>Artificial Intelligence (AI) and Machine Learning (ML) applications</li>
+                            <li>Cloud computing: IaaS, PaaS, and SaaS models</li>
+                            <li>Big data analytics and data lakes</li>
+                            <li>Blockchain for supply chain and data integrity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Hands-on Activity:</div>
+                    Configure IT services in a simulated environment
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 3 -->
+        <div class="workshop-part" id="part3">
+            <div class="part-header" onclick="togglePart('part3')">
+                <div>
+                    <div class="part-title">Part 3: Operational Technology Deep Dive</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Morning</div>
+                </div>
+                <div class="part-duration">4 hours</div>
+                <div class="toggle-icon" id="icon-part3">▼</div>
+            </div>
+            <div class="part-content" id="content-part3">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives3')">
+                        <div class="objectives-title">Learning Objectives for Part 3 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives3">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Identify</strong> and classify IIoT devices, sensors, and their specific industrial applications</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Explain</strong> the function and operation of industrial control systems including PLCs, SCADA, and DCS</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Differentiate</strong> between various industrial communication protocols and their security implications</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Simulate</strong> OT device configurations and protocol communications using appropriate tools</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Assess</strong> the unique operational requirements and constraints of OT systems in real-time environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Create</strong> practical exercises that demonstrate OT concepts and hands-on skills for students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">3.1 Industrial Internet of Things (IIoT) Ecosystem</div>
+                    <div class="subsection">
+                        <h4>Smart Sensor Technologies</h4>
+                        <ul>
+                            <li>Environmental monitoring: temperature, humidity, pressure, chemical detection</li>
+                            <li>Equipment monitoring: vibration, proximity, flow, and position sensors</li>
+                            <li>Safety systems: fire detection, gas detection, and flood monitoring</li>
+                            <li>Advanced sensor technologies: wireless, battery-powered, and self-diagnosing</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Control and Automation Devices</h4>
+                        <ul>
+                            <li>Actuators and control elements</li>
+                            <li>RFID and asset tracking systems</li>
+                            <li>Edge computing gateways and protocol converters</li>
+                            <li>Industrial communication interfaces</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">3.2 Industrial Control Systems Architecture</div>
+                    <div class="subsection">
+                        <h4>Control System Fundamentals</h4>
+                        <ul>
+                            <li>Analog-to-digital conversion and signal processing</li>
+                            <li>Real-time control loops and feedback systems</li>
+                            <li>Safety Instrumented Systems (SIS) and fail-safe design</li>
+                            <li>Redundancy and fault tolerance mechanisms</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Modern Control Platforms</h4>
+                        <ul>
+                            <li>Advanced PLCs with embedded security features</li>
+                            <li>Distributed Control Systems (DCS) with cybersecurity capabilities</li>
+                            <li>SCADA systems and centralized monitoring</li>
+                            <li>Cyber-physical systems integration</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">3.3 OT Communication Protocols and Standards</div>
+                    <div class="subsection">
+                        <h4>Traditional Industrial Protocols</h4>
+                        <ul>
+                            <li>Modbus RTU/TCP for device communication</li>
+                            <li>DNP3 for utility and SCADA applications</li>
+                            <li>Profibus and Profinet for manufacturing automation</li>
+                            <li>IEC 61850 for electrical substation automation</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Modern Secure Protocols</h4>
+                        <ul>
+                            <li>OPC-UA with security extensions</li>
+                            <li>Ethernet/IP with CIP Security</li>
+                            <li>Secure communication standards and encryption</li>
+                            <li>Protocol gateway and translation services</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Hands-on Activity:</div>
+                    Configure OT devices and protocols in simulation environment
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 4 -->
+        <div class="workshop-part" id="part4">
+            <div class="part-header" onclick="togglePart('part4')">
+                <div>
+                    <div class="part-title">Part 4: Current Threat Landscape and Attack Vectors</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
+                </div>
+                <div class="part-duration">2 hours</div>
+                <div class="toggle-icon" id="icon-part4">▼</div>
+            </div>
+            <div class="part-content" id="content-part4">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives4')">
+                        <div class="objectives-title">Learning Objectives for Part 4 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives4">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Analyze</strong> current threat actors, their motivations, and attack methodologies targeting IT/OT environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Evaluate</strong> real-world attack vectors and their potential impact on industrial operations and critical infrastructure</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Examine</strong> case studies of actual IT/OT security incidents and extract relevant lessons learned</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Assess</strong> vulnerability patterns and risk factors specific to converged environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Apply</strong> threat modeling techniques to hypothetical IT/OT scenarios</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Design</strong> case study-based learning activities that engage students in threat analysis</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">4.1 Contemporary Threat Actor Analysis</div>
+                    <div class="subsection">
+                        <h4>Nation-State Actors</h4>
+                        <ul>
+                            <li>Advanced Persistent Threats (APTs) targeting critical infrastructure</li>
+                            <li>Recent examples including Stuxnet and German steel mill attacks</li>
+                            <li>Geopolitical motivations and strategic objectives</li>
+                            <li>Attribution challenges and intelligence sharing</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Cybercriminal Organizations</h4>
+                        <ul>
+                            <li>Ransomware-as-a-Service (RaaS) operators</li>
+                            <li>Double and triple extortion tactics</li>
+                            <li>Supply chain attack methodologies</li>
+                            <li>Financial motivation and business disruption goals</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Insider Threats and Human Factors</h4>
+                        <ul>
+                            <li>Privileged access abuse scenarios</li>
+                            <li>Unintentional security violations</li>
+                            <li>Social engineering and phishing campaigns</li>
+                            <li>Contractor and third-party risks</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">4.2 Attack Vectors and Current Statistics</div>
+                    <div class="subsection">
+                        <h4>Primary Attack Pathways</h4>
+                        <ul>
+                            <li>IT network breaches leading to OT compromise (48% of OT incidents)</li>
+                            <li>Phishing attacks targeting OT personnel</li>
+                            <li>Supply chain compromises affecting industrial equipment</li>
+                            <li>Remote access vulnerabilities in converged environments</li>
+                            <li>Legacy system exploitation due to unpatched vulnerabilities</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Real-World Impact Assessment</h4>
+                        <ul>
+                            <li>Manufacturing companies integrating IT and OT systems experiencing enhanced production efficiency but introducing vulnerabilities</li>
+                            <li>Water treatment facility attacks affecting public health</li>
+                            <li>Energy sector disruptions and grid stability concerns</li>
+                            <li>Transportation system vulnerabilities and cascading effects</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">4.3 Case Study Analysis</div>
+                    <div class="subsection">
+                        <h4>Manufacturing Sector Incidents</h4>
+                        <ul>
+                            <li>Production line disruptions and economic impact</li>
+                            <li>Quality control system compromises</li>
+                            <li>Intellectual property theft scenarios</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Critical Infrastructure Events</h4>
+                        <ul>
+                            <li>Water treatment facility security breaches</li>
+                            <li>Electrical grid and energy distribution attacks</li>
+                            <li>Transportation system vulnerabilities</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Interactive Activity:</div>
+                    Threat modeling exercise using real case studies
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 5 -->
+        <div class="workshop-part" id="part5">
+            <div class="part-header" onclick="togglePart('part5')">
+                <div>
+                    <div class="part-title">Part 5: Security Frameworks and Controls Implementation</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
+                </div>
+                <div class="part-duration">2 hours</div>
+                <div class="toggle-icon" id="icon-part5">▼</div>
+            </div>
+            <div class="part-content" id="content-part5">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives5')">
+                        <div class="objectives-title">Learning Objectives for Part 5 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives5">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Compare</strong> major security frameworks (IEC 62443, NIST SP 800-82, NIST CSF) and their applicability to IT/OT environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Apply</strong> framework requirements to specific IT/OT convergence scenarios and use cases</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Design</strong> security architectures incorporating Zero Trust principles and defense-in-depth strategies</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Implement</strong> risk assessment methodologies appropriate for converged industrial environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Map</strong> security controls across different frameworks to avoid duplication and ensure comprehensive coverage</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Develop</strong> framework-based curriculum modules and assessment rubrics for student evaluation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">5.1 Industry-Standard Security Frameworks</div>
+                    <div class="subsection">
+                        <h4>IEC 62443 Comprehensive Framework</h4>
+                        <ul>
+                            <li>Four families of standards: General, Policies and Procedures, System, and Component standards</li>
+                            <li>Seven Foundational Requirements (FRs) with detailed Requirement Enhancements (REs)</li>
+                            <li>Zone and conduit model for network segmentation</li>
+                            <li>Security levels and risk assessment methodologies</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>NIST Special Publication 800-82</h4>
+                        <ul>
+                            <li>OT-specific guidance for industrial control systems security</li>
+                            <li>Integration with NIST Cybersecurity Framework</li>
+                            <li>OT overlay for NIST SP 800-53 Revision 5 security controls providing tailored security control baselines</li>
+                            <li>Performance, reliability, and safety considerations</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>NIST Cybersecurity Framework (CSF) 2.0</h4>
+                        <ul>
+                            <li>Five core functions: Identify, Protect, Detect, Respond, and Recover</li>
+                            <li>Framework profiles and implementation tiers for organizational maturity assessment</li>
+                            <li>Integration with industry-specific requirements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">5.2 Integrated Security Architecture Design</div>
+                    <div class="subsection">
+                        <h4>Zero Trust Implementation</h4>
+                        <ul>
+                            <li>Zero Trust architecture essential to reduce vulnerabilities, ensuring both IT and OT environments are monitored and segmented</li>
+                            <li>Micro-segmentation strategies for OT networks</li>
+                            <li>Identity and access management (IAM) for converged environments</li>
+                            <li>Continuous verification and monitoring principles</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Defense in Depth Strategies</h4>
+                        <ul>
+                            <li>Layered defense principles for industrial environments</li>
+                            <li>Network segmentation and DMZ implementation</li>
+                            <li>Endpoint protection and device hardening</li>
+                            <li>Security monitoring and incident detection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">5.3 Risk Management and Compliance</div>
+                    <div class="subsection">
+                        <h4>Risk Assessment Methodologies</h4>
+                        <ul>
+                            <li>ISO 31000 risk management principles adapted for IT/OT environments</li>
+                            <li>Asset inventory and criticality assessment</li>
+                            <li>Vulnerability identification and prioritization</li>
+                            <li>Business impact analysis for operational disruptions</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Regulatory Compliance Considerations</h4>
+                        <ul>
+                            <li>GDPR, NERC CIP, and regional regulatory frameworks</li>
+                            <li>NIS2 compliance using existing cybersecurity frameworks</li>
+                            <li>Audit preparation and documentation requirements</li>
+                            <li>Continuous compliance monitoring strategies</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Hands-on Activity:</div>
+                    Security framework mapping exercise
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 6 -->
+        <div class="workshop-part" id="part6">
+            <div class="part-header" onclick="togglePart('part6')">
+                <div>
+                    <div class="part-title">Part 6: Governance, Implementation, and Continuous Improvement</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
+                </div>
+                <div class="part-duration">2 hours</div>
+                <div class="toggle-icon" id="icon-part6">▼</div>
+            </div>
+            <div class="part-content" id="content-part6">
+                <div class="learning-objectives">
+                    <div class="objectives-header" onclick="toggleObjectives('objectives6')">
+                        <div class="objectives-title">Learning Objectives for Part 6 ▼</div>
+                    </div>
+                    <div class="objectives-list show" id="objectives6">
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Establish</strong> organizational governance structures and team integration strategies for IT/OT convergence programs</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Plan</strong> comprehensive asset management and incident response procedures for converged environments</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Implement</strong> continuous monitoring and improvement processes using industry best practices</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Create</strong> performance metrics and KPIs to measure security program effectiveness and maturity</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Synthesize</strong> all workshop concepts into a cohesive curriculum development plan</div>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
+                            <div class="objective-text"><strong>Evaluate</strong> their own institutional readiness for implementing IT/OT convergence cybersecurity education</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">6.1 Organizational Structure and Governance</div>
+                    <div class="subsection">
+                        <h4>Leadership and Oversight</h4>
+                        <ul>
+                            <li>Chief Information Security Officer (CISO) responsibility for overall coordination and board reporting</li>
+                            <li>Cross-functional team development and management</li>
+                            <li>Executive sponsorship and resource allocation</li>
+                            <li>Board-level cybersecurity reporting and metrics</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>IT/OT Team Integration Strategies</h4>
+                        <ul>
+                            <li>Methods to ease transition including workshops to reconcile perspectives and cross-pollination of groups</li>
+                            <li>Building competencies and having OT engineers with the right technical skills, and CISOs with the right mindset about OT</li>
+                            <li>Communication protocols and collaboration frameworks</li>
+                            <li>Skills development and cross-training programs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">6.2 Operational Implementation</div>
+                    <div class="subsection">
+                        <h4>Asset Management and Visibility</h4>
+                        <ul>
+                            <li>Comprehensive asset inventory for IT and OT systems</li>
+                            <li>Configuration management and change control</li>
+                            <li>Lifecycle management and refresh strategies</li>
+                            <li>Third-party and vendor risk management</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Incident Response and Recovery</h4>
+                        <ul>
+                            <li>Unified incident response procedures for IT/OT environments</li>
+                            <li>Communication protocols during security incidents</li>
+                            <li>Business continuity and disaster recovery planning</li>
+                            <li>Lessons learned and improvement processes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section-content">
+                    <div class="section-title">6.3 Continuous Monitoring and Improvement</div>
+                    <div class="subsection">
+                        <h4>Security Operations Center (SOC) Integration</h4>
+                        <ul>
+                            <li>Integration of third parties with specific capabilities to address ongoing shortages in cybersecurity professionals</li>
+                            <li>Real-time monitoring and threat detection</li>
+                            <li>Security information and event management (SIEM) integration</li>
+                            <li>Automated response and orchestration capabilities</li>
+                        </ul>
+                    </div>
+                    <div class="subsection">
+                        <h4>Performance Metrics and KPIs</h4>
+                        <ul>
+                            <li>Security maturity assessment frameworks</li>
+                            <li>Risk reduction metrics and trend analysis</li>
+                            <li>Operational efficiency measurements</li>
+                            <li>Compliance status reporting and dashboards</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="activity-box">
+                    <div class="activity-title">Hands-on Activity:</div>
+                    Develop governance framework template
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <h2>Progressive Learning Objective Analysis</h2>
+            <p>The workshop's learning objectives are designed with intentional progression following Bloom's taxonomy, building from foundational knowledge to advanced application and synthesis:</p>
+            
+            <h3>Knowledge Foundation (Parts 1-3):</h3>
+            <ul>
+                <li><strong>Remember & Understand:</strong> Define, identify, and explain core IT/OT concepts</li>
+                <li><strong>Apply:</strong> Configure systems and demonstrate technical skills in simulation environments</li>
+                <li><strong>Analyze:</strong> Compare, contrast, and categorize different technologies and approaches</li>
+            </ul>
+            
+            <h3>Critical Application (Parts 4-5):</h3>
+            <ul>
+                <li><strong>Analyze:</strong> Evaluate threats, assess risks, and examine real-world case studies</li>
+                <li><strong>Apply:</strong> Implement frameworks and design security architectures</li>
+                <li><strong>Evaluate:</strong> Compare frameworks and assess their effectiveness in various scenarios</li>
+            </ul>
+            
+            <h3>Advanced Synthesis (Part 6):</h3>
+            <ul>
+                <li><strong>Create:</strong> Develop comprehensive governance structures and curriculum materials</li>
+                <li><strong>Synthesize:</strong> Integrate all concepts into cohesive educational programs</li>
+                <li><strong>Evaluate:</strong> Assess institutional readiness and program effectiveness</li>
+            </ul>
+            
+            <h3>Cross-Cutting Competencies:</h3>
+            <p>Throughout all parts, participants develop the ability to design practical learning experiences, create teaching materials and curriculum resources, and develop industry-relevant case studies and exercises.</p>
+        </div>
+    </div>
+
+    <script>
+        function togglePart(partId) {
+            const content = document.getElementById('content-' + partId);
+            const icon = document.getElementById('icon-' + partId);
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('active');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function toggleObjectives(objectivesId) {
+            const objectives = document.getElementById(objectivesId);
+            const header = objectives.previousElementSibling.querySelector('.objectives-title');
+            
+            if (objectives.classList.contains('show')) {
+                objectives.classList.remove('show');
+                header.innerHTML = header.innerHTML.replace('▲', '▼');
+            } else {
+                objectives.classList.add('show');
+                header.innerHTML = header.innerHTML.replace('▼', '▲');
+            }
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.objective-checkbox');
+            const totalObjectives = checkboxes.length;
+            const completedObjectives = document.querySelectorAll('.objective-checkbox:checked').length;
+            
+            const progressPercentage = Math.round((completedObjectives / totalObjectives) * 100);
+            
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
+            document.getElementById('progressText').textContent = `Workshop Progress: ${progressPercentage}% Complete`;
+            document.getElementById('completedObjectives').textContent = completedObjectives;
+            
+            // Count completed parts (all objectives in a part checked)
+            let partsCompleted = 0;
+            for (let i = 1; i <= 6; i++) {
+                const partCheckboxes = document.querySelectorAll(`#objectives${i} .objective-checkbox`);
+                const partCompleted = document.querySelectorAll(`#objectives${i} .objective-checkbox:checked`);
+                if (partCheckboxes.length === partCompleted.length && partCheckboxes.length > 0) {
+                    partsCompleted++;
+                }
+            }
+            document.getElementById('partsCompleted').textContent = partsCompleted;
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-btn[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Auto-expand the clicked section
+                    const content = target.querySelector('.part-content');
+                    const icon = target.querySelector('.toggle-icon');
+                    if (content && !content.classList.contains('active')) {
+                        content.classList.add('active');
+                        if (icon) {
+                            icon.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+            });
+        });
+
+        // Initialize all objectives as visible
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state for all objectives to be visible
+            document.querySelectorAll('.objectives-list').forEach(list => {
+                list.classList.add('show');
+            });
+            
+            // Update initial progress
+            updateProgress();
+        });
+
+        // Save progress to localStorage
+        function saveProgress() {
+            const checkboxes = document.querySelectorAll('.objective-checkbox');
+            const progress = [];
+            checkboxes.forEach((checkbox, index) => {
+                progress[index] = checkbox.checked;
+            });
+            localStorage.setItem('workshopProgress', JSON.stringify(progress));
+        }
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('workshopProgress');
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                const checkboxes = document.querySelectorAll('.objective-checkbox');
+                checkboxes.forEach((checkbox, index) => {
+                    if (progress[index]) {
+                        checkbox.checked = true;
+                    }
+                });
+                updateProgress();
+            }
+        }
+
+        // Add event listeners for saving progress
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('objective-checkbox')) {
+                saveProgress();
+            }
+        });
+
+        // Load progress on page load
+        document.addEventListener('DOMContentLoaded', loadProgress);
+    </script>
+</body>
+</html>
