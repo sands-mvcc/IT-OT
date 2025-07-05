@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Ethernet Protocol Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2d5a27, #4a7c59);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2d5a27;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: white;
+            color: #2d5a27;
+            border: 2px solid #2d5a27;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 2px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-button.active {
+            background: #2d5a27;
+            color: white;
+        }
+
+        .tab-button:hover {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 2px solid #2d5a27;
+            border-radius: 0 10px 10px 10px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fdf8;
+            border-left: 5px solid #2d5a27;
+            border-radius: 8px;
+        }
+
+        .section h3 {
+            color: #2d5a27;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .frame-builder {
+            background: white;
+            padding: 20px;
+            border: 2px solid #2d5a27;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .frame-field {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f8f0;
+            border-radius: 5px;
+            border: 1px solid #4a7c59;
+        }
+
+        .field-label {
+            width: 150px;
+            font-weight: bold;
+            color: #2d5a27;
+        }
+
+        .field-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #2d5a27;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+
+        .field-info {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .frame-display {
+            background: black;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .protocol-simulator {
+            background: white;
+            border: 2px solid #2d5a27;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sim-button {
+            background: #2d5a27;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .sim-button:hover {
+            background: #4a7c59;
+        }
+
+        .sim-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .network-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fdf8;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .network-node {
+            width: 80px;
+            height: 80px;
+            background: #2d5a27;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .network-node.active {
+            background: #4a7c59;
+            transform: scale(1.1);
+        }
+
+        .data-packet {
+            width: 30px;
+            height: 30px;
+            background: #00ff00;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 1s ease;
+            z-index: 10;
+        }
+
+        .standards-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .standards-table th,
+        .standards-table td {
+            border: 1px solid #2d5a27;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .standards-table th {
+            background: #2d5a27;
+            color: white;
+            font-weight: bold;
+        }
+
+        .standards-table tr:nth-child(even) {
+            background: #f8fdf8;
+        }
+
+        .quiz-container {
+            background: white;
+            border: 2px solid #2d5a27;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d5a27;
+        }
+
+        .quiz-options {
+            margin: 10px 0;
+        }
+
+        .quiz-option {
+            display: block;
+            margin: 8px 0;
+            padding: 8px;
+            background: #f8fdf8;
+            border: 1px solid #4a7c59;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: #e8f5e8;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #2d5a27;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #721c24;
+        }
+
+        .workplace-example {
+            background: white;
+            border: 2px solid #2d5a27;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .workplace-example h4 {
+            color: #2d5a27;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: #e8f5e8;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                width: 100%;
+                margin: 1px 0;
+            }
+            
+            .frame-field {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .field-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .field-input {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Interactive Ethernet Protocol Trainer</h1>
+            <p>Master the fundamentals of modern Ethernet networking technology</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="showTab('overview')">Protocol Overview</button>
+            <button class="tab-button" onclick="showTab('standards')">Current Standards</button>
+            <button class="tab-button" onclick="showTab('frame-builder')">Frame Builder</button>
+            <button class="tab-button" onclick="showTab('simulator')">Protocol Simulator</button>
+            <button class="tab-button" onclick="showTab('workplace')">Workplace Examples</button>
+            <button class="tab-button" onclick="showTab('quiz')">Knowledge Check</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h3>What is Ethernet?</h3>
+                <p>Ethernet is a family of wired computer networking technologies commonly used in Local Area Networks (LAN), Metropolitan Area Networks (MAN), and Wide Area Networks (WAN). First commercially introduced in 1980 and standardized as IEEE 802.3 in 1983, Ethernet has evolved to support higher bit rates, more nodes, and longer distances while maintaining backward compatibility.</p>
+            </div>
+
+            <div class="section">
+                <h3>Ethernet Frame Structure</h3>
+                <div class="frame-display">
+|  Preamble  | SFD |  Destination MAC  |   Source MAC   | EtherType/Length |     Payload Data     |  FCS  |
+|  7 bytes   | 1B  |     6 bytes       |    6 bytes     |     2 bytes      | 46-1500 bytes        | 4 bytes|
+|10101010... |10101011| xx:xx:xx:xx:xx:xx | xx:xx:xx:xx:xx:xx |   0x0800 (IPv4)   | IP Packet + Data     | CRC32 |
+                </div>
+                <ul>
+                    <li><strong>Preamble (7 bytes):</strong> Synchronization pattern (10101010...)</li>
+                    <li><strong>Start Frame Delimiter (1 byte):</strong> Marks frame start (10101011)</li>
+                    <li><strong>Destination MAC (6 bytes):</strong> Target device MAC address</li>
+                    <li><strong>Source MAC (6 bytes):</strong> Sender device MAC address</li>
+                    <li><strong>EtherType/Length (2 bytes):</strong> Protocol type or frame length</li>
+                    <li><strong>Payload (46-1500 bytes):</strong> Actual data being transmitted</li>
+                    <li><strong>Frame Check Sequence (4 bytes):</strong> CRC error detection</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>CSMA/CD:</strong> Carrier Sense Multiple Access with Collision Detection</li>
+                    <li><strong>MAC Addressing:</strong> 48-bit globally unique hardware addresses</li>
+                    <li><strong>Error Detection:</strong> 32-bit CRC for frame integrity</li>
+                    <li><strong>Auto-negotiation:</strong> Automatic speed and duplex detection</li>
+                    <li><strong>Full-duplex:</strong> Simultaneous send/receive on modern networks</li>
+                    <li><strong>Power over Ethernet (PoE):</strong> Data and power over same cable</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Standards Tab -->
+        <div id="standards" class="tab-content">
+            <div class="section">
+                <h3>Current Ethernet Standards (2025)</h3>
+                <table class="standards-table">
+                    <thead>
+                        <tr>
+                            <th>Standard</th>
+                            <th>Speed</th>
+                            <th>Media Type</th>
+                            <th>Max Distance</th>
+                            <th>Applications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10BASE-T</td>
+                            <td>10 Mbps</td>
+                            <td>Cat3+ UTP</td>
+                            <td>100m</td>
+                            <td>Legacy networks</td>
+                        </tr>
+                        <tr>
+                            <td>100BASE-TX</td>
+                            <td>100 Mbps</td>
+                            <td>Cat5+ UTP</td>
+                            <td>100m</td>
+                            <td>Desktop connections</td>
+                        </tr>
+                        <tr>
+                            <td>1000BASE-T</td>
+                            <td>1 Gbps</td>
+                            <td>Cat5e+ UTP</td>
+                            <td>100m</td>
+                            <td>Standard enterprise</td>
+                        </tr>
+                        <tr>
+                            <td>10GBASE-T</td>
+                            <td>10 Gbps</td>
+                            <td>Cat6a UTP</td>
+                            <td>100m</td>
+                            <td>High-performance workstations</td>
+                        </tr>
+                        <tr>
+                            <td>25GBASE-T</td>
+                            <td>25 Gbps</td>
+                            <td>Cat8 UTP</td>
+                            <td>30m</td>
+                            <td>Data center servers</td>
+                        </tr>
+                        <tr>
+                            <td>40GBASE-T</td>
+                            <td>40 Gbps</td>
+                            <td>Cat8 UTP</td>
+                            <td>30m</td>
+                            <td>Data center backbone</td>
+                        </tr>
+                        <tr>
+                            <td>100GBASE-SR4</td>
+                            <td>100 Gbps</td>
+                            <td>Multimode Fiber</td>
+                            <td>100m</td>
+                            <td>Data center interconnects</td>
+                        </tr>
+                        <tr>
+                            <td>400GBASE-SR8</td>
+                            <td>400 Gbps</td>
+                            <td>Multimode Fiber</td>
+                            <td>100m</td>
+                            <td>Hyperscale data centers</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">800GBASE-SR8</span></td>
+                            <td><span class="highlight">800 Gbps</span></td>
+                            <td>Multimode Fiber</td>
+                            <td>100m</td>
+                            <td>AI/ML clusters, HPC</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">1.6TBASE (Dev)</span></td>
+                            <td><span class="highlight">1.6 Tbps</span></td>
+                            <td>Advanced Fiber</td>
+                            <td>TBD</td>
+                            <td>Next-gen AI infrastructure</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h3>2025 Ethernet Developments</h3>
+                <ul>
+                    <li><strong>800GbE Maturation:</strong> IEEE P802.3df v1.0 released February 2024</li>
+                    <li><strong>1.6 Terabit Ethernet:</strong> Industry trials expected late 2025</li>
+                    <li><strong>Ultra Ethernet Consortium:</strong> v1.0 specification released June 2025 for AI/ML workloads</li>
+                    <li><strong>Linear Pluggable Optics (LPO):</strong> Power-efficient solutions for data centers</li>
+                    <li><strong>Automotive Ethernet:</strong> 10Mbps to 10Gbps for ADAS applications</li>
+                    <li><strong>Industrial Ethernet:</strong> 10BASE-T1L for long-reach OT applications</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Frame Builder Tab -->
+        <div id="frame-builder" class="tab-content">
+            <div class="section">
+                <h3>Interactive Ethernet Frame Builder</h3>
+                <p>Build your own Ethernet frame and see how different fields affect the final packet structure.</p>
+                
+                <div class="frame-builder">
+                    <div class="frame-field">
+                        <span class="field-label">Destination MAC:</span>
+                        <input type="text" class="field-input" id="destMac" value="00:1A:2B:3C:4D:5E" placeholder="xx:xx:xx:xx:xx:xx">
+                        <span class="field-info">Target device MAC address</span>
+                    </div>
+                    
+                    <div class="frame-field">
+                        <span class="field-label">Source MAC:</span>
+                        <input type="text" class="field-input" id="srcMac" value="00:50:56:AB:CD:EF" placeholder="xx:xx:xx:xx:xx:xx">
+                        <span class="field-info">Sender device MAC address</span>
+                    </div>
+                    
+                    <div class="frame-field">
+                        <span class="field-label">EtherType:</span>
+                        <select class="field-input" id="etherType">
+                            <option value="0x0800">0x0800 (IPv4)</option>
+                            <option value="0x86DD">0x86DD (IPv6)</option>
+                            <option value="0x0806">0x0806 (ARP)</option>
+                            <option value="0x8100">0x8100 (VLAN Tag)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <span class="field-info">Protocol identifier</span>
+                    </div>
+                    
+                    <div class="frame-field">
+                        <span class="field-label">Payload Data:</span>
+                        <input type="text" class="field-input" id="payloadData" value="Hello, Ethernet World!" placeholder="Enter your data">
+                        <span class="field-info">Actual data to transmit</span>
+                    </div>
+                    
+                    <div class="frame-field">
+                        <span class="field-label">Frame Size:</span>
+                        <span class="field-input" id="frameSize">64 bytes</span>
+                        <span class="field-info">Total frame size (min: 64, max: 1518)</span>
+                    </div>
+                    
+                    <button class="sim-button" onclick="buildFrame()">Build Frame</button>
+                    <button class="sim-button" onclick="validateFrame()">Validate Frame</button>
+                    <button class="sim-button" onclick="randomizeFrame()">Random Example</button>
+                </div>
+                
+                <h4>Generated Ethernet Frame:</h4>
+                <div class="frame-display" id="builtFrame">
+Click "Build Frame" to generate your Ethernet packet...
+                </div>
+                
+                <div id="frameValidation" style="margin-top: 15px; padding: 10px; border-radius: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- Simulator Tab -->
+        <div id="simulator" class="tab-content">
+            <div class="section">
+                <h3>Ethernet Protocol Operation Simulator</h3>
+                <p>Watch how Ethernet frames travel through a network and observe different protocol operations.</p>
+                
+                <div class="protocol-simulator">
+                    <div class="sim-controls">
+                        <button class="sim-button" onclick="simulateUnicast()">Unicast Transmission</button>
+                        <button class="sim-button" onclick="simulateBroadcast()">Broadcast Transmission</button>
+                        <button class="sim-button" onclick="simulateCollision()">Collision Detection</button>
+                        <button class="sim-button" onclick="simulateCSMACD()">CSMA/CD Process</button>
+                        <button class="sim-button" onclick="resetSimulation()">Reset</button>
+                    </div>
+                    
+                    <div class="network-display" id="networkDisplay">
+                        <div class="network-node" id="node1">PC-A</div>
+                        <div class="network-node" id="switch">Switch</div>
+                        <div class="network-node" id="node2">PC-B</div>
+                        <div class="network-node" id="node3">PC-C</div>
+                    </div>
+                    
+                    <div id="simulationLog" style="background: #f8fdf8; padding: 15px; border-radius: 8px; margin-top: 20px; height: 200px; overflow-y: auto; border: 1px solid #2d5a27;">
+                        <strong>Simulation Log:</strong><br>
+                        Ready to simulate Ethernet operations...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Examples Tab -->
+        <div id="workplace" class="tab-content">
+            <div class="section">
+                <h3>Real-World Ethernet Applications</h3>
+                
+                <div class="workplace-example">
+                    <h4>🏢 Corporate Office Network</h4>
+                    <p><strong>Scenario:</strong> 500-employee office building with multiple floors</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Backbone:</span> 10GBASE-SR fiber between floors (10 Gbps)</li>
+                        <li><span class="highlight">Desktop connections:</span> 1000BASE-T Cat6 cables (1 Gbps)</li>
+                        <li><span class="highlight">VoIP phones:</span> PoE+ switches delivering power and data</li>
+                        <li><span class="highlight">Wireless APs:</span> 2.5GBASE-T for high-density WiFi 6E</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Reliable connectivity, centralized management, future-ready infrastructure</p>
+                </div>
+
+                <div class="workplace-example">
+                    <h4>🏭 Manufacturing Plant</h4>
+                    <p><strong>Scenario:</strong> Industrial automation with PLCs, SCADA systems, and IoT sensors</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Control network:</span> 100BASE-TX with industrial switches</li>
+                        <li><span class="highlight">Sensor network:</span> 10BASE-T1L single-pair Ethernet for long runs</li>
+                        <li><span class="highlight">Redundancy:</span> Ring topology with rapid spanning tree protocol</li>
+                        <li><span class="highlight">Time-sensitive:</span> IEEE 802.1AS for synchronized operations</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Real-time control, reduced cable infrastructure, IP-based diagnostics</p>
+                </div>
+
+                <div class="workplace-example">
+                    <h4>🏥 Hospital Network</h4>
+                    <p><strong>Scenario:</strong> Critical healthcare systems requiring high availability</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Core network:</span> 40GBASE-SR4 for electronic health records</li>
+                        <li><span class="highlight">Medical devices:</span> 1000BASE-T with medical-grade switches</li>
+                        <li><span class="highlight">Nurse call systems:</span> PoE++ for advanced communication panels</li>
+                        <li><span class="highlight">Imaging systems:</span> 10GBASE-T for MRI/CT data transfer</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Patient safety, data integrity, regulatory compliance</p>
+                </div>
+
+                <div class="workplace-example">
+                    <h4>🎓 University Campus</h4>
+                    <p><strong>Scenario:</strong> Multi-building campus with research and student networks</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Campus backbone:</span> 100GBASE-LR4 fiber between buildings</li>
+                        <li><span class="highlight">Dorm rooms:</span> 1000BASE-T with per-port authentication</li>
+                        <li><span class="highlight">Research labs:</span> 25GBASE-T for high-performance computing</li>
+                        <li><span class="highlight">Lecture halls:</span> PoE+ for presentation systems</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Scalable bandwidth, secure access, support for diverse applications</p>
+                </div>
+
+                <div class="workplace-example">
+                    <h4>☁️ Data Center</h4>
+                    <p><strong>Scenario:</strong> Hyperscale cloud provider data center</p>
+                    <p><strong>Implementation:</strong></p>
+                    <ul>
+                        <li><span class="highlight">Server connections:</span> 100GBASE-CR4 direct attach cables</li>
+                        <li><span class="highlight">Top-of-rack:</span> 400GBASE-SR8 spine-leaf architecture</li>
+                        <li><span class="highlight">AI/ML clusters:</span> 800GBASE-SR8 for training workloads</li>
+                        <li><span class="highlight">Storage arrays:</span> 25GBASE-SFP28 for distributed storage</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Ultra-low latency, massive bandwidth, energy efficiency</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Troubleshooting Common Issues</h3>
+                <div class="workplace-example">
+                    <h4>🔧 Network Performance Problems</h4>
+                    <ul>
+                        <li><strong>Symptom:</strong> Slow file transfers, high latency</li>
+                        <li><strong>Causes:</strong> Duplex mismatches, cable quality, switch overload</li>
+                        <li><strong>Solutions:</strong> Auto-negotiation verification, cable testing, traffic analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="workplace-example">
+                    <h4>⚡ Power over Ethernet Issues</h4>
+                    <ul>
+                        <li><strong>Symptom:</strong> Devices not powering on, intermittent operation</li>
+                        <li><strong>Causes:</strong> Insufficient PoE budget, cable resistance, device classification</li>
+                        <li><strong>Solutions:</strong> PoE+ switches, lower AWG cables, power management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <div class="section">
+                <h3>Knowledge Assessment</h3>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question">1. What is the minimum Ethernet frame size?</div>
+                    <div class="quiz-options">
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q1"> 46 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, true)">
+                            <input type="radio" name="q1"> 64 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q1"> 72 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q1"> 1518 bytes
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">2. What does the EtherType value 0x0800 indicate?</div>
+                    <div class="quiz-options">
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q2"> ARP packet
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, true)">
+                            <input type="radio" name="q2"> IPv4 packet
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q2"> IPv6 packet
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q2"> VLAN tag
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">3. What is the latest Ethernet standard as of 2025?</div>
+                    <div class="quiz-options">
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q3"> 400GBASE-SR8
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, true)">
+                            <input type="radio" name="q3"> 800GBASE-SR8
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q3"> 1.6TBASE
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q3"> 100GBASE-T
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">4. How many bytes is a MAC address?</div>
+                    <div class="quiz-options">
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q4"> 4 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, true)">
+                            <input type="radio" name="q4"> 6 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q4"> 8 bytes
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q4"> 12 bytes
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">5. What does CSMA/CD stand for?</div>
+                    <div class="quiz-options">
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q5"> Carrier Signal Multiple Access/Collision Detection
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, true)">
+                            <input type="radio" name="q5"> Carrier Sense Multiple Access/Collision Detection
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q5"> Carrier Sense Multiple Access/Collision Domain
+                        </label>
+                        <label class="quiz-option" onclick="checkAnswer(this, false)">
+                            <input type="radio" name="q5"> Computer Signal Management Access/Collision Detection
+                        </label>
+                    </div>
+                </div>
+
+                <button class="sim-button" onclick="resetQuiz()" style="margin-top: 20px;">Reset Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Management
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Frame Builder Functions
+        function buildFrame() {
+            const destMac = document.getElementById('destMac').value;
+            const srcMac = document.getElementById('srcMac').value;
+            const etherType = document.getElementById('etherType').value;
+            const payload = document.getElementById('payloadData').value;
+            
+            // Calculate frame size
+            const headerSize = 22; // Preamble + SFD + MACs + EtherType
+            const payloadSize = Math.max(46, payload.length); // Minimum 46 bytes
+            const fcsSize = 4;
+            const totalSize = headerSize + payloadSize + fcsSize;
+            
+            document.getElementById('frameSize').textContent = totalSize + ' bytes';
+            
+            // Build frame display
+            const frameDisplay = `
+Ethernet Frame Structure:
+=========================
+Preamble:        10101010 10101010 10101010 10101010 10101010 10101010 10101010
+SFD:             10101011
+Dest MAC:        ${destMac}
+Source MAC:      ${srcMac}
+EtherType:       ${etherType}
+Payload Length:  ${payloadSize} bytes
+Payload Data:    "${payload}"
+${payloadSize > payload.length ? 'Padding:         ' + '0'.repeat(payloadSize - payload.length) + ' (padding to minimum)' : ''}
+FCS:             [CRC32 Checksum]
+
+Total Frame Size: ${totalSize} bytes
+            `;
+            
+            document.getElementById('builtFrame').textContent = frameDisplay;
+        }
+
+        function validateFrame() {
+            const destMac = document.getElementById('destMac').value;
+            const srcMac = document.getElementById('srcMac').value;
+            const payload = document.getElementById('payloadData').value;
+            
+            const validation = document.getElementById('frameValidation');
+            let errors = [];
+            let warnings = [];
+            
+            // MAC address validation
+            const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+            if (!macRegex.test(destMac)) errors.push('Invalid destination MAC address format');
+            if (!macRegex.test(srcMac)) errors.push('Invalid source MAC address format');
+            
+            // Payload validation
+            if (payload.length === 0) warnings.push('Empty payload - frame will be padded to minimum size');
+            if (payload.length > 1500) errors.push('Payload exceeds maximum size (1500 bytes)');
+            
+            // Display results
+            if (errors.length > 0) {
+                validation.style.background = '#f8d7da';
+                validation.style.border = '1px solid #721c24';
+                validation.innerHTML = '<strong>Validation Errors:</strong><br>' + errors.join('<br>');
+            } else if (warnings.length > 0) {
+                validation.style.background = '#fff3cd';
+                validation.style.border = '1px solid #856404';
+                validation.innerHTML = '<strong>Validation Warnings:</strong><br>' + warnings.join('<br>');
+            } else {
+                validation.style.background = '#d4edda';
+                validation.style.border = '1px solid #2d5a27';
+                validation.innerHTML = '<strong>✓ Frame is valid!</strong>';
+            }
+        }
+
+        function randomizeFrame() {
+            const randomMacs = [
+                '00:1A:2B:3C:4D:5E', '00:50:56:AB:CD:EF', '08:00:27:12:34:56',
+                'AA:BB:CC:DD:EE:FF', '12:34:56:78:9A:BC', 'FE:DC:BA:98:76:54'
+            ];
+            
+            const randomPayloads = [
+                'Hello, Ethernet!', 'Network packet data', 'Test transmission',
+                'Real-time video stream', 'Database query result', 'File transfer chunk'
+            ];
+            
+            document.getElementById('destMac').value = randomMacs[Math.floor(Math.random() * randomMacs.length)];
+            document.getElementById('srcMac').value = randomMacs[Math.floor(Math.random() * randomMacs.length)];
+            document.getElementById('payloadData').value = randomPayloads[Math.floor(Math.random() * randomPayloads.length)];
+            
+            buildFrame();
+        }
+
+        // Simulation Functions
+        let simulationActive = false;
+
+        function logMessage(message) {
+            const log = document.getElementById('simulationLog');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `<br>[${timestamp}] ${message}`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function resetSimulation() {
+            const nodes = document.querySelectorAll('.network-node');
+            nodes.forEach(node => node.classList.remove('active'));
+            
+            // Remove any existing packets
+            const packets = document.querySelectorAll('.data-packet');
+            packets.forEach(packet => packet.remove());
+            
+            document.getElementById('simulationLog').innerHTML = '<strong>Simulation Log:</strong><br>Ready to simulate Ethernet operations...';
+            simulationActive = false;
+        }
+
+        async function simulateUnicast() {
+            if (simulationActive) return;
+            simulationActive = true;
+            
+            resetSimulation();
+            logMessage('Starting unicast transmission simulation...');
+            
+            const sender = document.getElementById('node1');
+            const switch_node = document.getElementById('switch');
+            const receiver = document.getElementById('node2');
+            
+            // Step 1: Sender prepares frame
+            sender.classList.add('active');
+            logMessage('PC-A: Preparing Ethernet frame for PC-B');
+            logMessage('PC-A: Destination MAC = 00:1A:2B:3C:4D:5E');
+            await sleep(1500);
+            
+            // Step 2: Frame sent to switch
+            switch_node.classList.add('active');
+            logMessage('Switch: Received frame from PC-A');
+            logMessage('Switch: Looking up destination MAC in forwarding table');
+            await sleep(1500);
+            
+            // Step 3: Switch forwards to destination
+            receiver.classList.add('active');
+            logMessage('Switch: Forwarding frame to PC-B on port 2');
+            logMessage('PC-B: Frame received and validated');
+            await sleep(1500);
+            
+            // Step 4: Completion
+            logMessage('✓ Unicast transmission completed successfully');
+            simulationActive = false;
+        }
+
+        async function simulateBroadcast() {
+            if (simulationActive) return;
+            simulationActive = true;
+            
+            resetSimulation();
+            logMessage('Starting broadcast transmission simulation...');
+            
+            const sender = document.getElementById('node1');
+            const switch_node = document.getElementById('switch');
+            const node2 = document.getElementById('node2');
+            const node3 = document.getElementById('node3');
+            
+            // Step 1: Sender prepares broadcast frame
+            sender.classList.add('active');
+            logMessage('PC-A: Preparing broadcast frame (ARP request)');
+            logMessage('PC-A: Destination MAC = FF:FF:FF:FF:FF:FF (broadcast)');
+            await sleep(1500);
+            
+            // Step 2: Switch receives and floods
+            switch_node.classList.add('active');
+            logMessage('Switch: Received broadcast frame from PC-A');
+            logMessage('Switch: Flooding frame to all ports except source');
+            await sleep(1500);
+            
+            // Step 3: All nodes receive broadcast
+            node2.classList.add('active');
+            node3.classList.add('active');
+            logMessage('PC-B: Broadcast frame received');
+            logMessage('PC-C: Broadcast frame received');
+            await sleep(1500);
+            
+            logMessage('✓ Broadcast transmission completed');
+            simulationActive = false;
+        }
+
+        async function simulateCollision() {
+            if (simulationActive) return;
+            simulationActive = true;
+            
+            resetSimulation();
+            logMessage('Starting collision detection simulation (legacy half-duplex)...');
+            
+            const node1 = document.getElementById('node1');
+            const node2 = document.getElementById('node2');
+            
+            // Step 1: Both nodes try to transmit
+            node1.classList.add('active');
+            node2.classList.add('active');
+            logMessage('PC-A: Carrier sense - medium appears free, starting transmission');
+            logMessage('PC-B: Carrier sense - medium appears free, starting transmission');
+            await sleep(1500);
+            
+            // Step 2: Collision detected
+            logMessage('⚠️ COLLISION DETECTED! Both stations transmitting simultaneously');
+            logMessage('PC-A: Sending jam signal to notify all stations');
+            logMessage('PC-B: Sending jam signal to notify all stations');
+            await sleep(1500);
+            
+            // Step 3: Backoff algorithm
+            node1.classList.remove('active');
+            node2.classList.remove('active');
+            logMessage('PC-A: Backing off - waiting random time (binary exponential backoff)');
+            logMessage('PC-B: Backing off - waiting different random time');
+            await sleep(2000);
+            
+            // Step 4: Retry
+            node1.classList.add('active');
+            logMessage('PC-A: Retrying transmission after backoff');
+            await sleep(1500);
+            
+            logMessage('✓ Collision resolved, frame transmitted successfully');
+            simulationActive = false;
+        }
+
+        async function simulateCSMACD() {
+            if (simulationActive) return;
+            simulationActive = true;
+            
+            resetSimulation();
+            logMessage('Starting CSMA/CD process simulation...');
+            
+            const sender = document.getElementById('node1');
+            
+            // Step 1: Carrier Sense
+            logMessage('PC-A: Step 1 - Carrier Sense: Listening to medium...');
+            await sleep(1500);
+            
+            // Step 2: Medium Access
+            logMessage('PC-A: Medium is idle, proceeding with transmission');
+            logMessage('PC-A: Step 2 - Multiple Access: Gaining medium access');
+            sender.classList.add('active');
+            await sleep(1500);
+            
+            // Step 3: Transmission with collision detection
+            logMessage('PC-A: Step 3 - Transmitting frame while monitoring for collisions');
+            logMessage('PC-A: Collision Detection: No collisions detected');
+            await sleep(2000);
+            
+            // Step 4: Successful transmission
+            logMessage('PC-A: Frame transmitted successfully');
+            logMessage('✓ CSMA/CD process completed without collisions');
+            
+            simulationActive = false;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Quiz Functions
+        function checkAnswer(option, isCorrect) {
+            // Clear previous answers for this question
+            const parent = option.parentElement;
+            const options = parent.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            
+            // Mark the selected answer
+            if (isCorrect) {
+                option.classList.add('correct');
+            } else {
+                option.classList.add('incorrect');
+                // Also highlight the correct answer
+                options.forEach(opt => {
+                    if (opt.onclick.toString().includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        function resetQuiz() {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+                const radio = opt.querySelector('input[type="radio"]');
+                if (radio) radio.checked = false;
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            buildFrame(); // Build initial frame
+            
+            // Add event listeners for real-time frame building
+            document.getElementById('destMac').addEventListener('input', buildFrame);
+            document.getElementById('srcMac').addEventListener('input', buildFrame);
+            document.getElementById('etherType').addEventListener('change', buildFrame);
+            document.getElementById('payloadData').addEventListener('input', buildFrame);
+        });
+    </script>
+</body>
+</html>
