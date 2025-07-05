@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information Technology Fundamentals - Faculty Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-bar {
+            background: #2d5016;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-btn:hover {
+            background: #5a8c69;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: #2d5016;
+            border-color: #4a7c59;
+        }
+
+        .section {
+            display: none;
+            background: white;
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #4a7c59;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h2 {
+            color: #2d5016;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #4a7c59;
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .analogy-box::before {
+            content: "💡 Analogy";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #4a7c59;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .example-box {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            border: 2px solid #2d5016;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .example-box::before {
+            content: "📋 Example";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #2d5016;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .interactive-element {
+            background: #f8f9fa;
+            border: 2px dashed #4a7c59;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .btn {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #2d5016;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .quiz-question {
+            background: white;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .quiz-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: #e8f5e8;
+            border-color: #4a7c59;
+        }
+
+        .quiz-option.correct {
+            background: #d4edda;
+            border-color: #2d5016;
+            color: #155724;
+        }
+
+        .quiz-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .protocol-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .protocol-layer {
+            background: #4a7c59;
+            color: white;
+            padding: 15px 30px;
+            margin: 5px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .protocol-layer:hover {
+            background: #2d5016;
+            transform: scale(1.05);
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 2rem 0;
+        }
+
+        .device-card {
+            background: white;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .device-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .device-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a7c59 0%, #2d5016 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2d5016;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .glossary-term {
+            color: #4a7c59;
+            font-weight: bold;
+            cursor: help;
+            text-decoration: underline dotted;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #2d5016;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .protocol-layer {
+                width: 250px;
+            }
+            
+            .timer {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">Session Time: 00:00:00</div>
+
+    <div class="header">
+        <div class="container">
+            <h1>🔧 Information Technology Fundamentals</h1>
+            <p>A Comprehensive 4-Hour Faculty Workshop on IT Technologies, Devices, Protocols & Services</p>
+            <p><em>Preparing for IT/OT Convergence</em></p>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="container">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('overview')">🌟 IT Overview</button>
+                <button class="nav-btn" onclick="showSection('devices')">🖥️ IT Devices</button>
+                <button class="nav-btn" onclick="showSection('protocols')">🌐 Protocols</button>
+                <button class="nav-btn" onclick="showSection('addressing')">📍 IP Addressing</button>
+                <button class="nav-btn" onclick="showSection('services')">⚙️ IT Services</button>
+                <button class="nav-btn" onclick="showSection('convergence')">🔄 IT/OT Prep</button>
+                <button class="nav-btn" onclick="showSection('assessment')">📝 Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 14.3%"></div>
+        </div>
+
+        <!-- Section 1: IT Overview -->
+        <div class="section active" id="overview">
+            <h2>🌟 Information Technology Overview</h2>
+            
+            <div class="analogy-box">
+                <strong>Understanding IT Through Analogy:</strong> Think of Information Technology as the nervous system of modern organizations. Just as your nervous system coordinates communication between your brain, organs, and limbs, IT coordinates communication between people, processes, and digital resources across an enterprise.
+            </div>
+
+            <h3>What is Information Technology?</h3>
+            <p>Information Technology encompasses the use of computers, networks, software, and digital systems to store, retrieve, transmit, and manipulate data. In today's hyperconnected world, IT serves as the backbone of virtually every business operation, from simple email communications to complex artificial intelligence systems.</p>
+
+            <p>IT is a broad term that encompasses elements like digital communication, network administration, software components, and physical devices. Many of these hardware and software systems aim to accomplish data mining, processing, and communication.</p>
+
+            <h3>Current IT Landscape (2025)</h3>
+            <p>As we navigate through 2025, the IT landscape is experiencing unprecedented transformation. The IoT market will be pegged at $1.6 trillion by the year 2025, with massive adoption in end-use industries like manufacturing, healthcare, and transportation. This growth reflects a fundamental shift toward interconnected, intelligent systems.</p>
+
+            <div class="example-box">
+                <strong>Real-World Example:</strong> A modern smart factory uses IT systems to monitor production lines, manage inventory, predict maintenance needs, and coordinate with suppliers. The same IT infrastructure that manages email and file sharing also controls sensors, robotics, and automated systems - this convergence is what we'll explore throughout this workshop.
+            </div>
+
+            <h3>Key IT Trends Shaping 2025</h3>
+            
+            <div class="interactive-element">
+                <h4>🎯 Interactive Element: IT Trends Explorer</h4>
+                <p>Click on each trend to learn more about its impact:</p>
+                <div id="trendsGrid" class="device-grid">
+                    <div class="device-card" onclick="showTrendDetails('ai')">
+                        <div class="device-icon">🤖</div>
+                        <h4>Artificial Intelligence</h4>
+                        <p>AI integration across all IT systems</p>
+                    </div>
+                    <div class="device-card" onclick="showTrendDetails('cloud')">
+                        <div class="device-icon">☁️</div>
+                        <h4>Cloud Computing</h4>
+                        <p>Infrastructure as a Service growth</p>
+                    </div>
+                    <div class="device-card" onclick="showTrendDetails('iot')">
+                        <div class="device-icon">🌐</div>
+                        <h4>Internet of Things</h4>
+                        <p>75 billion connected devices by 2025</p>
+                    </div>
+                    <div class="device-card" onclick="showTrendDetails('security')">
+                        <div class="device-icon">🔒</div>
+                        <h4>Cybersecurity</h4>
+                        <p>$10.5 trillion global cybercrime cost</p>
+                    </div>
+                </div>
+                <div id="trendDetails" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; display: none;">
+                    <h4 id="trendTitle"></h4>
+                    <p id="trendDescription"></p>
+                </div>
+            </div>
+
+            <h3>The Foundation for IT/OT Convergence</h3>
+            <p>Understanding traditional IT is crucial for grasping the coming convergence with Operational Technology (OT). The blockchain technology market will crescendo to $39.7 billion in 2025 as its adoption in different industries keeps increasing, valuable for any sector that demands high security and transparency.</p>
+
+            <div class="analogy-box">
+                <strong>IT vs OT Analogy:</strong> If IT is like the nervous system, then OT is like the muscular system. IT handles information and communication, while OT controls physical processes and machinery. The convergence we're moving toward is like creating a unified body where the nervous and muscular systems work together seamlessly.
+            </div>
+        </div>
+
+        <!-- Section 2: IT Devices -->
+        <div class="section" id="devices">
+            <h2>🖥️ IT Devices and Hardware Infrastructure</h2>
+
+            <h3>Core IT Device Categories</h3>
+            <p>IT devices form the physical foundation of all digital operations. Understanding these components is essential for faculty who will be working with increasingly complex technological environments.</p>
+
+            <div class="device-grid">
+                <div class="device-card" onclick="showDeviceDetails('servers')">
+                    <div class="device-icon">🖥️</div>
+                    <h4>Servers</h4>
+                    <p>Centralized computing powerhouses</p>
+                </div>
+                <div class="device-card" onclick="showDeviceDetails('routers')">
+                    <div class="device-icon">📡</div>
+                    <h4>Routers</h4>
+                    <p>Network traffic directors</p>
+                </div>
+                <div class="device-card" onclick="showDeviceDetails('switches')">
+                    <div class="device-icon">🔀</div>
+                    <h4>Switches</h4>
+                    <p>Local network connectors</p>
+                </div>
+                <div class="device-card" onclick="showDeviceDetails('firewalls')">
+                    <div class="device-icon">🛡️</div>
+                    <h4>Firewalls</h4>
+                    <p>Network security gatekeepers</p>
+                </div>
+                <div class="device-card" onclick="showDeviceDetails('storage')">
+                    <div class="device-icon">💾</div>
+                    <h4>Storage Systems</h4>
+                    <p>Data preservation infrastructure</p>
+                </div>
+                <div class="device-card" onclick="showDeviceDetails('endpoints')">
+                    <div class="device-icon">💻</div>
+                    <h4>Endpoints</h4>
+                    <p>User interaction devices</p>
+                </div>
+            </div>
+
+            <div id="deviceDetails" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                <h4 id="deviceTitle"></h4>
+                <p id="deviceDescription"></p>
+                <div id="deviceAnalogy" class="analogy-box" style="margin-top: 15px;"></div>
+            </div>
+
+            <h3>Market Trends and Evolution</h3>
+            <p>The global router and switch market was valued at USD 54.4 billion in 2024 and is anticipated to grow at a CAGR of over 6.6% between 2025 and 2034. This growth reflects the increasing demand for high-speed connectivity and sophisticated network management.</p>
+
+            <div class="example-box">
+                <strong>Educational Institution Example:</strong> A modern university's IT infrastructure might include:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Data Center:</strong> Servers hosting learning management systems, student information systems, and research computing</li>
+                    <li><strong>Network Core:</strong> High-capacity routers and switches connecting campus buildings</li>
+                    <li><strong>Edge Devices:</strong> Wireless access points, smart classroom technologies, and IoT sensors</li>
+                    <li><strong>Security Layer:</strong> Firewalls, intrusion detection systems, and endpoint protection</li>
+                </ul>
+            </div>
+
+            <h3>Emerging Device Technologies</h3>
+            <p>The data center portion of the Ethernet switch market grew 18% year-over-year in the third quarter, with revenues for 200/400 GbE switches surging 126.3%, indicating strong interest in high-speed Ethernet switches for data centers.</p>
+
+            <div class="interactive-element">
+                <h4>🔧 Interactive Element: Device Configuration Simulator</h4>
+                <p>Experience how different IT devices work together in a network:</p>
+                <canvas id="networkCanvas" width="600" height="400" style="border: 2px solid #4a7c59; border-radius: 8px; background: white;"></canvas>
+                <br><br>
+                <button class="btn" onclick="simulateTraffic()">🚀 Simulate Network Traffic</button>
+                <button class="btn" onclick="resetSimulation()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- Section 3: Protocols -->
+        <div class="section" id="protocols">
+            <h2>🌐 Networking Protocols and Communication Models</h2>
+
+            <h3>Understanding Network Communication</h3>
+            <p>Network protocols are like languages that devices use to communicate. Just as humans need common languages to understand each other, digital devices need standardized protocols to exchange information effectively.</p>
+
+            <div class="analogy-box">
+                <strong>Protocol Analogy:</strong> Think of network protocols like the postal system. The OSI model is like the complete postal infrastructure (from writing a letter to international delivery), while TCP/IP is like a streamlined express service that handles most common delivery needs efficiently.
+            </div>
+
+            <h3>The OSI Model: Seven Layers of Communication</h3>
+            <p>The OSI Model breaks down network communication into seven layers. These layers are useful for identifying network issues and understanding how data moves through networks.</p>
+
+            <div class="protocol-stack">
+                <div class="protocol-layer" onclick="showLayerDetails(7)" id="layer7">7. Application Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(6)" id="layer6">6. Presentation Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(5)" id="layer5">5. Session Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(4)" id="layer4">4. Transport Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(3)" id="layer3">3. Network Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(2)" id="layer2">2. Data Link Layer</div>
+                <div class="protocol-layer" onclick="showLayerDetails(1)" id="layer1">1. Physical Layer</div>
+            </div>
+
+            <div id="layerDetails" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                <h4 id="layerTitle"></h4>
+                <p id="layerDescription"></p>
+                <div id="layerExample" style="margin-top: 10px; font-style: italic;"></div>
+            </div>
+
+            <h3>TCP/IP Model: The Internet's Foundation</h3>
+            <p>The TCP/IP model is a framework that is used to model the communication in a network. It has four layers: Application, Transport, Network/Internet and Network Access. While the OSI model has seven layers, the 4 layer TCP/IP model is simpler and commonly used in today's Internet and networking systems.</p>
+
+            <div class="example-box">
+                <strong>Email Example Through the Layers:</strong>
+                <ol>
+                    <li><strong>Application:</strong> You compose an email in Outlook (SMTP protocol)</li>
+                    <li><strong>Transport:</strong> The email is broken into packets (TCP ensures reliability)</li>
+                    <li><strong>Network:</strong> Packets are addressed with IP addresses for routing</li>
+                    <li><strong>Data Link/Physical:</strong> Packets become electrical signals on cables</li>
+                </ol>
+                The process reverses at the destination to reconstruct your email.
+            </div>
+
+            <h3>Key Protocol Families</h3>
+            
+            <div class="interactive-element">
+                <h4>🎯 Protocol Matching Game</h4>
+                <p>Match each protocol with its primary function:</p>
+                <div id="protocolGame">
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h5>Protocols:</h5>
+                            <div class="quiz-option" draggable="true" ondragstart="drag(event)" id="http">HTTP</div>
+                            <div class="quiz-option" draggable="true" ondragstart="drag(event)" id="tcp">TCP</div>
+                            <div class="quiz-option" draggable="true" ondragstart="drag(event)" id="ip">IP</div>
+                            <div class="quiz-option" draggable="true" ondragstart="drag(event)" id="dns">DNS</div>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <h5>Functions:</h5>
+                            <div class="quiz-option" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="http">Web Page Transfer</div>
+                            <div class="quiz-option" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="tcp">Reliable Data Delivery</div>
+                            <div class="quiz-option" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="ip">Packet Routing</div>
+                            <div class="quiz-option" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="dns">Name Resolution</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="checkProtocolAnswers()" style="margin-top: 15px;">Check Answers</button>
+                </div>
+            </div>
+
+            <h3>Modern Protocol Developments</h3>
+            <p>As we advance into 2025, protocols continue evolving to support emerging technologies. IPv6 adoption is accelerating, new security protocols are emerging, and protocols specifically designed for IoT and edge computing are becoming mainstream.</p>
+
+            <div class="analogy-box">
+                <strong>Protocol Evolution Analogy:</strong> Protocol evolution is like the development of transportation systems. Just as we evolved from horse-drawn carriages to modern highways with traffic management systems, network protocols have evolved from simple point-to-point connections to sophisticated, multi-layered communication systems that can handle everything from a text message to real-time video calls across the globe.
+            </div>
+        </div>
+
+        <!-- Section 4: IP Addressing -->
+        <div class="section" id="addressing">
+            <h2>📍 IP Addressing and Network Services</h2>
+
+            <h3>Understanding IP Addresses</h3>
+            <p>IP (Internet Protocol) addresses are unique identifiers for devices on a network, much like postal addresses for houses. They ensure that data packets reach their intended destinations in the vast network of interconnected devices.</p>
+
+            <div class="analogy-box">
+                <strong>IP Address Analogy:</strong> Think of IP addresses like postal addresses. IPv4 addresses are like traditional house addresses with limited space in a city (only about 4.3 billion possible addresses). IPv6 addresses are like a futuristic addressing system that provides enough unique addresses for every grain of sand on Earth - ensuring we'll never run out of space as our digital world expands.
+            </div>
+
+            <h3>IPv4 vs IPv6: The Great Transition</h3>
+            <p>As of early 2025, global IPv6 adoption stands at slightly over 43%, based on IPv6 traffic to Google. IPv6 addresses are significantly larger, 128-bit IP addresses with a near-infinite IP capacity—up to 340 undecillion addresses.</p>
+
+            <div class="interactive-element">
+                <h4>🔢 IPv4 vs IPv6 Calculator</h4>
+                <p>Explore the difference in address space:</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5>IPv4 Address Space</h5>
+                        <p>32-bit addresses</p>
+                        <p>Total possible: <span style="color: #4a7c59; font-weight: bold;">4,294,967,296</span></p>
+                        <p>Example: 192.168.1.1</p>
+                        <div style="width: 100%; height: 10px; background: #dc3545; border-radius: 5px; margin-top: 10px;"></div>
+                        <p style="font-size: 0.8em; color: #721c24; margin-top: 5px;">Address exhaustion reached</p>
+                    </div>
+                    <div style="flex: 1; min-width: 250px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5>IPv6 Address Space</h5>
+                        <p>128-bit addresses</p>
+                        <p>Total possible: <span style="color: #4a7c59; font-weight: bold;">340,282,366,920,938,463,463,374,607,431,768,211,456</span></p>
+                        <p>Example: 2001:4860:4860::8888</p>
+                        <div style="width: 100%; height: 10px; background: #28a745; border-radius: 5px; margin-top: 10px;"></div>
+                        <p style="font-size: 0.8em; color: #155724; margin-top: 5px;">Virtually unlimited addresses</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Dynamic Host Configuration Protocol (DHCP)</h3>
+            <p>DHCP is a client-server protocol that dynamically assigns IP addresses and allocates TCP/IP configuration information to DHCP clients, including subnet mask information, default gateway IP addresses, and DNS addresses.</p>
+
+            <div class="example-box">
+                <strong>DHCP in Action:</strong> When you connect your laptop to a university Wi-Fi network, DHCP automatically:
+                <ol>
+                    <li>Assigns your device a unique IP address</li>
+                    <li>Provides the subnet mask to determine your network segment</li>
+                    <li>Sets the default gateway for internet access</li>
+                    <li>Configures DNS servers for web browsing</li>
+                </ol>
+                This happens in seconds without any manual configuration!
+            </div>
+
+            <h3>Domain Name System (DNS)</h3>
+            <p>DNS translates human-readable domain names (like google.com) into IP addresses that computers use to locate services. It's essentially the internet's phone book.</p>
+
+            <div class="analogy-box">
+                <strong>DNS Analogy:</strong> DNS is like a universal translator and directory service. When you want to call your friend "John," you don't need to remember his phone number - you just look up "John" in your contacts. Similarly, when you type "google.com," DNS looks up the actual IP address (like 8.8.8.8) so your computer knows where to connect.
+            </div>
+
+            <h3>DHCPv6 and Modern Addressing</h3>
+            <p>DHCPv6 (Dynamic Host Configuration Protocol for IPv6) enables devices to obtain network configuration details, such as IPv6 addresses, DNS server information, and other parameters, from a DHCPv6 server, supporting additional configuration options unlike SLAAC.</p>
+
+            <div class="interactive-element">
+                <h4>🌐 IP Address Lookup Tool</h4>
+                <input type="text" id="domainInput" placeholder="Enter a domain name (e.g., google.com)" style="padding: 10px; width: 300px; border: 2px solid #4a7c59; border-radius: 5px;">
+                <button class="btn" onclick="lookupDomain()">🔍 Lookup</button>
+                <div id="lookupResult" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; display: none;">
+                    <h5>Lookup Result:</h5>
+                    <p id="lookupText"></p>
+                </div>
+            </div>
+
+            <h3>Network Address Translation (NAT)</h3>
+            <p>NAT allows multiple devices on a private network to share a single public IP address, extending the life of IPv4 addresses while providing security benefits.</p>
+
+            <div class="example-box">
+                <strong>NAT in Your Home:</strong> Your home router receives one public IP address from your ISP, but all your devices (phones, laptops, smart TVs) can access the internet simultaneously. NAT creates private addresses (like 192.168.1.x) for your internal devices and translates between private and public addresses as needed.
+            </div>
+        </div>
+
+        <!-- Section 5: IT Services -->
+        <div class="section" id="services">
+            <h2>⚙️ IT Services and Applications</h2>
+
+            <h3>Core IT Service Categories</h3>
+            <p>IT services represent the functional layer where technology meets business needs. These services transform raw computing power and connectivity into valuable business capabilities.</p>
+
+            <div class="analogy-box">
+                <strong>IT Services Analogy:</strong> If IT infrastructure is like a city's utilities (water, electricity, roads), then IT services are like the businesses and services that make the city useful - hospitals, schools, banks, and entertainment venues. The infrastructure enables the services, but the services deliver the actual value to residents (users).
+            </div>
+
+            <h3>Cloud Computing Services</h3>
+            <p>Industry cloud platforms provide customized solutions, with the global market size growing from $17 billion in 2020 to $83 billion in 2025, at a 36.8% CAGR, driven by increasing needs for specialized cloud solutions.</p>
+
+            <div class="device-grid">
+                <div class="device-card" onclick="showServiceDetails('iaas')">
+                    <div class="device-icon">🏗️</div>
+                    <h4>Infrastructure as a Service (IaaS)</h4>
+                    <p>Virtual computing resources</p>
+                </div>
+                <div class="device-card" onclick="showServiceDetails('paas')">
+                    <div class="device-icon">🔧</div>
+                    <h4>Platform as a Service (PaaS)</h4>
+                    <p>Development and deployment platform</p>
+                </div>
+                <div class="device-card" onclick="showServiceDetails('saas')">
+                    <div class="device-icon">📱</div>
+                    <h4>Software as a Service (SaaS)</h4>
+                    <p>Ready-to-use applications</p>
+                </div>
+            </div>
+
+            <div id="serviceDetails" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                <h4 id="serviceTitle"></h4>
+                <p id="serviceDescription"></p>
+                <div id="serviceExample" class="example-box" style="margin-top: 15px;"></div>
+            </div>
+
+            <h3>Artificial Intelligence and Machine Learning Services</h3>
+            <p>The intelligent apps market will grow from $12.7 billion in 2020 to $62.4 billion by 2025 at a CAGR of 37.2%, with high adoption rates in industries that benefit from data-driven insights and automation.</p>
+
+            <div class="example-box">
+                <strong>AI in Education Example:</strong> Modern learning management systems use AI to:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Personalized Learning:</strong> Adapt content difficulty based on student performance</li>
+                    <li><strong>Automated Grading:</strong> Handle multiple-choice and even essay assessments</li>
+                    <li><strong>Predictive Analytics:</strong> Identify students at risk of dropping out</li>
+                    <li><strong>Intelligent Tutoring:</strong> Provide 24/7 student support through chatbots</li>
+                </ul>
+            </div>
+
+            <h3>Cybersecurity Services</h3>
+            <p>In 2025, the global cost of cybercrime is projected to reach US$10.5 trillion, while the global market for security products is expected to reach US$200 billion by 2028.</p>
+
+            <div class="interactive-element">
+                <h4>🔒 Security Layers Interactive Model</h4>
+                <p>Click on each security layer to understand how they work together:</p>
+                <div id="securityLayers" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <div class="protocol-layer" onclick="showSecurityLayer('user')" style="background: #dc3545;">User Education & Awareness</div>
+                    <div class="protocol-layer" onclick="showSecurityLayer('application')" style="background: #fd7e14;">Application Security</div>
+                    <div class="protocol-layer" onclick="showSecurityLayer('endpoint')" style="background: #ffc107;">Endpoint Protection</div>
+                    <div class="protocol-layer" onclick="showSecurityLayer('network')" style="background: #28a745;">Network Security</div>
+                    <div class="protocol-layer" onclick="showSecurityLayer('data')" style="background: #17a2b8;">Data Security</div>
+                    <div class="protocol-layer" onclick="showSecurityLayer('physical')" style="background: #6f42c1;">Physical Security</div>
+                </div>
+                <div id="securityDetails" style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 2px solid #4a7c59; display: none;">
+                    <h5 id="securityTitle"></h5>
+                    <p id="securityDescription"></p>
+                </div>
+            </div>
+
+            <h3>Internet of Things (IoT) Services</h3>
+            <p>By 2025, over 75 billion IoT devices are expected to be connected globally, driven by advancements in edge computing, 5G, and the growing need for real-time analytics in healthcare, manufacturing, and logistics.</p>
+
+            <div class="analogy-box">
+                <strong>IoT Services Analogy:</strong> IoT services are like having a highly attentive assistant for every aspect of your environment. Just as a good assistant anticipates your needs and manages details automatically, IoT services monitor conditions, predict requirements, and take actions without human intervention - whether it's adjusting building temperature, reordering supplies, or alerting maintenance teams.
+            </div>
+
+            <h3>Data Analytics and Business Intelligence</h3>
+            <p>Modern IT services increasingly focus on extracting value from the massive amounts of data generated by digital operations. These services help organizations make informed decisions based on data patterns and trends.</p>
+
+            <div class="example-box">
+                <strong>University Analytics Example:</strong> A university's data analytics services might track:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Student Performance:</strong> Identifying learning patterns and intervention opportunities</li>
+                    <li><strong>Resource Utilization:</strong> Optimizing classroom and lab usage</li>
+                    <li><strong>Financial Analytics:</strong> Budget forecasting and resource allocation</li>
+                    <li><strong>Research Metrics:</strong> Publication impact and collaboration patterns</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 6: IT/OT Convergence Preparation -->
+        <div class="section" id="convergence">
+            <h2>🔄 Preparing for IT/OT Convergence</h2>
+
+            <h3>Understanding the Convergence Paradigm</h3>
+            <p>The convergence of Information Technology (IT) and Operational Technology (OT) represents one of the most significant shifts in how organizations manage their technological infrastructure. This convergence is driving the Fourth Industrial Revolution (Industry 4.0).</p>
+
+            <div class="analogy-box">
+                <strong>IT/OT Convergence Analogy:</strong> Imagine a traditional orchestra where IT is like the administrative office (managing schedules, communications, finances) and OT is like the musicians (creating the actual performance). Convergence is like creating a "smart orchestra" where the administrative systems directly coordinate with intelligent instruments, automatically adjusting tempo, volume, and coordination in real-time based on audience response and environmental conditions.
+            </div>
+
+            <h3>Key Drivers of Convergence</h3>
+            <div class="device-grid">
+                <div class="device-card">
+                    <div class="device-icon">📈</div>
+                    <h4>Operational Efficiency</h4>
+                    <p>Unified systems reduce complexity and improve decision-making</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">💰</div>
+                    <h4>Cost Reduction</h4>
+                    <p>Shared infrastructure and streamlined operations</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🔍</div>
+                    <h4>Enhanced Visibility</h4>
+                    <p>Real-time insights across all operations</p>
+                </div>
+                <div class="device-card">
+                    <div class="device-icon">🚀</div>
+                    <h4>Innovation Enablement</h4>
+                    <p>New capabilities through system integration</p>
+                </div>
+            </div>
+
+            <h3>IT Skills Translating to IT/OT Environments</h3>
+            <p>Many of the IT concepts we've covered form the foundation for understanding converged environments:</p>
+
+            <div class="example-box">
+                <strong>IT Foundation Building Blocks for IT/OT:</strong>
+                <ul style="margin-top: 10px;">
+                    <li><strong>Networking Protocols:</strong> Same TCP/IP, Ethernet foundations, plus industrial protocols</li>
+                    <li><strong>Cybersecurity:</strong> IT security principles apply, with additional operational safety considerations</li>
+                    <li><strong>Data Management:</strong> IT data skills scale to handle sensor data and real-time operational metrics</li>
+                    <li><strong>Cloud Services:</strong> IT cloud experience applies to industrial IoT and edge computing</li>
+                </ul>
+            </div>
+
+            <h3>New Challenges in Converged Environments</h3>
+            <div class="interactive-element">
+                <h4>🎯 Challenge Identification Exercise</h4>
+                <p>Consider how each IT concept becomes more complex in IT/OT convergence:</p>
+                <div id="challengeCards" class="device-grid">
+                    <div class="device-card" onclick="showChallenge('security')">
+                        <div class="device-icon">🔐</div>
+                        <h4>Security Challenges</h4>
+                        <p>Click to explore</p>
+                    </div>
+                    <div class="device-card" onclick="showChallenge('latency')">
+                        <div class="device-icon">⚡</div>
+                        <h4>Real-time Requirements</h4>
+                        <p>Click to explore</p>
+                    </div>
+                    <div class="device-card" onclick="showChallenge('standards')">
+                        <div class="device-icon">📋</div>
+                        <h4>Protocol Integration</h4>
+                        <p>Click to explore</p>
+                    </div>
+                    <div class="device-card" onclick="showChallenge('workforce')">
+                        <div class="device-icon">👥</div>
+                        <h4>Skills Integration</h4>
+                        <p>Click to explore</p>
+                    </div>
+                </div>
+                <div id="challengeDetails" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                    <h4 id="challengeTitle"></h4>
+                    <p id="challengeDescription"></p>
+                </div>
+            </div>
+
+            <h3>Preparing Faculty for the Next Session</h3>
+            <p>As we prepare to explore Operational Technology in our next session, consider how the IT concepts you've learned will intersect with:</p>
+
+            <div class="analogy-box">
+                <strong>Looking Ahead:</strong> Think of today's IT lesson as learning about the human circulatory system (data flow, protocols, addressing). Our next OT session will be like learning about the muscular system (actuators, sensors, control systems). The magic happens when we understand how these systems work together to create intelligent, responsive organizations.
+            </div>
+
+            <div class="example-box">
+                <strong>Faculty Preparation Checklist:</strong>
+                <ol>
+                    <li><strong>Review Key IT Concepts:</strong> Ensure solid understanding of networking, protocols, and services</li>
+                    <li><strong>Consider Real-world Applications:</strong> Think about how IT systems in your institution could connect with physical operations</li>
+                    <li><strong>Identify Learning Opportunities:</strong> Look for examples of smart building systems, automated labs, or IoT implementations on campus</li>
+                    <li><strong>Prepare Questions:</strong> Consider what you'd like to know about how IT and OT will work together in educational environments</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Section 7: Assessment -->
+        <div class="section" id="assessment">
+            <h2>📝 Knowledge Assessment and Reflection</h2>
+
+            <h3>Comprehensive Knowledge Check</h3>
+            <p>Test your understanding of the key concepts covered in this workshop.</p>
+
+            <div class="quiz-question">
+                <h4>Question 1: Which layer of the OSI model is responsible for routing packets between different networks?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">A) Transport Layer (Layer 4)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">B) Data Link Layer (Layer 2)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">C) Network Layer (Layer 3)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) Application Layer (Layer 7)</div>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h4>Question 2: What is the primary advantage of IPv6 over IPv4?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">A) Faster data transmission</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">B) Vastly larger address space</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">C) Better compression algorithms</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) Lower power consumption</div>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h4>Question 3: In the context of IT/OT convergence, what does DHCP primarily provide?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">A) Automatic IP address assignment and network configuration</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">B) Domain name to IP address translation</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">C) Secure data encryption</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) Network traffic routing</div>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h4>Question 4: Which IT trend is expected to reach $1.6 trillion by 2025?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">A) Blockchain technology</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">B) Artificial Intelligence</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, true)">C) Internet of Things (IoT)</div>
+                    <div class="quiz-option" onclick="selectAnswer(this, false)">D) Cloud computing</div>
+                </div>
+            </div>
+
+            <h3>Reflection Exercise</h3>
+            <div class="interactive-element">
+                <h4>🤔 Personal Learning Reflection</h4>
+                <p>Take a moment to reflect on your learning journey:</p>
+                <textarea id="reflectionText" placeholder="Reflect on: What was most surprising? How will you apply this knowledge? What questions do you have for the OT session?" style="width: 100%; height: 120px; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px; font-family: inherit; font-size: 1rem;"></textarea>
+                <br><br>
+                <button class="btn" onclick="saveReflection()">💾 Save Reflection</button>
+            </div>
+
+            <h3>Workshop Summary</h3>
+            <div class="example-box">
+                <strong>Key Takeaways from Today's Session:</strong>
+                <ul style="margin-top: 10px;">
+                    <li><strong>IT Foundation:</strong> Understanding devices, protocols, and services as building blocks</li>
+                    <li><strong>Network Communication:</strong> How OSI and TCP/IP models enable global connectivity</li>
+                    <li><strong>Addressing Systems:</strong> The transition from IPv4 to IPv6 and the role of DHCP/DNS</li>
+                    <li><strong>Service Evolution:</strong> From basic computing to AI, cloud, and IoT services</li>
+                    <li><strong>Convergence Preparation:</strong> How IT knowledge prepares you for IT/OT integration</li>
+                </ul>
+            </div>
+
+            <h3>Next Steps</h3>
+            <div class="analogy-box">
+                <strong>Looking Forward:</strong> You've now built a solid foundation in Information Technology - the digital nervous system of modern organizations. In our next session on Operational Technology, you'll learn about the "muscular system" that controls physical processes. Together, these create the smart, responsive organizations of the future.
+            </div>
+
+            <div class="interactive-element">
+                <h4>📊 Workshop Completion</h4>
+                <p>Congratulations on completing the IT Fundamentals workshop!</p>
+                <button class="btn" onclick="generateCertificate()">🏆 Generate Completion Certificate</button>
+                <div id="certificate" style="display: none; margin-top: 20px; padding: 20px; background: white; border: 3px solid #4a7c59; border-radius: 10px; text-align: center;">
+                    <h3 style="color: #2d5016;">Certificate of Completion</h3>
+                    <p>This certifies that you have successfully completed the</p>
+                    <h4 style="color: #4a7c59;">Information Technology Fundamentals Workshop</h4>
+                    <p>4-Hour Faculty Development Program</p>
+                    <p><strong>Date:</strong> <span id="certDate"></span></p>
+                    <p style="font-style: italic; margin-top: 20px;">Ready for IT/OT Convergence Training</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let startTime = new Date();
+        let currentSection = 'overview';
+        let quizScore = 0;
+        let totalQuizQuestions = 4;
+
+        // Timer functionality
+        function updateTimer() {
+            const now = new Date();
+            const elapsed = new Date(now - startTime);
+            const hours = String(elapsed.getUTCHours()).padStart(2, '0');
+            const minutes = String(elapsed.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(elapsed.getUTCSeconds()).padStart(2, '0');
+            document.getElementById('timer').textContent = `Session Time: ${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateTimer, 1000);
+
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to corresponding nav button
+            event.target.classList.add('active');
+
+            // Update progress bar
+            const sections_array = ['overview', 'devices', 'protocols', 'addressing', 'services', 'convergence', 'assessment'];
+            const progress = ((sections_array.indexOf(sectionId) + 1) / sections_array.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            currentSection = sectionId;
+        }
+
+        // IT Trends functionality
+        function showTrendDetails(trend) {
+            const trends = {
+                'ai': {
+                    title: 'Artificial Intelligence Integration',
+                    description: 'AI is being integrated across all IT systems, from intelligent applications that grow from $12.7 billion to $62.4 billion by 2025, to automated decision-making processes that enhance business operations across finance, healthcare, retail, and manufacturing sectors.'
+                },
+                'cloud': {
+                    title: 'Cloud Computing Evolution',
+                    description: 'Industry cloud platforms are growing from $17 billion to $83 billion by 2025, providing specialized solutions for healthcare, finance, and manufacturing. Cloud environments are becoming the backbone for scalable, efficient business operations.'
+                },
+                'iot': {
+                    title: 'Internet of Things Expansion',
+                    description: 'The IoT market will reach $1.6 trillion by 2025, with over 75 billion connected devices globally. IoT is transforming manufacturing, healthcare, agriculture, and smart city initiatives through intelligent automation and data collection.'
+                },
+                'security': {
+                    title: 'Cybersecurity Imperative',
+                    description: 'With global cybercrime costs projected at $10.5 trillion in 2025, cybersecurity becomes critical. The security products market will reach $200 billion by 2028, emphasizing the need for robust, multilayered protection strategies.'
+                }
+            };
+
+            const trend_data = trends[trend];
+            document.getElementById('trendTitle').textContent = trend_data.title;
+            document.getElementById('trendDescription').textContent = trend_data.description;
+            document.getElementById('trendDetails').style.display = 'block';
+        }
+
+        // Device details functionality
+        function showDeviceDetails(device) {
+            const devices = {
+                'servers': {
+                    title: 'Servers: The Computing Powerhouses',
+                    description: 'Servers are centralized computers that provide services, data, and resources to other computers (clients) over a network. They handle everything from web hosting to database management, email services, and application hosting.',
+                    analogy: 'Think of servers like the kitchen in a restaurant. Just as the kitchen prepares meals for multiple customers simultaneously, servers process requests and deliver digital "meals" (data, applications, services) to multiple users at once. The more powerful the kitchen (server), the more customers it can serve efficiently.'
+                },
+                'routers': {
+                    title: 'Routers: Network Traffic Directors',
+                    description: 'Routers direct data packets between different networks, determining the best path for information to travel from source to destination. They operate at the Network Layer (Layer 3) of the OSI model and use IP addresses to make routing decisions.',
+                    analogy: 'Routers are like GPS navigation systems for data. Just as GPS finds the best route from your home to your destination, considering traffic and road conditions, routers analyze network conditions and choose the optimal path for each data packet to reach its destination efficiently.'
+                },
+                'switches': {
+                    title: 'Switches: Local Network Connectors',
+                    description: 'Switches connect devices within the same network segment, using MAC addresses to forward data only to the intended recipient. They operate at the Data Link Layer (Layer 2) and create collision domains for each port.',
+                    analogy: 'Switches are like intelligent postal sorting facilities. Instead of broadcasting mail to everyone in a neighborhood (like old hubs), switches read the address on each piece of data and deliver it directly to the correct recipient, making communication faster and more secure.'
+                },
+                'firewalls': {
+                    title: 'Firewalls: Network Security Gatekeepers',
+                    description: 'Firewalls monitor and control incoming and outgoing network traffic based on predetermined security rules. They act as barriers between trusted internal networks and untrusted external networks like the internet.',
+                    analogy: 'Firewalls are like security guards at a building entrance. They check everyone entering and leaving, verify they have proper authorization, and block anyone who doesn\'t meet the security criteria. They can also monitor for suspicious behavior and alert administrators to potential threats.'
+                },
+                'storage': {
+                    title: 'Storage Systems: Data Preservation Infrastructure',
+                    description: 'Storage systems provide persistent data storage for organizations, ranging from simple hard drives to complex Storage Area Networks (SANs). They ensure data availability, redundancy, and backup capabilities.',
+                    analogy: 'Storage systems are like a vast library with an intelligent filing system. Just as libraries organize books for easy retrieval and preserve them for future generations, storage systems organize digital data, make it quickly accessible, and ensure it\'s safely preserved with multiple copies.'
+                },
+                'endpoints': {
+                    title: 'Endpoints: User Interaction Devices',
+                    description: 'Endpoints are devices that connect to and communicate with a network, including computers, smartphones, tablets, IoT devices, and smart appliances. They represent the user interface to the broader IT infrastructure.',
+                    analogy: 'Endpoints are like different types of vehicles accessing a highway system. Whether it\'s a car, truck, or motorcycle (computer, phone, or IoT device), each needs to follow traffic rules (protocols) to safely navigate the highway (network) and reach their destination (services).'
+                }
+            };
+
+            const device_data = devices[device];
+            document.getElementById('deviceTitle').textContent = device_data.title;
+            document.getElementById('deviceDescription').textContent = device_data.description;
+            document.getElementById('deviceAnalogy').textContent = device_data.analogy;
+            document.getElementById('deviceDetails').style.display = 'block';
+        }
+
+        // Network simulation
+        function simulateTraffic() {
+            const canvas = document.getElementById('networkCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw network devices
+            drawDevice(ctx, 50, 200, 'Router', '#4a7c59');
+            drawDevice(ctx, 200, 100, 'Switch', '#2d5016');
+            drawDevice(ctx, 200, 300, 'Switch', '#2d5016');
+            drawDevice(ctx, 350, 50, 'Server', '#6c757d');
+            drawDevice(ctx, 350, 150, 'PC', '#17a2b8');
+            drawDevice(ctx, 350, 250, 'PC', '#17a2b8');
+            drawDevice(ctx, 350, 350, 'PC', '#17a2b8');
+            
+            // Draw connections
+            drawConnection(ctx, 90, 200, 160, 100);
+            drawConnection(ctx, 90, 200, 160, 300);
+            drawConnection(ctx, 240, 100, 310, 50);
+            drawConnection(ctx, 240, 100, 310, 150);
+            drawConnection(ctx, 240, 300, 310, 250);
+            drawConnection(ctx, 240, 300, 310, 350);
+            
+            // Animate data packets
+            animatePacket(ctx, 90, 200, 160, 100, '#ff6b6b');
+            setTimeout(() => animatePacket(ctx, 160, 100, 310, 150, '#ff6b6b'), 500);
+            setTimeout(() => animatePacket(ctx, 90, 200, 160, 300, '#4ecdc4'), 1000);
+            setTimeout(() => animatePacket(ctx, 160, 300, 310, 250, '#4ecdc4'), 1500);
+        }
+
+        function drawDevice(ctx, x, y, label, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x - 20, y - 15, 40, 30);
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x, y + 25);
+        }
+
+        function drawConnection(ctx, x1, y1, x2, y2) {
+            ctx.strokeStyle = '#6c757d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        function animatePacket(ctx, x1, y1, x2, y2, color) {
+            let progress = 0;
+            const animate = () => {
+                if (progress <= 1) {
+                    const x = x1 + (x2 - x1) * progress;
+                    const y = y1 + (y2 - y1) * progress;
+                    
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    progress += 0.02;
+                    setTimeout(animate, 20);
+                }
+            };
+            animate();
+        }
+
+        function resetSimulation() {
+            const canvas = document.getElementById('networkCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw static network
+            drawDevice(ctx, 50, 200, 'Router', '#4a7c59');
+            drawDevice(ctx, 200, 100, 'Switch', '#2d5016');
+            drawDevice(ctx, 200, 300, 'Switch', '#2d5016');
+            drawDevice(ctx, 350, 50, 'Server', '#6c757d');
+            drawDevice(ctx, 350, 150, 'PC', '#17a2b8');
+            drawDevice(ctx, 350, 250, 'PC', '#17a2b8');
+            drawDevice(ctx, 350, 350, 'PC', '#17a2b8');
+            
+            drawConnection(ctx, 90, 200, 160, 100);
+            drawConnection(ctx, 90, 200, 160, 300);
+            drawConnection(ctx, 240, 100, 310, 50);
+            drawConnection(ctx, 240, 100, 310, 150);
+            drawConnection(ctx, 240, 300, 310, 250);
+            drawConnection(ctx, 240, 300, 310, 350);
+        }
+
+        // Initialize network canvas
+        document.addEventListener('DOMContentLoaded', function() {
+            resetSimulation();
+        });
+
+        // OSI Layer details
+        function showLayerDetails(layer) {
+            const layers = {
+                7: {
+                    title: 'Application Layer (Layer 7)',
+                    description: 'This layer provides network services directly to end-users and applications. It handles protocols like HTTP for web browsing, SMTP for email, and FTP for file transfer.',
+                    example: 'When you open a web browser and visit a website, the Application Layer handles the HTTP protocol communication.'
+                },
+                6: {
+                    title: 'Presentation Layer (Layer 6)',
+                    description: 'Responsible for data translation, encryption, and compression. It ensures data from the application layer is properly formatted for transmission.',
+                    example: 'When you send an encrypted email, this layer handles the encryption before transmission and decryption upon receipt.'
+                },
+                5: {
+                    title: 'Session Layer (Layer 5)',
+                    description: 'Manages communication sessions between applications, including establishing, maintaining, and terminating connections.',
+                    example: 'When you log into a website, this layer maintains your session so you stay logged in as you navigate between pages.'
+                },
+                4: {
+                    title: 'Transport Layer (Layer 4)',
+                    description: 'Provides reliable data transfer services, including error checking, flow control, and data segmentation. TCP and UDP operate at this layer.',
+                    example: 'When downloading a file, TCP at this layer ensures all pieces arrive correctly and in order, requesting retransmission if needed.'
+                },
+                3: {
+                    title: 'Network Layer (Layer 3)',
+                    description: 'Handles routing of data packets between different networks using logical addressing (IP addresses). Routers operate primarily at this layer.',
+                    example: 'When you send data to a website, this layer determines the best path through multiple networks to reach the destination server.'
+                },
+                2: {
+                    title: 'Data Link Layer (Layer 2)',
+                    description: 'Manages communication between adjacent network devices using physical addressing (MAC addresses). Switches operate at this layer.',
+                    example: 'Within your local network, this layer ensures data gets from your computer to the router using MAC addresses.'
+                },
+                1: {
+                    title: 'Physical Layer (Layer 1)',
+                    description: 'Handles the actual transmission of raw bit streams over physical media like cables, radio waves, or optical fiber.',
+                    example: 'The electrical signals traveling through Ethernet cables or radio waves in Wi-Fi represent this layer in action.'
+                }
+            };
+
+            const layer_data = layers[layer];
+            document.getElementById('layerTitle').textContent = layer_data.title;
+            document.getElementById('layerDescription').textContent = layer_data.description;
+            document.getElementById('layerExample').textContent = 'Example: ' + layer_data.example;
+            document.getElementById('layerDetails').style.display = 'block';
+        }
+
+        // Protocol matching game
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const droppedElement = document.getElementById(data);
+            ev.target.textContent = droppedElement.textContent + ' → ' + ev.target.textContent.split(' → ')[0];
+            ev.target.setAttribute('data-dropped', data);
+            droppedElement.style.opacity = '0.5';
+        }
+
+        function checkProtocolAnswers() {
+            const answers = {
+                'http': 'Web Page Transfer',
+                'tcp': 'Reliable Data Delivery',
+                'ip': 'Packet Routing',
+                'dns': 'Name Resolution'
+            };
+
+            let correct = 0;
+            const dropZones = document.querySelectorAll('[data-answer]');
+            
+            dropZones.forEach(zone => {
+                const correctAnswer = zone.getAttribute('data-answer');
+                const droppedAnswer = zone.getAttribute('data-dropped');
+                
+                if (droppedAnswer === correctAnswer) {
+                    zone.classList.add('correct');
+                    correct++;
+                } else if (droppedAnswer) {
+                    zone.classList.add('incorrect');
+                }
+            });
+
+            alert(`You got ${correct} out of 4 correct!`);
+        }
+
+        // Service details
+        function showServiceDetails(service) {
+            const services = {
+                'iaas': {
+                    title: 'Infrastructure as a Service (IaaS)',
+                    description: 'IaaS provides virtualized computing resources over the internet, including virtual machines, storage, and networking. Users can rent IT infrastructure on a pay-per-use basis without owning physical hardware.',
+                    example: 'Amazon Web Services (AWS) EC2 instances allow you to rent virtual servers with specific CPU, memory, and storage configurations. You can scale up during busy periods and scale down to save costs, paying only for what you use.'
+                },
+                'paas': {
+                    title: 'Platform as a Service (PaaS)',
+                    description: 'PaaS provides a development and deployment environment in the cloud, including operating systems, development tools, database management, and business analytics. Developers can build applications without managing underlying infrastructure.',
+                    example: 'Microsoft Azure App Service lets developers deploy web applications without worrying about servers, operating systems, or runtime environments. Developers focus on code while the platform handles scaling, security patches, and infrastructure management.'
+                },
+                'saas': {
+                    title: 'Software as a Service (SaaS)',
+                    description: 'SaaS delivers fully functional applications over the internet on a subscription basis. Users access software through web browsers without installing or maintaining anything locally.',
+                    example: 'Google Workspace (Gmail, Docs, Sheets) provides complete office productivity tools accessible from any device with internet access. Updates, security, and data backup are handled automatically by Google.'
+                }
+            };
+
+            const service_data = services[service];
+            document.getElementById('serviceTitle').textContent = service_data.title;
+            document.getElementById('serviceDescription').textContent = service_data.description;
+            document.getElementById('serviceExample').innerHTML = '<strong>Example:</strong> ' + service_data.example;
+            document.getElementById('serviceDetails').style.display = 'block';
+        }
+
+        // Security layers
+        function showSecurityLayer(layer) {
+            const layers = {
+                'user': {
+                    title: 'User Education & Awareness',
+                    description: 'The human element in cybersecurity. Training users to recognize phishing attempts, use strong passwords, and follow security protocols. Often considered the most critical layer since humans are frequently the weakest link in security.'
+                },
+                'application': {
+                    title: 'Application Security',
+                    description: 'Securing software applications through secure coding practices, regular updates, input validation, and vulnerability testing. Includes web application firewalls and code analysis tools.'
+                },
+                'endpoint': {
+                    title: 'Endpoint Protection',
+                    description: 'Securing individual devices like computers, phones, and IoT devices with antivirus software, endpoint detection and response (EDR) tools, and device management policies.'
+                },
+                'network': {
+                    title: 'Network Security',
+                    description: 'Protecting network infrastructure with firewalls, intrusion detection systems, VPNs, and network segmentation to control traffic flow and prevent unauthorized access.'
+                },
+                'data': {
+                    title: 'Data Security',
+                    description: 'Protecting data through encryption, access controls, data loss prevention (DLP), and backup systems. Ensures data confidentiality, integrity, and availability.'
+                },
+                'physical': {
+                    title: 'Physical Security',
+                    description: 'Protecting physical access to IT infrastructure through locks, security cameras, access cards, and environmental controls. Prevents unauthorized physical access to systems.'
+                }
+            };
+
+            const layer_data = layers[layer];
+            document.getElementById('securityTitle').textContent = layer_data.title;
+            document.getElementById('securityDescription').textContent = layer_data.description;
+            document.getElementById('securityDetails').style.display = 'block';
+        }
+
+        // Challenge exploration
+        function showChallenge(challenge) {
+            const challenges = {
+                'security': {
+                    title: 'Security in Converged Environments',
+                    description: 'IT security focuses on data protection and access control, while OT security emphasizes safety and availability. Converged environments must balance both: protecting sensitive data while ensuring operational systems remain available for critical processes. New attack vectors emerge when IT networks connect to OT systems that were originally air-gapped.'
+                },
+                'latency': {
+                    title: 'Real-time Processing Requirements',
+                    description: 'Traditional IT can tolerate some delays - a few seconds for email delivery is acceptable. However, OT systems often require millisecond response times for safety-critical operations. Converged systems must maintain IT flexibility while meeting OT real-time constraints, requiring new network architectures and edge computing solutions.'
+                },
+                'standards': {
+                    title: 'Protocol and Standards Integration',
+                    description: 'IT typically uses standard protocols like TCP/IP and HTTP. OT uses specialized industrial protocols like Modbus, DNP3, and PROFINET. Convergence requires bridging these different protocol families while maintaining the reliability and deterministic behavior that industrial systems require.'
+                },
+                'workforce': {
+                    title: 'Skills and Workforce Integration',
+                    description: 'IT professionals understand networking, cybersecurity, and data management. OT professionals understand industrial processes, safety systems, and equipment maintenance. Successful convergence requires developing hybrid skills or creating teams where IT and OT professionals collaborate effectively, sharing knowledge across traditional boundaries.'
+                }
+            };
+
+            const challenge_data = challenges[challenge];
+            document.getElementById('challengeTitle').textContent = challenge_data.title;
+            document.getElementById('challengeDescription').textContent = challenge_data.description;
+            document.getElementById('challengeDetails').style.display = 'block';
+        }
+
+        // Domain lookup simulation
+        function lookupDomain() {
+            const domain = document.getElementById('domainInput').value.toLowerCase();
+            const lookupResult = document.getElementById('lookupResult');
+            const lookupText = document.getElementById('lookupText');
+
+            if (!domain) {
+                alert('Please enter a domain name');
+                return;
+            }
+
+            // Simulate DNS lookup with common examples
+            const dnsResults = {
+                'google.com': '142.250.184.14 (IPv4) and 2607:f8b0:4004:c1b::65 (IPv6)',
+                'microsoft.com': '20.70.246.20 (IPv4) and 2620:1ec:c11::200 (IPv6)',
+                'github.com': '140.82.114.4 (IPv4) and 2a03:2880:f11c:8083:face:b00c:0:25de (IPv6)',
+                'stackoverflow.com': '151.101.193.69 (IPv4) and 2a04:4e42:200::729 (IPv6)',
+                'wikipedia.org': '91.198.174.192 (IPv4) and 2620:0:862:ed1a::1 (IPv6)'
+            };
+
+            let result = dnsResults[domain];
+            if (!result) {
+                result = `Simulated lookup for ${domain}: 203.0.113.${Math.floor(Math.random() * 255)} (IPv4)`;
+            }
+
+            lookupText.textContent = `Domain: ${domain} resolves to: ${result}`;
+            lookupResult.style.display = 'block';
+        }
+
+        // Quiz functionality
+        function selectAnswer(element, isCorrect) {
+            // Remove any existing selections in this question
+            const siblings = element.parentNode.children;
+            for (let sibling of siblings) {
+                sibling.classList.remove('correct', 'incorrect');
+            }
+
+            // Mark the selected answer
+            if (isCorrect) {
+                element.classList.add('correct');
+                quizScore++;
+            } else {
+                element.classList.add('incorrect');
+                // Also show the correct answer
+                for (let sibling of siblings) {
+                    if (sibling.onclick.toString().includes('true')) {
+                        sibling.classList.add('correct');
+                    }
+                }
+            }
+
+            // Disable further clicks on this question
+            for (let sibling of siblings) {
+                sibling.onclick = null;
+                sibling.style.cursor = 'default';
+            }
+        }
+
+        // Reflection functionality
+        function saveReflection() {
+            const reflection = document.getElementById('reflectionText').value;
+            if (reflection.trim()) {
+                localStorage.setItem('itWorkshopReflection', reflection);
+                alert('Reflection saved! You can review it before the OT session.');
+            } else {
+                alert('Please write a reflection before saving.');
+            }
+        }
+
+        // Certificate generation
+        function generateCertificate() {
+            document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('certificate').style.display = 'block';
+            
+            // Calculate final score
+            const finalScore = Math.round((quizScore / totalQuizQuestions) * 100);
+            alert(`Congratulations! You scored ${finalScore}% on the assessment. Your certificate is ready below.`);
+        }
+
+        // Initialize tooltips for glossary terms
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add tooltips to technical terms
+            const terms = document.querySelectorAll('.glossary-term');
+            terms.forEach(term => {
+                term.addEventListener('mouseenter', function() {
+                    // Add tooltip functionality here if needed
+                });
+            });
+        });
+    </script>
+</body>
+</html>
