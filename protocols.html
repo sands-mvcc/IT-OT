@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT/OT Protocols Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #00ff00;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #00ff00;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #cccccc;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-input {
+            width: 400px;
+            padding: 12px 20px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 25px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #cccccc;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .category {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .category:hover {
+            border-color: #00ff00;
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .category-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+
+        .category-title {
+            font-size: 1.4em;
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .category-toggle {
+            margin-left: auto;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .category.collapsed .category-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .protocols {
+            display: grid;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .category.collapsed .protocols {
+            display: none;
+        }
+
+        .protocol {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .protocol:hover {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            transform: scale(1.02);
+        }
+
+        .protocol.completed {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.15);
+        }
+
+        .protocol-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .protocol-status {
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .protocol.completed .protocol-status {
+            background: #00ff00;
+            color: black;
+        }
+
+        .protocol-description {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .protocol-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .protocol.expanded .protocol-details {
+            display: block;
+        }
+
+        .protocol-purpose {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .protocol-purpose h4 {
+            color: #00ff00;
+            margin-bottom: 8px;
+        }
+
+        .protocol-features {
+            list-style: none;
+        }
+
+        .protocol-features li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .protocol-features li:before {
+            content: "▶";
+            color: #00ff00;
+            position: absolute;
+            left: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #00ff00;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .quiz-button {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .stats {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 0.9em;
+        }
+
+        .stats h4 {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .stats {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 IT/OT Protocols Workshop</h1>
+            <p>Interactive Learning Tool for Industrial Network Integration</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search protocols..." id="searchInput">
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats" id="stats">
+            <h4>Progress</h4>
+            <div>Completed: <span id="completedCount">0</span></div>
+            <div>Total: <span id="totalCount">0</span></div>
+            <div>Progress: <span id="progressPercent">0%</span></div>
+        </div>
+
+        <div class="categories" id="categories">
+            <!-- Categories will be dynamically generated -->
+        </div>
+    </div>
+
+    <div class="modal" id="protocolModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const protocols = {
+            "🔒 Security-Critical IT Protocols": {
+                icon: "🔒",
+                description: "High Priority for OT Integration - Vital for securing communication and maintaining confidentiality and integrity across IT/OT boundaries.",
+                protocols: {
+                    "TLS/SSL": {
+                        fullName: "Transport Layer Security / Secure Sockets Layer",
+                        description: "Encrypts data in transit, often used in web-based HMIs or cloud-connected SCADA systems",
+                        purpose: "Provides cryptographic security for communications over networks, ensuring data confidentiality, integrity, and authentication between applications.",
+                        features: [
+                            "End-to-end encryption of data transmission",
+                            "Digital certificate validation for server authentication",
+                            "Protection against man-in-the-middle attacks",
+                            "Widely supported across industrial web interfaces",
+                            "Essential for secure remote access to OT systems"
+                        ],
+                        useCases: "Web-based HMIs, cloud-connected SCADA systems, secure API communications, remote monitoring dashboards"
+                    },
+                    "HTTPS": {
+                        fullName: "HTTP Secure",
+                        description: "Web interface access for industrial systems and dashboards, important for accessing OT systems remotely",
+                        purpose: "Secures HTTP communications using TLS/SSL encryption, enabling safe web-based access to industrial control systems and monitoring interfaces.",
+                        features: [
+                            "HTTP over TLS/SSL encryption",
+                            "Browser-supported security protocols",
+                            "Certificate-based authentication",
+                            "Standard port 443 for secure web traffic",
+                            "Compatible with most industrial web interfaces"
+                        ],
+                        useCases: "Industrial web portals, remote HMI access, SCADA web interfaces, IoT device management, cloud-based monitoring systems"
+                    },
+                    "IPSec": {
+                        fullName: "Internet Protocol Security",
+                        description: "Secures IP communications between IT and OT networks, often used in VPNs",
+                        purpose: "Provides network-layer security by authenticating and encrypting IP packets, creating secure tunnels between IT and OT network segments.",
+                        features: [
+                            "Network-layer encryption and authentication",
+                            "Support for both tunnel and transport modes",
+                            "Strong cryptographic protection",
+                            "Integration with VPN solutions",
+                            "Transparent to applications"
+                        ],
+                        useCases: "Site-to-site VPNs, secure inter-network communication, OT network isolation, remote facility connections"
+                    },
+                    "VPN Protocols": {
+                        fullName: "Virtual Private Network Protocols (OpenVPN, IPsec VPN)",
+                        description: "Secure remote access for technicians and engineers, important in remote maintenance of OT systems",
+                        purpose: "Creates secure, encrypted tunnels over public networks, enabling safe remote access to industrial systems for maintenance and monitoring.",
+                        features: [
+                            "Encrypted tunnel establishment",
+                            "Multi-factor authentication support",
+                            "Centralized access control",
+                            "Audit logging capabilities",
+                            "Cross-platform compatibility"
+                        ],
+                        useCases: "Remote maintenance access, engineer connectivity, vendor support access, emergency system access, mobile workforce connectivity"
+                    }
+                }
+            },
+            "🌐 Core Networking Protocols": {
+                icon: "🌐",
+                description: "Foundation of Communication - These protocols ensure reliable data exchange between systems.",
+                protocols: {
+                    "TCP/IP": {
+                        fullName: "Transmission Control Protocol / Internet Protocol",
+                        description: "The backbone of all modern network communications, basis for integrating IT systems with IP-enabled OT devices",
+                        purpose: "Provides the fundamental communication framework for internet and network communications, enabling reliable data transmission between IT and OT systems.",
+                        features: [
+                            "Reliable, connection-oriented data transmission",
+                            "Error detection and correction",
+                            "Flow control and congestion management",
+                            "Universal compatibility across systems",
+                            "Scalable addressing with IPv4/IPv6"
+                        ],
+                        useCases: "All network communications, IT/OT integration, industrial Ethernet networks, device connectivity, data exchange protocols"
+                    },
+                    "UDP": {
+                        fullName: "User Datagram Protocol",
+                        description: "Used in time-sensitive OT protocols like SNMP or video surveillance, less reliable but faster",
+                        purpose: "Provides fast, connectionless data transmission for applications where speed is more critical than guaranteed delivery.",
+                        features: [
+                            "Low-latency, connectionless communication",
+                            "Minimal protocol overhead",
+                            "No guaranteed delivery or ordering",
+                            "Suitable for real-time applications",
+                            "Broadcast and multicast support"
+                        ],
+                        useCases: "Real-time monitoring, video streaming, SNMP queries, time synchronization (NTP), industrial automation protocols"
+                    },
+                    "DHCP": {
+                        fullName: "Dynamic Host Configuration Protocol",
+                        description: "Automatically assigns IP addresses to IT/OT devices",
+                        purpose: "Automatically configures network settings for devices, simplifying network management in converged IT/OT environments.",
+                        features: [
+                            "Automatic IP address assignment",
+                            "Network configuration distribution",
+                            "Lease management and renewal",
+                            "Centralized network administration",
+                            "Support for device reservations"
+                        ],
+                        useCases: "Device network configuration, IP address management, network simplification, mobile device support, temporary connections"
+                    },
+                    "DNS": {
+                        fullName: "Domain Name System",
+                        description: "Name resolution services needed for IT/OT hybrid environments",
+                        purpose: "Translates human-readable domain names to IP addresses, enabling easier management and access to industrial systems.",
+                        features: [
+                            "Domain name to IP address translation",
+                            "Hierarchical naming structure",
+                            "Caching for improved performance",
+                            "Load balancing capabilities",
+                            "Service discovery support"
+                        ],
+                        useCases: "System name resolution, service discovery, load balancing, simplified system addressing, cloud service integration"
+                    }
+                }
+            },
+            "📊 Data and Monitoring Protocols": {
+                icon: "📊",
+                description: "Enable performance tracking and integration between IT and OT systems.",
+                protocols: {
+                    "SNMP": {
+                        fullName: "Simple Network Management Protocol",
+                        description: "Used for monitoring OT and IT devices like switches, routers, and controllers",
+                        purpose: "Provides standardized network device monitoring and management capabilities across both IT and OT infrastructure.",
+                        features: [
+                            "Standardized device monitoring",
+                            "Real-time status queries",
+                            "Trap-based event notifications",
+                            "Performance metric collection",
+                            "Configuration management support"
+                        ],
+                        useCases: "Network monitoring, device health checks, performance analytics, alarm management, infrastructure monitoring"
+                    },
+                    "Syslog": {
+                        fullName: "System Logging Protocol",
+                        description: "Standard protocol for message logging, useful for centralized logging in SIEM systems",
+                        purpose: "Provides standardized logging and event collection from network devices and systems for security and operational monitoring.",
+                        features: [
+                            "Standardized log message format",
+                            "Centralized log collection",
+                            "Severity level classification",
+                            "Time-stamped event records",
+                            "SIEM integration support"
+                        ],
+                        useCases: "Security monitoring, compliance logging, troubleshooting, audit trails, incident response, system health monitoring"
+                    },
+                    "MQTT": {
+                        fullName: "Message Queuing Telemetry Transport",
+                        description: "Lightweight publish/subscribe messaging protocol, common in IIoT environments",
+                        purpose: "Enables efficient, lightweight messaging for IoT and industrial devices with minimal bandwidth and power requirements.",
+                        features: [
+                            "Publish/subscribe messaging model",
+                            "Lightweight protocol overhead",
+                            "Quality of Service levels",
+                            "Retained message support",
+                            "Last Will and Testament feature"
+                        ],
+                        useCases: "IoT device communication, sensor data collection, remote monitoring, mobile applications, low-bandwidth networks"
+                    },
+                    "RESTful APIs / JSON / XML": {
+                        fullName: "Representational State Transfer APIs with JSON/XML",
+                        description: "Common in modern IT/OT integrations, used in interfacing enterprise software with OT data systems",
+                        purpose: "Provides modern, web-standard interfaces for integrating enterprise systems with operational technology data and services.",
+                        features: [
+                            "HTTP-based stateless communication",
+                            "Standard data formats (JSON/XML)",
+                            "CRUD operations support",
+                            "Platform-independent integration",
+                            "Scalable architecture support"
+                        ],
+                        useCases: "Enterprise integration, data analytics platforms, cloud connectivity, mobile applications, third-party integrations"
+                    }
+                }
+            },
+            "🏭 OT-Relevant IT Protocols": {
+                icon: "🏭",
+                description: "Bridge the IT side with industrial protocols.",
+                protocols: {
+                    "OPC UA": {
+                        fullName: "Open Platform Communications Unified Architecture",
+                        description: "Secure and reliable data exchange between IT systems and industrial equipment, becoming the standard for Industry 4.0",
+                        purpose: "Provides secure, reliable, and platform-independent communication for industrial automation, enabling seamless IT/OT integration.",
+                        features: [
+                            "Platform-independent communication",
+                            "Built-in security mechanisms",
+                            "Complex data modeling support",
+                            "Service-oriented architecture",
+                            "Standardized information models"
+                        ],
+                        useCases: "Industry 4.0 implementations, machine-to-machine communication, enterprise manufacturing integration, cloud connectivity"
+                    },
+                    "Modbus over TCP/IP": {
+                        fullName: "Modbus Protocol over TCP/IP",
+                        description: "A traditional OT protocol that can be routed over IT networks",
+                        purpose: "Enables traditional industrial devices to communicate over standard IP networks, bridging legacy OT systems with modern IT infrastructure.",
+                        features: [
+                            "Simple master-slave communication",
+                            "Wide device compatibility",
+                            "Ethernet network support",
+                            "Standard TCP/IP routing",
+                            "Legacy system integration"
+                        ],
+                        useCases: "Legacy system integration, PLCs and HMIs, remote monitoring, industrial device connectivity, retrofit projects"
+                    },
+                    "BACnet/IP": {
+                        fullName: "Building Automation and Control Networks over IP",
+                        description: "Used in building automation systems (HVAC, lighting, etc.)",
+                        purpose: "Standardizes communication in building automation systems, enabling integration of HVAC, lighting, and security systems with IT networks.",
+                        features: [
+                            "Building automation standardization",
+                            "Object-oriented data model",
+                            "Interoperability between vendors",
+                            "IP network compatibility",
+                            "Energy management integration"
+                        ],
+                        useCases: "Building automation, HVAC control, lighting systems, energy management, smart building integration"
+                    },
+                    "EtherNet/IP": {
+                        fullName: "Ethernet Industrial Protocol",
+                        description: "CIP-based protocol used in manufacturing systems",
+                        purpose: "Provides real-time industrial communication over standard Ethernet networks, supporting time-critical manufacturing applications.",
+                        features: [
+                            "Real-time industrial communication",
+                            "Standard Ethernet infrastructure",
+                            "CIP (Common Industrial Protocol) based",
+                            "Deterministic data delivery",
+                            "Safety protocol support"
+                        ],
+                        useCases: "Manufacturing automation, assembly lines, robotics control, motion control, safety systems"
+                    }
+                }
+            },
+            "🔐 Identity & Access Protocols": {
+                icon: "🔐",
+                description: "Crucial for Zero Trust OT Environments - Essential as security boundaries between IT and OT are minimized.",
+                protocols: {
+                    "LDAP": {
+                        fullName: "Lightweight Directory Access Protocol",
+                        description: "Centralized authentication, used in Active Directory environments",
+                        purpose: "Provides centralized directory services for user authentication and authorization across IT and OT systems.",
+                        features: [
+                            "Centralized user directory",
+                            "Authentication and authorization",
+                            "Hierarchical data structure",
+                            "Active Directory integration",
+                            "Cross-platform support"
+                        ],
+                        useCases: "User authentication, access control, directory services, single sign-on, identity management"
+                    },
+                    "Kerberos": {
+                        fullName: "Kerberos Authentication Protocol",
+                        description: "Secure authentication protocol in Windows-based networks",
+                        purpose: "Provides strong authentication using symmetric key cryptography, preventing password transmission over networks.",
+                        features: [
+                            "Ticket-based authentication",
+                            "Mutual authentication support",
+                            "Single sign-on capabilities",
+                            "Time-stamped tickets",
+                            "Replay attack prevention"
+                        ],
+                        useCases: "Windows domain authentication, single sign-on, secure service access, cross-realm authentication"
+                    },
+                    "RADIUS / TACACS+": {
+                        fullName: "Remote Authentication Dial-In User Service / Terminal Access Controller Access-Control System Plus",
+                        description: "Authentication, Authorization, and Accounting for network devices",
+                        purpose: "Provides centralized AAA (Authentication, Authorization, and Accounting) services for network access control and device management.",
+                        features: [
+                            "Centralized AAA services",
+                            "Network device authentication",
+                            "Granular authorization control",
+                            "Comprehensive accounting logs",
+                            "Multi-vendor device support"
+                        ],
+                        useCases: "Network device access control, VPN authentication, wireless network access, administrative access logging"
+                    }
+                }
+            }
+        };
+
+        let completedProtocols = new Set();
+        let totalProtocols = 0;
+
+        function initializeWorkshop() {
+            const categoriesContainer = document.getElementById('categories');
+            let protocolCount = 0;
+
+            Object.entries(protocols).forEach(([categoryName, categoryData]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.innerHTML = `
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-icon">${categoryData.icon}</span>
+                        <div>
+                            <div class="category-title">${categoryName}</div>
+                            <div style="font-size: 0.9em; color: #ccc; margin-top: 5px;">${categoryData.description}</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="protocols">
+                        ${Object.entries(categoryData.protocols).map(([protocolName, protocolData]) => {
+                            protocolCount++;
+                            return `
+                                <div class="protocol" data-protocol="${protocolName}" onclick="showProtocolDetails('${protocolName}', '${categoryName}')">
+                                    <div class="protocol-name">
+                                        ${protocolName}
+                                        <span class="protocol-status">Not Completed</span>
+                                    </div>
+                                    <div class="protocol-description">${protocolData.description}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                categoriesContainer.appendChild(categoryDiv);
+            });
+
+            totalProtocols = protocolCount;
+            document.getElementById('totalCount').textContent = totalProtocols;
+            updateProgress();
+
+            // Initialize search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+        }
+
+        function toggleCategory(header) {
+            const category = header.parentElement;
+            category.classList.toggle('collapsed');
+        }
+
+        function showProtocolDetails(protocolName, categoryName) {
+            const protocolData = protocols[categoryName].protocols[protocolName];
+            const modal = document.getElementById('protocolModal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+                <h2 style="color: #00ff00; margin-bottom: 20px;">${protocolName}</h2>
+                <h3 style="color: #ccc; margin-bottom: 20px;">${protocolData.fullName}</h3>
+                
+                <div class="protocol-purpose">
+                    <h4>Purpose & Overview</h4>
+                    <p>${protocolData.purpose}</p>
+                </div>
+
+                <h4 style="color: #00ff00; margin-bottom: 10px;">Key Features:</h4>
+                <ul class="protocol-features">
+                    ${protocolData.features.map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+
+                <h4 style="color: #00ff00; margin: 20px 0 10px 0;">Common Use Cases:</h4>
+                <p style="color: #ccc; line-height: 1.6;">${protocolData.useCases}</p>
+
+                <button class="quiz-button" onclick="markAsCompleted('${protocolName}')">
+                    Mark as Completed ✓
+                </button>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('protocolModal').style.display = 'none';
+        }
+
+        function markAsCompleted(protocolName) {
+            completedProtocols.add(protocolName);
+            const protocolElement = document.querySelector(`[data-protocol="${protocolName}"]`);
+            protocolElement.classList.add('completed');
+            protocolElement.querySelector('.protocol-status').textContent = 'Completed ✓';
+            
+            updateProgress();
+            closeModal();
+        }
+
+        function updateProgress() {
+            const completed = completedProtocols.size;
+            const percentage = Math.round((completed / totalProtocols) * 100);
+            
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('progressPercent').textContent = percentage + '%';
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const protocolElements = document.querySelectorAll('.protocol');
+            
+            protocolElements.forEach(element => {
+                const protocolName = element.dataset.protocol.toLowerCase();
+                const description = element.querySelector('.protocol-description').textContent.toLowerCase();
+                
+                if (protocolName.includes(searchTerm) || description.includes(searchTerm)) {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('protocolModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize the workshop when page loads
+        document.addEventListener('DOMContentLoaded', initializeWorkshop);
+    </script>
+</body>
+</html>
