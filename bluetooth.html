@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluetooth Protocol Expert Training Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            color: black;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a3d);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab {
+            background: white;
+            border: 2px solid #28a745;
+            color: black;
+            padding: 12px 20px;
+            margin: 0 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-tab:hover {
+            background: #28a745;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .content-section {
+            display: none;
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .version-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .version-card {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .version-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
+        }
+        
+        .version-title {
+            color: #28a745;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .header-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .field-group {
+            background: white;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .field-group label {
+            display: block;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 8px;
+        }
+        
+        .field-group input, .field-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .field-group input:focus, .field-group select:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+        }
+        
+        .packet-display {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 2px solid #28a745;
+        }
+        
+        .security-demo {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .workplace-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .example-card {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.2);
+        }
+        
+        .protocol-simulator {
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .step {
+            background: #e9ecef;
+            border: 2px solid #28a745;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background: #28a745;
+            color: white;
+        }
+        
+        .quiz-container {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .quiz-question {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-options {
+            list-style: none;
+        }
+        
+        .quiz-options li {
+            margin: 10px 0;
+        }
+        
+        .quiz-options input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .result-display {
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .highlight {
+            background: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔵 Bluetooth Protocol Expert Training Platform</h1>
+            <p>Master Bluetooth standards, security, and protocol operations through interactive learning</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('overview')">Overview & Standards</div>
+            <div class="nav-tab" onclick="showSection('security')">Security Features</div>
+            <div class="nav-tab" onclick="showSection('header-trainer')">Header Constructor</div>
+            <div class="nav-tab" onclick="showSection('protocol-ops')">Protocol Operations</div>
+            <div class="nav-tab" onclick="showSection('workplace')">Workplace Applications</div>
+            <div class="nav-tab" onclick="showSection('quiz')">Knowledge Test</div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <h2>Bluetooth Standards Overview</h2>
+            
+            <div class="version-grid">
+                <div class="version-card">
+                    <div class="version-title">Bluetooth 6.0 (2024)</div>
+                    <p><strong>Latest Features:</strong></p>
+                    <ul>
+                        <li>Channel Sounding for centimeter-precision ranging</li>
+                        <li>Decision-Based Advertising Filtering (DBAF)</li>
+                        <li>Enhanced security with attack detection</li>
+                        <li>IoT applications focus</li>
+                    </ul>
+                </div>
+                
+                <div class="version-card">
+                    <div class="version-title">Bluetooth 5.4 (2023)</div>
+                    <p><strong>Key Improvements:</strong></p>
+                    <ul>
+                        <li>Periodic Advertising Enhancement</li>
+                        <li>Improved channel selection algorithm</li>
+                        <li>Enhanced range and speed</li>
+                        <li>Better reliability in crowded environments</li>
+                    </ul>
+                </div>
+                
+                <div class="version-card">
+                    <div class="version-title">Bluetooth 5.0-5.3</div>
+                    <p><strong>Major Features:</strong></p>
+                    <ul>
+                        <li>4x range, 2x speed, 8x broadcast capacity</li>
+                        <li>LE Audio support (5.2+)</li>
+                        <li>LC3 codec for better audio quality</li>
+                        <li>Mesh networking capabilities</li>
+                    </ul>
+                </div>
+                
+                <div class="version-card">
+                    <div class="version-title">Bluetooth LE (4.0+)</div>
+                    <p><strong>Low Energy Focus:</strong></p>
+                    <ul>
+                        <li>Ultra-low power consumption</li>
+                        <li>Coin cell battery operation for years</li>
+                        <li>IoT and beacon applications</li>
+                        <li>128-bit AES encryption</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>Performance Comparison Tool</h3>
+                <label>Select Bluetooth Version:</label>
+                <select id="versionSelector" onchange="updatePerformanceData()">
+                    <option value="1.2">Bluetooth 1.2</option>
+                    <option value="2.1">Bluetooth 2.1 + EDR</option>
+                    <option value="4.0">Bluetooth 4.0 LE</option>
+                    <option value="5.0">Bluetooth 5.0</option>
+                    <option value="5.4">Bluetooth 5.4</option>
+                    <option value="6.0">Bluetooth 6.0</option>
+                </select>
+                
+                <div id="performanceResults" class="result-display">
+                    Select a version to see detailed specifications...
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Section -->
+        <div id="security" class="content-section">
+            <h2>Bluetooth Security Architecture</h2>
+            
+            <div class="security-demo">
+                <h3>Security Modes and Levels</h3>
+                <div class="version-grid">
+                    <div class="version-card">
+                        <div class="version-title">Security Mode 1</div>
+                        <p><strong>Non-secure mode:</strong> No security procedures initiated</p>
+                        <ul>
+                            <li>Level 1: No security</li>
+                            <li>Level 2: Service-level security</li>
+                            <li>Level 3: Link-level security</li>
+                            <li>Level 4: Service & link security</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="version-card">
+                        <div class="version-title">Security Mode 2</div>
+                        <p><strong>Service-level security:</strong> Enforced after L2CAP channel establishment</p>
+                        <ul>
+                            <li>Authorization required</li>
+                            <li>Authentication optional</li>
+                            <li>Encryption optional</li>
+                            <li>Key size negotiable (1-16 bytes)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="version-card">
+                        <div class="version-title">Security Mode 3</div>
+                        <p><strong>Link-level security:</strong> Enforced before physical link established</p>
+                        <ul>
+                            <li>Mandatory authentication</li>
+                            <li>Mandatory encryption</li>
+                            <li>Fixed key size</li>
+                            <li>Legacy security mode</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>Encryption Demonstration</h3>
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>Plaintext Data:</label>
+                        <input type="text" id="plaintext" placeholder="Enter data to encrypt" value="Hello Bluetooth!">
+                    </div>
+                    <div class="field-group">
+                        <label>Encryption Algorithm:</label>
+                        <select id="encryptionType">
+                            <option value="E0">E0 (Legacy)</option>
+                            <option value="AES-CCM">AES-CCM (Modern)</option>
+                            <option value="AES-128">AES-128 (LE)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="demonstrateEncryption()">Encrypt Data</button>
+                <button class="btn" onclick="demonstratePairing()">Simulate Pairing</button>
+                
+                <div id="encryptionResult" class="packet-display">
+                    Encryption results will appear here...
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h4>Key Security Features:</h4>
+                <ul>
+                    <li><strong>Authentication:</strong> Challenge-response mechanism using shared secret keys</li>
+                    <li><strong>Authorization:</strong> Permission-based access to services and resources</li>
+                    <li><strong>Encryption:</strong> E0 stream cipher or AES-CCM for data protection</li>
+                    <li><strong>Key Management:</strong> Secure key generation, exchange, and storage</li>
+                    <li><strong>Secure Simple Pairing:</strong> ECDH-based key exchange (Bluetooth 2.1+)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Header Constructor -->
+        <div id="header-trainer" class="content-section">
+            <h2>Interactive Bluetooth Header Constructor</h2>
+            
+            <div class="interactive-area">
+                <h3>Packet Header Builder</h3>
+                <div class="info-box">
+                    <p>Build a Bluetooth BR/EDR packet header by configuring the fields below. The header is 54 bits total.</p>
+                </div>
+                
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>LT_ADDR (3 bits):</label>
+                        <select id="ltAddr">
+                            <option value="0">000 - Master</option>
+                            <option value="1">001 - Slave 1</option>
+                            <option value="2">010 - Slave 2</option>
+                            <option value="3">011 - Slave 3</option>
+                            <option value="4">100 - Slave 4</option>
+                            <option value="5">101 - Slave 5</option>
+                            <option value="6">110 - Slave 6</option>
+                            <option value="7">111 - Slave 7</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Packet Type (4 bits):</label>
+                        <select id="packetType">
+                            <option value="0">NULL</option>
+                            <option value="1">POLL</option>
+                            <option value="2">FHS</option>
+                            <option value="3">DM1</option>
+                            <option value="4">DH1</option>
+                            <option value="5">DM3</option>
+                            <option value="6">DH3</option>
+                            <option value="7">DM5</option>
+                            <option value="8">DH5</option>
+                            <option value="9">HV1</option>
+                            <option value="10">HV2</option>
+                            <option value="11">HV3</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Flow Control (1 bit):</label>
+                        <select id="flowControl">
+                            <option value="0">Stop (0)</option>
+                            <option value="1">Go (1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>ARQN (1 bit):</label>
+                        <select id="arqn">
+                            <option value="0">NAK (0)</option>
+                            <option value="1">ACK (1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>SEQN (1 bit):</label>
+                        <select id="seqn">
+                            <option value="0">Even (0)</option>
+                            <option value="1">Odd (1)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Payload Length:</label>
+                        <input type="number" id="payloadLength" min="0" max="2745" value="0" placeholder="0-2745 bytes">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="buildHeader()">Build Header</button>
+                <button class="btn" onclick="validateHeader()">Validate Header</button>
+                <button class="btn" onclick="resetHeader()">Reset</button>
+                
+                <div id="headerResult" class="packet-display">
+                    Configure header fields and click "Build Header" to see the result...
+                </div>
+                
+                <div id="headerAnalysis" class="result-display" style="display: none;">
+                    Header analysis will appear here...
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>LE Packet Header Builder</h3>
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>PDU Type (4 bits):</label>
+                        <select id="lePduType">
+                            <option value="0">ADV_IND</option>
+                            <option value="1">ADV_DIRECT_IND</option>
+                            <option value="2">ADV_NONCONN_IND</option>
+                            <option value="3">SCAN_REQ</option>
+                            <option value="4">SCAN_RSP</option>
+                            <option value="5">CONNECT_REQ</option>
+                            <option value="6">ADV_SCAN_IND</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>TxAdd (1 bit):</label>
+                        <select id="txAdd">
+                            <option value="0">Public Address</option>
+                            <option value="1">Random Address</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>RxAdd (1 bit):</label>
+                        <select id="rxAdd">
+                            <option value="0">Public Address</option>
+                            <option value="1">Random Address</option>
+                        </select>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Length (8 bits):</label>
+                        <input type="number" id="leLength" min="0" max="255" value="0" placeholder="0-255 bytes">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="buildLEHeader()">Build LE Header</button>
+                
+                <div id="leHeaderResult" class="packet-display">
+                    LE header will appear here...
+                </div>
+            </div>
+        </div>
+
+        <!-- Protocol Operations -->
+        <div id="protocol-ops" class="content-section">
+            <h2>Bluetooth Protocol Operations Simulator</h2>
+            
+            <div class="protocol-simulator">
+                <h3>Connection Establishment Simulator</h3>
+                <div class="step-indicator">
+                    <div class="step active" id="step1">Inquiry</div>
+                    <div class="step" id="step2">Page</div>
+                    <div class="step" id="step3">Authentication</div>
+                    <div class="step" id="step4">Encryption</div>
+                    <div class="step" id="step5">Data Transfer</div>
+                </div>
+                
+                <div id="simulationArea" class="result-display">
+                    <strong>Step 1: Inquiry Phase</strong><br>
+                    Master device broadcasts inquiry messages to discover nearby devices...
+                </div>
+                
+                <button class="btn" onclick="nextStep()">Next Step</button>
+                <button class="btn" onclick="resetSimulation()">Reset Simulation</button>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>Frequency Hopping Demonstration</h3>
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>Piconet Clock:</label>
+                        <input type="number" id="piconetClock" value="0" min="0" max="268435455" placeholder="28-bit clock">
+                    </div>
+                    <div class="field-group">
+                        <label>Master BD_ADDR (Last 6 bits):</label>
+                        <input type="text" id="masterAddr" value="101010" maxlength="6" placeholder="6 bits">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="calculateHoppingSequence()">Calculate Hop Sequence</button>
+                
+                <div id="hoppingResult" class="packet-display">
+                    Frequency hopping sequence will appear here...
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>L2CAP Packet Simulator</h3>
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>Channel ID (CID):</label>
+                        <select id="channelId">
+                            <option value="1">Signaling (0x0001)</option>
+                            <option value="2">Connectionless reception (0x0002)</option>
+                            <option value="3">A2MP (0x0003)</option>
+                            <option value="4">ATT (0x0004)</option>
+                            <option value="5">LE Signaling (0x0005)</option>
+                            <option value="6">Security Manager (0x0006)</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Data Payload:</label>
+                        <input type="text" id="l2capData" placeholder="Enter data payload" value="Hello L2CAP!">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="buildL2CAPPacket()">Build L2CAP Packet</button>
+                
+                <div id="l2capResult" class="packet-display">
+                    L2CAP packet will appear here...
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Applications -->
+        <div id="workplace" class="content-section">
+            <h2>Bluetooth in the Workplace</h2>
+            
+            <div class="workplace-examples">
+                <div class="example-card">
+                    <div class="version-title">Industrial IoT</div>
+                    <p><strong>Applications:</strong></p>
+                    <ul>
+                        <li>Asset tracking in manufacturing facilities</li>
+                        <li>Environmental monitoring (temperature, humidity)</li>
+                        <li>Predictive maintenance sensors</li>
+                        <li>Worker safety monitoring</li>
+                        <li>Inventory management systems</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Low power, mesh networking, long-range capabilities</p>
+                </div>
+                
+                <div class="example-card">
+                    <div class="version-title">Healthcare</div>
+                    <p><strong>Applications:</strong></p>
+                    <ul>
+                        <li>Patient monitoring devices</li>
+                        <li>Medical equipment tracking</li>
+                        <li>Staff location services</li>
+                        <li>Real-time vital sign monitoring</li>
+                        <li>Emergency response systems</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> HIPAA compliance, reliability, interoperability</p>
+                </div>
+                
+                <div class="example-card">
+                    <div class="version-title">Smart Buildings</div>
+                    <p><strong>Applications:</strong></p>
+                    <ul>
+                        <li>Lighting control systems</li>
+                        <li>HVAC optimization</li>
+                        <li>Access control and security</li>
+                        <li>Energy management</li>
+                        <li>Occupancy sensing</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Energy efficiency, scalability, cost-effectiveness</p>
+                </div>
+                
+                <div class="example-card">
+                    <div class="version-title">Retail & Logistics</div>
+                    <p><strong>Applications:</strong></p>
+                    <ul>
+                        <li>Electronic shelf labels (ESL)</li>
+                        <li>Inventory tracking</li>
+                        <li>Customer analytics</li>
+                        <li>Supply chain monitoring</li>
+                        <li>Point-of-sale systems</li>
+                    </ul>
+                    <p><strong>Benefits:</strong> Real-time updates, reduced labor costs, accuracy</p>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>ROI Calculator for Bluetooth Implementation</h3>
+                <div class="header-builder">
+                    <div class="field-group">
+                        <label>Number of Devices:</label>
+                        <input type="number" id="deviceCount" value="100" min="1" placeholder="Number of devices">
+                    </div>
+                    <div class="field-group">
+                        <label>Cost per Device ($):</label>
+                        <input type="number" id="deviceCost" value="25" min="1" placeholder="Cost per device">
+                    </div>
+                    <div class="field-group">
+                        <label>Implementation Type:</label>
+                        <select id="implementationType">
+                            <option value="asset_tracking">Asset Tracking</option>
+                            <option value="environmental">Environmental Monitoring</option>
+                            <option value="security">Security & Access</option>
+                            <option value="energy">Energy Management</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Expected Savings ($/year):</label>
+                        <input type="number" id="annualSavings" value="10000" min="0" placeholder="Annual savings">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="calculateROI()">Calculate ROI</button>
+                
+                <div id="roiResult" class="result-display">
+                    Enter parameters and click "Calculate ROI" to see results...
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4>Implementation Considerations:</h4>
+                <ul>
+                    <li><strong>Security:</strong> Always implement proper encryption and authentication</li>
+                    <li><strong>Interference:</strong> Plan for 2.4GHz interference management</li>
+                    <li><strong>Power Management:</strong> Design for optimal battery life in IoT devices</li>
+                    <li><strong>Scalability:</strong> Consider mesh networking for large deployments</li>
+                    <li><strong>Maintenance:</strong> Plan for firmware updates and device management</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Knowledge Test -->
+        <div id="quiz" class="content-section">
+            <h2>Bluetooth Protocol Knowledge Test</h2>
+            
+            <div class="quiz-container">
+                <div class="quiz-question" id="quizQuestion">
+                    Question 1: What is the maximum range of Bluetooth 5.0 in optimal conditions?
+                </div>
+                
+                <ul class="quiz-options">
+                    <li><input type="radio" name="quiz" value="a"> a) 10 meters</li>
+                    <li><input type="radio" name="quiz" value="b"> b) 100 meters</li>
+                    <li><input type="radio" name="quiz" value="c"> c) 240 meters</li>
+                    <li><input type="radio" name="quiz" value="d"> d) 1000 meters</li>
+                </ul>
+                
+                <button class="btn" onclick="checkAnswer()">Submit Answer</button>
+                <button class="btn" onclick="nextQuestion()">Next Question</button>
+                
+                <div id="quizResult" class="result-display" style="display: none;">
+                    Answer feedback will appear here...
+                </div>
+                
+                <div id="quizScore" class="info-box" style="display: none;">
+                    <h4>Quiz Progress</h4>
+                    <p>Score: <span id="scoreDisplay">0/0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let currentQuestion = 0;
+        let quizScore = 0;
+        let totalQuestions = 0;
+        
+        const quizData = [
+            {
+                question: "What is the maximum range of Bluetooth 5.0 in optimal conditions?",
+                options: ["a) 10 meters", "b) 100 meters", "c) 240 meters", "d) 1000 meters"],
+                correct: "c",
+                explanation: "Bluetooth 5.0 can achieve up to 240 meters range in optimal outdoor conditions."
+            },
+            {
+                question: "Which encryption algorithm is used in Bluetooth LE?",
+                options: ["a) E0", "b) AES-128", "c) DES", "d) RC4"],
+                correct: "b",
+                explanation: "Bluetooth LE uses AES-128 encryption for secure communications."
+            },
+            {
+                question: "How many frequency channels does Bluetooth use?",
+                options: ["a) 40", "b) 79", "c) 128", "d) 256"],
+                correct: "b",
+                explanation: "Bluetooth Classic uses 79 frequency channels, while BLE uses 40 channels."
+            },
+            {
+                question: "What does GFSK stand for in Bluetooth modulation?",
+                options: ["a) Gaussian Frequency Shift Keying", "b) General Frequency Signal Key", "c) Global Frequency System Key", "d) Guided Frequency Selection Key"],
+                correct: "a",
+                explanation: "GFSK (Gaussian Frequency Shift Keying) is the modulation scheme used in Bluetooth."
+            },
+            {
+                question: "What is the latest Bluetooth version as of 2024?",
+                options: ["a) Bluetooth 5.4", "b) Bluetooth 5.5", "c) Bluetooth 6.0", "d) Bluetooth 7.0"],
+                correct: "c",
+                explanation: "Bluetooth 6.0 was released in September 2024 with Channel Sounding features."
+            }
+        ];
+        
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Hide all nav tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function updatePerformanceData() {
+            const version = document.getElementById('versionSelector').value;
+            const resultDiv = document.getElementById('performanceResults');
+            
+            const specs = {
+                '1.2': {
+                    speed: '1 Mbps',
+                    range: '10 meters',
+                    powerClass: 'Class 1, 2, 3',
+                    features: 'Basic data transfer, AFH',
+                    security: 'E0 encryption, PIN-based pairing'
+                },
+                '2.1': {
+                    speed: '3 Mbps (EDR)',
+                    range: '10-100 meters',
+                    powerClass: 'Class 1, 2, 3',
+                    features: 'Enhanced Data Rate, SSP',
+                    security: 'Secure Simple Pairing, ECDH'
+                },
+                '4.0': {
+                    speed: '1 Mbps',
+                    range: '50 meters',
+                    powerClass: 'Ultra-low power',
+                    features: 'Bluetooth Low Energy, dual-mode',
+                    security: 'AES-128, application layer security'
+                },
+                '5.0': {
+                    speed: '2 Mbps',
+                    range: '240 meters',
+                    powerClass: 'Ultra-low power',
+                    features: '4x range, 2x speed, 8x capacity',
+                    security: 'AES-128, improved privacy'
+                },
+                '5.4': {
+                    speed: '2 Mbps',
+                    range: '240+ meters',
+                    powerClass: 'Ultra-low power',
+                    features: 'Periodic Advertising Enhancement',
+                    security: 'Enhanced encryption key size control'
+                },
+                '6.0': {
+                    speed: '2 Mbps',
+                    range: '240+ meters',
+                    powerClass: 'Ultra-low power',
+                    features: 'Channel Sounding, DBAF',
+                    security: 'Attack detection, sub-10cm ranging'
+                }
+            };
+            
+            const spec = specs[version];
+            resultDiv.innerHTML = `
+                <strong>Bluetooth ${version} Specifications:</strong><br>
+                <span class="highlight">Data Rate:</span> ${spec.speed}<br>
+                <span class="highlight">Range:</span> ${spec.range}<br>
+                <span class="highlight">Power Class:</span> ${spec.powerClass}<br>
+                <span class="highlight">Key Features:</span> ${spec.features}<br>
+                <span class="highlight">Security:</span> ${spec.security}
+            `;
+        }
+        
+        function demonstrateEncryption() {
+            const plaintext = document.getElementById('plaintext').value;
+            const encType = document.getElementById('encryptionType').value;
+            const resultDiv = document.getElementById('encryptionResult');
+            
+            // Simulate encryption (this is for demonstration only)
+            const encrypted = btoa(plaintext); // Base64 encoding for demo
+            const keySize = encType === 'AES-128' ? '128-bit' : encType === 'AES-CCM' ? '128-bit' : '64-bit';
+            
+            resultDiv.innerHTML = `
+<strong>Encryption Demonstration</strong>
+Algorithm: ${encType}
+Key Size: ${keySize}
+Input:  "${plaintext}"
+Output: ${encrypted}
+
+<span class="success">✓ Data successfully encrypted using ${encType}</span>
+            `;
+        }
+        
+        function demonstratePairing() {
+            const resultDiv = document.getElementById('encryptionResult');
+            resultDiv.innerHTML = `
+<strong>Pairing Process Simulation</strong>
+
+Step 1: Device Discovery
+    - Device A broadcasts inquiry
+    - Device B responds with inquiry response
+
+Step 2: Authentication
+    - Challenge-response using shared PIN/passkey
+    - Link key generation using E22 algorithm
+
+Step 3: Secure Connection
+    - Encryption enabled using generated link key
+    - Mutual authentication completed
+
+<span class="success">✓ Devices successfully paired and secured</span>
+            `;
+        }
+        
+        function buildHeader() {
+            const ltAddr = document.getElementById('ltAddr').value;
+            const packetType = document.getElementById('packetType').value;
+            const flowControl = document.getElementById('flowControl').value;
+            const arqn = document.getElementById('arqn').value;
+            const seqn = document.getElementById('seqn').value;
+            const payloadLength = document.getElementById('payloadLength').value;
+            
+            // Convert to binary representation
+            const ltAddrBin = parseInt(ltAddr).toString(2).padStart(3, '0');
+            const typeBin = parseInt(packetType).toString(2).padStart(4, '0');
+            const flowBin = flowControl;
+            const arqnBin = arqn;
+            const seqnBin = seqn;
+            
+            // Calculate HEC (simplified for demo)
+            const hec = "10101010"; // 8-bit HEC (simplified)
+            
+            const resultDiv = document.getElementById('headerResult');
+            resultDiv.innerHTML = `
+<strong>Bluetooth BR/EDR Packet Header (54 bits)</strong>
+
+LT_ADDR (3 bits):    ${ltAddrBin} (${ltAddr})
+TYPE (4 bits):       ${typeBin} (${document.getElementById('packetType').options[packetType].text})
+FLOW (1 bit):        ${flowBin} (${document.getElementById('flowControl').options[flowControl].text})
+ARQN (1 bit):        ${arqnBin} (${document.getElementById('arqn').options[arqn].text})
+SEQN (1 bit):        ${seqnBin} (${document.getElementById('seqn').options[seqn].text})
+HEC (8 bits):        ${hec}
+
+<span class="highlight">Complete Header:</span> ${ltAddrBin}${typeBin}${flowBin}${arqnBin}${seqnBin}${hec}...
+<span class="highlight">Payload Length:</span> ${payloadLength} bytes
+            `;
+            
+            document.getElementById('headerAnalysis').style.display = 'block';
+            document.getElementById('headerAnalysis').innerHTML = `
+                <strong>Header Analysis:</strong><br>
+                - Address identifies target device in piconet<br>
+                - Packet type determines data format and usage<br>
+                - Flow control manages data transmission rate<br>
+                - ARQN acknowledges previous packet reception<br>
+                - SEQN provides sequence numbering for reliability<br>
+                - HEC detects header transmission errors
+            `;
+        }
+        
+        function buildLEHeader() {
+            const pduType = document.getElementById('lePduType').value;
+            const txAdd = document.getElementById('txAdd').value;
+            const rxAdd = document.getElementById('rxAdd').value;
+            const length = document.getElementById('leLength').value;
+            
+            const pduTypeBin = parseInt(pduType).toString(2).padStart(4, '0');
+            const txAddBin = txAdd;
+            const rxAddBin = rxAdd;
+            const lengthBin = parseInt(length).toString(2).padStart(8, '0');
+            
+            const resultDiv = document.getElementById('leHeaderResult');
+            resultDiv.innerHTML = `
+<strong>Bluetooth LE Advertisement Header (16 bits)</strong>
+
+PDU Type (4 bits):   ${pduTypeBin} (${document.getElementById('lePduType').options[pduType].text})
+RFU (2 bits):        00 (Reserved)
+TxAdd (1 bit):       ${txAddBin} (${document.getElementById('txAdd').options[txAdd].text})
+RxAdd (1 bit):       ${rxAddBin} (${document.getElementById('rxAdd').options[rxAdd].text})
+Length (8 bits):     ${lengthBin} (${length} bytes)
+
+<span class="highlight">Complete Header:</span> ${pduTypeBin}00${txAddBin}${rxAddBin}${lengthBin}
+            `;
+        }
+        
+        function validateHeader() {
+            const payloadLength = parseInt(document.getElementById('payloadLength').value);
+            const packetType = parseInt(document.getElementById('packetType').value);
+            
+            let maxPayload = 0;
+            const packetNames = ['NULL', 'POLL', 'FHS', 'DM1', 'DH1', 'DM3', 'DH3', 'DM5', 'DH5', 'HV1', 'HV2', 'HV3'];
+            const maxPayloads = [0, 0, 18, 17, 27, 121, 183, 224, 339, 10, 20, 30];
+            
+            if (packetType < maxPayloads.length) {
+                maxPayload = maxPayloads[packetType];
+            }
+            
+            const resultDiv = document.getElementById('headerAnalysis');
+            if (payloadLength > maxPayload) {
+                resultDiv.innerHTML = `<span class="error">❌ Invalid: ${packetNames[packetType]} packets support maximum ${maxPayload} bytes payload</span>`;
+            } else {
+                resultDiv.innerHTML = `<span class="success">✅ Valid: Header configuration is correct for ${packetNames[packetType]} packet type</span>`;
+            }
+            resultDiv.style.display = 'block';
+        }
+        
+        function resetHeader() {
+            document.getElementById('ltAddr').selectedIndex = 0;
+            document.getElementById('packetType').selectedIndex = 0;
+            document.getElementById('flowControl').selectedIndex = 0;
+            document.getElementById('arqn').selectedIndex = 0;
+            document.getElementById('seqn').selectedIndex = 0;
+            document.getElementById('payloadLength').value = 0;
+            document.getElementById('headerResult').innerHTML = 'Configure header fields and click "Build Header" to see the result...';
+            document.getElementById('headerAnalysis').style.display = 'none';
+        }
+        
+        function nextStep() {
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            const descriptions = [
+                "Step 1: Inquiry Phase\nMaster device broadcasts inquiry messages to discover nearby devices...",
+                "Step 2: Page Phase\nMaster pages specific device using its address, device responds with page response...",
+                "Step 3: Authentication\nDevices exchange authentication challenges and responses using shared secret...",
+                "Step 4: Encryption Setup\nLink key established, encryption parameters negotiated and activated...",
+                "Step 5: Data Transfer\nSecure data communication channel established, ready for application data..."
+            ];
+            
+            if (currentStep <= 5) {
+                // Remove active from current step
+                if (currentStep > 1) {
+                    document.getElementById(steps[currentStep - 2]).classList.remove('active');
+                }
+                
+                // Add active to current step
+                if (currentStep <= 5) {
+                    document.getElementById(steps[currentStep - 1]).classList.add('active');
+                    document.getElementById('simulationArea').innerHTML = descriptions[currentStep - 1];
+                    currentStep++;
+                }
+            }
+            
+            if (currentStep > 5) {
+                document.getElementById('simulationArea').innerHTML = "<span class='success'>✅ Connection established successfully! Devices are now ready for secure data exchange.</span>";
+            }
+        }
+        
+        function resetSimulation() {
+            currentStep = 1;
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            steps.forEach(step => document.getElementById(step).classList.remove('active'));
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('simulationArea').innerHTML = "Step 1: Inquiry Phase\nMaster device broadcasts inquiry messages to discover nearby devices...";
+        }
+        
+        function calculateHoppingSequence() {
+            const clock = parseInt(document.getElementById('piconetClock').value);
+            const addr = document.getElementById('masterAddr').value;
+            
+            if (addr.length !== 6) {
+                document.getElementById('hoppingResult').innerHTML = '<span class="error">Error: Master address must be exactly 6 bits</span>';
+                return;
+            }
+            
+            // Simplified frequency hopping calculation for demonstration
+            const channels = [];
+            for (let i = 0; i < 10; i++) {
+                const hop = ((clock + i) ^ parseInt(addr, 2)) % 79;
+                channels.push(hop);
+            }
+            
+            document.getElementById('hoppingResult').innerHTML = `
+<strong>Frequency Hopping Sequence</strong>
+Clock: ${clock}
+Master Address: ${addr}
+
+Next 10 hop channels:
+${channels.map((ch, i) => `Slot ${i}: Channel ${ch} (${2402 + ch} MHz)`).join('\n')}
+
+<span class="highlight">Pattern follows pseudo-random sequence based on master clock and address</span>
+            `;
+        }
+        
+        function buildL2CAPPacket() {
+            const cid = document.getElementById('channelId').value;
+            const data = document.getElementById('l2capData').value;
+            const length = data.length;
+            
+            const cidNames = ['', 'Signaling', 'Connectionless', 'A2MP', 'ATT', 'LE Signaling', 'Security Manager'];
+            
+            document.getElementById('l2capResult').innerHTML = `
+<strong>L2CAP Packet Structure</strong>
+
+Length (2 bytes):    ${length.toString(16).padStart(4, '0')} (${length} bytes)
+CID (2 bytes):       ${parseInt(cid).toString(16).padStart(4, '0')} (${cidNames[cid]})
+Data:               "${data}"
+
+<span class="highlight">Complete L2CAP PDU:</span>
+Header: ${length.toString(16).padStart(4, '0')}${parseInt(cid).toString(16).padStart(4, '0')}
+Payload: ${Array.from(data).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ')}
+            `;
+        }
+        
+        function calculateROI() {
+            const deviceCount = parseInt(document.getElementById('deviceCount').value);
+            const deviceCost = parseFloat(document.getElementById('deviceCost').value);
+            const implementationType = document.getElementById('implementationType').value;
+            const annualSavings = parseFloat(document.getElementById('annualSavings').value);
+            
+            const totalCost = deviceCount * deviceCost;
+            const installationCost = totalCost * 0.3; // Estimate 30% for installation
+            const totalInvestment = totalCost + installationCost;
+            const paybackPeriod = totalInvestment / annualSavings;
+            const threeYearROI = ((annualSavings * 3 - totalInvestment) / totalInvestment) * 100;
+            
+            const typeDescriptions = {
+                asset_tracking: 'Reduced time searching for equipment, improved utilization',
+                environmental: 'Energy savings, regulatory compliance, predictive maintenance',
+                security: 'Reduced theft, improved access control, compliance',
+                energy: 'Automated optimization, reduced waste, monitoring efficiency'
+            };
+            
+            document.getElementById('roiResult').innerHTML = `
+<strong>Bluetooth Implementation ROI Analysis</strong>
+
+Initial Investment:
+- Device costs: $${totalCost.toLocaleString()} (${deviceCount} × $${deviceCost})
+- Installation: $${installationCost.toLocaleString()}
+- Total: $${totalInvestment.toLocaleString()}
+
+Financial Returns:
+- Annual savings: $${annualSavings.toLocaleString()}
+- Payback period: ${paybackPeriod.toFixed(1)} years
+- 3-year ROI: ${threeYearROI.toFixed(1)}%
+
+Implementation: ${implementationType.replace('_', ' ').toUpperCase()}
+Benefits: ${typeDescriptions[implementationType]}
+
+<span class="${threeYearROI > 100 ? 'success' : 'error'}">
+${threeYearROI > 100 ? '✅ Positive ROI - Recommended implementation' : '⚠️ Consider optimizing costs or increasing efficiency gains'}
+</span>
+            `;
+        }
+        
+        function checkAnswer() {
+            const selectedAnswer = document.querySelector('input[name="quiz"]:checked');
+            if (!selectedAnswer) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            const currentQuiz = quizData[currentQuestion];
+            const isCorrect = selectedAnswer.value === currentQuiz.correct;
+            
+            if (isCorrect) {
+                quizScore++;
+            }
+            
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <strong>${isCorrect ? 'Correct!' : 'Incorrect'}</strong><br>
+                ${currentQuiz.explanation}
+                ${isCorrect ? '<span class="success">+1 point</span>' : '<span class="error">0 points</span>'}
+            `;
+            
+            totalQuestions++;
+            document.getElementById('scoreDisplay').textContent = `${quizScore}/${totalQuestions}`;
+            document.getElementById('quizScore').style.display = 'block';
+        }
+        
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % quizData.length;
+            const quiz = quizData[currentQuestion];
+            
+            document.getElementById('quizQuestion').textContent = `Question ${currentQuestion + 1}: ${quiz.question}`;
+            
+            const options = document.querySelectorAll('.quiz-options li');
+            options.forEach((option, index) => {
+                option.innerHTML = `<input type="radio" name="quiz" value="${String.fromCharCode(97 + index)}"> ${quiz.options[index]}`;
+            });
+            
+            document.getElementById('quizResult').style.display = 'none';
+        }
+        
+        // Initialize the first performance data display
+        updatePerformanceData();
+    </script>
+</body>
+</html>
