@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAT/PAT Interactive Training Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #2d5a27, #4a8f3e);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            background-color: #f8f9fa;
+            border: 2px solid #2d5a27;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2d5a27;
+            border-bottom: 2px solid #4a8f3e;
+            padding-bottom: 10px;
+        }
+        
+        .interactive-demo {
+            background-color: white;
+            border: 1px solid #2d5a27;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .network-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .device {
+            background-color: #e8f5e8;
+            border: 2px solid #2d5a27;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+        }
+        
+        .router {
+            background-color: #2d5a27;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .server {
+            background-color: #4a8f3e;
+            color: white;
+        }
+        
+        .arrow {
+            font-size: 24px;
+            color: #2d5a27;
+            margin: 0 10px;
+        }
+        
+        .translation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .translation-table th,
+        .translation-table td {
+            border: 1px solid #2d5a27;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .translation-table th {
+            background-color: #2d5a27;
+            color: white;
+        }
+        
+        .translation-table tr:nth-child(even) {
+            background-color: #f0f8f0;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        .input-group label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+            color: #2d5a27;
+        }
+        
+        .input-group input {
+            padding: 8px;
+            border: 1px solid #2d5a27;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .btn {
+            background-color: #2d5a27;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: #4a8f3e;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .result-box {
+            background-color: #e8f5e8;
+            border: 1px solid #2d5a27;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .success {
+            background-color: #d1edff;
+            border-color: #2d5a27;
+            color: #0f4229;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            background-color: #f8f9fa;
+            border: 1px solid #2d5a27;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            background-color: #2d5a27;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .packet-header {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            border: 1px solid #2d5a27;
+            padding: 10px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NAT/PAT Interactive Training Tool</h1>
+            <p>Master Network Address Translation with Port Address Translation</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('overview')">Overview</div>
+            <div class="tab" onclick="showTab('simulator')">Live Simulator</div>
+            <div class="tab" onclick="showTab('header-trainer')">Header Trainer</div>
+            <div class="tab" onclick="showTab('workplace')">Workplace Examples</div>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2>What is NAT/PAT?</h2>
+                <p><strong>Network Address Translation (NAT)</strong> with <strong>Port Address Translation (PAT)</strong> is a networking technique that allows multiple devices on a private network to share a single public IP address when accessing the internet.</p>
+                
+                <div class="interactive-demo">
+                    <h3>Network Topology</h3>
+                    <div class="network-diagram">
+                        <div class="device">
+                            <strong>PC 1</strong><br>
+                            192.168.1.10:12345
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="device router">
+                            <strong>NAT Router</strong><br>
+                            Private: 192.168.1.1<br>
+                            Public: 203.0.113.1
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="device server">
+                            <strong>Web Server</strong><br>
+                            93.184.216.34:80
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Private IP Addresses:</strong> RFC 1918 addresses (10.x.x.x, 172.16-31.x.x, 192.168.x.x)</li>
+                    <li><strong>Public IP Address:</strong> Internet-routable address assigned by ISP</li>
+                    <li><strong>Port Translation:</strong> Using different ports to distinguish connections</li>
+                    <li><strong>Translation Table:</strong> Maintains mapping between internal and external addresses</li>
+                </ul>
+
+                <h3>NAT/PAT Process</h3>
+                <ol>
+                    <li>Internal device sends packet with private IP and random source port</li>
+                    <li>NAT router replaces source IP with public IP and assigns new port</li>
+                    <li>Router stores translation in NAT table</li>
+                    <li>External server responds to public IP and assigned port</li>
+                    <li>Router looks up translation and forwards to original internal device</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>Reserved Network Addresses</h2>
+                <table class="translation-table">
+                    <thead>
+                        <tr>
+                            <th>Address Range</th>
+                            <th>CIDR Notation</th>
+                            <th>Class</th>
+                            <th>Number of Addresses</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10.0.0.0 - 10.255.255.255</td>
+                            <td>10.0.0.0/8</td>
+                            <td>Class A</td>
+                            <td>16,777,216</td>
+                            <td>Large organizations</td>
+                        </tr>
+                        <tr>
+                            <td>172.16.0.0 - 172.31.255.255</td>
+                            <td>172.16.0.0/12</td>
+                            <td>Class B</td>
+                            <td>1,048,576</td>
+                            <td>Medium organizations</td>
+                        </tr>
+                        <tr>
+                            <td>192.168.0.0 - 192.168.255.255</td>
+                            <td>192.168.0.0/16</td>
+                            <td>Class C</td>
+                            <td>65,536</td>
+                            <td>Small networks/homes</td>
+                        </tr>
+                        <tr>
+                            <td>169.254.0.0 - 169.254.255.255</td>
+                            <td>169.254.0.0/16</td>
+                            <td>Link-Local</td>
+                            <td>65,536</td>
+                            <td>APIPA/Auto-config</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="simulator" class="tab-content">
+            <div class="section">
+                <h2>Live NAT/PAT Simulator</h2>
+                <p>Create connections and watch NAT/PAT in action!</p>
+                
+                <div class="interactive-demo">
+                    <h3>Create New Connection</h3>
+                    <div class="input-group">
+                        <label>Internal IP:</label>
+                        <input type="text" id="internal-ip" value="192.168.1.10" />
+                    </div>
+                    <div class="input-group">
+                        <label>Internal Port:</label>
+                        <input type="number" id="internal-port" min="1024" max="65535" value="12345" />
+                    </div>
+                    <div class="input-group">
+                        <label>Destination IP:</label>
+                        <input type="text" id="dest-ip" value="93.184.216.34" />
+                    </div>
+                    <div class="input-group">
+                        <label>Destination Port:</label>
+                        <input type="number" id="dest-port" min="1" max="65535" value="80" />
+                    </div>
+                    <button class="btn" onclick="createConnection()">Create Connection</button>
+                    <button class="btn btn-secondary" onclick="clearTable()">Clear Table</button>
+                </div>
+
+                <h3>Current NAT Translation Table</h3>
+                <table class="translation-table" id="nat-table">
+                    <thead>
+                        <tr>
+                            <th>Internal IP:Port</th>
+                            <th>External IP:Port</th>
+                            <th>Destination</th>
+                            <th>Protocol</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nat-table-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #666;">No active connections</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="interactive-demo">
+                    <h3>Packet Flow Visualization</h3>
+                    <div id="packet-flow"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="header-trainer" class="tab-content">
+            <div class="section">
+                <h2>TCP/IP Header Construction Trainer</h2>
+                <p>Practice building and analyzing packet headers through NAT/PAT translation.</p>
+                
+                <div class="interactive-demo">
+                    <h3>Original Packet (Internal Network)</h3>
+                    <div class="input-group">
+                        <label>Source IP:</label>
+                        <input type="text" id="orig-src-ip" value="192.168.1.100" />
+                    </div>
+                    <div class="input-group">
+                        <label>Source Port:</label>
+                        <input type="number" id="orig-src-port" min="1024" max="65535" value="54321" />
+                    </div>
+                    <div class="input-group">
+                        <label>Dest IP:</label>
+                        <input type="text" id="orig-dest-ip" value="208.67.222.222" />
+                    </div>
+                    <div class="input-group">
+                        <label>Dest Port:</label>
+                        <input type="number" id="orig-dest-port" min="1" max="65535" value="53" />
+                    </div>
+                    <div class="input-group">
+                        <label>Public IP:</label>
+                        <input type="text" id="public-ip" value="203.0.113.45" />
+                    </div>
+                    <button class="btn" onclick="translateHeader()">Perform NAT Translation</button>
+                </div>
+
+                <div id="header-result"></div>
+            </div>
+
+            <div class="section">
+                <h2>Protocol Operations Quiz</h2>
+                <div class="interactive-demo">
+                    <div id="quiz-question"></div>
+                    <div id="quiz-options"></div>
+                    <button class="btn" onclick="checkAnswer()" id="check-btn" style="display:none;">Check Answer</button>
+                    <button class="btn" onclick="nextQuestion()">Start Quiz</button>
+                    <div id="quiz-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="workplace" class="tab-content">
+            <div class="section">
+                <h2>Workplace Applications and Examples</h2>
+                
+                <div class="interactive-demo">
+                    <h3>1. Corporate Office Network</h3>
+                    <p><strong>Scenario:</strong> 500-employee company with single public IP from ISP</p>
+                    <ul>
+                        <li><strong>Challenge:</strong> Enable internet access for all employees</li>
+                        <li><strong>Solution:</strong> NAT/PAT router with 10.0.0.0/8 internal network</li>
+                        <li><strong>Implementation:</strong> Cisco ASA firewall with PAT configuration</li>
+                        <li><strong>Benefits:</strong> Cost savings, security through obscurity, centralized internet control</li>
+                    </ul>
+                    <div class="packet-header">
+                        <strong>Configuration Example (Cisco):</strong><br>
+                        interface GigabitEthernet0/0<br>
+                        &nbsp;ip address 203.0.113.10 255.255.255.248<br>
+                        &nbsp;ip nat outside<br>
+                        interface GigabitEthernet0/1<br>
+                        &nbsp;ip address 10.0.1.1 255.255.255.0<br>
+                        &nbsp;ip nat inside<br>
+                        ip nat inside source list 1 interface GigabitEthernet0/0 overload<br>
+                        access-list 1 permit 10.0.0.0 0.255.255.255
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>2. Home Office Setup</h3>
+                    <p><strong>Scenario:</strong> Remote worker with multiple devices</p>
+                    <ul>
+                        <li><strong>Devices:</strong> Laptop, desktop, phone, IoT devices</li>
+                        <li><strong>ISP Assignment:</strong> Single dynamic public IP</li>
+                        <li><strong>Router:</strong> Consumer-grade with automatic NAT/PAT</li>
+                        <li><strong>Network:</strong> 192.168.1.0/24</li>
+                    </ul>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>3. Data Center DMZ</h3>
+                    <p><strong>Scenario:</strong> Web servers behind NAT for security</p>
+                    <ul>
+                        <li><strong>External Access:</strong> Port forwarding for HTTP/HTTPS</li>
+                        <li><strong>Internal Servers:</strong> Database servers with private IPs</li>
+                        <li><strong>Security:</strong> Stateful inspection and logging</li>
+                    </ul>
+                    <div class="packet-header">
+                        <strong>Port Forwarding Example:</strong><br>
+                        ip nat inside source static tcp 192.168.100.10 80 203.0.113.10 80<br>
+                        ip nat inside source static tcp 192.168.100.10 443 203.0.113.10 443
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>4. Troubleshooting Common Issues</h3>
+                    <button class="btn" onclick="showTroubleshootingScenario()">Generate Troubleshooting Scenario</button>
+                    <div id="troubleshooting-scenario"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Best Practices and Considerations</h2>
+                <ul>
+                    <li><strong>Port Exhaustion:</strong> Monitor active connections (65,535 port limit)</li>
+                    <li><strong>Session Timeouts:</strong> Configure appropriate timeout values</li>
+                    <li><strong>Logging:</strong> Enable NAT logging for security and troubleshooting</li>
+                    <li><strong>Performance:</strong> Consider NAT hardware acceleration for high throughput</li>
+                    <li><strong>IPv6 Transition:</strong> Plan for IPv6 implementation to reduce NAT dependency</li>
+                    <li><strong>Security:</strong> NAT is not a security feature - use proper firewalls</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let natTable = [];
+        let currentQuiz = 0;
+        let nextExternalPort = 1024;
+        
+        const quizQuestions = [
+            {
+                question: "What happens when an internal device sends a packet through NAT?",
+                options: [
+                    "Only the destination IP is changed",
+                    "The source IP and port are translated to public IP and new port",
+                    "The packet is dropped",
+                    "Only the source port is changed"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which RFC defines private IP address ranges?",
+                options: ["RFC 1918", "RFC 791", "RFC 793", "RFC 2460"],
+                correct: 0
+            },
+            {
+                question: "What is the maximum number of simultaneous connections through NAT/PAT with one public IP?",
+                options: ["1024", "32768", "65535", "Unlimited"],
+                correct: 2
+            },
+            {
+                question: "What information does the NAT translation table store?",
+                options: [
+                    "Only IP addresses",
+                    "Internal IP:Port, External IP:Port, and destination",
+                    "Only port numbers",
+                    "MAC addresses"
+                ],
+                correct: 1
+            }
+        ];
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function createConnection() {
+            const internalIP = document.getElementById('internal-ip').value;
+            const internalPort = parseInt(document.getElementById('internal-port').value);
+            const destIP = document.getElementById('dest-ip').value;
+            const destPort = parseInt(document.getElementById('dest-port').value);
+            
+            if (!isValidIP(internalIP) || !isValidIP(destIP)) {
+                alert('Please enter valid IP addresses');
+                return;
+            }
+            
+            const externalPort = nextExternalPort++;
+            const publicIP = '203.0.113.1';
+            
+            const connection = {
+                internalIP,
+                internalPort,
+                externalIP: publicIP,
+                externalPort,
+                destIP,
+                destPort,
+                protocol: 'TCP',
+                status: 'Active'
+            };
+            
+            natTable.push(connection);
+            updateNATTable();
+            showPacketFlow(connection);
+        }
+
+        function updateNATTable() {
+            const tbody = document.getElementById('nat-table-body');
+            tbody.innerHTML = '';
+            
+            if (natTable.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No active connections</td></tr>';
+                return;
+            }
+            
+            natTable.forEach((conn, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${conn.internalIP}:${conn.internalPort}</td>
+                    <td>${conn.externalIP}:${conn.externalPort}</td>
+                    <td>${conn.destIP}:${conn.destPort}</td>
+                    <td>${conn.protocol}</td>
+                    <td>${conn.status}</td>
+                    <td><button class="btn" style="padding: 5px 10px; font-size: 12px;" onclick="removeConnection(${index})">Remove</button></td>
+                `;
+            });
+        }
+
+        function removeConnection(index) {
+            natTable.splice(index, 1);
+            updateNATTable();
+        }
+
+        function clearTable() {
+            natTable = [];
+            nextExternalPort = 1024;
+            updateNATTable();
+            document.getElementById('packet-flow').innerHTML = '';
+        }
+
+        function showPacketFlow(connection) {
+            const flowDiv = document.getElementById('packet-flow');
+            flowDiv.innerHTML = `
+                <h4>Latest Connection Flow:</h4>
+                <div class="network-diagram">
+                    <div class="device">
+                        <strong>Internal Device</strong><br>
+                        ${connection.internalIP}:${connection.internalPort}
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="device router">
+                        <strong>NAT Router</strong><br>
+                        Translates to<br>
+                        ${connection.externalIP}:${connection.externalPort}
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="device server">
+                        <strong>Destination</strong><br>
+                        ${connection.destIP}:${connection.destPort}
+                    </div>
+                </div>
+            `;
+        }
+
+        function translateHeader() {
+            const srcIP = document.getElementById('orig-src-ip').value;
+            const srcPort = document.getElementById('orig-src-port').value;
+            const destIP = document.getElementById('orig-dest-ip').value;
+            const destPort = document.getElementById('orig-dest-port').value;
+            const publicIP = document.getElementById('public-ip').value;
+            
+            const newPort = Math.floor(Math.random() * 30000) + 1024;
+            
+            const resultDiv = document.getElementById('header-result');
+            resultDiv.innerHTML = `
+                <h3>Translation Result</h3>
+                <div class="packet-header">
+                    <strong>Original Packet Header:</strong><br>
+                    Source IP: <span class="highlight">${srcIP}</span><br>
+                    Source Port: <span class="highlight">${srcPort}</span><br>
+                    Destination IP: ${destIP}<br>
+                    Destination Port: ${destPort}<br>
+                    Protocol: TCP<br><br>
+                    
+                    <strong>Translated Packet Header (Outbound):</strong><br>
+                    Source IP: <span class="highlight">${publicIP}</span> (Changed)<br>
+                    Source Port: <span class="highlight">${newPort}</span> (Changed)<br>
+                    Destination IP: ${destIP}<br>
+                    Destination Port: ${destPort}<br>
+                    Protocol: TCP<br><br>
+                    
+                    <strong>NAT Table Entry Created:</strong><br>
+                    ${srcIP}:${srcPort} ⟷ ${publicIP}:${newPort} → ${destIP}:${destPort}
+                </div>
+            `;
+        }
+
+        function nextQuestion() {
+            if (currentQuiz >= quizQuestions.length) {
+                currentQuiz = 0;
+            }
+            
+            const question = quizQuestions[currentQuiz];
+            document.getElementById('quiz-question').innerHTML = `<h4>Question ${currentQuiz + 1}: ${question.question}</h4>`;
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                optionsHTML += `<label><input type="radio" name="quiz-option" value="${index}"> ${option}</label><br>`;
+            });
+            document.getElementById('quiz-options').innerHTML = optionsHTML;
+            document.getElementById('check-btn').style.display = 'inline-block';
+            document.getElementById('quiz-result').innerHTML = '';
+        }
+
+        function checkAnswer() {
+            const selected = document.querySelector('input[name="quiz-option"]:checked');
+            if (!selected) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            const question = quizQuestions[currentQuiz];
+            const isCorrect = parseInt(selected.value) === question.correct;
+            const resultDiv = document.getElementById('quiz-result');
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = '<div class="result-box success">Correct! Well done.</div>';
+            } else {
+                resultDiv.innerHTML = `<div class="result-box error">Incorrect. The correct answer is: ${question.options[question.correct]}</div>`;
+            }
+            
+            currentQuiz++;
+            document.getElementById('check-btn').style.display = 'none';
+        }
+
+        function showTroubleshootingScenario() {
+            const scenarios = [
+                {
+                    title: "Port Exhaustion Issue",
+                    problem: "Users complaining about intermittent internet connectivity during peak hours",
+                    symptoms: "Connection timeouts, slow browsing, failed downloads",
+                    solution: "Monitor NAT table size, implement connection limits, consider additional public IPs"
+                },
+                {
+                    title: "Session Timeout Problem",
+                    problem: "VPN connections dropping unexpectedly",
+                    symptoms: "Frequent disconnections, need to reconnect every few minutes",
+                    solution: "Increase NAT session timeout values, configure proper keep-alive settings"
+                },
+                {
+                    title: "Asymmetric Routing",
+                    problem: "Outbound traffic works but return traffic fails",
+                    symptoms: "Can send requests but no responses received",
+                    solution: "Check routing tables, verify NAT table entries, ensure proper return path"
+                }
+            ];
+            
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            document.getElementById('troubleshooting-scenario').innerHTML = `
+                <div class="result-box">
+                    <h4>${scenario.title}</h4>
+                    <p><strong>Problem:</strong> ${scenario.problem}</p>
+                    <p><strong>Symptoms:</strong> ${scenario.symptoms}</p>
+                    <p><strong>Solution:</strong> ${scenario.solution}</p>
+                </div>
+            `;
+        }
+
+        function isValidIP(ip) {
+            const regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!regex.test(ip)) return false;
+            
+            const parts = ip.split('.');
+            return parts.every(part => {
+                const num = parseInt(part);
+                return num >= 0 && num <= 255;
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNATTable();
+        });
+    </script>
+</body>
+</html>
