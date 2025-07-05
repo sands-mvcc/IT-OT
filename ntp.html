@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Time Protocol (NTP) Interactive Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016, #4a7c2a);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2d5016;
+        }
+
+        .nav-tab {
+            background: #f8f9fa;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            background: #e8f5e8;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: #2d5016;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #4a7c2a;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #2d5016;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #4a7c2a;
+            padding-bottom: 10px;
+        }
+
+        .card h3 {
+            color: #2d5016;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .packet-field {
+            background: #f8f9fa;
+            border: 2px solid #4a7c2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .packet-field:hover {
+            background: #e8f5e8;
+            transform: scale(1.02);
+        }
+
+        .packet-field.selected {
+            background: #4a7c2a;
+            color: white;
+        }
+
+        .field-details {
+            display: none;
+            background: #2d5016;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .field-details.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; height: 0; }
+            to { opacity: 1; height: auto; }
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #f8f9fa, #e8f5e8);
+            border: 2px solid #4a7c2a;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .timestamp-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .timestamp-box {
+            background: white;
+            border: 2px solid #4a7c2a;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .timestamp-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .timestamp-label {
+            font-weight: bold;
+            color: #2d5016;
+            margin-bottom: 10px;
+        }
+
+        .timestamp-value {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .btn {
+            background: #4a7c2a;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            background: #2d5016;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a7c2a, #2d5016);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .quiz-container {
+            background: #f8f9fa;
+            border: 2px solid #4a7c2a;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d5016;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #4a7c2a;
+            background: #e8f5e8;
+        }
+
+        .quiz-option.correct {
+            background: #4a7c2a;
+            color: white;
+            border-color: #2d5016;
+        }
+
+        .quiz-option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #c82333;
+        }
+
+        .workplace-example {
+            background: linear-gradient(135deg, #e8f5e8, #f8f9fa);
+            border-left: 5px solid #4a7c2a;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 2px solid #4a7c2a;
+        }
+
+        .highlight {
+            background: #4a7c2a;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .stratum-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .stratum-level {
+            background: white;
+            border: 2px solid #4a7c2a;
+            border-radius: 10px;
+            padding: 15px 30px;
+            margin: 10px 0;
+            text-align: center;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .stratum-level:hover {
+            background: #e8f5e8;
+            transform: scale(1.05);
+        }
+
+        .stratum-arrow {
+            font-size: 2em;
+            color: #4a7c2a;
+            margin: 5px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            border: 3px solid #4a7c2a;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #2d5016;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                margin-bottom: 5px;
+                border-radius: 8px;
+            }
+            
+            .timestamp-demo {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Network Time Protocol (NTP) Interactive Training</h1>
+            <p>Master the fundamentals of network time synchronization</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+            <button class="nav-tab" onclick="showTab('packet-structure')">Packet Structure</button>
+            <button class="nav-tab" onclick="showTab('operations')">Operations</button>
+            <button class="nav-tab" onclick="showTab('trainer')">Interactive Trainer</button>
+            <button class="nav-tab" onclick="showTab('workplace')">Workplace Examples</button>
+            <button class="nav-tab" onclick="showTab('quiz')">Knowledge Quiz</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h2>What is Network Time Protocol (NTP)?</h2>
+                <p>Network Time Protocol (NTP) is a networking protocol designed to synchronize computer clocks across packet-switched, variable-latency data networks. Developed by David L. Mills in 1985, NTP is one of the oldest Internet protocols still in active use today.</p>
+                
+                <h3>Key Features</h3>
+                <ul style="margin-left: 20px;">
+                    <li><strong>High Precision:</strong> Can achieve microsecond accuracy on LANs and millisecond accuracy over the Internet</li>
+                    <li><strong>Hierarchical Architecture:</strong> Uses stratum levels to organize time sources</li>
+                    <li><strong>Fault Tolerance:</strong> Designed to handle network delays, lost packets, and unreliable servers</li>
+                    <li><strong>Security:</strong> Supports authentication mechanisms to prevent malicious attacks</li>
+                </ul>
+
+                <h3>Stratum Hierarchy</h3>
+                <div class="stratum-diagram">
+                    <div class="stratum-level">
+                        <strong>Stratum 0</strong><br>
+                        Reference Clocks (GPS, Atomic Clocks)
+                    </div>
+                    <div class="stratum-arrow">↓</div>
+                    <div class="stratum-level">
+                        <strong>Stratum 1</strong><br>
+                        Primary Time Servers
+                    </div>
+                    <div class="stratum-arrow">↓</div>
+                    <div class="stratum-level">
+                        <strong>Stratum 2</strong><br>
+                        Secondary Time Servers
+                    </div>
+                    <div class="stratum-arrow">↓</div>
+                    <div class="stratum-level">
+                        <strong>Stratum 3-15</strong><br>
+                        Client Systems
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>How NTP Works</h2>
+                <p>NTP uses a client-server model where clients request time from servers. The protocol calculates network delay and clock offset using four timestamps:</p>
+                
+                <div class="interactive-demo">
+                    <h3>NTP Transaction Process</h3>
+                    <div class="timestamp-demo">
+                        <div class="timestamp-box">
+                            <div class="timestamp-label">T1 - Origin Timestamp</div>
+                            <div class="timestamp-value" id="t1-value">Client sends request</div>
+                        </div>
+                        <div class="timestamp-box">
+                            <div class="timestamp-label">T2 - Receive Timestamp</div>
+                            <div class="timestamp-value" id="t2-value">Server receives request</div>
+                        </div>
+                        <div class="timestamp-box">
+                            <div class="timestamp-label">T3 - Transmit Timestamp</div>
+                            <div class="timestamp-value" id="t3-value">Server sends response</div>
+                        </div>
+                        <div class="timestamp-box">
+                            <div class="timestamp-label">T4 - Destination Timestamp</div>
+                            <div class="timestamp-value" id="t4-value">Client receives response</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="simulateNTPTransaction()">Simulate NTP Transaction</button>
+                </div>
+
+                <h3>Calculations</h3>
+                <div class="code-block">
+Network Delay = ((T4 - T1) - (T3 - T2)) / 2
+Clock Offset = ((T2 - T1) + (T3 - T4)) / 2
+                </div>
+            </div>
+        </div>
+
+        <!-- Packet Structure Tab -->
+        <div id="packet-structure" class="tab-content">
+            <div class="card">
+                <h2>NTP Packet Header Structure</h2>
+                <p>The NTP packet consists of 12 mandatory 32-bit words (48 bytes minimum) plus optional extension fields and authentication data.</p>
+
+                <div class="interactive-demo">
+                    <h3>Interactive Packet Header</h3>
+                    <p><strong>Click on each field to learn more:</strong></p>
+                    
+                    <div class="packet-field" onclick="toggleFieldDetails('li-field')">
+                        <strong>Leap Indicator (LI) - 2 bits</strong>
+                        <div id="li-field" class="field-details">
+                            <strong>Values:</strong><br>
+                            00 = No leap second warning<br>
+                            01 = Last minute has 61 seconds<br>
+                            10 = Last minute has 59 seconds<br>
+                            11 = Clock unsynchronized
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('vn-field')">
+                        <strong>Version Number (VN) - 3 bits</strong>
+                        <div id="vn-field" class="field-details">
+                            Current version is 4 (NTPv4). This field indicates the NTP version number to ensure compatibility between different implementations.
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('mode-field')">
+                        <strong>Mode - 3 bits</strong>
+                        <div id="mode-field" class="field-details">
+                            <strong>Values:</strong><br>
+                            0 = Reserved<br>
+                            1 = Symmetric active<br>
+                            2 = Symmetric passive<br>
+                            3 = Client<br>
+                            4 = Server<br>
+                            5 = Broadcast<br>
+                            6 = NTP control message<br>
+                            7 = Reserved for private use
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('stratum-field')">
+                        <strong>Stratum - 8 bits</strong>
+                        <div id="stratum-field" class="field-details">
+                            Indicates the stratum level (1-15). Stratum 1 = primary reference, Stratum 16 = unsynchronized. Lower numbers indicate higher precision.
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('poll-field')">
+                        <strong>Poll Interval - 8 bits</strong>
+                        <div id="poll-field" class="field-details">
+                            Maximum interval between successive messages in log2 seconds. Typical values range from 4 (16 seconds) to 10 (1024 seconds).
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('precision-field')">
+                        <strong>Precision - 8 bits</strong>
+                        <div id="precision-field" class="field-details">
+                            Precision of the local clock in log2 seconds. For example, -6 indicates precision of 2^-6 = ~15.6 milliseconds.
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('rootdelay-field')">
+                        <strong>Root Delay - 32 bits</strong>
+                        <div id="rootdelay-field" class="field-details">
+                            Total round-trip delay to the primary reference source in NTP short format (16.16 fixed point).
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('rootdisp-field')">
+                        <strong>Root Dispersion - 32 bits</strong>
+                        <div id="rootdisp-field" class="field-details">
+                            Maximum error relative to the primary reference source in NTP short format.
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('refid-field')">
+                        <strong>Reference Identifier - 32 bits</strong>
+                        <div id="refid-field" class="field-details">
+                            Identifies the particular reference clock. For stratum 1: ASCII string (GPS, ATOM). For stratum 2+: IP address of reference server.
+                        </div>
+                    </div>
+
+                    <div class="packet-field" onclick="toggleFieldDetails('timestamps-field')">
+                        <strong>Timestamps - 4 × 64 bits</strong>
+                        <div id="timestamps-field" class="field-details">
+                            <strong>Reference Timestamp:</strong> Time when system clock was last set<br>
+                            <strong>Origin Timestamp:</strong> Time at client when request departed<br>
+                            <strong>Receive Timestamp:</strong> Time at server when request arrived<br>
+                            <strong>Transmit Timestamp:</strong> Time at server when response departed
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operations Tab -->
+        <div id="operations" class="tab-content">
+            <div class="card">
+                <h2>NTP Protocol Operations</h2>
+                
+                <h3>Client-Server Mode</h3>
+                <p>The most common NTP operation mode where clients poll servers for time information.</p>
+                
+                <div class="interactive-demo">
+                    <h3>Operation Sequence</h3>
+                    <ol style="margin-left: 20px;">
+                        <li>Client sends request packet to server (Mode 3)</li>
+                        <li>Server receives packet and timestamps arrival (T2)</li>
+                        <li>Server processes request and prepares response</li>
+                        <li>Server sends response packet (Mode 4) with timestamp (T3)</li>
+                        <li>Client receives response and timestamps arrival (T4)</li>
+                        <li>Client calculates offset and delay</li>
+                        <li>Client adjusts local clock based on calculations</li>
+                    </ol>
+                    <button class="btn" onclick="simulateClientServer()">Simulate Client-Server Exchange</button>
+                </div>
+
+                <h3>Symmetric Mode</h3>
+                <p>Used between peers of similar stratum levels for mutual synchronization.</p>
+
+                <h3>Broadcast Mode</h3>
+                <p>Server periodically broadcasts time to multiple clients on the local network.</p>
+
+                <h3>Polling Strategy</h3>
+                <div class="workplace-example">
+                    <strong>Adaptive Polling:</strong> NTP adjusts polling intervals based on network conditions and clock stability. Intervals range from 16 seconds to 36 hours, optimizing accuracy while minimizing network traffic.
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Clock Discipline Algorithm</h2>
+                <p>NTP uses sophisticated algorithms to maintain accurate time:</p>
+                
+                <h3>Clock Filter</h3>
+                <p>Maintains the eight most recent offset/delay measurements and selects the best sample for synchronization.</p>
+                
+                <h3>Clock Select</h3>
+                <p>Determines the best time source from multiple servers using the intersection algorithm.</p>
+                
+                <h3>Clock Adjust</h3>
+                <p>Gradually adjusts the local clock frequency and phase to maintain synchronization.</p>
+            </div>
+        </div>
+
+        <!-- Interactive Trainer Tab -->
+        <div id="trainer" class="tab-content">
+            <div class="card">
+                <h2>NTP Header Construction Trainer</h2>
+                <p>Practice building NTP packet headers with different scenarios:</p>
+                
+                <div class="interactive-demo">
+                    <h3>Scenario Builder</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <div>
+                            <label><strong>Mode:</strong></label><br>
+                            <select id="mode-select" onchange="updateHeaderPreview()">
+                                <option value="3">Client (3)</option>
+                                <option value="4">Server (4)</option>
+                                <option value="1">Symmetric Active (1)</option>
+                                <option value="2">Symmetric Passive (2)</option>
+                                <option value="5">Broadcast (5)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label><strong>Stratum:</strong></label><br>
+                            <select id="stratum-select" onchange="updateHeaderPreview()">
+                                <option value="1">Stratum 1 (Primary)</option>
+                                <option value="2">Stratum 2 (Secondary)</option>
+                                <option value="3">Stratum 3</option>
+                                <option value="4">Stratum 4</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label><strong>Leap Indicator:</strong></label><br>
+                            <select id="leap-select" onchange="updateHeaderPreview()">
+                                <option value="0">No Warning (0)</option>
+                                <option value="1">61 Seconds (1)</option>
+                                <option value="2">59 Seconds (2)</option>
+                                <option value="3">Unsynchronized (3)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label><strong>Poll Interval:</strong></label><br>
+                            <select id="poll-select" onchange="updateHeaderPreview()">
+                                <option value="4">16 seconds (4)</option>
+                                <option value="6">64 seconds (6)</option>
+                                <option value="8">256 seconds (8)</option>
+                                <option value="10">1024 seconds (10)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="generateRandomScenario()">Generate Random Scenario</button>
+                    <button class="btn" onclick="validateHeader()">Validate Header</button>
+                    
+                    <h3>Generated Header Preview</h3>
+                    <div class="code-block" id="header-preview">
+Click "Generate Random Scenario" or modify fields above to see header preview
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Timestamp Calculator</h2>
+                <div class="interactive-demo">
+                    <h3>NTP Timestamp Converter</h3>
+                    <p>Convert between NTP timestamps and human-readable dates:</p>
+                    
+                    <div style="margin: 20px 0;">
+                        <label><strong>Enter Unix Timestamp:</strong></label><br>
+                        <input type="number" id="unix-timestamp" placeholder="1642723200" style="padding: 10px; width: 200px; margin: 10px 0;">
+                        <button class="btn" onclick="convertToNTP()">Convert to NTP</button>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <label><strong>NTP Timestamp (hex):</strong></label><br>
+                        <div class="code-block" id="ntp-result">Enter a Unix timestamp above</div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <label><strong>Human Readable:</strong></label><br>
+                        <div class="timestamp-value" id="human-readable">Enter a timestamp above</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Examples Tab -->
+        <div id="workplace" class="tab-content">
+            <div class="card">
+                <h2>Enterprise NTP Applications</h2>
+                
+                <h3>Financial Services</h3>
+                <div class="workplace-example">
+                    <strong>Use Case:</strong> High-frequency trading systems require microsecond-level timestamp accuracy for trade execution and regulatory compliance (MiFID II, SEC requirements).
+                    <br><br>
+                    <strong>Implementation:</strong> Dedicated GPS-synchronized stratum 1 servers with hardware timestamping. Typical setup includes redundant time sources and sub-microsecond accuracy monitoring.
+                </div>
+
+                <h3>Data Centers & Cloud Computing</h3>
+                <div class="workplace-example">
+                    <strong>Use Case:</strong> Distributed computing, log correlation, database replication, and performance monitoring across multiple servers and geographic locations.
+                    <br><br>
+                    <strong>Implementation:</strong> Hierarchical NTP infrastructure with local stratum 2 servers synchronizing to multiple external stratum 1 sources.
+                </div>
+
+                <h3>Network Infrastructure</h3>
+                <div class="workplace-example">
+                    <strong>Use Case:</strong> Router and switch synchronization for network monitoring, SNMP data correlation, and Quality of Service (QoS) measurements.
+                    <br><br>
+                    <strong>Implementation:</strong> NTP clients on all network devices pointing to centralized NTP servers. Critical for accurate network performance analysis.
+                </div>
+
+                <h3>Security & Compliance</h3>
+                <div class="workplace-example">
+                    <strong>Use Case:</strong> Security log correlation, forensic analysis, certificate validation, and Kerberos authentication which requires synchronized clocks.
+                    <br><br>
+                    <strong>Implementation:</strong> Secure NTP with authentication keys, preferably using internal time sources to prevent external attacks.
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Configuration Examples</h2>
+                
+                <h3>Linux NTP Client Configuration</h3>
+                <div class="code-block">
+# /etc/ntp.conf
+# Use pool servers for redundancy
+pool 0.pool.ntp.org iburst
+pool 1.pool.ntp.org iburst
+pool 2.pool.ntp.org iburst
+
+# Local clock as fallback (stratum 10)
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10
+
+# Access restrictions
+restrict default nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict ::1
+
+# Drift file for frequency correction
+driftfile /var/lib/ntp/drift
+
+# Statistics logging
+statsdir /var/log/ntpstats/
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+                </div>
+
+                <h3>Cisco Router NTP Configuration</h3>
+                <div class="code-block">
+! Configure NTP servers
+ntp server 129.6.15.28 prefer
+ntp server 129.6.15.29
+
+! Set timezone
+clock timezone EST -5
+clock summer-time EDT recurring
+
+! Enable NTP authentication (optional)
+ntp authenticate
+ntp authentication-key 1 md5 MySecretKey
+ntp trusted-key 1
+ntp server 129.6.15.28 key 1
+
+! Serve time to local network
+ntp master 3
+                </div>
+
+                <h3>Windows Time Service Configuration</h3>
+                <div class="code-block">
+# Configure Windows Time service
+w32tm /config /manualpeerlist:"pool.ntp.org,time.google.com" /syncfromflags:manual
+
+# Set update interval (in seconds)
+w32tm /config /update
+
+# Start the service
+net start w32time
+
+# Force immediate synchronization
+w32tm /resync
+
+# Check status
+w32tm /query /status
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Best Practices</h2>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Use Multiple Sources:</strong> Configure at least 3-4 NTP servers for redundancy and accuracy</li>
+                    <li><strong>Hierarchical Design:</strong> Implement local stratum 2 servers to reduce external dependencies</li>
+                    <li><strong>Security:</strong> Use authentication keys and restrict access to NTP services</li>
+                    <li><strong>Monitoring:</strong> Implement monitoring for NTP server availability and time accuracy</li>
+                    <li><strong>Firewall Configuration:</strong> Ensure UDP port 123 is properly configured in firewalls</li>
+                    <li><strong>Gradual Adjustments:</strong> Use 'iburst' option for faster initial synchronization</li>
+                    <li><strong>Documentation:</strong> Maintain documentation of NTP infrastructure and dependencies</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <div class="card">
+                <h2>NTP Knowledge Quiz</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quiz-progress"></div>
+                </div>
+                <p><span id="quiz-score">Score: 0/0</span> | <span id="quiz-question-number">Question 1 of 10</span></p>
+            </div>
+
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-question" id="quiz-question">Loading question...</div>
+                <div id="quiz-options"></div>
+                <button class="btn" id="next-question" onclick="nextQuestion()" style="display: none;">Next Question</button>
+                <button class="btn" onclick="resetQuiz()">Reset Quiz</button>
+            </div>
+
+            <div class="card" id="quiz-results" style="display: none;">
+                <h2>Quiz Complete!</h2>
+                <p id="final-score"></p>
+                <p id="performance-message"></p>
+                <button class="btn" onclick="resetQuiz()">Take Quiz Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed explanations -->
+    <div id="explanation-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Explanation</h2>
+            <p id="modal-content">Detailed explanation will appear here.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentQuizQuestion = 0;
+        let quizScore = 0;
+        let quizQuestions = [
+            {
+                question: "What is the current version of NTP in widespread use?",
+                options: ["NTPv2", "NTPv3", "NTPv4", "NTPv5"],
+                correct: 2,
+                explanation: "NTPv4 is the current version, published in RFC 5905. It includes improvements for IPv6 support and enhanced security features."
+            },
+            {
+                question: "Which UDP port does NTP use for communication?",
+                options: ["53", "123", "161", "389"],
+                correct: 1,
+                explanation: "NTP uses UDP port 123 for all client-server and peer-to-peer communications."
+            },
+            {
+                question: "What does a stratum 1 NTP server represent?",
+                options: ["Unsynchronized clock", "Primary time server", "Secondary time server", "Client device"],
+                correct: 1,
+                explanation: "Stratum 1 servers are primary time servers directly connected to reference clocks like GPS or atomic clocks."
+            },
+            {
+                question: "How many timestamps are used in a typical NTP transaction?",
+                options: ["2", "3", "4", "5"],
+                correct: 2,
+                explanation: "NTP uses four timestamps: Origin (T1), Receive (T2), Transmit (T3), and Destination (T4) to calculate offset and delay."
+            },
+            {
+                question: "What is the NTP epoch date?",
+                options: ["January 1, 1970", "January 1, 1900", "January 1, 1980", "January 1, 2000"],
+                correct: 1,
+                explanation: "NTP uses January 1, 1900 as its epoch, unlike Unix which uses January 1, 1970."
+            },
+            {
+                question: "Which mode value indicates an NTP client request?",
+                options: ["1", "2", "3", "4"],
+                correct: 2,
+                explanation: "Mode 3 indicates a client request, while Mode 4 indicates a server response."
+            },
+            {
+                question: "What does the leap indicator field warn about?",
+                options: ["Clock drift", "Network delay", "Leap seconds", "Stratum changes"],
+                correct: 2,
+                explanation: "The leap indicator warns of impending leap second adjustments in UTC time."
+            },
+            {
+                question: "What is the maximum stratum level in NTP?",
+                options: ["8", "15", "16", "32"],
+                correct: 1,
+                explanation: "The maximum usable stratum is 15. Stratum 16 indicates an unsynchronized clock."
+            },
+            {
+                question: "Which algorithm does NTP use for server selection?",
+                options: ["Dijkstra's algorithm", "Intersection algorithm", "Bellman-Ford algorithm", "Round-robin"],
+                correct: 1,
+                explanation: "NTP uses the intersection algorithm (modified Marzullo's algorithm) to select the best time sources."
+            },
+            {
+                question: "What accuracy can NTP typically achieve on a LAN?",
+                options: ["Seconds", "Milliseconds", "Microseconds", "Nanoseconds"],
+                correct: 2,
+                explanation: "NTP can achieve microsecond accuracy on local area networks under ideal conditions."
+            }
+        ];
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Toggle field details in packet structure
+        function toggleFieldDetails(fieldId) {
+            const details = document.getElementById(fieldId);
+            const field = details.parentElement;
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                field.classList.remove('selected');
+            } else {
+                // Hide all other details first
+                document.querySelectorAll('.field-details').forEach(detail => {
+                    detail.classList.remove('show');
+                    detail.parentElement.classList.remove('selected');
+                });
+                
+                details.classList.add('show');
+                field.classList.add('selected');
+            }
+        }
+
+        // Simulate NTP transaction
+        function simulateNTPTransaction() {
+            const now = Date.now();
+            const networkDelay = Math.random() * 50 + 10; // 10-60ms delay
+            const clockOffset = (Math.random() - 0.5) * 1000; // ±500ms offset
+
+            // Simulate timestamps
+            const t1 = now;
+            const t2 = t1 + networkDelay + clockOffset;
+            const t3 = t2 + Math.random() * 5; // Processing time
+            const t4 = t3 + networkDelay;
+
+            // Update display
+            document.getElementById('t1-value').textContent = new Date(t1).toISOString();
+            document.getElementById('t2-value').textContent = new Date(t2).toISOString();
+            document.getElementById('t3-value').textContent = new Date(t3).toISOString();
+            document.getElementById('t4-value').textContent = new Date(t4).toISOString();
+
+            // Calculate and show results
+            const calculatedDelay = ((t4 - t1) - (t3 - t2)) / 2;
+            const calculatedOffset = ((t2 - t1) + (t3 - t4)) / 2;
+
+            setTimeout(() => {
+                alert(`Calculated Network Delay: ${calculatedDelay.toFixed(2)}ms\nCalculated Clock Offset: ${calculatedOffset.toFixed(2)}ms`);
+            }, 1000);
+        }
+
+        // Simulate client-server exchange
+        function simulateClientServer() {
+            let step = 0;
+            const steps = [
+                "Client prepares NTP request packet...",
+                "Client sends request to server (Mode 3)...",
+                "Server receives request and timestamps (T2)...",
+                "Server processes request and prepares response...",
+                "Server sends response (Mode 4) with timestamp (T3)...",
+                "Client receives response and timestamps (T4)...",
+                "Client calculates offset and delay...",
+                "Client adjusts local clock based on calculations",
+                "Exchange complete - next poll in 64 seconds"
+            ];
+
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    alert(steps[step]);
+                    step++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1500);
+        }
+
+        // Update header preview in trainer
+        function updateHeaderPreview() {
+            const mode = document.getElementById('mode-select').value;
+            const stratum = document.getElementById('stratum-select').value;
+            const leap = document.getElementById('leap-select').value;
+            const poll = document.getElementById('poll-select').value;
+
+            const version = 4; // NTPv4
+            const precision = -6; // ~15.6ms precision
+
+            const header = `
+NTP Header Preview:
+==================
+LI (Leap Indicator): ${leap} (2 bits)
+VN (Version Number): ${version} (3 bits)  
+Mode: ${mode} (3 bits)
+Stratum: ${stratum} (8 bits)
+Poll Interval: ${poll} (${Math.pow(2, poll)} seconds)
+Precision: ${precision} (~${(Math.pow(2, precision) * 1000).toFixed(1)}ms)
+
+First Byte (Binary): ${leap.padStart(2, '0')}${version.toString(2).padStart(3, '0')}${parseInt(mode).toString(2).padStart(3, '0')}
+First Byte (Hex): 0x${(parseInt(leap) << 6 | parseInt(version) << 3 | parseInt(mode)).toString(16).toUpperCase().padStart(2, '0')}
+
+Root Delay: 0x00000000 (0.000 seconds)
+Root Dispersion: 0x00000000 (0.000 seconds)
+Reference ID: GPS${String.fromCharCode(0)} (for Stratum 1)
+            `;
+
+            document.getElementById('header-preview').textContent = header;
+        }
+
+        // Generate random scenario
+        function generateRandomScenario() {
+            const modes = ['1', '2', '3', '4', '5'];
+            const stratums = ['1', '2', '3', '4'];
+            const leaps = ['0', '1', '2', '3'];
+            const polls = ['4', '6', '8', '10'];
+
+            document.getElementById('mode-select').value = modes[Math.floor(Math.random() * modes.length)];
+            document.getElementById('stratum-select').value = stratums[Math.floor(Math.random() * stratums.length)];
+            document.getElementById('leap-select').value = leaps[Math.floor(Math.random() * leaps.length)];
+            document.getElementById('poll-select').value = polls[Math.floor(Math.random() * polls.length)];
+
+            updateHeaderPreview();
+        }
+
+        // Validate header configuration
+        function validateHeader() {
+            const mode = parseInt(document.getElementById('mode-select').value);
+            const stratum = parseInt(document.getElementById('stratum-select').value);
+            const leap = parseInt(document.getElementById('leap-select').value);
+
+            let issues = [];
+
+            if (mode === 4 && stratum > 1 && leap === 3) {
+                issues.push("Server mode with stratum > 1 should not have unsynchronized leap indicator");
+            }
+
+            if (mode === 3 && stratum === 1) {
+                issues.push("Client mode typically should not have stratum 1");
+            }
+
+            if (mode === 5 && stratum > 3) {
+                issues.push("Broadcast mode with high stratum may not be useful");
+            }
+
+            if (issues.length === 0) {
+                alert("Header configuration looks valid!");
+            } else {
+                alert("Potential issues found:\n" + issues.join("\n"));
+            }
+        }
+
+        // Convert Unix timestamp to NTP
+        function convertToNTP() {
+            const unixTimestamp = parseInt(document.getElementById('unix-timestamp').value);
+            
+            if (isNaN(unixTimestamp)) {
+                alert("Please enter a valid Unix timestamp");
+                return;
+            }
+
+            // NTP epoch starts Jan 1, 1900, Unix epoch starts Jan 1, 1970
+            // Difference is 70 years = 2,208,988,800 seconds
+            const ntpTimestamp = unixTimestamp + 2208988800;
+            
+            // Convert to hex (assuming fractional part is 0)
+            const ntpHex = '0x' + ntpTimestamp.toString(16).toUpperCase().padStart(8, '0') + '00000000';
+            
+            // Human readable
+            const humanDate = new Date(unixTimestamp * 1000).toISOString();
+
+            document.getElementById('ntp-result').textContent = ntpHex;
+            document.getElementById('human-readable').textContent = humanDate;
+        }
+
+        // Quiz functionality
+        function loadQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('quiz-question').textContent = question.question;
+            document.getElementById('quiz-question-number').textContent = `Question ${currentQuizQuestion + 1} of ${quizQuestions.length}`;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            document.getElementById('next-question').style.display = 'none';
+            updateQuizProgress();
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+
+            // Disable all options
+            options.forEach(option => option.style.pointerEvents = 'none');
+
+            // Mark correct and incorrect answers
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Update score
+            if (selectedIndex === question.correct) {
+                quizScore++;
+            }
+
+            updateQuizScore();
+            document.getElementById('next-question').style.display = 'inline-block';
+
+            // Show explanation modal
+            setTimeout(() => {
+                showExplanation(question.explanation);
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuizQuestion++;
+            loadQuestion();
+        }
+
+        function updateQuizScore() {
+            document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${currentQuizQuestion + 1}`;
+        }
+
+        function updateQuizProgress() {
+            const progress = ((currentQuizQuestion + 1) / quizQuestions.length) * 100;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'block';
+            document.getElementById('final-score').textContent = `Final Score: ${quizScore}/${quizQuestions.length} (${percentage}%)`;
+
+            let message;
+            if (percentage >= 90) {
+                message = "Excellent! You have mastered NTP fundamentals.";
+            } else if (percentage >= 70) {
+                message = "Good job! You have a solid understanding of NTP.";
+            } else if (percentage >= 50) {
+                message = "Not bad! Review the training materials for better understanding.";
+            } else {
+                message = "Keep studying! NTP is complex but important to master.";
+            }
+
+            document.getElementById('performance-message').textContent = message;
+        }
+
+        function resetQuiz() {
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('quiz-results').style.display = 'none';
+            loadQuestion();
+        }
+
+        function showExplanation(explanation) {
+            document.getElementById('modal-title').textContent = 'Explanation';
+            document.getElementById('modal-content').textContent = explanation;
+            document.getElementById('explanation-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('explanation-modal').style.display = 'none';
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestion();
+            updateHeaderPreview();
+            
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('explanation-modal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
