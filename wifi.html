@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Protocol Interactive Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            padding: 5px;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-button:hover {
+            background-color: #e8f5e8;
+        }
+
+        .tab-button.active {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .wifi-standard {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid #4caf50;
+        }
+
+        .security-protocol {
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid #2e7d32;
+        }
+
+        .frame-builder {
+            background-color: #f8f8f8;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .field-label {
+            min-width: 150px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .field-input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            min-width: 100px;
+        }
+
+        .field-input:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+
+        .generated-frame {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border: 2px solid #4caf50;
+        }
+
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #2e7d32;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1b5e20;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .protocol-simulator {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .simulation-step {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .workplace-example {
+            background-color: #f0f8f0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #4caf50;
+        }
+
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+
+        .alert {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .field-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .field-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>WiFi Protocol Interactive Trainer</h1>
+            <p>Master WiFi standards, security, frame construction, and enterprise applications</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="openTab(event, 'standards')">WiFi Standards</button>
+            <button class="tab-button" onclick="openTab(event, 'security')">Security Protocols</button>
+            <button class="tab-button" onclick="openTab(event, 'frames')">Frame Construction</button>
+            <button class="tab-button" onclick="openTab(event, 'operations')">Protocol Operations</button>
+            <button class="tab-button" onclick="openTab(event, 'workplace')">Workplace Examples</button>
+        </div>
+
+        <!-- WiFi Standards Tab -->
+        <div id="standards" class="tab-content active">
+            <h2>WiFi Standards Evolution</h2>
+            <p>WiFi standards have evolved significantly since 1997. Here's a comprehensive overview of current standards:</p>
+
+            <div class="wifi-standard">
+                <h3>WiFi 4 (802.11n) - 2009</h3>
+                <p><strong>Speed:</strong> Up to 600 Mbps | <strong>Frequency:</strong> 2.4 GHz & 5 GHz | <strong>Range:</strong> ~70m indoors</p>
+                <p><strong>Key Features:</strong> MIMO technology, channel bonding (40 MHz), backward compatibility</p>
+                <p><strong>Applications:</strong> Basic internet browsing, email, standard definition video streaming</p>
+            </div>
+
+            <div class="wifi-standard">
+                <h3>WiFi 5 (802.11ac) - 2013</h3>
+                <p><strong>Speed:</strong> Up to 3.5 Gbps | <strong>Frequency:</strong> 5 GHz only | <strong>Range:</strong> ~35m indoors</p>
+                <p><strong>Key Features:</strong> 256-QAM, 80/160 MHz channels, MU-MIMO, beamforming</p>
+                <p><strong>Applications:</strong> HD video streaming, cloud computing, large file transfers</p>
+            </div>
+
+            <div class="wifi-standard">
+                <h3>WiFi 6 (802.11ax) - 2019</h3>
+                <p><strong>Speed:</strong> Up to 9.6 Gbps | <strong>Frequency:</strong> 2.4 GHz & 5 GHz | <strong>Range:</strong> ~30m indoors</p>
+                <p><strong>Key Features:</strong> OFDMA, 1024-QAM, Target Wake Time, 8x8 MU-MIMO</p>
+                <p><strong>Applications:</strong> 4K streaming, VR/AR, IoT dense environments, enterprise applications</p>
+            </div>
+
+            <div class="wifi-standard">
+                <h3>WiFi 6E (802.11ax-6GHz) - 2020</h3>
+                <p><strong>Speed:</strong> Up to 9.6 Gbps | <strong>Frequency:</strong> 2.4 GHz, 5 GHz & 6 GHz | <strong>Range:</strong> ~25m indoors</p>
+                <p><strong>Key Features:</strong> 6 GHz band access, less congestion, wider channels</p>
+                <p><strong>Applications:</strong> Enterprise environments, high-density deployments, latency-sensitive apps</p>
+            </div>
+
+            <div class="wifi-standard">
+                <h3>WiFi 7 (802.11be) - 2024</h3>
+                <p><strong>Speed:</strong> Up to 46 Gbps | <strong>Frequency:</strong> 2.4 GHz, 5 GHz & 6 GHz | <strong>Range:</strong> ~25m indoors</p>
+                <p><strong>Key Features:</strong> 320 MHz channels, 4096-QAM, Multi-Link Operation (MLO), 16x16 MU-MIMO</p>
+                <p><strong>Applications:</strong> 8K streaming, cloud gaming, AR/VR, industrial IoT, real-time applications</p>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Max Speed</th>
+                        <th>Frequency Bands</th>
+                        <th>Channel Width</th>
+                        <th>Security</th>
+                        <th>Key Innovation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>WiFi 4 (802.11n)</td>
+                        <td>600 Mbps</td>
+                        <td>2.4 & 5 GHz</td>
+                        <td>40 MHz</td>
+                        <td>WPA2</td>
+                        <td>MIMO</td>
+                    </tr>
+                    <tr>
+                        <td>WiFi 5 (802.11ac)</td>
+                        <td>3.5 Gbps</td>
+                        <td>5 GHz</td>
+                        <td>160 MHz</td>
+                        <td>WPA2</td>
+                        <td>MU-MIMO</td>
+                    </tr>
+                    <tr>
+                        <td>WiFi 6 (802.11ax)</td>
+                        <td>9.6 Gbps</td>
+                        <td>2.4 & 5 GHz</td>
+                        <td>160 MHz</td>
+                        <td>WPA3</td>
+                        <td>OFDMA</td>
+                    </tr>
+                    <tr>
+                        <td>WiFi 6E</td>
+                        <td>9.6 Gbps</td>
+                        <td>2.4, 5 & 6 GHz</td>
+                        <td>160 MHz</td>
+                        <td>WPA3</td>
+                        <td>6 GHz Band</td>
+                    </tr>
+                    <tr>
+                        <td>WiFi 7 (802.11be)</td>
+                        <td>46 Gbps</td>
+                        <td>2.4, 5 & 6 GHz</td>
+                        <td>320 MHz</td>
+                        <td>WPA3/WPA4</td>
+                        <td>MLO</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Security Protocols Tab -->
+        <div id="security" class="tab-content">
+            <h2>WiFi Security Protocols</h2>
+            <p>Understanding WiFi security is crucial for protecting wireless networks from unauthorized access and data breaches.</p>
+
+            <div class="security-protocol">
+                <h3>WEP (Wired Equivalent Privacy) - 1997</h3>
+                <p><strong>Status:</strong> <span style="color: red;">DEPRECATED - DO NOT USE</span></p>
+                <p><strong>Encryption:</strong> RC4 with 40-bit or 104-bit keys</p>
+                <p><strong>Vulnerabilities:</strong> Static keys, weak initialization vectors, easily cracked</p>
+                <p><strong>Use Case:</strong> Legacy devices only (avoid if possible)</p>
+            </div>
+
+            <div class="security-protocol">
+                <h3>WPA (WiFi Protected Access) - 2003</h3>
+                <p><strong>Status:</strong> <span style="color: orange;">LEGACY - Avoid for new deployments</span></p>
+                <p><strong>Encryption:</strong> TKIP with RC4, dynamic keys</p>
+                <p><strong>Improvements:</strong> Key rotation, message integrity checks</p>
+                <p><strong>Vulnerabilities:</strong> Still based on RC4, susceptible to certain attacks</p>
+            </div>
+
+            <div class="security-protocol">
+                <h3>WPA2 (WiFi Protected Access 2) - 2004</h3>
+                <p><strong>Status:</strong> <span style="color: green;">CURRENT STANDARD</span></p>
+                <p><strong>Encryption:</strong> AES with CCMP (128-bit)</p>
+                <p><strong>Modes:</strong> Personal (PSK) and Enterprise (802.1X)</p>
+                <p><strong>Vulnerabilities:</strong> KRACK attack (patched), offline dictionary attacks with weak passwords</p>
+                <p><strong>Use Case:</strong> Most current deployments, good security when properly configured</p>
+            </div>
+
+            <div class="security-protocol">
+                <h3>WPA3 (WiFi Protected Access 3) - 2018</h3>
+                <p><strong>Status:</strong> <span style="color: green;">LATEST STANDARD</span></p>
+                <p><strong>Encryption:</strong> AES (128-bit personal, 192-bit enterprise)</p>
+                <p><strong>Key Features:</strong> SAE (Simultaneous Authentication of Equals), Forward Secrecy, Protection against offline attacks</p>
+                <p><strong>Modes:</strong> Personal, Enterprise, Enhanced Open (OWE)</p>
+                <p><strong>Use Case:</strong> New deployments, high-security environments</p>
+            </div>
+
+            <div class="alert">
+                <strong>Security Recommendation:</strong> Always use WPA3 for new deployments. For existing networks, upgrade to WPA2 at minimum. Never use WEP or open networks for sensitive data.
+            </div>
+
+            <h3>Authentication Methods</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Use Case</th>
+                        <th>Security Level</th>
+                        <th>Implementation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pre-Shared Key (PSK)</td>
+                        <td>Home/Small Office</td>
+                        <td>Medium</td>
+                        <td>Shared password</td>
+                    </tr>
+                    <tr>
+                        <td>802.1X/EAP</td>
+                        <td>Enterprise</td>
+                        <td>High</td>
+                        <td>Individual certificates/credentials</td>
+                    </tr>
+                    <tr>
+                        <td>Enhanced Open (OWE)</td>
+                        <td>Public WiFi</td>
+                        <td>Medium</td>
+                        <td>Encryption without authentication</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Frame Construction Tab -->
+        <div id="frames" class="tab-content">
+            <h2>802.11 Frame Construction</h2>
+            <p>Learn how WiFi frames are structured and build your own frames interactively.</p>
+
+            <h3>Frame Types</h3>
+            <ul>
+                <li><strong>Management Frames (Type 00):</strong> Network management (Beacon, Probe, Association)</li>
+                <li><strong>Control Frames (Type 01):</strong> Channel access control (RTS, CTS, ACK)</li>
+                <li><strong>Data Frames (Type 10):</strong> User data transmission (QoS Data, Null frames)</li>
+            </ul>
+
+            <div class="frame-builder">
+                <h3>Interactive Frame Builder</h3>
+                <p>Build your own 802.11 frame header by filling in the fields below:</p>
+
+                <div class="field-row">
+                    <span class="field-label">Protocol Version:</span>
+                    <select class="field-input" id="protocol-version">
+                        <option value="00">00 (802.11)</option>
+                        <option value="01">01 (802.11ah)</option>
+                    </select>
+                    <span>(2 bits)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Frame Type:</span>
+                    <select class="field-input" id="frame-type">
+                        <option value="00">00 - Management</option>
+                        <option value="01">01 - Control</option>
+                        <option value="10">10 - Data</option>
+                    </select>
+                    <span>(2 bits)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Frame Subtype:</span>
+                    <select class="field-input" id="frame-subtype">
+                        <option value="0000">0000 - Association Request</option>
+                        <option value="0001">0001 - Association Response</option>
+                        <option value="0100">0100 - Probe Request</option>
+                        <option value="0101">0101 - Probe Response</option>
+                        <option value="1000">1000 - Beacon</option>
+                        <option value="1011">1011 - RTS</option>
+                        <option value="1100">1100 - CTS</option>
+                        <option value="1101">1101 - ACK</option>
+                    </select>
+                    <span>(4 bits)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">To DS:</span>
+                    <select class="field-input" id="to-ds">
+                        <option value="0">0 - Not to DS</option>
+                        <option value="1">1 - To DS</option>
+                    </select>
+                    <span>(1 bit)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">From DS:</span>
+                    <select class="field-input" id="from-ds">
+                        <option value="0">0 - Not from DS</option>
+                        <option value="1">1 - From DS</option>
+                    </select>
+                    <span>(1 bit)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">More Fragments:</span>
+                    <select class="field-input" id="more-fragments">
+                        <option value="0">0 - Last fragment</option>
+                        <option value="1">1 - More fragments</option>
+                    </select>
+                    <span>(1 bit)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Retry:</span>
+                    <select class="field-input" id="retry">
+                        <option value="0">0 - Not a retry</option>
+                        <option value="1">1 - Retry transmission</option>
+                    </select>
+                    <span>(1 bit)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Power Management:</span>
+                    <select class="field-input" id="power-mgmt">
+                        <option value="0">0 - Active mode</option>
+                        <option value="1">1 - Power save mode</option>
+                    </select>
+                    <span>(1 bit)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Duration (μs):</span>
+                    <input type="number" class="field-input" id="duration" min="0" max="65535" value="0">
+                    <span>(16 bits)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Address 1 (Destination):</span>
+                    <input type="text" class="field-input" id="addr1" placeholder="00:11:22:33:44:55" style="width: 200px;">
+                    <span>(48 bits)</span>
+                </div>
+
+                <div class="field-row">
+                    <span class="field-label">Address 2 (Source):</span>
+                    <input type="text" class="field-input" id="addr2" placeholder="AA:BB:CC:DD:EE:FF" style="width: 200px;">
+                    <span>(48 bits)</span>
+                </div>
+
+                <button class="btn" onclick="generateFrame()">Generate Frame</button>
+                <button class="btn btn-secondary" onclick="clearFrame()">Clear Fields</button>
+
+                <div id="generated-frame" class="generated-frame" style="display: none;"></div>
+            </div>
+
+            <h3>Frame Format Reference</h3>
+            <div class="code-block">
+Frame Control (2 bytes) | Duration (2 bytes) | Address 1 (6 bytes) | Address 2 (6 bytes) | Address 3 (6 bytes) | Sequence Control (2 bytes) | Address 4 (6 bytes) | Frame Body (0-2312 bytes) | FCS (4 bytes)
+
+Frame Control Breakdown:
+- Protocol Version: 2 bits
+- Type: 2 bits  
+- Subtype: 4 bits
+- To DS: 1 bit
+- From DS: 1 bit
+- More Fragments: 1 bit
+- Retry: 1 bit
+- Power Management: 1 bit
+- More Data: 1 bit
+- Protected Frame: 1 bit
+- Order: 1 bit
+            </div>
+        </div>
+
+        <!-- Protocol Operations Tab -->
+        <div id="operations" class="tab-content">
+            <h2>WiFi Protocol Operations</h2>
+            <p>Understand how WiFi devices communicate and manage network operations.</p>
+
+            <div class="protocol-simulator">
+                <h3>Connection Process Simulator</h3>
+                <button class="btn" onclick="simulateConnection()">Simulate WiFi Connection</button>
+                <button class="btn btn-secondary" onclick="clearSimulation()">Clear Simulation</button>
+                
+                <div id="simulation-output"></div>
+            </div>
+
+            <h3>Key Protocol Operations</h3>
+            
+            <div class="simulation-step">
+                <h4>1. Network Discovery</h4>
+                <p><strong>Passive Scanning:</strong> Listen for beacon frames broadcast by access points</p>
+                <p><strong>Active Scanning:</strong> Send probe request frames and listen for probe responses</p>
+                <p><strong>Beacon Interval:</strong> Typically 100ms (100 TU - Time Units)</p>
+            </div>
+
+            <div class="simulation-step">
+                <h4>2. Authentication</h4>
+                <p><strong>Open System:</strong> No credentials required (legacy)</p>
+                <p><strong>Shared Key:</strong> WEP-based challenge-response (deprecated)</p>
+                <p><strong>SAE (WPA3):</strong> Simultaneous Authentication of Equals</p>
+            </div>
+
+            <div class="simulation-step">
+                <h4>3. Association</h4>
+                <p><strong>Association Request:</strong> Client requests to join the BSS</p>
+                <p><strong>Association Response:</strong> AP grants access and assigns AID</p>
+                <p><strong>Capability Negotiation:</strong> Agree on supported features</p>
+            </div>
+
+            <div class="simulation-step">
+                <h4>4. Data Transmission</h4>
+                <p><strong>CSMA/CA:</strong> Carrier Sense Multiple Access with Collision Avoidance</p>
+                <p><strong>RTS/CTS:</strong> Request to Send / Clear to Send (optional)</p>
+                <p><strong>Acknowledgment:</strong> Confirm successful reception</p>
+            </div>
+
+            <div class="simulation-step">
+                <h4>5. Power Management</h4>
+                <p><strong>Power Save Mode:</strong> Client sleeps to conserve battery</p>
+                <p><strong>TIM (Traffic Indication Map):</strong> AP indicates buffered frames</p>
+                <p><strong>PS-Poll:</strong> Client requests buffered data</p>
+            </div>
+
+            <h3>OFDMA in WiFi 6/7</h3>
+            <div class="code-block">
+Resource Unit (RU) Allocation:
+- 26-tone RU: 9 users max
+- 52-tone RU: 4 users max  
+- 106-tone RU: 2 users max
+- 242-tone RU: 1 user
+- 484-tone RU: 1 user (80 MHz)
+- 996-tone RU: 1 user (160 MHz)
+- 2x996-tone RU: 1 user (320 MHz - WiFi 7)
+            </div>
+
+            <h3>Multi-Link Operation (WiFi 7)</h3>
+            <div class="alert">
+                <strong>MLO Benefits:</strong> WiFi 7 introduces Multi-Link Operation, allowing devices to simultaneously use multiple frequency bands (2.4 GHz, 5 GHz, and 6 GHz) for increased throughput, reduced latency, and improved reliability.
+            </div>
+        </div>
+
+        <!-- Workplace Examples Tab -->
+        <div id="workplace" class="tab-content">
+            <h2>WiFi in the Workplace</h2>
+            <p>Real-world applications and implementations of WiFi protocols in enterprise environments.</p>
+
+            <div class="workplace-example">
+                <h3>Enterprise Office Building</h3>
+                <p><strong>Scenario:</strong> 500-employee corporate headquarters with 3 floors</p>
+                <p><strong>WiFi Standard:</strong> WiFi 6 (802.11ax) with WiFi 6E in high-density areas</p>
+                <p><strong>Security:</strong> WPA3-Enterprise with 802.1X authentication</p>
+                <p><strong>Applications:</strong></p>
+                <ul>
+                    <li>Video conferencing (Teams, Zoom) - requires low latency</li>
+                    <li>Cloud applications (Office 365, Google Workspace)</li>
+                    <li>File sharing and collaboration tools</li>
+                    <li>IP phones and VoIP communications</li>
+                    <li>Digital signage and room booking systems</li>
+                </ul>
+                <p><strong>Design Considerations:</strong> High-density AP deployment, guest network isolation, QoS for voice traffic</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>Manufacturing Facility</h3>
+                <p><strong>Scenario:</strong> Smart factory with IoT sensors and automated systems</p>
+                <p><strong>WiFi Standard:</strong> WiFi 6 for reliability and IoT device support</p>
+                <p><strong>Security:</strong> WPA3 with network segmentation</p>
+                <p><strong>Applications:</strong></p>
+                <ul>
+                    <li>Industrial IoT sensors monitoring equipment</li>
+                    <li>Automated guided vehicles (AGVs)</li>
+                    <li>Real-time production monitoring</li>
+                    <li>Predictive maintenance systems</li>
+                    <li>Worker tablets and mobile devices</li>
+                </ul>
+                <p><strong>Design Considerations:</strong> Interference from machinery, ruggedized APs, industrial-grade security</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>Healthcare Hospital</h3>
+                <p><strong>Scenario:</strong> 300-bed hospital with critical care systems</p>
+                <p><strong>WiFi Standard:</strong> WiFi 6 with mission-critical reliability</p>
+                <p><strong>Security:</strong> WPA3-Enterprise with HIPAA compliance</p>
+                <p><strong>Applications:</strong></p>
+                <ul>
+                    <li>Electronic Health Records (EHR) access</li>
+                    <li>Medical device monitoring and telemetry</li>
+                    <li>Nurse call systems</li>
+                    <li>Real-time location services (RTLS)</li>
+                    <li>Mobile medical carts and devices</li>
+                </ul>
+                <p><strong>Design Considerations:</strong> No interference with medical equipment, redundancy, 24/7 reliability</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>Educational Campus</h3>
+                <p><strong>Scenario:</strong> University campus with 10,000 students</p>
+                <p><strong>WiFi Standard:</strong> WiFi 6E for high-density environments</p>
+                <p><strong>Security:</strong> WPA3 with multiple SSIDs for different user groups</p>
+                <p><strong>Applications:</strong></p>
+                <ul>
+                    <li>Student learning management systems</li>
+                    <li>Research data transfer and cloud computing</li>
+                    <li>Streaming lectures and online content</li>
+                    <li>Campus-wide communication systems</li>
+                    <li>IoT sensors for energy management</li>
+                </ul>
+                <p><strong>Design Considerations:</strong> High user density in lecture halls, outdoor coverage, bandwidth management</p>
+            </div>
+
+            <h3>Enterprise WiFi Best Practices</h3>
+            <div class="code-block">
+Network Design:
+✓ Site survey before deployment
+✓ Proper AP placement and power settings
+✓ Channel planning to minimize interference
+✓ Load balancing across APs
+✓ Redundancy and failover planning
+
+Security Implementation:
+✓ WPA3-Enterprise with 802.1X
+✓ Network segmentation (VLANs)
+✓ Guest network isolation
+✓ Regular security audits
+✓ Certificate-based authentication
+
+Performance Optimization:
+✓ QoS policies for critical applications
+✓ Band steering (2.4 GHz → 5 GHz)
+✓ Airtime fairness
+✓ Client load balancing
+✓ Regular performance monitoring
+
+Management and Monitoring:
+✓ Centralized wireless controllers
+✓ Network monitoring tools
+✓ Automated alerts and reporting
+✓ Firmware update management
+✓ User experience monitoring
+            </div>
+
+            <h3>ROI and Business Benefits</h3>
+            <ul>
+                <li><strong>Productivity:</strong> Mobile workforce flexibility increases efficiency by 20-30%</li>
+                <li><strong>Cost Savings:</strong> Reduced cabling costs, easier moves/changes</li>
+                <li><strong>Scalability:</strong> Easy to add users and devices without infrastructure changes</li>
+                <li><strong>Innovation:</strong> Enables IoT, automation, and digital transformation</li>
+                <li><strong>Employee Satisfaction:</strong> Modern, flexible work environment</li>
+            </ul>
+
+            <div class="alert">
+                <strong>Future Trends:</strong> WiFi 7 adoption will accelerate in 2025-2026, enabling new applications like 8K streaming, advanced AR/VR, and ultra-low latency industrial automation.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            
+            // Hide all tab content
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tab buttons
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+            
+            // Show the selected tab and mark button as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function generateFrame() {
+            const protocolVersion = document.getElementById('protocol-version').value;
+            const frameType = document.getElementById('frame-type').value;
+            const frameSubtype = document.getElementById('frame-subtype').value;
+            const toDS = document.getElementById('to-ds').value;
+            const fromDS = document.getElementById('from-ds').value;
+            const moreFragments = document.getElementById('more-fragments').value;
+            const retry = document.getElementById('retry').value;
+            const powerMgmt = document.getElementById('power-mgmt').value;
+            const duration = document.getElementById('duration').value;
+            const addr1 = document.getElementById('addr1').value;
+            const addr2 = document.getElementById('addr2').value;
+
+            // Construct frame control field (simplified)
+            const frameControl = protocolVersion + frameType + frameSubtype + toDS + fromDS + moreFragments + retry + powerMgmt + "000";
+            
+            // Convert duration to hex
+            const durationHex = parseInt(duration).toString(16).padStart(4, '0');
+            
+            // Format addresses
+            const formattedAddr1 = addr1.replace(/:/g, '') || "000000000000";
+            const formattedAddr2 = addr2.replace(/:/g, '') || "000000000000";
+
+            const frameOutput = `
+Generated 802.11 Frame Header:
+
+Frame Control:    ${frameControl} (${parseInt(frameControl, 2).toString(16).padStart(4, '0')})
+  Protocol Ver:   ${protocolVersion}
+  Type:           ${frameType} (${getFrameTypeName(frameType)})
+  Subtype:        ${frameSubtype} (${getSubtypeName(frameType, frameSubtype)})
+  To DS:          ${toDS}
+  From DS:        ${fromDS}
+  More Frag:      ${moreFragments}
+  Retry:          ${retry}
+  Power Mgmt:     ${powerMgmt}
+
+Duration:         ${duration} μs (0x${durationHex})
+Address 1:        ${addr1 || "00:00:00:00:00:00"} (Destination)
+Address 2:        ${addr2 || "00:00:00:00:00:00"} (Source)
+
+Binary Frame Control: ${frameControl}
+Hex Frame Control:    0x${parseInt(frameControl, 2).toString(16).toUpperCase()}
+
+Raw Frame Header (hex):
+${parseInt(frameControl, 2).toString(16).padStart(4, '0')} ${durationHex} ${formattedAddr1.match(/.{2}/g).join('')} ${formattedAddr2.match(/.{2}/g).join('')}
+            `;
+
+            document.getElementById('generated-frame').textContent = frameOutput;
+            document.getElementById('generated-frame').style.display = 'block';
+        }
+
+        function clearFrame() {
+            const inputs = document.querySelectorAll('.field-input');
+            inputs.forEach(input => {
+                if (input.type === 'number') {
+                    input.value = 0;
+                } else if (input.tagName === 'SELECT') {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+            });
+            document.getElementById('generated-frame').style.display = 'none';
+        }
+
+        function getFrameTypeName(type) {
+            switch(type) {
+                case '00': return 'Management';
+                case '01': return 'Control';
+                case '10': return 'Data';
+                default: return 'Reserved';
+            }
+        }
+
+        function getSubtypeName(type, subtype) {
+            if (type === '00') {
+                switch(subtype) {
+                    case '0000': return 'Association Request';
+                    case '0001': return 'Association Response';
+                    case '0100': return 'Probe Request';
+                    case '0101': return 'Probe Response';
+                    case '1000': return 'Beacon';
+                    default: return 'Management Frame';
+                }
+            } else if (type === '01') {
+                switch(subtype) {
+                    case '1011': return 'RTS';
+                    case '1100': return 'CTS';
+                    case '1101': return 'ACK';
+                    default: return 'Control Frame';
+                }
+            }
+            return 'Data Frame';
+        }
+
+        function simulateConnection() {
+            const output = document.getElementById('simulation-output');
+            output.innerHTML = '';
+
+            const steps = [
+                { delay: 0, content: "🔍 <strong>Step 1: Network Discovery</strong><br>Client scans for available networks..." },
+                { delay: 1000, content: "📡 <strong>Broadcasting Probe Request</strong><br>Probe Request sent on all channels" },
+                { delay: 2000, content: "📨 <strong>Probe Response Received</strong><br>AP responds with network capabilities:<br>• SSID: CorporateWiFi<br>• Security: WPA3-Enterprise<br>• Channel: 36 (5 GHz)" },
+                { delay: 3500, content: "🔐 <strong>Step 2: Authentication</strong><br>802.1X authentication initiated..." },
+                { delay: 4500, content: "✅ <strong>Authentication Success</strong><br>EAP-TLS certificate validation completed" },
+                { delay: 5500, content: "🤝 <strong>Step 3: Association</strong><br>Sending Association Request..." },
+                { delay: 6500, content: "✅ <strong>Association Response</strong><br>AID assigned: 0x0042<br>Capabilities negotiated:<br>• Max Rate: 1.2 Gbps<br>• MU-MIMO: Supported<br>• 256-QAM: Enabled" },
+                { delay: 7500, content: "🔑 <strong>Step 4: Key Exchange</strong><br>4-way handshake initiated..." },
+                { delay: 8500, content: "✅ <strong>Connection Established</strong><br>Client successfully connected to network<br>IP Address: 192.168.1.100<br>Gateway: 192.168.1.1<br>DNS: 8.8.8.8" },
+                { delay: 9500, content: "🌐 <strong>Data Flow Ready</strong><br>Ready to transmit data securely!" }
+            ];
+
+            steps.forEach(step => {
+                setTimeout(() => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'simulation-step';
+                    stepDiv.innerHTML = step.content;
+                    output.appendChild(stepDiv);
+                    
+                    // Scroll to bottom
+                    stepDiv.scrollIntoView({ behavior: 'smooth' });
+                }, step.delay);
+            });
+        }
+
+        function clearSimulation() {
+            document.getElementById('simulation-output').innerHTML = '';
+        }
+
+        // Initialize default values for frame builder
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('duration').value = 0;
+        });
+    </script>
+</body>
+</html>
