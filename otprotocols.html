@@ -13,8 +13,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-            color: white;
+            background: #ffffff;
+            color: #000000;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -28,9 +28,10 @@
         .header {
             text-align: center;
             padding: 40px 0;
-            border-bottom: 3px solid #00ff00;
+            border-bottom: 3px solid #000000;
             margin-bottom: 40px;
             position: relative;
+            background: #ffffff;
         }
 
         .header::before {
@@ -41,26 +42,25 @@
             transform: translateX(-50%);
             width: 100px;
             height: 4px;
-            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            background: linear-gradient(90deg, transparent, #000000, transparent);
         }
 
         .header h1 {
             font-size: 3em;
-            color: #00ff00;
+            color: #000000;
             margin-bottom: 15px;
-            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
             font-weight: 300;
         }
 
         .header .subtitle {
             font-size: 1.3em;
-            color: #cccccc;
+            color: #333333;
             margin-bottom: 10px;
         }
 
         .header .description {
             font-size: 1.1em;
-            color: #999;
+            color: #555555;
             max-width: 800px;
             margin: 0 auto;
             line-height: 1.6;
@@ -76,26 +76,27 @@
 
         .tab {
             padding: 15px 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #333;
+            background: #ffffff;
+            border: 2px solid #000000;
             border-radius: 25px;
-            color: #ccc;
+            color: #000000;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
         }
 
         .tab:hover {
-            border-color: #00ff00;
-            color: white;
+            border-color: #333333;
+            color: #000000;
             transform: translateY(-2px);
+            background: #f8f9fa;
         }
 
         .tab.active {
-            background: linear-gradient(45deg, #00ff00, #00cc00);
-            color: black;
-            border-color: #00ff00;
-            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.3);
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
         .content-section {
@@ -120,13 +121,14 @@
         }
 
         .protocol-card {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08));
-            border: 1px solid #333;
+            background: #ffffff;
+            border: 2px solid #000000;
             border-radius: 20px;
             padding: 30px;
             transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .protocol-card::before {
@@ -136,7 +138,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
             transition: left 0.6s ease;
         }
 
@@ -145,8 +147,8 @@
         }
 
         .protocol-card:hover {
-            border-color: #00ff00;
-            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+            border-color: #333333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
 
@@ -192,15 +194,15 @@
         }
 
         .purpose-section {
-            background: rgba(0, 255, 0, 0.1);
-            border-left: 4px solid #00ff00;
+            background: rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #000000;
             padding: 20px;
             border-radius: 0 10px 10px 0;
             margin: 20px 0;
         }
 
         .purpose-section h4 {
-            color: #00ff00;
+            color: #000000;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
@@ -213,15 +215,16 @@
         }
 
         .feature-item {
-            background: rgba(0, 0, 0, 0.3);
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
-            border-left: 3px solid #00ff00;
+            border-left: 3px solid #000000;
             transition: all 0.3s ease;
+            color: #333333;
         }
 
         .feature-item:hover {
-            background: rgba(0, 255, 0, 0.1);
+            background: rgba(0, 0, 0, 0.05);
             transform: translateX(5px);
         }
 
@@ -229,14 +232,15 @@
             width: 100%;
             border-collapse: collapse;
             margin: 30px 0;
-            background: rgba(255, 255, 255, 0.03);
+            background: #ffffff;
             border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .comparison-table th {
-            background: linear-gradient(45deg, #00ff00, #00cc00);
-            color: black;
+            background: #000000;
+            color: #ffffff;
             padding: 15px;
             font-weight: bold;
             text-align: left;
@@ -244,21 +248,23 @@
 
         .comparison-table td {
             padding: 15px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #dee2e6;
             vertical-align: top;
+            color: #333333;
         }
 
         .comparison-table tr:hover {
-            background: rgba(0, 255, 0, 0.05);
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .use-case-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #444;
+            background: #ffffff;
+            border: 2px solid #000000;
             border-radius: 15px;
             padding: 25px;
             margin: 15px 0;
             position: relative;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .use-case-card::before {
@@ -266,14 +272,15 @@
             position: absolute;
             top: -10px;
             left: 20px;
-            background: #1a1a1a;
+            background: #ffffff;
             padding: 5px 10px;
             border-radius: 50%;
             font-size: 20px;
+            border: 2px solid #000000;
         }
 
         .use-case-title {
-            color: #00ff00;
+            color: #000000;
             font-size: 1.3em;
             font-weight: bold;
             margin-bottom: 15px;
@@ -281,17 +288,18 @@
         }
 
         .architecture-diagram {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed #00ff00;
+            background: #f8f9fa;
+            border: 2px dashed #000000;
             border-radius: 15px;
             padding: 30px;
             margin: 30px 0;
             text-align: center;
+            color: #333333;
         }
 
         .quiz-section {
-            background: linear-gradient(145deg, rgba(0, 255, 0, 0.05), rgba(0, 255, 0, 0.1));
-            border: 2px solid #00ff00;
+            background: rgba(0, 0, 0, 0.05);
+            border: 2px solid #000000;
             border-radius: 20px;
             padding: 30px;
             margin: 30px 0;
@@ -309,21 +317,22 @@
 
         .quiz-option {
             padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
+            background: #ffffff;
+            border: 2px solid #000000;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            color: #333333;
         }
 
         .quiz-option:hover {
-            border-color: #00ff00;
-            background: rgba(0, 255, 0, 0.1);
+            border-color: #333333;
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .quiz-option.correct {
-            background: rgba(0, 255, 0, 0.2);
-            border-color: #00ff00;
+            background: rgba(0, 0, 0, 0.1);
+            border-color: #000000;
         }
 
         .quiz-option.incorrect {
@@ -350,19 +359,19 @@
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, #00ff00, #00cc00);
-            color: black;
+            background: #000000;
+            color: #ffffff;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid #00ff00;
+            background: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
         }
 
         .btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .progress-indicator {
@@ -469,7 +478,7 @@
                             <p>OPC UA is the cornerstone of Industry 4.0, providing secure, reliable, and platform-independent communication for industrial automation. It enables seamless IT/OT integration with built-in security and complex data modeling capabilities.</p>
                         </div>
                         
-                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <h4 style="color: #000000; margin: 20px 0 15px 0;">Key Capabilities</h4>
                         <div class="features-grid">
                             <div class="feature-item">🔒 Built-in Security (X.509 certificates, encryption)</div>
                             <div class="feature-item">🌐 Platform Independence (Windows, Linux, embedded)</div>
@@ -586,7 +595,7 @@
 
         <!-- Comparison Section -->
         <div id="comparison" class="content-section">
-            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Protocol Comparison Matrix</h2>
+            <h2 style="color: #000000; text-align: center; margin-bottom: 30px;">Protocol Comparison Matrix</h2>
             
             <table class="comparison-table">
                 <thead>
@@ -636,11 +645,11 @@
             </table>
 
             <div style="margin-top: 40px;">
-                <h3 style="color: #00ff00; margin-bottom: 20px;">Selection Guidelines</h3>
+                <h3 style="color: #000000; margin-bottom: 20px;">Selection Guidelines</h3>
                 <div class="protocols-grid">
                     <div class="use-case-card">
                         <div class="use-case-title">Choose OPC UA When:</div>
-                        <ul style="color: #ccc; line-height: 1.8;">
+                        <ul style="color: #666; line-height: 1.8;">
                             <li>Implementing Industry 4.0 initiatives</li>
                             <li>Requiring enterprise-level integration</li>
                             <li>Security is a top priority</li>
@@ -650,7 +659,7 @@
                     </div>
                     <div class="use-case-card">
                         <div class="use-case-title">Choose Modbus TCP/IP When:</div>
-                        <ul style="color: #ccc; line-height: 1.8;">
+                        <ul style="color: #666; line-height: 1.8;">
                             <li>Integrating legacy systems</li>
                             <li>Simple master-slave communication suffices</li>
                             <li>Cost is a primary concern</li>
@@ -660,7 +669,7 @@
                     </div>
                     <div class="use-case-card">
                         <div class="use-case-title">Choose BACnet/IP When:</div>
-                        <ul style="color: #ccc; line-height: 1.8;">
+                        <ul style="color: #666; line-height: 1.8;">
                             <li>Building automation is the focus</li>
                             <li>HVAC systems need integration</li>
                             <li>Energy management is important</li>
@@ -670,7 +679,7 @@
                     </div>
                     <div class="use-case-card">
                         <div class="use-case-title">Choose EtherNet/IP When:</div>
-                        <ul style="color: #ccc; line-height: 1.8;">
+                        <ul style="color: #666; line-height: 1.8;">
                             <li>Manufacturing automation is primary</li>
                             <li>Real-time control is critical</li>
                             <li>Motion control applications exist</li>
@@ -684,16 +693,16 @@
 
         <!-- Use Cases Section -->
         <div id="usecases" class="content-section">
-            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Real-World Implementation Scenarios</h2>
+            <h2 style="color: #000000; text-align: center; margin-bottom: 30px;">Real-World Implementation Scenarios</h2>
             
             <div class="use-case-card">
                 <div class="use-case-title">Scenario 1: Smart Manufacturing Plant</div>
                 <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
                     A automotive manufacturing facility needs to integrate robots, PLCs, quality control systems, and enterprise ERP systems for real-time production monitoring and optimization.
                 </p>
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
-                    <strong style="color: #00ff00;">Recommended Solution:</strong> OPC UA + EtherNet/IP
-                    <ul style="margin-top: 10px; color: #ccc;">
+                <div style="background: rgba(0,0,0,0.03); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #000000;">Recommended Solution:</strong> OPC UA + EtherNet/IP
+                    <ul style="margin-top: 10px; color: #666;">
                         <li><strong>EtherNet/IP:</strong> Real-time control between PLCs, robots, and motion controllers</li>
                         <li><strong>OPC UA:</strong> Secure data exchange with enterprise systems and cloud analytics</li>
                         <li><strong>Benefits:</strong> Real-time control + enterprise integration + security</li>
@@ -703,12 +712,12 @@
 
             <div class="use-case-card">
                 <div class="use-case-title">Scenario 2: Smart Building Complex</div>
-                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">
                     A commercial office building requires integration of HVAC, lighting, security, fire safety, and energy management systems with a central building management platform.
                 </p>
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
-                    <strong style="color: #00ff00;">Recommended Solution:</strong> BACnet/IP Primary + OPC UA Gateway
-                    <ul style="margin-top: 10px; color: #ccc;">
+                <div style="background: rgba(0,0,0,0.03); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #000000;">Recommended Solution:</strong> BACnet/IP Primary + OPC UA Gateway
+                    <ul style="margin-top: 10px; color: #666;">
                         <li><strong>BACnet/IP:</strong> Native building automation communication</li>
                         <li><strong>OPC UA Gateway:</strong> Enterprise integration and cloud connectivity</li>
                         <li><strong>Benefits:</strong> Standardized building protocols + enterprise analytics</li>
@@ -718,12 +727,12 @@
 
             <div class="use-case-card">
                 <div class="use-case-title">Scenario 3: Legacy System Modernization</div>
-                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">
                     A water treatment facility with existing Modbus devices needs to add remote monitoring, predictive maintenance, and integration with corporate IT systems.
                 </p>
-                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
-                    <strong style="color: #00ff00;">Recommended Solution:</strong> Modbus TCP/IP + OPC UA Gateway
-                    <ul style="margin-top: 10px; color: #ccc;">
+                <div style="background: rgba(0,0,0,0.03); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #000000;">Recommended Solution:</strong> Modbus TCP/IP + OPC UA Gateway
+                    <ul style="margin-top: 10px; color: #666;">
                         <li><strong>Modbus TCP/IP:</strong> Maintain existing device compatibility</li>
                         <li><strong>OPC UA Gateway:</strong> Add security and enterprise connectivity</li>
                         <li><strong>Benefits:</strong> Preserve investment + add modern capabilities</li>
@@ -732,7 +741,7 @@
             </div>
 
             <div class="architecture-diagram">
-                <h3 style="color: #00ff00; margin-bottom: 20px;">Typical Integration Architecture</h3>
+                <h3 style="color: #000000; margin-bottom: 20px;">Typical Integration Architecture</h3>
                 <div style="font-family: monospace; line-height: 2; color: #ccc;">
                     ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐<br>
                     │   Enterprise    │    │    OPC UA        │    │   Field Level   │<br>
@@ -751,7 +760,7 @@
 
         <!-- Implementation Section -->
         <div id="implementation" class="content-section">
-            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Implementation Best Practices</h2>
+            <h2 style="color: #000000; text-align: center; margin-bottom: 30px;">Implementation Best Practices</h2>
             
             <div class="protocols-grid">
                 <div class="protocol-card">
@@ -788,12 +797,12 @@
             </div>
 
             <div class="quiz-section">
-                <h3 style="color: #00ff00; margin-bottom: 20px;">🔧 Implementation Planning Tool</h3>
+                <h3 style="color: #000000; margin-bottom: 20px;">🔧 Implementation Planning Tool</h3>
                 <p style="margin-bottom: 20px;">Use this interactive tool to plan your protocol implementation:</p>
                 
                 <div style="margin: 20px 0;">
-                    <label style="color: #00ff00; display: block; margin-bottom: 10px;">Primary Industry Sector:</label>
-                    <select id="industry" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #00ff00; border-radius: 5px; color: white;">
+                    <label style="color: #000000; display: block; margin-bottom: 10px;">Primary Industry Sector:</label>
+                    <select id="industry" style="width: 100%; padding: 10px; background: #ffffff; border: 2px solid #000000; border-radius: 5px; color: #333;">
                         <option value="">Select your industry...</option>
                         <option value="manufacturing">Manufacturing</option>
                         <option value="building">Building Automation</option>
@@ -805,20 +814,20 @@
                 </div>
 
                 <div style="margin: 20px 0;">
-                    <label style="color: #00ff00; display: block; margin-bottom: 10px;">Key Requirements:</label>
+                    <label style="color: #000000; display: block; margin-bottom: 10px;">Key Requirements:</label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                        <label style="color: #ccc;"><input type="checkbox" value="realtime"> Real-time control</label>
-                        <label style="color: #ccc;"><input type="checkbox" value="security"> High security</label>
-                        <label style="color: #ccc;"><input type="checkbox" value="legacy"> Legacy integration</label>
-                        <label style="color: #ccc;"><input type="checkbox" value="cloud"> Cloud connectivity</label>
-                        <label style="color: #ccc;"><input type="checkbox" value="mobile"> Mobile access</label>
-                        <label style="color: #ccc;"><input type="checkbox" value="analytics"> Data analytics</label>
+                        <label style="color: #333;"><input type="checkbox" value="realtime"> Real-time control</label>
+                        <label style="color: #333;"><input type="checkbox" value="security"> High security</label>
+                        <label style="color: #333;"><input type="checkbox" value="legacy"> Legacy integration</label>
+                        <label style="color: #333;"><input type="checkbox" value="cloud"> Cloud connectivity</label>
+                        <label style="color: #333;"><input type="checkbox" value="mobile"> Mobile access</label>
+                        <label style="color: #333;"><input type="checkbox" value="analytics"> Data analytics</label>
                     </div>
                 </div>
 
                 <button class="btn btn-primary" onclick="generateRecommendation()">Get Protocol Recommendation</button>
-                <div id="recommendation" style="margin-top: 20px; padding: 20px; background: rgba(0,255,0,0.1); border-radius: 10px; display: none;">
-                    <h4 style="color: #00ff00;">Recommended Solution:</h4>
+                <div id="recommendation" style="margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.05); border-radius: 10px; display: none;">
+                    <h4 style="color: #000000;">Recommended Solution:</h4>
                     <div id="recommendationText"></div>
                 </div>
             </div>
@@ -826,11 +835,11 @@
 
         <!-- Quiz Section -->
         <div id="quiz" class="content-section">
-            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Knowledge Validation Quiz</h2>
+            <h2 style="color: #000000; text-align: center; margin-bottom: 30px;">Knowledge Validation Quiz</h2>
             
             <div class="quiz-section">
                 <div class="quiz-question">
-                    <h4 style="color: #00ff00;">Question 1: Which protocol is best suited for Industry 4.0 implementations requiring high security?</h4>
+                    <h4 style="color: #000000;">Question 1: Which protocol is best suited for Industry 4.0 implementations requiring high security?</h4>
                     <div class="quiz-options">
                         <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
                         <div class="quiz-option" onclick="selectAnswer(this, true)">OPC UA</div>
@@ -840,7 +849,7 @@
                 </div>
 
                 <div class="quiz-question">
-                    <h4 style="color: #00ff00;">Question 2: Which protocol is specifically designed for building automation systems?</h4>
+                    <h4 style="color: #000000;">Question 2: Which protocol is specifically designed for building automation systems?</h4>
                     <div class="quiz-options">
                         <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
                         <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
@@ -850,7 +859,7 @@
                 </div>
 
                 <div class="quiz-question">
-                    <h4 style="color: #00ff00;">Question 3: Which protocol provides the best real-time performance for manufacturing control?</h4>
+                    <h4 style="color: #000000;">Question 3: Which protocol provides the best real-time performance for manufacturing control?</h4>
                     <div class="quiz-options">
                         <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
                         <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
@@ -860,7 +869,7 @@
                 </div>
 
                 <div class="quiz-question">
-                    <h4 style="color: #00ff00;">Question 4: Which protocol is simplest to implement for legacy device integration?</h4>
+                    <h4 style="color: #000000;">Question 4: Which protocol is simplest to implement for legacy device integration?</h4>
                     <div class="quiz-options">
                         <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
                         <div class="quiz-option" onclick="selectAnswer(this, true)">Modbus TCP/IP</div>
