@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modbus TCP/IP Interactive Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background-color: #e8e8e8;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            border-right: 1px solid #ddd;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab.active {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #e8e8e8;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #4caf50;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #2e7d32;
+            margin: 20px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .protocol-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .layer {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c8);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #2e7d32;
+            transition: transform 0.3s;
+        }
+
+        .layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+
+        .header-builder {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+        }
+
+        .header-field {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-field label {
+            width: 200px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .header-field input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 0 10px;
+            font-family: monospace;
+        }
+
+        .header-field input:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+
+        .header-field .byte-display {
+            font-family: monospace;
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .packet-display {
+            background-color: black;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 2px solid #2e7d32;
+        }
+
+        .function-codes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .function-code {
+            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #4caf50;
+            transition: all 0.3s;
+        }
+
+        .function-code:hover {
+            background: linear-gradient(135deg, #c8e6c8, #e8f5e8);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .function-code h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .simulator {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+        }
+
+        .simulator-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .simulator-controls select,
+        .simulator-controls input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .simulator-controls select:focus,
+        .simulator-controls input:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .response-display {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid #4caf50;
+            font-family: monospace;
+        }
+
+        .workplace-example {
+            background: linear-gradient(135deg, #f1f8e9, #e8f5e8);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #2e7d32;
+        }
+
+        .workplace-example h4 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .network-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .device {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 4px 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .connection {
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(90deg, #2e7d32, #4caf50);
+            margin: 0 10px;
+            border-radius: 2px;
+        }
+
+        .quiz-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #2e7d32;
+        }
+
+        .quiz-question {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .quiz-options {
+            margin: 15px 0;
+        }
+
+        .quiz-options label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .quiz-options label:hover {
+            background-color: #e8f5e8;
+        }
+
+        .correct {
+            background-color: #c8e6c8 !important;
+            border: 2px solid #2e7d32;
+        }
+
+        .incorrect {
+            background-color: #ffcdd2 !important;
+            border: 2px solid #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .simulator-controls {
+                flex-direction: column;
+            }
+            
+            .network-diagram {
+                flex-direction: column;
+            }
+            
+            .connection {
+                width: 3px;
+                height: 30px;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Modbus TCP/IP Interactive Training Tool</h1>
+            <p>Master Operational Technology Communication Protocol</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Protocol Overview</button>
+            <button class="tab" onclick="showTab('header-builder')">Header Builder</button>
+            <button class="tab" onclick="showTab('simulator')">Protocol Simulator</button>
+            <button class="tab" onclick="showTab('applications')">Real-World Applications</button>
+            <button class="tab" onclick="showTab('quiz')">Knowledge Quiz</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <h2>🌐 Modbus TCP/IP Protocol Overview</h2>
+            
+            <h3>What is Modbus TCP/IP?</h3>
+            <p><strong>Modbus TCP/IP</strong> is an industrial communication protocol that enables automation devices to exchange data over TCP/IP networks. Developed in 1979 by Modicon (now Schneider Electric), it has become the de facto standard for industrial automation communications.</p>
+
+            <h3>📊 Protocol Stack</h3>
+            <div class="protocol-stack">
+                <div class="layer">
+                    <strong>Application Layer</strong><br>
+                    Modbus Application Protocol (MBAP)
+                </div>
+                <div class="layer">
+                    <strong>Transport Layer</strong><br>
+                    TCP (Port 502)
+                </div>
+                <div class="layer">
+                    <strong>Network Layer</strong><br>
+                    IP (Internet Protocol)
+                </div>
+                <div class="layer">
+                    <strong>Data Link Layer</strong><br>
+                    Ethernet Frame
+                </div>
+            </div>
+
+            <h3>🔧 Key Features</h3>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+                <li><strong>Open Standard:</strong> No licensing fees, widely supported</li>
+                <li><strong>Simple:</strong> Easy to implement and troubleshoot</li>
+                <li><strong>Reliable:</strong> TCP provides error checking and guaranteed delivery</li>
+                <li><strong>Scalable:</strong> Supports up to 65,536 devices per network</li>
+                <li><strong>Interoperable:</strong> Works with devices from different manufacturers</li>
+            </ul>
+
+            <h3>📦 Data Types</h3>
+            <div class="function-codes">
+                <div class="function-code">
+                    <h4>Coils (0xxxx)</h4>
+                    <p>Read/Write single bits (digital outputs)</p>
+                    <p><strong>Example:</strong> Motor start/stop commands</p>
+                </div>
+                <div class="function-code">
+                    <h4>Discrete Inputs (1xxxx)</h4>
+                    <p>Read-only single bits (digital inputs)</p>
+                    <p><strong>Example:</strong> Sensor status, limit switches</p>
+                </div>
+                <div class="function-code">
+                    <h4>Input Registers (3xxxx)</h4>
+                    <p>Read-only 16-bit values (analog inputs)</p>
+                    <p><strong>Example:</strong> Temperature, pressure readings</p>
+                </div>
+                <div class="function-code">
+                    <h4>Holding Registers (4xxxx)</h4>
+                    <p>Read/Write 16-bit values (analog outputs)</p>
+                    <p><strong>Example:</strong> Setpoints, configuration values</p>
+                </div>
+            </div>
+
+            <h3>🔄 Communication Process</h3>
+            <div class="network-diagram">
+                <div class="device">HMI/SCADA<br>(Client)</div>
+                <div class="connection"></div>
+                <div class="device">TCP/IP<br>Network</div>
+                <div class="connection"></div>
+                <div class="device">PLC/RTU<br>(Server)</div>
+            </div>
+            <p style="text-align: center; margin-top: 15px;">1. Client sends request → 2. Server processes → 3. Server sends response</p>
+        </div>
+
+        <div id="header-builder" class="tab-content">
+            <h2>🔨 MBAP Header Builder</h2>
+            <p>The Modbus Application Protocol (MBAP) header is 7 bytes long and precedes every Modbus TCP message.</p>
+
+            <div class="header-builder">
+                <h3>Build Your Header</h3>
+                <div class="header-field">
+                    <label>Transaction ID:</label>
+                    <input type="number" id="transactionId" value="1" min="0" max="65535" onchange="updateHeader()">
+                    <div class="byte-display" id="transIdBytes">00 01</div>
+                    <span style="margin-left: 10px; color: #666;">2 bytes - Unique identifier for request/response pairing</span>
+                </div>
+
+                <div class="header-field">
+                    <label>Protocol ID:</label>
+                    <input type="number" id="protocolId" value="0" min="0" max="65535" onchange="updateHeader()">
+                    <div class="byte-display" id="protocolBytes">00 00</div>
+                    <span style="margin-left: 10px; color: #666;">2 bytes - Always 0x0000 for Modbus</span>
+                </div>
+
+                <div class="header-field">
+                    <label>Length:</label>
+                    <input type="number" id="length" value="6" min="1" max="255" onchange="updateHeader()">
+                    <div class="byte-display" id="lengthBytes">00 06</div>
+                    <span style="margin-left: 10px; color: #666;">2 bytes - Number of bytes following this field</span>
+                </div>
+
+                <div class="header-field">
+                    <label>Unit ID:</label>
+                    <input type="number" id="unitId" value="1" min="0" max="255" onchange="updateHeader()">
+                    <div class="byte-display" id="unitBytes">01</div>
+                    <span style="margin-left: 10px; color: #666;">1 byte - Device address/identifier</span>
+                </div>
+
+                <h3>Complete MBAP Header</h3>
+                <div class="packet-display" id="headerDisplay">
+                    00 01 00 00 00 06 01
+                </div>
+                <p style="margin-top: 10px; color: #666;">This header would be followed by the Function Code and Data fields</p>
+
+                <button onclick="randomizeHeader()">🎲 Generate Random Header</button>
+                <button onclick="resetHeader()">🔄 Reset to Default</button>
+            </div>
+
+            <h3>📖 Header Field Explanations</h3>
+            <div class="function-codes">
+                <div class="function-code">
+                    <h4>Transaction Identifier</h4>
+                    <p>Allows client to match responses with requests. Critical for networks with multiple simultaneous transactions.</p>
+                </div>
+                <div class="function-code">
+                    <h4>Protocol Identifier</h4>
+                    <p>Identifies the protocol being used. Always 0x0000 for standard Modbus operations.</p>
+                </div>
+                <div class="function-code">
+                    <h4>Length Field</h4>
+                    <p>Specifies the number of bytes that follow this field, including Unit ID, Function Code, and Data.</p>
+                </div>
+                <div class="function-code">
+                    <h4>Unit Identifier</h4>
+                    <p>Identifies the target device. Useful for Modbus gateways that bridge to serial devices.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="simulator" class="tab-content">
+            <h2>⚡ Protocol Operation Simulator</h2>
+            
+            <div class="simulator">
+                <h3>Build and Send Modbus Requests</h3>
+                <div class="simulator-controls">
+                    <select id="functionCode">
+                        <option value="01">FC01 - Read Coils</option>
+                        <option value="02">FC02 - Read Discrete Inputs</option>
+                        <option value="03" selected>FC03 - Read Holding Registers</option>
+                        <option value="04">FC04 - Read Input Registers</option>
+                        <option value="05">FC05 - Write Single Coil</option>
+                        <option value="06">FC06 - Write Single Register</option>
+                        <option value="15">FC15 - Write Multiple Coils</option>
+                        <option value="16">FC16 - Write Multiple Registers</option>
+                    </select>
+                    
+                    <input type="number" id="startAddress" placeholder="Start Address" value="0" min="0" max="65535">
+                    <input type="number" id="quantity" placeholder="Quantity" value="1" min="1" max="2000">
+                    <input type="number" id="deviceId" placeholder="Device ID" value="1" min="0" max="255">
+                </div>
+                
+                <button onclick="generateRequest()">🚀 Generate Request</button>
+                <button onclick="simulateResponse()">📨 Simulate Response</button>
+                <button onclick="clearSimulation()">🧹 Clear</button>
+
+                <div class="response-display" id="requestDisplay" style="display: none;">
+                    <h4>📤 Request Packet:</h4>
+                    <div id="requestPacket"></div>
+                    <div id="requestExplanation"></div>
+                </div>
+
+                <div class="response-display" id="responseDisplay" style="display: none;">
+                    <h4>📥 Response Packet:</h4>
+                    <div id="responsePacket"></div>
+                    <div id="responseExplanation"></div>
+                </div>
+            </div>
+
+            <h3>📋 Common Function Codes</h3>
+            <div class="function-codes">
+                <div class="function-code">
+                    <h4>FC01 - Read Coils</h4>
+                    <p><strong>Purpose:</strong> Read 1-2000 coil status</p>
+                    <p><strong>Use Case:</strong> Check motor running status, valve positions</p>
+                </div>
+                <div class="function-code">
+                    <h4>FC03 - Read Holding Registers</h4>
+                    <p><strong>Purpose:</strong> Read 1-125 holding registers</p>
+                    <p><strong>Use Case:</strong> Read setpoints, process values</p>
+                </div>
+                <div class="function-code">
+                    <h4>FC06 - Write Single Register</h4>
+                    <p><strong>Purpose:</strong> Write value to one register</p>
+                    <p><strong>Use Case:</strong> Set temperature setpoint, speed reference</p>
+                </div>
+                <div class="function-code">
+                    <h4>FC16 - Write Multiple Registers</h4>
+                    <p><strong>Purpose:</strong> Write values to multiple registers</p>
+                    <p><strong>Use Case:</strong> Configure multiple parameters at once</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="applications" class="tab-content">
+            <h2>🏭 Real-World Applications</h2>
+
+            <div class="workplace-example">
+                <h4>🔌 Power Monitoring System</h4>
+                <p><strong>Scenario:</strong> Monitoring electrical consumption across a manufacturing facility</p>
+                <p><strong>Setup:</strong> Power meters with Modbus TCP → Ethernet network → SCADA system</p>
+                <p><strong>Data Exchanged:</strong> Voltage, current, power consumption, energy totals</p>
+                <p><strong>Benefits:</strong> Real-time monitoring, automated reporting, predictive maintenance</p>
+            </div>
+
+            <div class="workplace-example">
+                <h4>🏗️ Building Automation</h4>
+                <p><strong>Scenario:</strong> HVAC control in a commercial building</p>
+                <p><strong>Setup:</strong> Temperature controllers, damper actuators → Building management system</p>
+                <p><strong>Data Exchanged:</strong> Temperature readings, setpoints, equipment status</p>
+                <p><strong>Benefits:</strong> Energy efficiency, comfort control, maintenance scheduling</p>
+            </div>
+
+            <div class="workplace-example">
+                <h4>🚰 Water Treatment Plant</h4>
+                <p><strong>Scenario:</strong> Controlling pumps, valves, and monitoring water quality</p>
+                <p><strong>Setup:</strong> PLCs controlling field devices → Central SCADA system</p>
+                <p><strong>Data Exchanged:</strong> Flow rates, pressure, pH levels, pump status</p>
+                <p><strong>Benefits:</strong> Process optimization, regulatory compliance, remote operation</p>
+            </div>
+
+            <div class="workplace-example">
+                <h4>🏭 Manufacturing Line</h4>
+                <p><strong>Scenario:</strong> Coordinating conveyor systems and assembly stations</p>
+                <p><strong>Setup:</strong> Multiple PLCs → HMI stations → MES (Manufacturing Execution System)</p>
+                <p><strong>Data Exchanged:</strong> Production counts, quality data, equipment status</p>
+                <p><strong>Benefits:</strong> Production tracking, quality control, efficiency optimization</p>
+            </div>
+
+            <h3>🌐 Typical Network Architecture</h3>
+            <div class="network-diagram">
+                <div class="device">SCADA<br>Server</div>
+                <div class="connection"></div>
+                <div class="device">Ethernet<br>Switch</div>
+                <div class="connection"></div>
+                <div class="device">HMI<br>Stations</div>
+            </div>
+            <div class="network-diagram">
+                <div class="device">PLC #1<br>192.168.1.10</div>
+                <div class="connection"></div>
+                <div class="device">Gateway</div>
+                <div class="connection"></div>
+                <div class="device">PLC #2<br>192.168.1.11</div>
+            </div>
+
+            <h3>💡 Implementation Best Practices</h3>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+                <li><strong>Network Segmentation:</strong> Separate OT networks from IT networks</li>
+                <li><strong>Device Addressing:</strong> Use consistent IP addressing schemes</li>
+                <li><strong>Polling Rates:</strong> Optimize scan rates to avoid network congestion</li>
+                <li><strong>Error Handling:</strong> Implement timeout and retry mechanisms</li>
+                <li><strong>Security:</strong> Use VLANs, firewalls, and access controls</li>
+                <li><strong>Documentation:</strong> Maintain register maps and network diagrams</li>
+            </ul>
+        </div>
+
+        <div id="quiz" class="tab-content">
+            <h2>🧠 Knowledge Assessment Quiz</h2>
+            
+            <div class="quiz-section">
+                <div class="quiz-question">
+                    <h4>1. What is the default TCP port for Modbus TCP/IP?</h4>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1" value="a"> 80</label>
+                        <label><input type="radio" name="q1" value="b"> 502</label>
+                        <label><input type="radio" name="q1" value="c"> 443</label>
+                        <label><input type="radio" name="q1" value="d"> 1024</label>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>2. How many bytes is the MBAP header?</h4>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q2" value="a"> 6 bytes</label>
+                        <label><input type="radio" name="q2" value="b"> 7 bytes</label>
+                        <label><input type="radio" name="q2" value="c"> 8 bytes</label>
+                        <label><input type="radio" name="q2" value="d"> 10 bytes</label>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>3. What function code is used to read holding registers?</h4>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q3" value="a"> FC01</label>
+                        <label><input type="radio" name="q3" value="b"> FC02</label>
+                        <label><input type="radio" name="q3" value="c"> FC03</label>
+                        <label><input type="radio" name="q3" value="d"> FC04</label>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>4. In the MBAP header, what should the Protocol Identifier always be?</h4>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q4" value="a"> 0x0001</label>
+                        <label><input type="radio" name="q4" value="b"> 0x0000</label>
+                        <label><input type="radio" name="q4" value="c"> 0xFFFF</label>
+                        <label><input type="radio" name="q4" value="d"> Variable</label>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>5. What communication model does Modbus TCP use?</h4>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q5" value="a"> Peer-to-peer</label>
+                        <label><input type="radio" name="q5" value="b"> Client-server</label>
+                        <label><input type="radio" name="q5" value="c"> Broadcast only</label>
+                        <label><input type="radio" name="q5" value="d"> Ring topology</label>
+                    </div>
+                </div>
+
+                <button onclick="checkAnswers()">📝 Check Answers</button>
+                <button onclick="resetQuiz()">🔄 Reset Quiz</button>
+                
+                <div id="quizResults" style="display: none; margin-top: 20px; padding: 20px; background-color: #e8f5e8; border-radius: 10px;">
+                    <h4>Quiz Results:</h4>
+                    <div id="scoreDisplay"></div>
+                    <div id="explanations"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Header builder functionality
+        function updateHeader() {
+            const transId = parseInt(document.getElementById('transactionId').value);
+            const protocolId = parseInt(document.getElementById('protocolId').value);
+            const length = parseInt(document.getElementById('length').value);
+            const unitId = parseInt(document.getElementById('unitId').value);
+
+            // Update individual byte displays
+            document.getElementById('transIdBytes').textContent = 
+                String((transId >> 8) & 0xFF).padStart(2, '0').toUpperCase() + ' ' +
+                String(transId & 0xFF).padStart(2, '0').toUpperCase();
+            
+            document.getElementById('protocolBytes').textContent = 
+                String((protocolId >> 8) & 0xFF).padStart(2, '0').toUpperCase() + ' ' +
+                String(protocolId & 0xFF).padStart(2, '0').toUpperCase();
+            
+            document.getElementById('lengthBytes').textContent = 
+                String((length >> 8) & 0xFF).padStart(2, '0').toUpperCase() + ' ' +
+                String(length & 0xFF).padStart(2, '0').toUpperCase();
+            
+            document.getElementById('unitBytes').textContent = 
+                String(unitId & 0xFF).padStart(2, '0').toUpperCase();
+
+            // Update complete header display
+            const header = [
+                (transId >> 8) & 0xFF,
+                transId & 0xFF,
+                (protocolId >> 8) & 0xFF,
+                protocolId & 0xFF,
+                (length >> 8) & 0xFF,
+                length & 0xFF,
+                unitId & 0xFF
+            ].map(byte => byte.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+            
+            document.getElementById('headerDisplay').textContent = header;
+        }
+
+        function randomizeHeader() {
+            document.getElementById('transactionId').value = Math.floor(Math.random() * 65536);
+            document.getElementById('protocolId').value = 0; // Always 0 for Modbus
+            document.getElementById('length').value = Math.floor(Math.random() * 20) + 6;
+            document.getElementById('unitId').value = Math.floor(Math.random() * 255) + 1;
+            updateHeader();
+        }
+
+        function resetHeader() {
+            document.getElementById('transactionId').value = 1;
+            document.getElementById('protocolId').value = 0;
+            document.getElementById('length').value = 6;
+            document.getElementById('unitId').value = 1;
+            updateHeader();
+        }
+
+        // Simulator functionality
+        function generateRequest() {
+            const funcCode = document.getElementById('functionCode').value;
+            const startAddr = parseInt(document.getElementById('startAddress').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const deviceId = parseInt(document.getElementById('deviceId').value);
+            
+            // Generate MBAP header
+            const transId = Math.floor(Math.random() * 65536);
+            const protocolId = 0;
+            const length = 6; // Unit ID + Function Code + 4 bytes data
+            
+            // Build packet
+            const packet = [
+                (transId >> 8) & 0xFF, transId & 0xFF,
+                0, 0, // Protocol ID
+                0, length,
+                deviceId,
+                parseInt(funcCode, 16),
+                (startAddr >> 8) & 0xFF, startAddr & 0xFF,
+                (quantity >> 8) & 0xFF, quantity & 0xFF
+            ];
+            
+            const hexPacket = packet.map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+            
+            document.getElementById('requestDisplay').style.display = 'block';
+            document.getElementById('requestPacket').innerHTML = `<strong>${hexPacket}</strong>`;
+            
+            const explanation = `
+                <br><strong>Breakdown:</strong><br>
+                • Transaction ID: ${transId.toString(16).padStart(4, '0').toUpperCase()}<br>
+                • Protocol ID: 0000 (Modbus)<br>
+                • Length: ${length.toString(16).padStart(4, '0').toUpperCase()} (${length} bytes following)<br>
+                • Unit ID: ${deviceId.toString(16).padStart(2, '0').toUpperCase()}<br>
+                • Function Code: ${funcCode}<br>
+                • Start Address: ${startAddr.toString(16).padStart(4, '0').toUpperCase()} (${startAddr})<br>
+                • Quantity: ${quantity.toString(16).padStart(4, '0').toUpperCase()} (${quantity})
+            `;
+            
+            document.getElementById('requestExplanation').innerHTML = explanation;
+        }
+
+        function simulateResponse() {
+            const funcCode = document.getElementById('functionCode').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const deviceId = parseInt(document.getElementById('deviceId').value);
+            
+            // Generate response based on function code
+            let responseData = [];
+            let explanation = '';
+            
+            if (funcCode === '03' || funcCode === '04') {
+                // Read registers response
+                const byteCount = quantity * 2;
+                responseData = [byteCount];
+                for (let i = 0; i < quantity; i++) {
+                    const value = Math.floor(Math.random() * 65536);
+                    responseData.push((value >> 8) & 0xFF, value & 0xFF);
+                }
+                explanation = `Reading ${quantity} registers, ${byteCount} bytes of data`;
+            } else if (funcCode === '01' || funcCode === '02') {
+                // Read coils/discrete inputs response
+                const byteCount = Math.ceil(quantity / 8);
+                responseData = [byteCount];
+                for (let i = 0; i < byteCount; i++) {
+                    responseData.push(Math.floor(Math.random() * 256));
+                }
+                explanation = `Reading ${quantity} coils/inputs, ${byteCount} bytes of data`;
+            } else if (funcCode === '05' || funcCode === '06') {
+                // Write single response (echo)
+                const startAddr = parseInt(document.getElementById('startAddress').value);
+                responseData = [
+                    (startAddr >> 8) & 0xFF, startAddr & 0xFF,
+                    0, 1 // Example value
+                ];
+                explanation = 'Write confirmation - echoing address and value';
+            }
+            
+            // Build response packet
+            const transId = Math.floor(Math.random() * 65536);
+            const length = 3 + responseData.length; // Unit ID + Function Code + data
+            
+            const packet = [
+                (transId >> 8) & 0xFF, transId & 0xFF,
+                0, 0, // Protocol ID
+                (length >> 8) & 0xFF, length & 0xFF,
+                deviceId,
+                parseInt(funcCode, 16),
+                ...responseData
+            ];
+            
+            const hexPacket = packet.map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+            
+            document.getElementById('responseDisplay').style.display = 'block';
+            document.getElementById('responsePacket').innerHTML = `<strong>${hexPacket}</strong>`;
+            document.getElementById('responseExplanation').innerHTML = `<br><strong>Response:</strong> ${explanation}`;
+        }
+
+        function clearSimulation() {
+            document.getElementById('requestDisplay').style.display = 'none';
+            document.getElementById('responseDisplay').style.display = 'none';
+        }
+
+        // Quiz functionality
+        function checkAnswers() {
+            const answers = {
+                q1: 'b', // Port 502
+                q2: 'b', // 7 bytes
+                q3: 'c', // FC03
+                q4: 'b', // 0x0000
+                q5: 'b'  // Client-server
+            };
+            
+            const explanations = {
+                q1: 'Port 502 is the standard TCP port for Modbus TCP/IP communication.',
+                q2: 'The MBAP header is exactly 7 bytes: Transaction ID (2), Protocol ID (2), Length (2), Unit ID (1).',
+                q3: 'Function Code 03 is used to read holding registers (4xxxx addresses).',
+                q4: 'The Protocol Identifier is always 0x0000 for standard Modbus operations.',
+                q5: 'Modbus uses a client-server model where clients initiate requests and servers respond.'
+            };
+            
+            let score = 0;
+            let resultHtml = '';
+            
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                const labels = document.querySelectorAll(`input[name="${q}"]`);
+                
+                labels.forEach(input => {
+                    const label = input.parentElement;
+                    label.classList.remove('correct', 'incorrect');
+                    
+                    if (input.value === answers[q]) {
+                        label.classList.add('correct');
+                    } else if (input.checked) {
+                        label.classList.add('incorrect');
+                    }
+                });
+                
+                if (selected && selected.value === answers[q]) {
+                    score++;
+                }
+                
+                resultHtml += `<p><strong>Question ${q.slice(1)}:</strong> ${explanations[q]}</p>`;
+            }
+            
+            document.getElementById('quizResults').style.display = 'block';
+            document.getElementById('scoreDisplay').innerHTML = `<h4>Score: ${score}/5 (${Math.round(score/5*100)}%)</h4>`;
+            document.getElementById('explanations').innerHTML = resultHtml;
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+                input.parentElement.classList.remove('correct', 'incorrect');
+            });
+            document.getElementById('quizResults').style.display = 'none';
+        }
+
+        // Initialize the page
+        updateHeader();
+    </script>
+</body>
+</html>
