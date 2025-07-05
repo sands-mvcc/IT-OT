@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPC UA Protocol Interactive Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5a27, #4a7c59);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            background-color: #f8f9fa;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            border-bottom: 3px solid #2d5a27;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background-color: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background-color: #2d5a27;
+            color: white;
+            border-bottom-color: #4a7c59;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #2d5a27;
+        }
+
+        .section h2 {
+            color: #2d5a27;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #4a7c59;
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .protocol-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .layer {
+            background: linear-gradient(135deg, #2d5a27, #4a7c59);
+            color: white;
+            padding: 15px 30px;
+            margin: 5px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .layer:hover {
+            transform: scale(1.05);
+        }
+
+        .message-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .message-type {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .message-type:hover {
+            border-color: #2d5a27;
+            transform: translateY(-2px);
+        }
+
+        .message-type h4 {
+            color: #2d5a27;
+            margin-bottom: 10px;
+        }
+
+        .header-builder {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .header-field {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .header-field label {
+            width: 150px;
+            font-weight: bold;
+            color: #2d5a27;
+        }
+
+        .header-field select,
+        .header-field input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .header-output {
+            background: #2d5a27;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        .btn {
+            background: #2d5a27;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #4a7c59;
+        }
+
+        .simulator {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .communication-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .endpoint {
+            background: #2d5a27;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #4a7c59;
+            margin: 0 10px;
+        }
+
+        .step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2d5a27;
+        }
+
+        .workplace-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .example {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid #2d5a27;
+        }
+
+        .example h4 {
+            color: #2d5a27;
+            margin-bottom: 10px;
+        }
+
+        .quiz {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            margin: 15px 0;
+        }
+
+        .quiz-options {
+            margin: 10px 0;
+        }
+
+        .quiz-option {
+            margin: 5px 0;
+        }
+
+        .quiz-option input {
+            margin-right: 10px;
+        }
+
+        .feedback {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #2d5a27, #4a7c59);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .communication-flow {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>OPC UA Protocol Training</h1>
+        <p>Master the Open Platform Communications Unified Architecture</p>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+        <button class="nav-tab" onclick="showTab('structure')">Protocol Structure</button>
+        <button class="nav-tab" onclick="showTab('headers')">Header Builder</button>
+        <button class="nav-tab" onclick="showTab('communication')">Communication Flow</button>
+        <button class="nav-tab" onclick="showTab('applications')">Workplace Examples</button>
+        <button class="nav-tab" onclick="showTab('quiz')">Interactive Quiz</button>
+    </div>
+
+    <div class="container">
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2>What is OPC UA?</h2>
+                <p><strong>OPC Unified Architecture (OPC UA)</strong> is a cross-platform, open-source communication protocol for industrial automation. It enables secure, reliable data exchange between diverse devices and systems in operational technology environments.</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Platform Independent:</strong> Works on Windows, Linux, embedded systems, and cloud platforms</li>
+                    <li><strong>Secure by Design:</strong> Built-in encryption, authentication, and digital signatures</li>
+                    <li><strong>Service-Oriented Architecture:</strong> Based on standardized services for data access</li>
+                    <li><strong>Rich Information Modeling:</strong> Object-oriented data representation</li>
+                    <li><strong>Scalable:</strong> From embedded devices to enterprise systems</li>
+                </ul>
+
+                <h3>Why OPC UA Matters</h3>
+                <p>OPC UA is the backbone of Industry 4.0 and Industrial IoT (IIoT). It replaces the Windows-dependent OPC Classic with a modern, secure, and interoperable solution that works across diverse industrial environments.</p>
+            </div>
+
+            <div class="section">
+                <h2>OPC UA Architecture</h2>
+                <div class="protocol-stack">
+                    <div class="layer">Application Layer<br><small>Services, Information Models, Security</small></div>
+                    <div class="layer">Session Layer<br><small>Session Management, Service Calls</small></div>
+                    <div class="layer">Transport Layer<br><small>TCP/IP, HTTP, WebSockets</small></div>
+                </div>
+                
+                <h3>Communication Patterns</h3>
+                <div class="message-types">
+                    <div class="message-type">
+                        <h4>Client-Server</h4>
+                        <p>Traditional request-response pattern for real-time data access and control operations.</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>Publish-Subscribe</h4>
+                        <p>Event-driven communication for efficient many-to-many data distribution.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Protocol Structure Tab -->
+        <div id="structure" class="tab-content">
+            <div class="section">
+                <h2>OPC UA Message Types</h2>
+                <div class="message-types">
+                    <div class="message-type">
+                        <h4>HEL (Hello)</h4>
+                        <p>Initial client message to establish connection parameters with the server.</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>ACK (Acknowledge)</h4>
+                        <p>Server response confirming connection parameters and protocol version.</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>OPN (Open SecureChannel)</h4>
+                        <p>Establishes a secure communication channel with encryption and authentication.</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>MSG (Message)</h4>
+                        <p>Application-level service requests and responses (Read, Write, Subscribe, etc.).</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>CLO (Close SecureChannel)</h4>
+                        <p>Closes the secure channel and releases allocated resources.</p>
+                    </div>
+                    <div class="message-type">
+                        <h4>ERR (Error)</h4>
+                        <p>Indicates protocol-level errors or connection issues.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Binary Message Header Structure</h2>
+                <p>Every OPC UA message starts with an 8-byte header containing critical protocol information:</p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #2d5a27; color: white;">
+                            <th style="padding: 10px; border: 1px solid #ccc;">Field</th>
+                            <th style="padding: 10px; border: 1px solid #ccc;">Size (bytes)</th>
+                            <th style="padding: 10px; border: 1px solid #ccc;">Description</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ccc;"><strong>MessageType</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">3</td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">Three-character message type (HEL, ACK, OPN, MSG, CLO, ERR)</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 10px; border: 1px solid #ccc;"><strong>ChunkType</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">1</td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">Message chunk indicator (F=Final, C=Intermediate, A=Abort)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ccc;"><strong>MessageSize</strong></td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">4</td>
+                            <td style="padding: 10px; border: 1px solid #ccc;">Total message length including header (little-endian UInt32)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>Security Header (for encrypted channels)</h3>
+                <p>Messages on secure channels include additional security information:</p>
+                <ul>
+                    <li><strong>SecurityPolicyUri:</strong> Cryptographic algorithms used</li>
+                    <li><strong>SenderCertificate:</strong> X.509 certificate for authentication</li>
+                    <li><strong>ReceiverCertificateThumbprint:</strong> Target certificate identifier</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Header Builder Tab -->
+        <div id="headers" class="tab-content">
+            <div class="section">
+                <h2>Interactive Header Constructor</h2>
+                <p>Build and analyze OPC UA message headers with this interactive tool:</p>
+                
+                <div class="header-builder">
+                    <div class="header-field">
+                        <label>Message Type:</label>
+                        <select id="messageType" onchange="updateHeader()">
+                            <option value="HEL">HEL (Hello)</option>
+                            <option value="ACK">ACK (Acknowledge)</option>
+                            <option value="OPN">OPN (Open SecureChannel)</option>
+                            <option value="MSG">MSG (Service Message)</option>
+                            <option value="CLO">CLO (Close SecureChannel)</option>
+                            <option value="ERR">ERR (Error)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="header-field">
+                        <label>Chunk Type:</label>
+                        <select id="chunkType" onchange="updateHeader()">
+                            <option value="F">F (Final chunk)</option>
+                            <option value="C">C (Intermediate chunk)</option>
+                            <option value="A">A (Abort)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="header-field">
+                        <label>Message Size:</label>
+                        <input type="number" id="messageSize" value="24" min="8" max="65536" onchange="updateHeader()">
+                        <span style="margin-left: 10px; color: #666;">bytes</span>
+                    </div>
+                    
+                    <div class="header-field">
+                        <label>Secure Channel ID:</label>
+                        <input type="number" id="secureChannelId" value="0" min="0" onchange="updateHeader()">
+                    </div>
+                    
+                    <button class="btn" onclick="generateRandomHeader()">Generate Random Header</button>
+                    <button class="btn" onclick="analyzeHeader()">Analyze Current Header</button>
+                    
+                    <div class="header-output" id="headerOutput">
+                        <div>Binary Header (hex): <span id="hexOutput">48454C46 18000000</span></div>
+                        <div>Decoded: <span id="decodedOutput">HEL/F, Size: 24 bytes</span></div>
+                    </div>
+                </div>
+                
+                <div id="headerAnalysis" class="section" style="display: none;">
+                    <h3>Header Analysis</h3>
+                    <div id="analysisContent"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Service Message Simulator</h2>
+                <p>Simulate common OPC UA service calls:</p>
+                
+                <div class="simulator">
+                    <div class="header-field">
+                        <label>Service Type:</label>
+                        <select id="serviceType" onchange="updateServiceMessage()">
+                            <option value="ReadRequest">Read Request</option>
+                            <option value="WriteRequest">Write Request</option>
+                            <option value="BrowseRequest">Browse Request</option>
+                            <option value="CreateSubscriptionRequest">Create Subscription</option>
+                            <option value="CreateMonitoredItemsRequest">Create Monitored Items</option>
+                            <option value="CallRequest">Method Call Request</option>
+                        </select>
+                    </div>
+                    
+                    <div class="header-field">
+                        <label>Node Count:</label>
+                        <input type="number" id="nodeCount" value="1" min="1" max="1000" onchange="updateServiceMessage()">
+                    </div>
+                    
+                    <button class="btn" onclick="simulateService()">Simulate Service Call</button>
+                    
+                    <div class="header-output" id="serviceOutput">
+                        <div>Service: ReadRequest</div>
+                        <div>Estimated Message Size: 64 bytes</div>
+                        <div>Expected Response: ReadResponse with value data</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communication Flow Tab -->
+        <div id="communication" class="tab-content">
+            <div class="section">
+                <h2>OPC UA Connection Establishment</h2>
+                <p>Understanding the complete communication handshake process:</p>
+                
+                <div class="communication-flow">
+                    <div class="endpoint">OPC UA Client</div>
+                    <div class="arrow">→</div>
+                    <div class="endpoint">OPC UA Server</div>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 1: TCP Connection</h4>
+                    <p>Client initiates TCP connection to server on configured port (typically 4840).</p>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 2: Hello/Acknowledge Handshake</h4>
+                    <p>Client sends HEL message with protocol version and buffer sizes. Server responds with ACK confirming parameters.</p>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 3: Open SecureChannel</h4>
+                    <p>Client sends OPN request to establish secure channel with specified security policy. Server creates secure channel and responds.</p>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 4: Create Session</h4>
+                    <p>Client sends CreateSession request with authentication credentials. Server validates and creates session context.</p>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 5: Activate Session</h4>
+                    <p>Client activates the session with user credentials. Server validates user and activates session for service calls.</p>
+                </div>
+                
+                <div class="step">
+                    <h4>Step 6: Service Operations</h4>
+                    <p>Client can now send service requests (Read, Write, Subscribe, Browse, etc.) over the established session.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Interactive Communication Simulator</h2>
+                <div class="simulator">
+                    <button class="btn" onclick="startConnectionSimulation()">Start Connection Simulation</button>
+                    <button class="btn" onclick="simulateSecurityNegotiation()">Simulate Security Negotiation</button>
+                    <button class="btn" onclick="simulateDataExchange()">Simulate Data Exchange</button>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="connectionProgress" style="width: 0%;"></div>
+                    </div>
+                    
+                    <div id="simulationLog" class="header-output" style="height: 200px; overflow-y: auto;">
+                        <div>Click "Start Connection Simulation" to begin...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Applications Tab -->
+        <div id="applications" class="tab-content">
+            <div class="section">
+                <h2>Real-World OPC UA Applications</h2>
+                <p>OPC UA is transforming industrial operations across various sectors:</p>
+                
+                <div class="workplace-examples">
+                    <div class="example">
+                        <h4>🚗 Automotive Manufacturing</h4>
+                        <p><strong>Application:</strong> Coordinating robotic assembly lines, welding operations, and quality control systems.</p>
+                        <p><strong>Benefits:</strong> Real-time synchronization of 50+ PLCs, reduced downtime, seamless integration of multi-vendor equipment.</p>
+                        <p><strong>Example:</strong> Position sensors ensure precise part placement, torque sensors verify fastener quality, all communicating via OPC UA to central MES systems.</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h4>🏭 Process Manufacturing</h4>
+                        <p><strong>Application:</strong> Chemical plant monitoring, pharmaceutical production lines, food processing.</p>
+                        <p><strong>Benefits:</strong> Secure data exchange between control systems and enterprise MES/ERP, compliance with regulatory requirements.</p>
+                        <p><strong>Example:</strong> Temperature, pressure, and flow sensors in reactor vessels communicate critical data for batch control and quality traceability.</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h4>⚡ Energy & Utilities</h4>
+                        <p><strong>Application:</strong> Smart grid management, renewable energy integration, power plant operations.</p>
+                        <p><strong>Benefits:</strong> Real-time grid monitoring, predictive maintenance, efficient renewable energy distribution.</p>
+                        <p><strong>Example:</strong> Wind turbines and solar panels report generation data, grid operators adjust distribution in real-time.</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h4>🏢 Building Automation</h4>
+                        <p><strong>Application:</strong> HVAC systems, lighting control, security systems, energy management.</p>
+                        <p><strong>Benefits:</strong> Centralized building management, energy optimization, predictive maintenance.</p>
+                        <p><strong>Example:</strong> Occupancy sensors, temperature controllers, and air quality monitors integrate through OPC UA for optimal comfort and efficiency.</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h4>🔧 Machine Tools & Robotics</h4>
+                        <p><strong>Application:</strong> CNC machines, industrial robots, automated assembly systems.</p>
+                        <p><strong>Benefits:</strong> Real-time production monitoring, predictive maintenance, quality assurance.</p>
+                        <p><strong>Example:</strong> CNC machines report tool wear, production counts, and quality metrics to factory MES systems for optimized scheduling.</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h4>💊 Pharmaceutical Manufacturing</h4>
+                        <p><strong>Application:</strong> Batch production control, cleanroom monitoring, packaging systems.</p>
+                        <p><strong>Benefits:</strong> FDA compliance, complete traceability, secure data integrity.</p>
+                        <p><strong>Example:</strong> Tablet press machines communicate production data, environmental sensors monitor cleanroom conditions, all logged for regulatory compliance.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Implementation Considerations</h2>
+                <h3>Security Best Practices</h3>
+                <ul>
+                    <li><strong>Certificate Management:</strong> Use X.509 certificates for device authentication</li>
+                    <li><strong>Encryption:</strong> Implement SignAndEncrypt security mode for sensitive data</li>
+                    <li><strong>User Authentication:</strong> Configure appropriate user credentials and access rights</li>
+                    <li><strong>Network Segmentation:</strong> Deploy OPC UA within secure network zones</li>
+                </ul>
+                
+                <h3>Performance Optimization</h3>
+                <ul>
+                    <li><strong>Subscription Management:</strong> Use publish-subscribe for efficient data distribution</li>
+                    <li><strong>Buffer Sizing:</strong> Configure appropriate message buffer sizes for network conditions</li>
+                    <li><strong>Compression:</strong> Enable message compression for bandwidth-constrained networks</li>
+                    <li><strong>Connection Pooling:</strong> Reuse connections and sessions when possible</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Interactive Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <div class="section">
+                <h2>OPC UA Knowledge Assessment</h2>
+                <p>Test your understanding of OPC UA concepts and protocols:</p>
+                
+                <div class="quiz">
+                    <div class="quiz-question">
+                        <h4>Question 1: What does the 'F' chunk type indicate in an OPC UA message header?</h4>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">First chunk of a multi-chunk message</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">Final chunk (complete message)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">Failed message transmission</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">Fragmented message indicator</label>
+                            </div>
+                        </div>
+                        <div id="feedback1" class="feedback"></div>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 2: Which security modes are available in OPC UA?</h4>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">None, Sign, SignAndEncrypt</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">Basic, Advanced, Enterprise</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">Low, Medium, High</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">SSL, TLS, HTTPS</label>
+                            </div>
+                        </div>
+                        <div id="feedback2" class="feedback"></div>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 3: What is the typical default port for OPC UA TCP communication?</h4>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">80</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">443</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">4840</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">8080</label>
+                            </div>
+                        </div>
+                        <div id="feedback3" class="feedback"></div>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h4>Question 4: Which message type establishes a secure communication channel?</h4>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="a" id="q4a">
+                                <label for="q4a">HEL</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="b" id="q4b">
+                                <label for="q4b">OPN</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="c" id="q4c">
+                                <label for="q4c">MSG</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="d" id="q4d">
+                                <label for="q4d">ACK</label>
+                            </div>
+                        </div>
+                        <div id="feedback4" class="feedback"></div>
+                    </div>
+                    
+                    <button class="btn" onclick="checkAnswers()">Check All Answers</button>
+                    <button class="btn" onclick="resetQuiz()">Reset Quiz</button>
+                    
+                    <div id="quizResults" class="section" style="display: none;">
+                        <h3>Quiz Results</h3>
+                        <div id="scoreDisplay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Header builder functions
+        function updateHeader() {
+            const messageType = document.getElementById('messageType').value;
+            const chunkType = document.getElementById('chunkType').value;
+            const messageSize = parseInt(document.getElementById('messageSize').value);
+            
+            // Create binary representation
+            const header = messageType + chunkType;
+            const sizeBytes = new ArrayBuffer(4);
+            const sizeView = new DataView(sizeBytes);
+            sizeView.setUint32(0, messageSize, true); // little-endian
+            
+            // Convert to hex
+            let hex = '';
+            for (let i = 0; i < header.length; i++) {
+                hex += header.charCodeAt(i).toString(16).padStart(2, '0').toUpperCase();
+            }
+            hex += Array.from(new Uint8Array(sizeBytes))
+                .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+                .join('');
+            
+            // Format hex output
+            const formattedHex = hex.match(/.{1,8}/g).join(' ');
+            
+            document.getElementById('hexOutput').textContent = formattedHex;
+            document.getElementById('decodedOutput').textContent = 
+                `${messageType}/${chunkType}, Size: ${messageSize} bytes`;
+        }
+
+        function generateRandomHeader() {
+            const messageTypes = ['HEL', 'ACK', 'OPN', 'MSG', 'CLO', 'ERR'];
+            const chunkTypes = ['F', 'C', 'A'];
+            
+            document.getElementById('messageType').value = 
+                messageTypes[Math.floor(Math.random() * messageTypes.length)];
+            document.getElementById('chunkType').value = 
+                chunkTypes[Math.floor(Math.random() * chunkTypes.length)];
+            document.getElementById('messageSize').value = 
+                Math.floor(Math.random() * 1000) + 24;
+            document.getElementById('secureChannelId').value = 
+                Math.floor(Math.random() * 65536);
+            
+            updateHeader();
+        }
+
+        function analyzeHeader() {
+            const messageType = document.getElementById('messageType').value;
+            const chunkType = document.getElementById('chunkType').value;
+            const messageSize = parseInt(document.getElementById('messageSize').value);
+            const secureChannelId = parseInt(document.getElementById('secureChannelId').value);
+            
+            let analysis = '<h4>Header Analysis Results</h4>';
+            
+            // Message type analysis
+            const typeDescriptions = {
+                'HEL': 'Initial connection handshake from client to server',
+                'ACK': 'Server acknowledgment of connection parameters',
+                'OPN': 'Establishes secure channel with cryptographic parameters',
+                'MSG': 'Application service request or response',
+                'CLO': 'Closes secure channel and releases resources',
+                'ERR': 'Indicates protocol or connection error'
+            };
+            
+            analysis += `<p><strong>Message Type:</strong> ${messageType} - ${typeDescriptions[messageType]}</p>`;
+            
+            // Chunk type analysis
+            const chunkDescriptions = {
+                'F': 'Final chunk - complete message',
+                'C': 'Continuation chunk - more data follows',
+                'A': 'Abort - message transmission cancelled'
+            };
+            
+            analysis += `<p><strong>Chunk Type:</strong> ${chunkType} - ${chunkDescriptions[chunkType]}</p>`;
+            
+            // Size analysis
+            analysis += `<p><strong>Message Size:</strong> ${messageSize} bytes`;
+            if (messageSize < 8) {
+                analysis += ' <span style="color: red;">⚠️ Invalid: Minimum size is 8 bytes</span>';
+            } else if (messageSize > 65536) {
+                analysis += ' <span style="color: orange;">⚠️ Warning: Very large message</span>';
+            } else {
+                analysis += ' <span style="color: green;">✓ Valid size</span>';
+            }
+            analysis += '</p>';
+            
+            // Security analysis
+            analysis += `<p><strong>Secure Channel ID:</strong> ${secureChannelId}`;
+            if (secureChannelId === 0) {
+                analysis += ' (Insecure channel)';
+            } else {
+                analysis += ' (Secure channel established)';
+            }
+            analysis += '</p>';
+            
+            document.getElementById('analysisContent').innerHTML = analysis;
+            document.getElementById('headerAnalysis').style.display = 'block';
+        }
+
+        // Service message simulator
+        function updateServiceMessage() {
+            const serviceType = document.getElementById('serviceType').value;
+            const nodeCount = parseInt(document.getElementById('nodeCount').value);
+            
+            const serviceDescriptions = {
+                'ReadRequest': 'Reads current values from specified nodes',
+                'WriteRequest': 'Writes new values to specified nodes',
+                'BrowseRequest': 'Discovers available nodes and references',
+                'CreateSubscriptionRequest': 'Creates subscription for data change notifications',
+                'CreateMonitoredItemsRequest': 'Adds items to existing subscription',
+                'CallRequest': 'Invokes methods on server objects'
+            };
+            
+            // Estimate message size
+            const baseSize = 64;
+            const perNodeSize = serviceType.includes('Read') || serviceType.includes('Write') ? 24 : 32;
+            const estimatedSize = baseSize + (nodeCount * perNodeSize);
+            
+            document.getElementById('serviceOutput').innerHTML = `
+                <div>Service: ${serviceType}</div>
+                <div>Description: ${serviceDescriptions[serviceType]}</div>
+                <div>Node Count: ${nodeCount}</div>
+                <div>Estimated Message Size: ${estimatedSize} bytes</div>
+                <div>Expected Response: ${serviceType.replace('Request', 'Response')} with result data</div>
+            `;
+        }
+
+        function simulateService() {
+            const serviceType = document.getElementById('serviceType').value;
+            const nodeCount = parseInt(document.getElementById('nodeCount').value);
+            
+            let simulation = `<div style="color: green;">✓ Simulating ${serviceType}:</div>`;
+            simulation += `<div>1. Encoding ${nodeCount} node ID(s)</div>`;
+            simulation += `<div>2. Adding service-specific parameters</div>`;
+            simulation += `<div>3. Wrapping in MSG/F header</div>`;
+            simulation += `<div>4. Sending over secure channel</div>`;
+            simulation += `<div style="color: blue;">📤 Request sent successfully</div>`;
+            simulation += `<div style="color: green;">📥 Response received: StatusCode Good</div>`;
+            
+            document.getElementById('serviceOutput').innerHTML = simulation;
+        }
+
+        // Communication simulator
+        function startConnectionSimulation() {
+            const log = document.getElementById('simulationLog');
+            const progress = document.getElementById('connectionProgress');
+            
+            log.innerHTML = '<div style="color: blue;">🔄 Starting OPC UA connection simulation...</div>';
+            
+            let step = 0;
+            const steps = [
+                '📡 TCP connection established on port 4840',
+                '🤝 Sending HEL message with protocol version 1.04',
+                '✅ Received ACK message from server',
+                '🔐 Sending OPN request with security policy',
+                '🛡️ Secure channel established with 256-bit encryption',
+                '👤 Creating session with user credentials',
+                '🎯 Session activated successfully',
+                '✨ Ready for service operations!'
+            ];
+            
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    log.innerHTML += `<div>${steps[step]}</div>`;
+                    progress.style.width = `${((step + 1) / steps.length) * 100}%`;
+                    log.scrollTop = log.scrollHeight;
+                    step++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 800);
+        }
+
+        function simulateSecurityNegotiation() {
+            const log = document.getElementById('simulationLog');
+            log.innerHTML = `
+                <div style="color: green;">🔐 Security Negotiation Simulation</div>
+                <div>1. Client Certificate: CN=OPCClient, Valid until 2025-12-31</div>
+                <div>2. Server Certificate: CN=OPCServer, Valid until 2025-12-31</div>
+                <div>3. Security Policy: Basic256Sha256</div>
+                <div>4. Message Security: SignAndEncrypt</div>
+                <div>5. Key Exchange: RSA-OAEP with 2048-bit keys</div>
+                <div>6. Symmetric Encryption: AES-256-CBC</div>
+                <div>7. Message Authentication: HMAC-SHA256</div>
+                <div style="color: green;">✅ Secure channel established successfully</div>
+            `;
+        }
+
+        function simulateDataExchange() {
+            const log = document.getElementById('simulationLog');
+            log.innerHTML = `
+                <div style="color: blue;">📊 Data Exchange Simulation</div>
+                <div>📤 Read Request: ns=2;i=1001 (Temperature Sensor)</div>
+                <div>📥 Read Response: 23.5°C, Quality: Good, Timestamp: ${new Date().toISOString()}</div>
+                <div>📤 Write Request: ns=2;i=2001 (Setpoint) = 25.0</div>
+                <div>📥 Write Response: StatusCode Good</div>
+                <div>🔔 Subscription Notification: Value changed to 24.1°C</div>
+                <div style="color: green;">✅ Data exchange completed successfully</div>
+            `;
+        }
+
+        // Quiz functionality
+        function checkAnswers() {
+            const answers = {
+                q1: 'b', // Final chunk
+                q2: 'a', // None, Sign, SignAndEncrypt
+                q3: 'c', // 4840
+                q4: 'b'  // OPN
+            };
+            
+            let score = 0;
+            let total = Object.keys(answers).length;
+            
+            for (let question in answers) {
+                const selected = document.querySelector(`input[name="${question}"]:checked`);
+                const feedback = document.getElementById(`feedback${question.slice(1)}`);
+                
+                if (selected) {
+                    if (selected.value === answers[question]) {
+                        feedback.className = 'feedback correct';
+                        feedback.textContent = '✅ Correct!';
+                        feedback.style.display = 'block';
+                        score++;
+                    } else {
+                        feedback.className = 'feedback incorrect';
+                        feedback.textContent = '❌ Incorrect. Try again!';
+                        feedback.style.display = 'block';
+                    }
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.textContent = '⚠️ Please select an answer.';
+                    feedback.style.display = 'block';
+                }
+            }
+            
+            const percentage = Math.round((score / total) * 100);
+            document.getElementById('scoreDisplay').innerHTML = `
+                <h4>Your Score: ${score}/${total} (${percentage}%)</h4>
+                <p>${percentage >= 80 ? '🎉 Excellent! You have a strong understanding of OPC UA.' : 
+                      percentage >= 60 ? '👍 Good job! Review the topics you missed.' : 
+                      '📚 Keep studying! Review the training materials and try again.'}</p>
+            `;
+            document.getElementById('quizResults').style.display = 'block';
+        }
+
+        function resetQuiz() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(button => button.checked = false);
+            
+            const feedbacks = document.querySelectorAll('.feedback');
+            feedbacks.forEach(feedback => feedback.style.display = 'none');
+            
+            document.getElementById('quizResults').style.display = 'none';
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHeader();
+            updateServiceMessage();
+        });
+    </script>
+</body>
+</html>
