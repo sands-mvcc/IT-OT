@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data & Monitoring Protocols | IT/OT Integration Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 3px solid #00ff00;
+            margin-bottom: 40px;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #00aa00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 170, 0, 0.3);
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+
+        .header .description {
+            font-size: 1.1em;
+            color: #555555;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            border-color: #00aa00;
+            color: #000;
+            transform: translateY(-2px);
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #00aa00, #008800);
+            color: white;
+            border-color: #00aa00;
+            box-shadow: 0 5px 20px rgba(0, 170, 0, 0.3);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .protocols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .protocol-card {
+            background: #ffffff;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .protocol-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 170, 0, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .protocol-card:hover::before {
+            left: 100%;
+        }
+
+        .protocol-card:hover {
+            border-color: #00aa00;
+            box-shadow: 0 10px 30px rgba(0, 170, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .protocol-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .protocol-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 20px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .protocol-title {
+            flex: 1;
+        }
+
+        .protocol-name {
+            font-size: 1.8em;
+            color: #00ff00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .protocol-fullname {
+            font-size: 1em;
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .protocol-content {
+            line-height: 1.7;
+        }
+
+        .purpose-section {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+
+        .purpose-section h4 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #00ff00;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .data-flow-diagram {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed #00ff00;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(45deg, #00aa00, #008800);
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+            color: #333;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 170, 0, 0.05);
+        }
+
+        .use-case-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .use-case-card::before {
+            content: '📊';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #1a1a1a;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 20px;
+        }
+
+        .use-case-title {
+            color: #00ff00;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 0, 0.05));
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.2);
+        }
+
+        .metric-number {
+            font-size: 2.5em;
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .metric-label {
+            color: #ccc;
+            margin-top: 10px;
+        }
+
+        .code-example {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .code-example pre {
+            margin: 0;
+            color: #00aa00;
+        }
+
+        .code-example h4 {
+            color: #00aa00;
+            margin-bottom: 10px;
+        }
+
+        .integration-pattern {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #00ff00;
+        }
+
+        .quiz-section {
+            background: linear-gradient(145deg, rgba(0, 255, 0, 0.05), rgba(0, 255, 0, 0.1));
+            border: 2px solid #00ff00;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quiz-option {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00aa00, #008800);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #00aa00;
+            border: 2px solid #00aa00;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 170, 0, 0.3);
+        }
+
+        .progress-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 220px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .progress-item.completed {
+            background: rgba(0, 170, 0, 0.2);
+        }
+
+        .interactive-demo {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-output {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            color: #00ff00;
+            min-height: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .protocols-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .progress-indicator {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 30px;
+            }
+            
+            .protocol-card {
+                padding: 20px;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Data & Monitoring Protocols</h1>
+            <div class="subtitle">Performance Tracking & IT/OT Integration</div>
+            <div class="description">
+                Explore the essential protocols that enable real-time data collection, system monitoring, and seamless integration 
+                between IT and OT environments. These protocols form the backbone of modern industrial data analytics, 
+                predictive maintenance, and operational intelligence systems.
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showSection('overview')">Protocol Overview</div>
+            <div class="tab" onclick="showSection('comparison')">Data Flow Patterns</div>
+            <div class="tab" onclick="showSection('integration')">Integration Scenarios</div>
+            <div class="tab" onclick="showSection('implementation')">Implementation Guide</div>
+            <div class="tab" onclick="showSection('demo')">Interactive Demo</div>
+            <div class="tab" onclick="showSection('quiz')">Knowledge Check</div>
+        </div>
+
+        <div class="progress-indicator">
+            <h4 style="color: #00aa00; margin-bottom: 15px;">Learning Progress</h4>
+            <div class="progress-item" data-protocol="snmp">
+                <span>SNMP</span>
+                <span id="snmp-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="syslog">
+                <span>Syslog</span>
+                <span id="syslog-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="mqtt">
+                <span>MQTT</span>
+                <span id="mqtt-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="restapi">
+                <span>REST APIs</span>
+                <span id="restapi-status">📖</span>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <div class="protocols-grid">
+                <!-- SNMP -->
+                <div class="protocol-card" data-protocol="snmp">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">SNMP</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">SNMP</div>
+                            <div class="protocol-fullname">Simple Network Management Protocol</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>SNMP provides standardized network device monitoring and management capabilities across both IT and OT infrastructure, enabling centralized visibility into device health, performance metrics, and operational status.</p>
+                        </div>
+                        
+                        <h4 style="color: #00aa00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">📊 Real-time device monitoring</div>
+                            <div class="feature-item">⚡ Trap-based event notifications</div>
+                            <div class="feature-item">📈 Performance metric collection</div>
+                            <div class="feature-item">🔧 Configuration management support</div>
+                            <div class="feature-item">🌐 Cross-vendor device compatibility</div>
+                            <div class="feature-item">📋 Standardized MIB (Management Information Base)</div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4 style="color: #00ff00; margin-bottom: 10px;">SNMP Query Example:</h4>
+                            <pre>
+snmpget -v2c -c public 192.168.1.100 1.3.6.1.2.1.1.5.0
+# Returns: system.sysName.0 = STRING: "Industrial-Switch-01"
+
+snmpwalk -v2c -c public 192.168.1.100 1.3.6.1.2.1.2.2.1.10
+# Returns interface traffic statistics
+                            </pre>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('snmp')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showMIBDetails()">Explore MIBs</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Syslog -->
+                <div class="protocol-card" data-protocol="syslog">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">SLOG</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">Syslog</div>
+                            <div class="protocol-fullname">System Logging Protocol</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>Syslog provides standardized logging and event collection from network devices and systems, enabling centralized security monitoring, compliance reporting, and operational troubleshooting across IT/OT environments.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">📝 Standardized log message format</div>
+                            <div class="feature-item">🏢 Centralized log collection</div>
+                            <div class="feature-item">⚠️ Severity level classification</div>
+                            <div class="feature-item">⏰ Precise time-stamped events</div>
+                            <div class="feature-item">🔒 SIEM integration support</div>
+                            <div class="feature-item">📊 Real-time log streaming</div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4 style="color: #00ff00; margin-bottom: 10px;">Syslog Message Format:</h4>
+                            <pre>
+&lt;Priority&gt;Timestamp Hostname Tag: Message
+
+Example:
+&lt;166&gt;Oct 22 10:52:01 plc-server-01 modbus[1234]: Connection established to HMI client 192.168.1.50
+&lt;165&gt;Oct 22 10:52:15 sensor-gateway-02 mqtt[5678]: Temperature sensor offline - Device ID: TEMP_001
+                            </pre>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('syslog')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showSyslogSeverities()">Severity Levels</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MQTT -->
+                <div class="protocol-card" data-protocol="mqtt">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">MQTT</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">MQTT</div>
+                            <div class="protocol-fullname">Message Queuing Telemetry Transport</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>MQTT enables efficient, lightweight messaging for IoT and industrial devices with minimal bandwidth and power requirements, using a publish/subscribe model perfect for distributed sensor networks and real-time data streaming.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">📡 Publish/Subscribe messaging model</div>
+                            <div class="feature-item">⚡ Ultra-lightweight protocol overhead</div>
+                            <div class="feature-item">🎯 Quality of Service (QoS) levels</div>
+                            <div class="feature-item">💾 Retained message support</div>
+                            <div class="feature-item">💔 Last Will and Testament feature</div>
+                            <div class="feature-item">🔄 Persistent session support</div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4 style="color: #00ff00; margin-bottom: 10px;">MQTT Topic Structure:</h4>
+                            <pre>
+factory/line-1/temperature          → 24.5°C
+factory/line-1/pressure             → 2.1 bar
+factory/line-1/status               → "running"
+factory/line-2/vibration/sensor-01  → 0.002 mm/s
+factory/alerts/critical             → "Motor overheating on Line 1"
+
+# QoS Levels:
+# QoS 0: At most once delivery (fire and forget)
+# QoS 1: At least once delivery (acknowledged)
+# QoS 2: Exactly once delivery (assured)
+                            </pre>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('mqtt')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showMQTTTopics()">Topic Design</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REST APIs -->
+                <div class="protocol-card" data-protocol="restapi">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">REST</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">RESTful APIs</div>
+                            <div class="protocol-fullname">REST with JSON/XML Data Formats</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>RESTful APIs provide modern, web-standard interfaces for integrating enterprise systems with operational technology data and services, enabling scalable, platform-independent communication using standard HTTP methods.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">🌐 HTTP-based stateless communication</div>
+                            <div class="feature-item">📋 Standard data formats (JSON/XML)</div>
+                            <div class="feature-item">🔄 CRUD operations support</div>
+                            <div class="feature-item">🔧 Platform-independent integration</div>
+                            <div class="feature-item">📈 Highly scalable architecture</div>
+                            <div class="feature-item">🔒 OAuth/JWT authentication support</div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4 style="color: #00ff00; margin-bottom: 10px;">REST API Example:</h4>
+                            <pre>
+# Get sensor data
+GET /api/v1/sensors/temperature/line-1
+Response: {
+  "sensor_id": "TEMP_LINE1_001",
+  "value": 24.5,
+  "unit": "celsius",
+  "timestamp": "2025-07-05T10:30:00Z",
+  "status": "normal"
+}
+
+# Update device configuration
+PUT /api/v1/devices/plc-001/config
+{
+  "sampling_rate": 1000,
+  "alarm_threshold": 85.0,
+  "enabled": true
+}
+                            </pre>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('restapi')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showAPIDesign()">API Design</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Patterns Section -->
+        <div id="comparison" class="content-section">
+            <h2 style="color: #00aa00; text-align: center; margin-bottom: 30px;">Data Flow Patterns & Architecture</h2>
+            
+            <div class="data-flow-diagram">
+                <h3 style="color: #00aa00; margin-bottom: 20px;">Integrated Monitoring Architecture</h3>
+                <div style="color: #ccc; line-height: 1.8;">
+                    ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐<br>
+                    │   Enterprise    │    │     SIEM /       │    │   Field Level   │<br>
+                    │   Dashboard     │◄──►│   Analytics      │◄──►│    Devices      │<br>
+                    │  (REST APIs)    │    │   Platform       │    │  (SNMP/Syslog)  │<br>
+                    └─────────────────┘    └──────────────────┘    └─────────────────┘<br>
+                                                    │<br>
+                                           ┌──────────────────┐<br>
+                                           │  MQTT Broker     │<br>
+                                           │  (Real-time      │<br>
+                                           │   Streaming)     │<br>
+                                           └──────────────────┘<br>
+                                                    │<br>
+                                           ┌──────────────────┐<br>
+                                           │   IoT Sensors    │<br>
+                                           │   & Gateways     │<br>
+                                           └──────────────────┘
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Protocol</th>
+                        <th>Data Flow Pattern</th>
+                        <th>Bandwidth Usage</th>
+                        <th>Latency</th>
+                        <th>Best For</th>
+                        <th>Scalability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SNMP</strong></td>
+                        <td>Pull-based polling / Trap-based push</td>
+                        <td>📊 Low (periodic queries)</td>
+                        <td>⏱️ Medium (polling intervals)</td>
+                        <td>Device status monitoring</td>
+                        <td>📈 Good (thousands of devices)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Syslog</strong></td>
+                        <td>Event-driven push</td>
+                        <td>📊 Variable (event-dependent)</td>
+                        <td>⏱️ Low (real-time events)</td>
+                        <td>Security events, audit logs</td>
+                        <td>📈 Excellent (millions of events)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MQTT</strong></td>
+                        <td>Publish/Subscribe broker-based</td>
+                        <td>📊 Very Low (optimized packets)</td>
+                        <td>⏱️ Very Low (near real-time)</td>
+                        <td>IoT sensor data, real-time streams</td>
+                        <td>📈 Excellent (millions of devices)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>REST APIs</strong></td>
+                        <td>Request/Response (HTTP)</td>
+                        <td>📊 Medium (JSON/XML overhead)</td>
+                        <td>⏱️ Medium (HTTP processing)</td>
+                        <td>Enterprise integration, web services</td>
+                        <td>📈 Excellent (cloud-native)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="protocols-grid">
+                <div class="metric-card">
+                    <div class="metric-number">1000+</div>
+                    <div class="metric-label">Devices per SNMP Manager</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">100K+</div>
+                    <div class="metric-label">Syslog Events per Second</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">1M+</div>
+                    <div class="metric-label">MQTT Messages per Second</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">10K+</div>
+                    <div class="metric-label">REST API Calls per Second</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Scenarios Section -->
+        <div id="integration" class="content-section">
+            <h2 style="color: #00aa00; text-align: center; margin-bottom: 30px;">Integration Scenarios & Use Cases</h2>
+            
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 1: Industrial IoT Monitoring Platform</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A manufacturing facility deploys hundreds of wireless sensors for temperature, vibration, and pressure monitoring 
+                    across production lines, with real-time alerting and predictive analytics requirements.
+                </p>
+                <div class="integration-pattern">
+                    <strong style="color: #00ff00;">Integration Pattern:</strong>
+                    <ul style="margin-top: 10px; color: #ccc; line-height: 1.6;">
+                        <li><strong>MQTT:</strong> Sensor data streaming (temp, pressure, vibration)</li>
+                        <li><strong>REST APIs:</strong> Configuration management and historical data access</li>
+                        <li><strong>Syslog:</strong> Security events and system status logging</li>
+                        <li><strong>SNMP:</strong> Network infrastructure monitoring (gateways, switches)</li>
+                    </ul>
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px;">
+                        <strong>Result:</strong> Real-time monitoring with &lt;100ms latency, 99.9% data reliability, and comprehensive audit trails
+                    </div>
+                </div>
+            </div>
+
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 2: Smart Building Energy Management</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A commercial building complex requires integrated monitoring of HVAC systems, lighting controls, 
+                    security systems, and energy consumption with centralized dashboard and mobile access.
+                </p>
+                <div class="integration-pattern">
+                    <strong style="color: #00ff00;">Integration Pattern:</strong>
+                    <ul style="margin-top: 10px; color: #ccc; line-height: 1.6;">
+                        <li><strong>REST APIs:</strong> Building management system integration and mobile apps</li>
+                        <li><strong>MQTT:</strong> Real-time sensor data (occupancy, temperature, lighting)</li>
+                        <li><strong>SNMP:</strong> Network device monitoring (controllers, switches)</li>
+                        <li><strong>Syslog:</strong> Security access logs and system events</li>
+                    </ul>
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px;">
+                        <strong>Result:</strong> 30% energy reduction, mobile access, comprehensive security logging
+                    </div>
+                </div>
+            </div>
+
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 3: Critical Infrastructure Monitoring</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A water treatment facility needs comprehensive monitoring of pumps, valves, chemical levels, 
+                    and water quality with SCADA integration and regulatory compliance reporting.
+                </p>
+                <div class="integration-pattern">
+                    <strong style="color: #00ff00;">Integration Pattern:</strong>
+                    <ul style="margin-top: 10px; color: #ccc; line-height: 1.6;">
+                        <li><strong>SNMP:</strong> Network device health and infrastructure monitoring</li>
+                        <li><strong>Syslog:</strong> Comprehensive audit logging for compliance</li>
+                        <li><strong>REST APIs:</strong> SCADA system integration and reporting</li>
+                        <li><strong>MQTT:</strong> Real-time water quality and chemical level data</li>
+                    </ul>
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px;">
+                        <strong>Result:</strong> 99.99% uptime monitoring, full compliance reporting, rapid incident response
+                    </div>
+                </div>
+            </div>
+
+            <div class="protocols-grid">
+                <div class="use-case-card">
+                    <div class="use-case-title">Protocol Selection Guidelines</div>
+                    <ul style="color: #ccc; line-height: 1.8;">
+                        <li><strong>High-frequency sensor data:</strong> Use MQTT for real-time streaming</li>
+                        <li><strong>Device health monitoring:</strong> Use SNMP for standardized metrics</li>
+                        <li><strong>Security and audit events:</strong> Use Syslog for centralized logging</li>
+                        <li><strong>Enterprise integration:</strong> Use REST APIs for web services</li>
+                        <li><strong>Mobile and web access:</strong> REST APIs with JSON formatting</li>
+                        <li><strong>Battery-powered devices:</strong> MQTT for power efficiency</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case-card">
+                    <div class="use-case-title">Bandwidth Optimization Tips</div>
+                    <ul style="color: #ccc; line-height: 1.8;">
+                        <li><strong>MQTT:</strong> Use QoS 0 for high-frequency, non-critical data</li>
+                        <li><strong>SNMP:</strong> Optimize polling intervals based on criticality</li>
+                        <li><strong>REST:</strong> Implement compression and caching strategies</li>
+                        <li><strong>Syslog:</strong> Use appropriate severity filtering</li>
+                        <li><strong>General:</strong> Implement data aggregation at edge gateways</li>
+                        <li><strong>Network:</strong> Use Quality of Service (QoS) prioritization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Guide Section -->
+        <div id="implementation" class="content-section">
+            <h2 style="color: #00aa00; text-align: center; margin-bottom: 30px;">Implementation Guide & Best Practices</h2>
+            
+            <div class="quiz-section">
+                <h3 style="color: #00aa00; margin-bottom: 20px;">🚀 Implementation Roadmap</h3>
+                
+                <div class="protocols-grid">
+                    <div class="protocol-card">
+                        <h4 style="color: #00aa00; margin-bottom: 15px;">Phase 1: Assessment & Planning</h4>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="inventory"> Complete device and system inventory
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="requirements"> Define monitoring requirements and KPIs
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="bandwidth"> Assess network bandwidth and capacity
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="security"> Design security and access control policies
+                        </div>
+                        <div class="feature-item">
+                            <input type="checkbox" id="protocols"> Select appropriate protocol mix
+                        </div>
+                    </div>
+
+                    <div class="protocol-card">
+                        <h4 style="color: #00aa00; margin-bottom: 15px;">Phase 2: Infrastructure Setup</h4>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="network"> Configure network segmentation and VLANs
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="servers"> Deploy monitoring servers and brokers
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="certificates"> Set up certificates and authentication
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="firewalls"> Configure firewalls and access controls
+                        </div>
+                        <div class="feature-item">
+                            <input type="checkbox" id="testing"> Implement testing and staging environments
+                        </div>
+                    </div>
+                </div>
+
+                <div class="protocols-grid">
+                    <div class="protocol-card">
+                        <h4 style="color: #00aa00; margin-bottom: 15px;">Phase 3: Device Integration</h4>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="pilot"> Start with pilot deployment (10-20 devices)
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="configure"> Configure device monitoring and alerting
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="validate"> Validate data flow and accuracy
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="tune"> Tune polling intervals and thresholds
+                        </div>
+                        <div class="feature-item">
+                            <input type="checkbox" id="rollout"> Scale to full production rollout
+                        </div>
+                    </div>
+
+                    <div class="protocol-card">
+                        <h4 style="color: #00aa00; margin-bottom: 15px;">Phase 4: Operations & Maintenance</h4>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="monitoring"> Establish 24/7 monitoring procedures
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="backup"> Implement backup and disaster recovery
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="training"> Conduct staff training and certification
+                        </div>
+                        <div class="feature-item" style="margin-bottom: 10px;">
+                            <input type="checkbox" id="documentation"> Create comprehensive documentation
+                        </div>
+                        <div class="feature-item">
+                            <input type="checkbox" id="optimization"> Continuous optimization and tuning
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="use-case-card">
+                <div class="use-case-title">⚠️ Common Implementation Pitfalls</div>
+                <div class="protocols-grid">
+                    <div style="color: #666; line-height: 1.8;">
+                        <h5 style="color: #ff6666; margin-bottom: 10px;">Technical Pitfalls:</h5>
+                        <ul>
+                            <li>Insufficient bandwidth planning for MQTT burst traffic</li>
+                            <li>SNMP community string security vulnerabilities</li>
+                            <li>REST API rate limiting and timeout issues</li>
+                            <li>Syslog message loss during high-volume events</li>
+                            <li>Lack of proper message queuing and buffering</li>
+                        </ul>
+                    </div>
+                    <div style="color: #666; line-height: 1.8;">
+                        <h5 style="color: #ff6666; margin-bottom: 10px;">Operational Pitfalls:</h5>
+                        <ul>
+                            <li>Inadequate monitoring of monitoring systems</li>
+                            <li>Poor alarm management and alert fatigue</li>
+                            <li>Insufficient staff training on new protocols</li>
+                            <li>Lack of change management procedures</li>
+                            <li>Missing disaster recovery and backup plans</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="integration-pattern">
+                <h4 style="color: #00aa00; margin-bottom: 15px;">🔧 Performance Tuning Guidelines</h4>
+                <div class="protocols-grid">
+                    <div>
+                        <h5 style="color: #00aa00;">SNMP Optimization:</h5>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>Use SNMPv3 for security in production</li>
+                            <li>Optimize polling intervals (5-60 seconds typical)</li>
+                            <li>Implement bulk operations for efficiency</li>
+                            <li>Use SNMP traps for critical events</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: #00aa00;">MQTT Optimization:</h5>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>Use QoS 0 for high-frequency sensor data</li>
+                            <li>Implement client keepalive appropriately</li>
+                            <li>Design hierarchical topic structures</li>
+                            <li>Use retained messages for device status</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Demo Section -->
+        <div id="demo" class="content-section">
+            <h2 style="color: #00aa00; text-align: center; margin-bottom: 30px;">Interactive Protocol Demonstrations</h2>
+            
+            <div class="interactive-demo">
+                <h3 style="color: #00aa00; margin-bottom: 20px;">🧪 MQTT Message Simulator</h3>
+                <p style="color: #666; margin-bottom: 20px;">Simulate MQTT messages from industrial sensors and observe the publish/subscribe pattern.</p>
+                
+                <div class="demo-controls">
+                    <button class="btn btn-primary" onclick="startMQTTDemo()">Start Simulation</button>
+                    <button class="btn btn-secondary" onclick="stopMQTTDemo()">Stop Simulation</button>
+                    <button class="btn btn-secondary" onclick="clearMQTTDemo()">Clear Log</button>
+                    <select id="mqttQoS" style="padding: 10px; background: #ffffff; border: 2px solid #00aa00; border-radius: 5px; color: #333;">
+                        <option value="0">QoS 0 (At most once)</option>
+                        <option value="1">QoS 1 (At least once)</option>
+                        <option value="2">QoS 2 (Exactly once)</option>
+                    </select>
+                </div>
+                
+                <div class="demo-output" id="mqttOutput">
+                    MQTT Broker Ready - Waiting for simulation to start...
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3 style="color: #00aa00; margin-bottom: 20px;">📊 SNMP Query Simulator</h3>
+                <p style="color: #666; margin-bottom: 20px;">Simulate SNMP queries to network devices and view MIB data responses.</p>
+                
+                <div class="demo-controls">
+                    <input type="text" id="snmpOID" placeholder="Enter OID (e.g., 1.3.6.1.2.1.1.1.0)" 
+                           style="flex: 1; padding: 10px; background: #ffffff; border: 2px solid #00aa00; border-radius: 5px; color: #333; margin-right: 10px;">
+                    <button class="btn btn-primary" onclick="querySNMP()">Query Device</button>
+                    <button class="btn btn-secondary" onclick="walkSNMP()">SNMP Walk</button>
+                </div>
+                
+                <div class="demo-output" id="snmpOutput">
+                    SNMP Manager Ready - Enter an OID to query...
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3 style="color: #00aa00; margin-bottom: 20px;">🔗 REST API Response Simulator</h3>
+                <p style="color: #666; margin-bottom: 20px;">Test REST API endpoints and observe JSON response formats for industrial data.</p>
+                
+                <div class="demo-controls">
+                    <select id="restMethod" style="padding: 10px; background: #ffffff; border: 2px solid #00aa00; border-radius: 5px; color: #333; margin-right: 10px;">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                    <input type="text" id="restEndpoint" placeholder="Endpoint (e.g., /api/v1/sensors/temperature)" 
+                           style="flex: 1; padding: 10px; background: #ffffff; border: 2px solid #00aa00; border-radius: 5px; color: #333; margin-right: 10px;">
+                    <button class="btn btn-primary" onclick="callRestAPI()">Send Request</button>
+                </div>
+                
+                <div class="demo-output" id="restOutput">
+                    REST API Server Ready - Configure request and send...
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="content-section">
+            <h2 style="color: #00aa00; text-align: center; margin-bottom: 30px;">Knowledge Validation Assessment</h2>
+            
+            <div class="quiz-section">
+                <div class="quiz-question">
+                    <h4 style="color: #00aa00;">Question 1: Which protocol is best suited for battery-powered IoT sensors transmitting data every few minutes?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">SNMP (polling-based)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">MQTT (with QoS 0)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">REST API (HTTP POST)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Syslog (UDP)</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00aa00;">Question 2: For centralized security monitoring and compliance logging, which protocol is most appropriate?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">MQTT</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">SNMP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">Syslog</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">REST APIs</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00aa00;">Question 3: Which protocol provides the best enterprise integration capabilities for web-based applications?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">SNMP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">MQTT</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Syslog</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">RESTful APIs with JSON</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00aa00;">Question 4: What is the primary advantage of MQTT's publish/subscribe model over traditional request/response protocols?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Higher security</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">Decoupled communication and scalability</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Better error handling</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Simpler configuration</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00aa00;">Question 5: Which SNMP version should be used in production environments for security reasons?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">SNMPv1 (community strings)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">SNMPv2c (enhanced community)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">SNMPv3 (user-based security)</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Any version with proper firewall rules</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="calculateQuizScore()" id="quizSubmit" style="display: none;">Calculate Score</button>
+                <div id="quizResults" style="margin-top: 20px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedProtocols = new Set();
+        let answeredQuestions = 0;
+        let correctAnswers = 0;
+        let mqttInterval;
+        let mqttMessageCount = 0;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function markCompleted(protocolId) {
+            completedProtocols.add(protocolId);
+            updateProgressIndicator(protocolId);
+            
+            const card = document.querySelector(`[data-protocol="${protocolId}"]`);
+            card.style.border = '2px solid #00ff00';
+            card.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.5)';
+            
+            const button = card.querySelector('.btn-primary');
+            button.textContent = 'Completed ✅';
+            button.style.background = 'linear-gradient(45deg, #00cc00, #008800)';
+        }
+
+        function updateProgressIndicator(protocolId) {
+            const progressItem = document.querySelector(`[data-protocol="${protocolId}"]`);
+            progressItem.classList.add('completed');
+            document.getElementById(`${protocolId}-status`).textContent = '✅';
+        }
+
+        function showMIBDetails() {
+            alert(`MIB Explorer would show:\n\n• System MIB (1.3.6.1.2.1.1) - Device information\n• Interface MIB (1.3.6.1.2.1.2) - Network interfaces\n• IP MIB (1.3.6.1.2.1.4) - IP statistics\n• SNMP MIB (1.3.6.1.2.1.11) - SNMP statistics\n• Enterprise MIBs - Vendor-specific OIDs`);
+        }
+
+        function showSyslogSeverities() {
+            alert(`Syslog Severity Levels:\n\n0 - Emergency: System unusable\n1 - Alert: Action must be taken immediately\n2 - Critical: Critical conditions\n3 - Error: Error conditions\n4 - Warning: Warning conditions\n5 - Notice: Normal but significant\n6 - Informational: Informational messages\n7 - Debug: Debug-level messages`);
+        }
+
+        function showMQTTTopics() {
+            alert(`MQTT Topic Design Best Practices:\n\n• Use hierarchical structure: factory/line/device/metric\n• Avoid spaces and special characters\n• Use consistent naming conventions\n• Consider future scalability\n• Implement topic-based access control\n• Use retained messages for status data`);
+        }
+
+        function showAPIDesign() {
+            alert(`REST API Design Principles:\n\n• Use resource-based URLs\n• Implement proper HTTP status codes\n• Version your APIs (/api/v1/)\n• Use JSON for data exchange\n• Implement authentication (OAuth/JWT)\n• Provide comprehensive documentation\n• Include rate limiting and error handling`);
+        }
+
+        // Interactive Demo Functions
+        function startMQTTDemo() {
+            const output = document.getElementById('mqttOutput');
+            const qos = document.getElementById('mqttQoS').value;
+            
+            output.innerHTML = `MQTT Broker Started - QoS Level: ${qos}\n\n`;
+            mqttMessageCount = 0;
+            
+            mqttInterval = setInterval(() => {
+                mqttMessageCount++;
+                const sensors = ['temperature', 'pressure', 'vibration', 'flow_rate', 'power_consumption'];
+                const lines = ['line-1', 'line-2', 'line-3'];
+                const sensor = sensors[Math.floor(Math.random() * sensors.length)];
+                const line = lines[Math.floor(Math.random() * lines.length)];
+                
+                let value;
+                switch(sensor) {
+                    case 'temperature': value = (20 + Math.random() * 15).toFixed(1) + '°C'; break;
+                    case 'pressure': value = (1.8 + Math.random() * 0.4).toFixed(2) + ' bar'; break;
+                    case 'vibration': value = (Math.random() * 0.01).toFixed(4) + ' mm/s'; break;
+                    case 'flow_rate': value = (50 + Math.random() * 20).toFixed(1) + ' L/min'; break;
+                    case 'power_consumption': value = (2000 + Math.random() * 500).toFixed(0) + 'W'; break;
+                }
+                
+                const timestamp = new Date().toISOString();
+                const topic = `factory/${line}/${sensor}`;
+                
+                output.innerHTML += `[${timestamp.substr(11,8)}] PUBLISH → ${topic}: ${value} (QoS: ${qos})\n`;
+                output.scrollTop = output.scrollHeight;
+                
+                if (mqttMessageCount >= 20) {
+                    stopMQTTDemo();
+                }
+            }, 1000);
+        }
+
+        function stopMQTTDemo() {
+            if (mqttInterval) {
+                clearInterval(mqttInterval);
+                mqttInterval = null;
+                const output = document.getElementById('mqttOutput');
+                output.innerHTML += `\n--- MQTT Simulation Stopped ---\n`;
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        function clearMQTTDemo() {
+            document.getElementById('mqttOutput').innerHTML = 'MQTT Broker Ready - Waiting for simulation to start...';
+        }
+
+        function querySNMP() {
+            const oid = document.getElementById('snmpOID').value || '1.3.6.1.2.1.1.1.0';
+            const output = document.getElementById('snmpOutput');
+            
+            const responses = {
+                '1.3.6.1.2.1.1.1.0': 'STRING: "Industrial Ethernet Switch v2.1.5"',
+                '1.3.6.1.2.1.1.3.0': 'Timeticks: (1234567) 3:25:45.67',
+                '1.3.6.1.2.1.1.5.0': 'STRING: "FACTORY-SW-01"',
+                '1.3.6.1.2.1.2.1.0': 'INTEGER: 24 interfaces',
+                '1.3.6.1.2.1.2.2.1.10.1': 'Counter32: 15423678 octets',
+                '1.3.6.1.2.1.2.2.1.16.1': 'Counter32: 987456 octets'
+            };
+            
+            const response = responses[oid] || 'No Such Object available on this agent at this OID';
+            const timestamp = new Date().toISOString();
+            
+            output.innerHTML += `[${timestamp.substr(11,8)}] SNMP GET ${oid}\n`;
+            output.innerHTML += `Response: ${response}\n\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function walkSNMP() {
+            const output = document.getElementById('snmpOutput');
+            const timestamp = new Date().toISOString();
+            
+            output.innerHTML += `[${timestamp.substr(11,8)}] SNMP WALK 1.3.6.1.2.1.2.2.1.2\n`;
+            output.innerHTML += `1.3.6.1.2.1.2.2.1.2.1 = STRING: "GigabitEthernet0/1"\n`;
+            output.innerHTML += `1.3.6.1.2.1.2.2.1.2.2 = STRING: "GigabitEthernet0/2"\n`;
+            output.innerHTML += `1.3.6.1.2.1.2.2.1.2.3 = STRING: "Management0/1"\n`;
+            output.innerHTML += `1.3.6.1.2.1.2.2.1.2.4 = STRING: "VLAN1"\n\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function callRestAPI() {
+            const method = document.getElementById('restMethod').value;
+            const endpoint = document.getElementById('restEndpoint').value || '/api/v1/sensors/temperature';
+            const output = document.getElementById('restOutput');
+            
+            const responses = {
+                'GET': {
+                    '/api/v1/sensors/temperature': {
+                        status: 200,
+                        data: {
+                            sensor_id: "TEMP_LINE1_001",
+                            value: 24.5,
+                            unit: "celsius",
+                            timestamp: new Date().toISOString(),
+                            status: "normal",
+                            location: "Production Line 1"
+                        }
+                    },
+                    '/api/v1/devices': {
+                        status: 200,
+                        data: [
+                            { id: "PLC-001", type: "controller", status: "online" },
+                            { id: "HMI-001", type: "interface", status: "online" },
+                            { id: "SENSOR-001", type: "temperature", status: "normal" }
+                        ]
+                    }
+                },
+                'POST': {
+                    default: {
+                        status: 201,
+                        data: { message: "Resource created successfully", id: "12345" }
+                    }
+                },
+                'PUT': {
+                    default: {
+                        status: 200,
+                        data: { message: "Resource updated successfully" }
+                    }
+                },
+                'DELETE': {
+                    default: {
+                        status: 204,
+                        data: { message: "Resource deleted successfully" }
+                    }
+                }
+            };
+            
+            const response = responses[method][endpoint] || responses[method]['default'] || responses['GET']['/api/v1/sensors/temperature'];
+            const timestamp = new Date().toISOString();
+            
+            output.innerHTML += `[${timestamp.substr(11,8)}] ${method} ${endpoint}\n`;
+            output.innerHTML += `HTTP ${response.status}\n`;
+            output.innerHTML += `${JSON.stringify(response.data, null, 2)}\n\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function selectAnswer(element, isCorrect) {
+            const options = element.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+                if (option === element) {
+                    option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (option.onclick.toString().includes('true')) {
+                    option.classList.add('correct');
+                }
+            });
+
+            answeredQuestions++;
+            if (isCorrect) correctAnswers++;
+
+            if (answeredQuestions >= 5) {
+                document.getElementById('quizSubmit').style.display = 'block';
+            }
+        }
+
+        function calculateQuizScore() {
+            const percentage = (correctAnswers / 5) * 100;
+            const resultsDiv = document.getElementById('quizResults');
+            
+            let message = '';
+            let color = '';
+            
+            if (percentage >= 80) {
+                message = 'Outstanding! You have mastered data and monitoring protocols for IT/OT integration.';
+                color = '#00ff00';
+            } else if (percentage >= 60) {
+                message = 'Good progress! Review the data flow patterns section for additional insights.';
+                color = '#ffff00';
+            } else {
+                message = 'Consider reviewing the protocol overview and implementation guide sections.';
+                color = '#ff6600';
+            }
+
+            resultsDiv.innerHTML = `
+                <h4 style="color: ${color};">Assessment Results</h4>
+                <p>Score: ${correctAnswers}/5 (${percentage}%)</p>
+                <p style="color: #ccc; margin-top: 10px;">${message}</p>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px;">
+                    <h5 style="color: #00ff00;">Next Steps:</h5>
+                    <ul style="color: #ccc; margin-top: 10px;">
+                        <li>Implement a pilot monitoring project using 2-3 protocols</li>
+                        <li>Practice with the interactive demos</li>
+                        <li>Review integration scenarios relevant to your industry</li>
+                        <li>Consider protocol certification training</li>
+                    </ul>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Data & Monitoring Protocols Training Tool Initialized');
+            
+            // Pre-populate some demo fields
+            document.getElementById('snmpOID').value = '1.3.6.1.2.1.1.1.0';
+            document.getElementById('restEndpoint').value = '/api/v1/sensors/temperature';
+        });
+    </script>
+</body>
+</html>
