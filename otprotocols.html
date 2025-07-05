@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OT-Relevant IT Protocols | Industrial Integration Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 3px solid #00ff00;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #00ff00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            font-size: 1.3em;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .header .description {
+            font-size: 1.1em;
+            color: #999;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #333;
+            border-radius: 25px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            border-color: #00ff00;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            border-color: #00ff00;
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.3);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .protocols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .protocol-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08));
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .protocol-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .protocol-card:hover::before {
+            left: 100%;
+        }
+
+        .protocol-card:hover {
+            border-color: #00ff00;
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .protocol-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .protocol-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 20px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .protocol-title {
+            flex: 1;
+        }
+
+        .protocol-name {
+            font-size: 1.8em;
+            color: #00ff00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .protocol-fullname {
+            font-size: 1em;
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .protocol-content {
+            line-height: 1.7;
+        }
+
+        .purpose-section {
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+
+        .purpose-section h4 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #00ff00;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            padding: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            vertical-align: top;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .use-case-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .use-case-card::before {
+            content: '🏭';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #1a1a1a;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 20px;
+        }
+
+        .use-case-title {
+            color: #00ff00;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .architecture-diagram {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed #00ff00;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .quiz-section {
+            background: linear-gradient(145deg, rgba(0, 255, 0, 0.05), rgba(0, 255, 0, 0.1));
+            border: 2px solid #00ff00;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quiz-option {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid #00ff00;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .progress-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 200px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-item.completed {
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .protocols-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .progress-indicator {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 30px;
+            }
+            
+            .protocol-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 OT-Relevant IT Protocols</h1>
+            <div class="subtitle">Industrial Integration & Industry 4.0 Communications</div>
+            <div class="description">
+                Master the essential protocols that bridge traditional operational technology with modern IT infrastructure. 
+                These protocols enable seamless integration, real-time data exchange, and advanced automation in industrial environments.
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showSection('overview')">Protocol Overview</div>
+            <div class="tab" onclick="showSection('comparison')">Comparison Matrix</div>
+            <div class="tab" onclick="showSection('usecases')">Use Cases</div>
+            <div class="tab" onclick="showSection('implementation')">Implementation</div>
+            <div class="tab" onclick="showSection('quiz')">Knowledge Check</div>
+        </div>
+
+        <div class="progress-indicator">
+            <h4 style="color: #00ff00; margin-bottom: 15px;">Learning Progress</h4>
+            <div class="progress-item" data-protocol="opcua">
+                <span>OPC UA</span>
+                <span id="opcua-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="modbus">
+                <span>Modbus/TCP</span>
+                <span id="modbus-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="bacnet">
+                <span>BACnet/IP</span>
+                <span id="bacnet-status">📖</span>
+            </div>
+            <div class="progress-item" data-protocol="ethernetip">
+                <span>EtherNet/IP</span>
+                <span id="ethernetip-status">📖</span>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <div class="protocols-grid">
+                <!-- OPC UA -->
+                <div class="protocol-card" data-protocol="opcua">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">UA</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">OPC UA</div>
+                            <div class="protocol-fullname">Open Platform Communications Unified Architecture</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>OPC UA is the cornerstone of Industry 4.0, providing secure, reliable, and platform-independent communication for industrial automation. It enables seamless IT/OT integration with built-in security and complex data modeling capabilities.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">🔒 Built-in Security (X.509 certificates, encryption)</div>
+                            <div class="feature-item">🌐 Platform Independence (Windows, Linux, embedded)</div>
+                            <div class="feature-item">📊 Rich Data Models (complex object structures)</div>
+                            <div class="feature-item">🔄 Service-Oriented Architecture</div>
+                            <div class="feature-item">📈 Scalable from sensors to enterprise</div>
+                            <div class="feature-item">🏗️ Standardized Information Models</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('opcua')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showDetails('opcua')">Technical Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modbus TCP/IP -->
+                <div class="protocol-card" data-protocol="modbus">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">MB</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">Modbus TCP/IP</div>
+                            <div class="protocol-fullname">Modbus Protocol over TCP/IP Networks</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>Modbus TCP/IP bridges traditional industrial devices with modern IP networks, enabling legacy OT systems to communicate over standard Ethernet infrastructure while maintaining simplicity and reliability.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">🔄 Simple Master-Slave Communication</div>
+                            <div class="feature-item">🔌 Wide Device Compatibility</div>
+                            <div class="feature-item">🌐 Standard Ethernet/IP Support</div>
+                            <div class="feature-item">🛠️ Easy Implementation & Troubleshooting</div>
+                            <div class="feature-item">📜 Legacy System Integration</div>
+                            <div class="feature-item">💰 Cost-Effective Solution</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('modbus')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showDetails('modbus')">Technical Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BACnet/IP -->
+                <div class="protocol-card" data-protocol="bacnet">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">BA</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">BACnet/IP</div>
+                            <div class="protocol-fullname">Building Automation and Control Networks over IP</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>BACnet/IP standardizes communication in building automation systems, enabling integration of HVAC, lighting, security, and energy management systems with IT networks for smart building solutions.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">🏢 Building Automation Standardization</div>
+                            <div class="feature-item">🎯 Object-Oriented Data Model</div>
+                            <div class="feature-item">🤝 Multi-Vendor Interoperability</div>
+                            <div class="feature-item">🌐 IP Network Compatibility</div>
+                            <div class="feature-item">⚡ Energy Management Integration</div>
+                            <div class="feature-item">📊 Real-Time Building Analytics</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('bacnet')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showDetails('bacnet')">Technical Details</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EtherNet/IP -->
+                <div class="protocol-card" data-protocol="ethernetip">
+                    <div class="protocol-header">
+                        <div class="protocol-icon">EIP</div>
+                        <div class="protocol-title">
+                            <div class="protocol-name">EtherNet/IP</div>
+                            <div class="protocol-fullname">Ethernet Industrial Protocol</div>
+                        </div>
+                    </div>
+                    <div class="protocol-content">
+                        <div class="purpose-section">
+                            <h4>🎯 Purpose & Mission</h4>
+                            <p>EtherNet/IP provides real-time industrial communication over standard Ethernet networks, supporting time-critical manufacturing applications with deterministic data delivery and safety protocol support.</p>
+                        </div>
+                        
+                        <h4 style="color: #00ff00; margin: 20px 0 15px 0;">Key Capabilities</h4>
+                        <div class="features-grid">
+                            <div class="feature-item">⚡ Real-Time Industrial Communication</div>
+                            <div class="feature-item">🌐 Standard Ethernet Infrastructure</div>
+                            <div class="feature-item">🔄 CIP (Common Industrial Protocol) Based</div>
+                            <div class="feature-item">⏱️ Deterministic Data Delivery</div>
+                            <div class="feature-item">🛡️ Safety Protocol Support (CIP Safety)</div>
+                            <div class="feature-item">🏭 Manufacturing Automation Focus</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="markCompleted('ethernetip')">Mark as Learned ✓</button>
+                            <button class="btn btn-secondary" onclick="showDetails('ethernetip')">Technical Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Section -->
+        <div id="comparison" class="content-section">
+            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Protocol Comparison Matrix</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Protocol</th>
+                        <th>Primary Use Case</th>
+                        <th>Security Level</th>
+                        <th>Complexity</th>
+                        <th>Scalability</th>
+                        <th>Real-Time Capability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>OPC UA</strong></td>
+                        <td>Industry 4.0, Enterprise Integration</td>
+                        <td>🔒🔒🔒 High (Built-in encryption)</td>
+                        <td>🔧🔧🔧 Complex</td>
+                        <td>📈📈📈 Excellent</td>
+                        <td>⚡⚡ Good</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modbus TCP/IP</strong></td>
+                        <td>Legacy Integration, Simple Control</td>
+                        <td>🔒 Low (Application layer security needed)</td>
+                        <td>🔧 Simple</td>
+                        <td>📈 Limited</td>
+                        <td>⚡ Basic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BACnet/IP</strong></td>
+                        <td>Building Automation, HVAC</td>
+                        <td>🔒🔒 Medium</td>
+                        <td>🔧🔧 Moderate</td>
+                        <td>📈📈 Good</td>
+                        <td>⚡⚡ Good</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EtherNet/IP</strong></td>
+                        <td>Manufacturing, Motion Control</td>
+                        <td>🔒🔒 Medium</td>
+                        <td>🔧🔧🔧 Complex</td>
+                        <td>📈📈 Good</td>
+                        <td>⚡⚡⚡ Excellent</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 40px;">
+                <h3 style="color: #00ff00; margin-bottom: 20px;">Selection Guidelines</h3>
+                <div class="protocols-grid">
+                    <div class="use-case-card">
+                        <div class="use-case-title">Choose OPC UA When:</div>
+                        <ul style="color: #ccc; line-height: 1.8;">
+                            <li>Implementing Industry 4.0 initiatives</li>
+                            <li>Requiring enterprise-level integration</li>
+                            <li>Security is a top priority</li>
+                            <li>Complex data modeling is needed</li>
+                            <li>Cross-platform compatibility is essential</li>
+                        </ul>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-title">Choose Modbus TCP/IP When:</div>
+                        <ul style="color: #ccc; line-height: 1.8;">
+                            <li>Integrating legacy systems</li>
+                            <li>Simple master-slave communication suffices</li>
+                            <li>Cost is a primary concern</li>
+                            <li>Wide device compatibility is needed</li>
+                            <li>Implementation simplicity is valued</li>
+                        </ul>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-title">Choose BACnet/IP When:</div>
+                        <ul style="color: #ccc; line-height: 1.8;">
+                            <li>Building automation is the focus</li>
+                            <li>HVAC systems need integration</li>
+                            <li>Energy management is important</li>
+                            <li>Multi-vendor environments exist</li>
+                            <li>Smart building features are desired</li>
+                        </ul>
+                    </div>
+                    <div class="use-case-card">
+                        <div class="use-case-title">Choose EtherNet/IP When:</div>
+                        <ul style="color: #ccc; line-height: 1.8;">
+                            <li>Manufacturing automation is primary</li>
+                            <li>Real-time control is critical</li>
+                            <li>Motion control applications exist</li>
+                            <li>Safety systems are involved</li>
+                            <li>Deterministic timing is required</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases Section -->
+        <div id="usecases" class="content-section">
+            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Real-World Implementation Scenarios</h2>
+            
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 1: Smart Manufacturing Plant</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A automotive manufacturing facility needs to integrate robots, PLCs, quality control systems, and enterprise ERP systems for real-time production monitoring and optimization.
+                </p>
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #00ff00;">Recommended Solution:</strong> OPC UA + EtherNet/IP
+                    <ul style="margin-top: 10px; color: #ccc;">
+                        <li><strong>EtherNet/IP:</strong> Real-time control between PLCs, robots, and motion controllers</li>
+                        <li><strong>OPC UA:</strong> Secure data exchange with enterprise systems and cloud analytics</li>
+                        <li><strong>Benefits:</strong> Real-time control + enterprise integration + security</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 2: Smart Building Complex</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A commercial office building requires integration of HVAC, lighting, security, fire safety, and energy management systems with a central building management platform.
+                </p>
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #00ff00;">Recommended Solution:</strong> BACnet/IP Primary + OPC UA Gateway
+                    <ul style="margin-top: 10px; color: #ccc;">
+                        <li><strong>BACnet/IP:</strong> Native building automation communication</li>
+                        <li><strong>OPC UA Gateway:</strong> Enterprise integration and cloud connectivity</li>
+                        <li><strong>Benefits:</strong> Standardized building protocols + enterprise analytics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="use-case-card">
+                <div class="use-case-title">Scenario 3: Legacy System Modernization</div>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">
+                    A water treatment facility with existing Modbus devices needs to add remote monitoring, predictive maintenance, and integration with corporate IT systems.
+                </p>
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;">
+                    <strong style="color: #00ff00;">Recommended Solution:</strong> Modbus TCP/IP + OPC UA Gateway
+                    <ul style="margin-top: 10px; color: #ccc;">
+                        <li><strong>Modbus TCP/IP:</strong> Maintain existing device compatibility</li>
+                        <li><strong>OPC UA Gateway:</strong> Add security and enterprise connectivity</li>
+                        <li><strong>Benefits:</strong> Preserve investment + add modern capabilities</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <h3 style="color: #00ff00; margin-bottom: 20px;">Typical Integration Architecture</h3>
+                <div style="font-family: monospace; line-height: 2; color: #ccc;">
+                    ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐<br>
+                    │   Enterprise    │    │    OPC UA        │    │   Field Level   │<br>
+                    │     Systems     │◄──►│    Gateway       │◄──►│    Devices      │<br>
+                    │ (ERP, MES, etc.)│    │                  │    │ (PLCs, Sensors) │<br>
+                    └─────────────────┘    └──────────────────┘    └─────────────────┘<br>
+                                                    │<br>
+                                           ┌──────────────────┐<br>
+                                           │  Network Layer   │<br>
+                                           │ (Modbus, BACnet, │<br>
+                                           │  EtherNet/IP)    │<br>
+                                           └──────────────────┘
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Section -->
+        <div id="implementation" class="content-section">
+            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Implementation Best Practices</h2>
+            
+            <div class="protocols-grid">
+                <div class="protocol-card">
+                    <h3 style="color: #00ff00; margin-bottom: 20px;">🚀 Getting Started Checklist</h3>
+                    <div class="feature-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" id="assess"> Assess current infrastructure and requirements
+                    </div>
+                    <div class="feature-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" id="select"> Select appropriate protocols based on use case
+                    </div>
+                    <div class="feature-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" id="security"> Design security architecture and policies
+                    </div>
+                    <div class="feature-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" id="pilot"> Implement pilot project for proof of concept
+                    </div>
+                    <div class="feature-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" id="scale"> Scale deployment across organization
+                    </div>
+                    <div class="feature-item">
+                        <input type="checkbox" id="monitor"> Establish monitoring and maintenance procedures
+                    </div>
+                </div>
+
+                <div class="protocol-card">
+                    <h3 style="color: #00ff00; margin-bottom: 20px;">⚠️ Common Pitfalls to Avoid</h3>
+                    <div class="feature-item">❌ Ignoring security implications in OT networks</div>
+                    <div class="feature-item">❌ Mixing protocols without proper gateways</div>
+                    <div class="feature-item">❌ Underestimating bandwidth requirements</div>
+                    <div class="feature-item">❌ Neglecting network segmentation</div>
+                    <div class="feature-item">❌ Insufficient staff training and documentation</div>
+                    <div class="feature-item">❌ Lack of change management procedures</div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <h3 style="color: #00ff00; margin-bottom: 20px;">🔧 Implementation Planning Tool</h3>
+                <p style="margin-bottom: 20px;">Use this interactive tool to plan your protocol implementation:</p>
+                
+                <div style="margin: 20px 0;">
+                    <label style="color: #00ff00; display: block; margin-bottom: 10px;">Primary Industry Sector:</label>
+                    <select id="industry" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid #00ff00; border-radius: 5px; color: white;">
+                        <option value="">Select your industry...</option>
+                        <option value="manufacturing">Manufacturing</option>
+                        <option value="building">Building Automation</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="oil-gas">Oil & Gas</option>
+                        <option value="food-bev">Food & Beverage</option>
+                        <option value="pharmaceutical">Pharmaceutical</option>
+                    </select>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <label style="color: #00ff00; display: block; margin-bottom: 10px;">Key Requirements:</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <label style="color: #ccc;"><input type="checkbox" value="realtime"> Real-time control</label>
+                        <label style="color: #ccc;"><input type="checkbox" value="security"> High security</label>
+                        <label style="color: #ccc;"><input type="checkbox" value="legacy"> Legacy integration</label>
+                        <label style="color: #ccc;"><input type="checkbox" value="cloud"> Cloud connectivity</label>
+                        <label style="color: #ccc;"><input type="checkbox" value="mobile"> Mobile access</label>
+                        <label style="color: #ccc;"><input type="checkbox" value="analytics"> Data analytics</label>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="generateRecommendation()">Get Protocol Recommendation</button>
+                <div id="recommendation" style="margin-top: 20px; padding: 20px; background: rgba(0,255,0,0.1); border-radius: 10px; display: none;">
+                    <h4 style="color: #00ff00;">Recommended Solution:</h4>
+                    <div id="recommendationText"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="content-section">
+            <h2 style="color: #00ff00; text-align: center; margin-bottom: 30px;">Knowledge Validation Quiz</h2>
+            
+            <div class="quiz-section">
+                <div class="quiz-question">
+                    <h4 style="color: #00ff00;">Question 1: Which protocol is best suited for Industry 4.0 implementations requiring high security?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">OPC UA</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">BACnet/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">EtherNet/IP</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00ff00;">Question 2: Which protocol is specifically designed for building automation systems?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">BACnet/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">EtherNet/IP</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00ff00;">Question 3: Which protocol provides the best real-time performance for manufacturing control?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">Modbus TCP/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">BACnet/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">EtherNet/IP</div>
+                    </div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4 style="color: #00ff00;">Question 4: Which protocol is simplest to implement for legacy device integration?</h4>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">OPC UA</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, true)">Modbus TCP/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">BACnet/IP</div>
+                        <div class="quiz-option" onclick="selectAnswer(this, false)">EtherNet/IP</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="calculateQuizScore()" id="quizSubmit" style="display: none;">Calculate Score</button>
+                <div id="quizResults" style="margin-top: 20px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let completedProtocols = new Set();
+        let answeredQuestions = 0;
+        let correctAnswers = 0;
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update tab states
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function markCompleted(protocolId) {
+            completedProtocols.add(protocolId);
+            updateProgressIndicator(protocolId);
+            
+            // Visual feedback
+            const card = document.querySelector(`[data-protocol="${protocolId}"]`);
+            card.style.border = '2px solid #00ff00';
+            card.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.5)';
+            
+            // Update button
+            const button = card.querySelector('.btn-primary');
+            button.textContent = 'Completed ✅';
+            button.style.background = 'linear-gradient(45deg, #00cc00, #008800)';
+        }
+
+        function updateProgressIndicator(protocolId) {
+            const progressItem = document.querySelector(`[data-protocol="${protocolId}"]`);
+            progressItem.classList.add('completed');
+            document.getElementById(`${protocolId}-status`).textContent = '✅';
+        }
+
+        function showDetails(protocolId) {
+            alert(`Detailed technical documentation for ${protocolId} would be displayed here in a full implementation. This could include API references, configuration examples, and troubleshooting guides.`);
+        }
+
+        function selectAnswer(element, isCorrect) {
+            // Disable all options in this question
+            const options = element.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+                if (option === element) {
+                    option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (option.onclick.toString().includes('true')) {
+                    option.classList.add('correct');
+                }
+            });
+
+            answeredQuestions++;
+            if (isCorrect) correctAnswers++;
+
+            // Show submit button when all questions answered
+            if (answeredQuestions >= 4) {
+                document.getElementById('quizSubmit').style.display = 'block';
+            }
+        }
+
+        function calculateQuizScore() {
+            const percentage = (correctAnswers / 4) * 100;
+            const resultsDiv = document.getElementById('quizResults');
+            
+            let message = '';
+            let color = '';
+            
+            if (percentage >= 80) {
+                message = 'Excellent! You have a strong understanding of OT-relevant IT protocols.';
+                color = '#00ff00';
+            } else if (percentage >= 60) {
+                message = 'Good job! You understand the basics. Consider reviewing the comparison matrix.';
+                color = '#ffff00';
+            } else {
+                message = 'You may want to review the protocol overview section before proceeding.';
+                color = '#ff6600';
+            }
+
+            resultsDiv.innerHTML = `
+                <h4 style="color: ${color};">Quiz Results</h4>
+                <p>Score: ${correctAnswers}/4 (${percentage}%)</p>
+                <p style="color: #ccc;">${message}</p>
+            `;
+            resultsDiv.style.display = 'block';
+        }
+
+        function generateRecommendation() {
+            const industry = document.getElementById('industry').value;
+            const requirements = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+            
+            let recommendation = '';
+            
+            if (!industry) {
+                alert('Please select your industry sector first.');
+                return;
+            }
+
+            // Simple recommendation logic
+            if (industry === 'manufacturing' && requirements.includes('realtime')) {
+                recommendation = '<strong>EtherNet/IP + OPC UA</strong><br>EtherNet/IP for real-time control, OPC UA for enterprise integration and security.';
+            } else if (industry === 'building') {
+                recommendation = '<strong>BACnet/IP + OPC UA Gateway</strong><br>BACnet/IP for native building automation, OPC UA for IT integration.';
+            } else if (requirements.includes('legacy')) {
+                recommendation = '<strong>Modbus TCP/IP + OPC UA Gateway</strong><br>Maintain existing Modbus devices while adding modern connectivity.';
+            } else if (requirements.includes('security') && requirements.includes('cloud')) {
+                recommendation = '<strong>OPC UA</strong><br>Built-in security and cloud connectivity for Industry 4.0 applications.';
+            } else {
+                recommendation = '<strong>OPC UA</strong><br>Most versatile choice for modern industrial applications with future-proofing capabilities.';
+            }
+
+            document.getElementById('recommendationText').innerHTML = recommendation;
+            document.getElementById('recommendation').style.display = 'block';
+        }
+
+        // Initialize the tool
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('OT-Relevant IT Protocols Training Tool Initialized');
+        });
+    </script>
+</body>
+</html>
