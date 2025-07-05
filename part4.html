@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OT Threat Landscape Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f0f8f0 100%);
+            color: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            border-radius: 15px;
+            color: black;
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 0, 0.4);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: black;
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .content-section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 150, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #006600;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 150, 0, 0.3);
+            font-weight: bold;
+        }
+
+        .threat-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .threat-card:hover {
+            border-color: #006600;
+            box-shadow: 0 10px 30px rgba(0, 150, 0, 0.2);
+            transform: translateX(10px);
+            background: rgba(240, 248, 240, 0.95);
+        }
+
+        .threat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .threat-card:hover::before {
+            left: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            color: #006600;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .expand-icon {
+            color: #2c3e50;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .threat-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .threat-card.expanded .card-content {
+            max-height: 500px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(240, 248, 240, 0.9), rgba(255, 255, 255, 0.95));
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            border-color: #006600;
+            box-shadow: 0 8px 25px rgba(0, 150, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #006600;
+            display: block;
+            text-shadow: 0 0 10px rgba(0, 150, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            margin-top: 10px;
+            opacity: 0.8;
+            color: #2c3e50;
+        }
+
+        .interactive-quiz {
+            background: rgba(248, 248, 248, 0.9);
+            border: 2px solid rgba(0, 150, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #006600;
+            font-weight: bold;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(0, 150, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-option:hover {
+            background: rgba(240, 248, 240, 0.95);
+            border-color: #00aa00;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            background: rgba(230, 245, 230, 0.95);
+            border-color: #006600;
+            box-shadow: 0 4px 15px rgba(0, 150, 0, 0.2);
+        }
+
+        .quiz-option.correct {
+            background: rgba(200, 240, 200, 0.95);
+            border-color: #006600;
+            color: #004400;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 220, 220, 0.95);
+            border-color: #cc0000;
+            color: #660000;
+        }
+
+        .quiz-btn {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .timeline {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #00ff00, #00cc00);
+        }
+
+        .timeline-item {
+            margin: 30px 0;
+            position: relative;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            width: 45%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: #2c3e50;
+        }
+
+        .timeline-item:nth-child(odd) {
+            margin-left: 55%;
+        }
+
+        .timeline-item:nth-child(even) {
+            margin-right: 55%;
+        }
+
+        .progress-bar {
+            background: rgba(200, 200, 200, 0.5);
+            height: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid rgba(0, 150, 0, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #006600, #00aa00);
+            border-radius: 4px;
+            transition: width 2s ease;
+        }
+
+        .alert-box {
+            background: rgba(255, 240, 240, 0.9);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+            color: #660000;
+            box-shadow: 0 4px 15px rgba(200, 0, 0, 0.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { border-color: #cc0000; }
+            50% { border-color: #ff6666; }
+        }
+
+        .success-box {
+            background: rgba(240, 255, 240, 0.9);
+            border: 2px solid #00aa00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #004400;
+            box-shadow: 0 4px 15px rgba(0, 150, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .timeline-item {
+                width: 90%;
+                margin-left: 5% !important;
+                margin-right: 5% !important;
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ OT Threat Landscape Training</h1>
+            <p>Interactive Learning Tool for IT/OT Convergence Security</p>
+        </div>
+
+        <nav class="navigation">
+            <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+            <button class="nav-btn" onclick="showSection('threat-actors')">Threat Actors</button>
+            <button class="nav-btn" onclick="showSection('attack-vectors')">Attack Vectors</button>
+            <button class="nav-btn" onclick="showSection('impact-stats')">Impact Statistics</button>
+            <button class="nav-btn" onclick="showSection('quiz')">Knowledge Check</button>
+        </nav>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <h2 class="section-title">IT/OT Convergence Overview</h2>
+            
+            <div class="alert-box">
+                <h3>🚨 Critical Alert: Threat Landscape Evolution</h3>
+                <p>The convergence of Information Technology (IT) and Operational Technology (OT) has created unprecedented security challenges. Traditional air-gapped OT systems are now connected to IT networks, dramatically expanding the attack surface.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">75%</span>
+                    <div class="stat-label">OT professionals experienced intrusions in 2024</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">87%</span>
+                    <div class="stat-label">Increase in OT ransomware attacks</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">48%</span>
+                    <div class="stat-label">OT incidents from IT breaches</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">29B</span>
+                    <div class="stat-label">IoT devices expected by 2030</div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>2019: Norsk Hydro Attack</h4>
+                    <p>$70 million cost from ransomware attack</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2021: Colonial Pipeline</h4>
+                    <p>OT shutdown from IT network compromise</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2024: Manufacturing Crisis</h4>
+                    <p>80% of firms experienced increased incidents</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2025: Current State</h4>
+                    <p>Average ransom: $1.5M (up from $199K in 2023)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Threat Actors Section -->
+        <div id="threat-actors" class="content-section">
+            <h2 class="section-title">Threat Actor Landscape</h2>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🌏 Nation-State Actors</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Primary Actors:</strong> Russia, China, Iran, North Korea</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Russia:</strong> Targeting critical infrastructure, energy sectors</li>
+                        <li><strong>China:</strong> Industrial espionage, supply chain compromises</li>
+                        <li><strong>Iran:</strong> Disruptive attacks on nuclear and energy facilities</li>
+                        <li><strong>North Korea:</strong> Financial motivation, cryptocurrency theft</li>
+                    </ul>
+                    <p><strong>Capabilities:</strong> Advanced persistent threats (APTs), zero-day exploits, long-term persistence</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">💰 Cybercriminal Groups</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Focus:</strong> Ransomware-as-a-Service (RaaS) operators</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>BlackBasta, LockBit, RansomHouse affiliates</li>
+                        <li>Manufacturing sector most targeted (14% of ransomware events)</li>
+                        <li>Average ransom payments: $1.5 million in 2024</li>
+                        <li>87% increase in OT-targeting ransomware attacks</li>
+                    </ul>
+                    <p><strong>Impact:</strong> Operational shutdowns, data theft, extortion</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🏴‍☠️ Hacktivists</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Motivation:</strong> Political messaging, disruption of critical infrastructure</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>15% of OT attacks with physical consequences</li>
+                        <li>Targeting water treatment facilities</li>
+                        <li>Energy grid disruptions</li>
+                        <li>Geopolitically motivated campaigns</li>
+                    </ul>
+                    <p><strong>Methods:</strong> DDoS attacks, defacement, system disruption</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">👨‍💼 Insider Threats</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Types:</strong> Privileged access abuse, negligent actions</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Accidental misconfigurations</li>
+                        <li>Malicious insiders with access to critical systems</li>
+                        <li>Social engineering targeting OT personnel</li>
+                        <li>USB-based malware introduction</li>
+                    </ul>
+                    <p><strong>Challenge:</strong> Difficult to detect, high trust levels</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attack Vectors Section -->
+        <div id="attack-vectors" class="content-section">
+            <h2 class="section-title">Common Attack Vectors</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">48%</span>
+                    <div class="stat-label">IT network breaches leading to OT compromise</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 48%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">75%</span>
+                    <div class="stat-label">Industrial controllers with unpatched vulnerabilities</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🌐 IT Network Breaches</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Primary pathway (48% of OT incidents):</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Lateral movement from compromised IT systems</li>
+                        <li>Inadequate network segmentation</li>
+                        <li>Shared credentials between IT and OT</li>
+                        <li>Converged networks without proper isolation</li>
+                    </ul>
+                    <p><strong>Prevention:</strong> Network segmentation, zero-trust architecture</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">📧 Phishing Attacks</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Targeting OT personnel:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Spear-phishing with industrial themes</li>
+                        <li>Malicious attachments (Excel, PDF with macros)</li>
+                        <li>Credential harvesting for OT access</li>
+                        <li>Business email compromise (BEC)</li>
+                    </ul>
+                    <p><strong>Impact:</strong> Initial access to secure OT networks</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🔗 Supply Chain Compromises</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Affecting industrial equipment:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Compromised vendor software updates</li>
+                        <li>Malicious firmware in industrial devices</li>
+                        <li>Third-party remote access tools</li>
+                        <li>Cloud service provider breaches</li>
+                    </ul>
+                    <p><strong>Challenge:</strong> Trusted relationships exploited</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🔓 Remote Access Vulnerabilities</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>In converged environments:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Unsecured VPN connections</li>
+                        <li>Default credentials on remote access tools</li>
+                        <li>Weak multi-factor authentication</li>
+                        <li>Internet-exposed HMI interfaces</li>
+                    </ul>
+                    <p><strong>Risk:</strong> Direct access to control systems</p>
+                </div>
+            </div>
+
+            <div class="threat-card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-title">🏗️ Legacy System Exploitation</div>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="card-content">
+                    <p><strong>Due to unpatched vulnerabilities:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Decades-old systems without security updates</li>
+                        <li>Proprietary protocols with known flaws</li>
+                        <li>Default passwords and configurations</li>
+                        <li>No encryption capabilities</li>
+                    </ul>
+                    <p><strong>Challenge:</strong> Cannot be easily updated or replaced</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Impact Statistics Section -->
+        <div id="impact-stats" class="content-section">
+            <h2 class="section-title">Real-World Impact Statistics</h2>
+
+            <div class="alert-box">
+                <h3>📊 2024 Manufacturing Crisis</h3>
+                <p>80% of manufacturing firms experienced increased security incidents, marking the highest rate in recorded history.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">80%</span>
+                    <div class="stat-label">Manufacturing firms with increased incidents (2024)</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">$70M</span>
+                    <div class="stat-label">Norsk Hydro ransomware cost (2019)</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">93%</span>
+                    <div class="stat-label">Firms globally affected by cybersecurity incidents</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">68</span>
+                    <div class="stat-label">OT attacks with physical consequences (2023)</div>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h3>💡 Key Impact Categories</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
+                    <div>
+                        <h4 style="color: #00ff00;">🏭 Operational</h4>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>Production line shutdowns</li>
+                            <li>Quality control failures</li>
+                            <li>Supply chain disruptions</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #00ff00;">💰 Financial</h4>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>Ransom payments</li>
+                            <li>Recovery costs</li>
+                            <li>Business interruption</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #00ff00;">🏥 Safety & Health</h4>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>Water treatment compromises</li>
+                            <li>Chemical process disruptions</li>
+                            <li>Public health impacts</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #00ff00;">⚡ Critical Infrastructure</h4>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>Power grid instability</li>
+                            <li>Transportation delays</li>
+                            <li>Communication outages</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>2019: Norsk Hydro</h4>
+                    <p>$70 million in damages from LockerGoga ransomware affecting aluminum production globally</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2021: Colonial Pipeline</h4>
+                    <p>5,500-mile fuel pipeline shut down for 6 days due to IT network compromise affecting OT operations</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2023: Multiple Water Facilities</h4>
+                    <p>Series of attacks on water treatment facilities affecting public health and safety across multiple states</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2024: Manufacturing Surge</h4>
+                    <p>80% of manufacturing firms report increased incidents, with average ransom demands reaching $1.5M</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="content-section">
+            <h2 class="section-title">Knowledge Check</h2>
+            
+            <div class="interactive-quiz">
+                <div class="quiz-question">
+                    What percentage of OT incidents are attributed to IT network breaches?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this, false)">25%</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">35%</div>
+                    <div class="quiz-option" onclick="selectOption(this, true)">48%</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">60%</div>
+                </div>
+                <button class="quiz-btn" onclick="checkAnswer(this)">Check Answer</button>
+                <div class="quiz-result" style="margin-top: 15px; display: none;"></div>
+            </div>
+
+            <div class="interactive-quiz">
+                <div class="quiz-question">
+                    Which nation-state actors are mentioned as primary OT threats?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this, true)">Russia, China, Iran, North Korea</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">USA, UK, Germany, Japan</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">India, Brazil, Mexico, Australia</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">France, Italy, Spain, Netherlands</div>
+                </div>
+                <button class="quiz-btn" onclick="checkAnswer(this)">Check Answer</button>
+                <div class="quiz-result" style="margin-top: 15px; display: none;"></div>
+            </div>
+
+            <div class="interactive-quiz">
+                <div class="quiz-question">
+                    What was the cost of the Norsk Hydro ransomware attack in 2019?
+                </div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(this, false)">$25 million</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">$50 million</div>
+                    <div class="quiz-option" onclick="selectOption(this, true)">$70 million</div>
+                    <div class="quiz-option" onclick="selectOption(this, false)">$100 million</div>
+                </div>
+                <button class="quiz-btn" onclick="checkAnswer(this)">Check Answer</button>
+                <div class="quiz-result" style="margin-top: 15px; display: none;"></div>
+            </div>
+
+            <div class="success-box">
+                <h3>🎯 Key Takeaways</h3>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>IT/OT convergence has dramatically expanded attack surfaces</li>
+                    <li>Nation-state actors and cybercriminals pose the greatest threats</li>
+                    <li>Most OT compromises originate from IT network breaches</li>
+                    <li>Manufacturing and critical infrastructure are primary targets</li>
+                    <li>Financial impact continues to rise with average ransoms now $1.5M</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'overview';
+        let quizProgress = { correct: 0, total: 0 };
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to corresponding nav button
+            event.target.classList.add('active');
+            
+            currentSection = sectionId;
+            
+            // Animate progress bars when showing impact stats
+            if (sectionId === 'impact-stats') {
+                setTimeout(() => {
+                    document.querySelectorAll('.progress-fill').forEach(bar => {
+                        const width = bar.style.width;
+                        bar.style.width = '0%';
+                        setTimeout(() => bar.style.width = width, 100);
+                    });
+                }, 200);
+            }
+        }
+
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function selectOption(option, isCorrect) {
+            // Remove previous selections in this quiz
+            const quiz = option.closest('.interactive-quiz');
+            quiz.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Mark this option as selected
+            option.classList.add('selected');
+            option.dataset.correct = isCorrect;
+        }
+
+        function checkAnswer(button) {
+            const quiz = button.closest('.interactive-quiz');
+            const selectedOption = quiz.querySelector('.quiz-option.selected');
+            const resultDiv = quiz.querySelector('.quiz-result');
+            
+            if (!selectedOption) {
+                resultDiv.innerHTML = '<p style="color: #ff6666;">Please select an answer first!</p>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            const isCorrect = selectedOption.dataset.correct === 'true';
+            quizProgress.total++;
+            
+            // Show all options as correct/incorrect
+            quiz.querySelectorAll('.quiz-option').forEach(opt => {
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                } else if (opt.classList.contains('selected') && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (isCorrect) {
+                quizProgress.correct++;
+                resultDiv.innerHTML = '<p style="color: #00ff00;">✅ Correct! Great job!</p>';
+            } else {
+                resultDiv.innerHTML = '<p style="color: #ff6666;">❌ Incorrect. The correct answer is highlighted in green.</p>';
+            }
+            
+            resultDiv.style.display = 'block';
+            button.style.display = 'none';
+            
+            // Update progress
+            updateQuizProgress();
+        }
+
+        function updateQuizProgress() {
+            if (quizProgress.total > 0) {
+                const percentage = Math.round((quizProgress.correct / quizProgress.total) * 100);
+                console.log(`Quiz Progress: ${quizProgress.correct}/${quizProgress.total} (${percentage}%)`);
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some interactive hover effects
+            document.querySelectorAll('.threat-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+            
+            // Animate stats on load
+            setTimeout(() => {
+                document.querySelectorAll('.stat-number').forEach(stat => {
+                    const originalText = stat.textContent;
+                    stat.textContent = '0';
+                    
+                    let current = 0;
+                    const target = originalText.includes('B') ? 
+                        parseInt(originalText) : 
+                        originalText.includes('%') ? 
+                        parseInt(originalText) : 
+                        parseInt(originalText.replace(/[^0-9]/g, ''));
+                    
+                    const increment = target / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            stat.textContent = originalText;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = Math.floor(current) + (originalText.includes('%') ? '%' : '');
+                        }
+                    }, 30);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
