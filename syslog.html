@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSLOG Protocol Interactive Trainer</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: white;
+            color: black;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            border: 3px solid #00aa00;
+            padding: 20px;
+            margin-bottom: 30px;
+            background-color: #f8fff8;
+        }
+        
+        .section {
+            border: 2px solid #00aa00;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid #00aa00;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: white;
+            border: 2px solid #00aa00;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            background-color: #00aa00;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .interactive-box {
+            background-color: white;
+            border: 2px solid #00aa00;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .message-display {
+            background-color: black;
+            color: #00aa00;
+            padding: 15px;
+            font-family: monospace;
+            border: 2px solid #00aa00;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .control-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-group label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        select, input[type="text"], input[type="number"] {
+            padding: 5px;
+            border: 2px solid #00aa00;
+            font-family: monospace;
+        }
+        
+        button {
+            background-color: #00aa00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #008800;
+        }
+        
+        .facility-table, .severity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .facility-table th, .facility-table td,
+        .severity-table th, .severity-table td {
+            border: 1px solid #00aa00;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .facility-table th, .severity-table th {
+            background-color: #00aa00;
+            color: white;
+        }
+        
+        .example-box {
+            background-color: #f0f8f0;
+            border-left: 5px solid #00aa00;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .protocol-diagram {
+            text-align: center;
+            font-family: monospace;
+            background-color: white;
+            border: 2px solid #00aa00;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ SYSLOG Protocol Interactive Training Tool</h1>
+            <p>Master the SYSLOG protocol with hands-on learning and interactive exercises</p>
+        </div>
+
+        <div class="tab-container">
+            <div class="tab active" onclick="showTab('overview')">Protocol Overview</div>
+            <div class="tab" onclick="showTab('structure')">Header Structure</div>
+            <div class="tab" onclick="showTab('interactive')">Interactive Builder</div>
+            <div class="tab" onclick="showTab('workplace')">Workplace Examples</div>
+            <div class="tab" onclick="showTab('analyzer')">Message Analyzer</div>
+        </div>
+
+        <!-- Protocol Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2>📋 SYSLOG Protocol Overview</h2>
+                <p><strong>SYSLOG</strong> is a standard protocol for logging system messages across networks. Originally developed in the 1980s, it's defined in RFC 3164 (traditional) and RFC 5424 (enhanced).</p>
+                
+                <div class="protocol-diagram">
+                    <h3>SYSLOG Communication Flow</h3>
+                    <pre>
+[Application/Device] ──► [SYSLOG Client] ──► [Network] ──► [SYSLOG Server] ──► [Log Storage]
+                                         UDP/TCP Port 514
+                    </pre>
+                </div>
+
+                <h3>Key Features:</h3>
+                <ul>
+                    <li><strong>Transport:</strong> Primarily UDP (port 514), also TCP for reliability</li>
+                    <li><strong>Format:</strong> Human-readable text messages</li>
+                    <li><strong>Priority:</strong> Combines facility and severity</li>
+                    <li><strong>Timestamp:</strong> When the event occurred</li>
+                    <li><strong>Source:</strong> Hostname or IP of sender</li>
+                </ul>
+
+                <div class="example-box">
+                    <h4>Sample SYSLOG Message:</h4>
+                    <div class="message-display">
+&lt;34&gt;Oct 11 22:14:15 server1 su: 'su root' failed for user john on /dev/pts/8
+                    </div>
+                    <p><strong>Breakdown:</strong> Priority=34, Timestamp=Oct 11 22:14:15, Host=server1, Process=su, Message='su root' failed...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Structure Tab -->
+        <div id="structure" class="tab-content">
+            <div class="section">
+                <h2>🔧 SYSLOG Header Structure</h2>
+                
+                <div class="protocol-diagram">
+                    <h3>Message Format (RFC 3164)</h3>
+                    <pre>
+&lt;PRI&gt;TIMESTAMP HOSTNAME TAG[PID]: MESSAGE
+ │      │         │       │   │     │
+ │      │         │       │   │     └─ Actual log message
+ │      │         │       │   └─ Process ID (optional)
+ │      │         │       └─ Application/process name
+ │      │         └─ Source hostname
+ │      └─ MMM dd hh:mm:ss format
+ └─ Priority Value (Facility * 8 + Severity)
+                    </pre>
+                </div>
+
+                <h3>Priority Value (PRI) Calculation</h3>
+                <p><strong>Formula:</strong> PRI = Facility × 8 + Severity</p>
+                
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <h4>Facility Codes (0-23)</h4>
+                        <table class="facility-table">
+                            <tr><th>Code</th><th>Facility</th><th>Description</th></tr>
+                            <tr><td>0</td><td>kernel</td><td>Kernel messages</td></tr>
+                            <tr><td>1</td><td>user</td><td>User-level messages</td></tr>
+                            <tr><td>2</td><td>mail</td><td>Mail system</td></tr>
+                            <tr><td>3</td><td>daemon</td><td>System daemons</td></tr>
+                            <tr><td>4</td><td>auth</td><td>Security/authorization</td></tr>
+                            <tr><td>5</td><td>syslog</td><td>Internal syslog</td></tr>
+                            <tr><td>6</td><td>lpr</td><td>Line printer subsystem</td></tr>
+                            <tr><td>7</td><td>news</td><td>Network news subsystem</td></tr>
+                            <tr><td>8</td><td>uucp</td><td>UUCP subsystem</td></tr>
+                            <tr><td>9</td><td>cron</td><td>Clock daemon</td></tr>
+                            <tr><td>10</td><td>authpriv</td><td>Security/authorization</td></tr>
+                            <tr><td>11</td><td>ftp</td><td>FTP daemon</td></tr>
+                            <tr><td>16-23</td><td>local0-7</td><td>Local use facilities</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div style="flex: 1;">
+                        <h4>Severity Levels (0-7)</h4>
+                        <table class="severity-table">
+                            <tr><th>Code</th><th>Severity</th><th>Description</th></tr>
+                            <tr><td>0</td><td>Emergency</td><td>System unusable</td></tr>
+                            <tr><td>1</td><td>Alert</td><td>Action must be taken</td></tr>
+                            <tr><td>2</td><td>Critical</td><td>Critical conditions</td></tr>
+                            <tr><td>3</td><td>Error</td><td>Error conditions</td></tr>
+                            <tr><td>4</td><td>Warning</td><td>Warning conditions</td></tr>
+                            <tr><td>5</td><td>Notice</td><td>Normal but significant</td></tr>
+                            <tr><td>6</td><td>Info</td><td>Informational messages</td></tr>
+                            <tr><td>7</td><td>Debug</td><td>Debug-level messages</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Builder Tab -->
+        <div id="interactive" class="tab-content">
+            <div class="section">
+                <h2>🛠️ Interactive SYSLOG Message Builder</h2>
+                
+                <div class="interactive-box">
+                    <h3>Build Your SYSLOG Message</h3>
+                    
+                    <div class="control-group">
+                        <label>Facility:</label>
+                        <select id="facility" onchange="updateMessage()">
+                            <option value="0">0 - kernel</option>
+                            <option value="1">1 - user</option>
+                            <option value="2">2 - mail</option>
+                            <option value="3">3 - daemon</option>
+                            <option value="4" selected>4 - auth</option>
+                            <option value="5">5 - syslog</option>
+                            <option value="6">6 - lpr</option>
+                            <option value="16">16 - local0</option>
+                            <option value="17">17 - local1</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Severity:</label>
+                        <select id="severity" onchange="updateMessage()">
+                            <option value="0">0 - Emergency</option>
+                            <option value="1">1 - Alert</option>
+                            <option value="2">2 - Critical</option>
+                            <option value="3">3 - Error</option>
+                            <option value="4">4 - Warning</option>
+                            <option value="5">5 - Notice</option>
+                            <option value="6" selected>6 - Info</option>
+                            <option value="7">7 - Debug</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Hostname:</label>
+                        <input type="text" id="hostname" value="server1" onchange="updateMessage()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Process Tag:</label>
+                        <input type="text" id="tag" value="sshd" onchange="updateMessage()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Process ID:</label>
+                        <input type="number" id="pid" value="1234" onchange="updateMessage()">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Message:</label>
+                        <input type="text" id="message" value="Authentication successful for user admin" onchange="updateMessage()">
+                    </div>
+                    
+                    <button onclick="generateRandomMessage()">Generate Random Message</button>
+                    <button onclick="resetFields()">Reset Fields</button>
+                </div>
+
+                <div class="interactive-box">
+                    <h3>Generated SYSLOG Message:</h3>
+                    <div class="message-display" id="generated-message"></div>
+                    <div id="message-breakdown"></div>
+                </div>
+
+                <div class="interactive-box">
+                    <h3>🧮 Priority Calculator</h3>
+                    <p>Priority = Facility × 8 + Severity</p>
+                    <div id="priority-calc"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Examples Tab -->
+        <div id="workplace" class="tab-content">
+            <div class="section">
+                <h2>💼 Workplace Applications & Examples</h2>
+                
+                <h3>Common Use Cases</h3>
+                
+                <div class="example-box">
+                    <h4>1. Security Monitoring</h4>
+                    <div class="message-display">
+&lt;38&gt;Dec 15 09:23:17 firewall1 pf: BLOCK IN on em0: 192.168.1.100:22 -&gt; 10.0.0.5:22
+&lt;84&gt;Dec 15 09:23:18 ids1 snort: [1:1002:3] Attempted SSH brute force
+&lt;36&gt;Dec 15 09:23:19 server1 sshd[2847]: Failed password for admin from 192.168.1.100
+                    </div>
+                    <p><strong>Scenario:</strong> Centralized security event correlation from firewalls, IDS, and authentication systems.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>2. Application Monitoring</h4>
+                    <div class="message-display">
+&lt;142&gt;Dec 15 10:45:32 web1 apache: - - [15/Dec/2024:10:45:32] "GET /api/users HTTP/1.1" 500
+&lt;145&gt;Dec 15 10:45:33 app1 nodejs[1523]: Database connection timeout to db-cluster-1
+&lt;148&gt;Dec 15 10:45:34 lb1 nginx: upstream server web1:80 failed (connection refused)
+                    </div>
+                    <p><strong>Scenario:</strong> Tracking cascading application failures across web servers, application servers, and load balancers.</p>
+                </div>
+
+                <div class="example-box">
+                    <h4>3. Network Infrastructure</h4>
+                    <div class="message-display">
+&lt;165&gt;Dec 15 11:12:45 switch1 %LINK-3-UPDOWN: Interface GigE0/1, changed state to down
+&lt;163&gt;Dec 15 11:12:46 router1 %OSPF-5-ADJCHG: Process 1, Nbr 10.0.0.2 on GigE0/1 from FULL to DOWN
+&lt;84&gt;Dec 15 11:12:47 monitor1 nagios: HOST ALERT: server2;DOWN;HARD;3;PING CRITICAL
+                    </div>
+                    <p><strong>Scenario:</strong> Network outage detection and root cause analysis through coordinated logging.</p>
+                </div>
+
+                <h3>Implementation Strategies</h3>
+                <div class="interactive-box">
+                    <h4>Centralized Logging Architecture</h4>
+                    <div class="protocol-diagram">
+                        <pre>
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Servers   │───▶│   Routers   │───▶│  Firewalls  │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       ▼                   ▼                   ▼
+┌─────────────────────────────────────────────────────┐
+│           SYSLOG Aggregation Server                 │
+│    ┌─────────────┐  ┌─────────────┐  ┌─────────────┐│
+│    │   Parser    │  │   Filter    │  │   Storage   ││
+│    └─────────────┘  └─────────────┘  └─────────────┘│
+└─────────────────────────────────────────────────────┘
+       │                   │                   │
+       ▼                   ▼                   ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Analytics  │    │   Alerts    │    │  Reporting  │
+└─────────────┘    └─────────────┘    └─────────────┘
+                        </pre>
+                    </div>
+                </div>
+
+                <h3>Best Practices</h3>
+                <ul>
+                    <li><strong>Consistent Timestamps:</strong> Use NTP synchronization across all devices</li>
+                    <li><strong>Facility Assignment:</strong> Use local0-7 for custom applications</li>
+                    <li><strong>Message Format:</strong> Include relevant context (user, session, transaction ID)</li>
+                    <li><strong>Retention Policies:</strong> Archive logs based on compliance requirements</li>
+                    <li><strong>Security:</strong> Use TLS transport for sensitive log data</li>
+                    <li><strong>Filtering:</strong> Implement log rotation and filtering to manage volume</li>
+                </ul>
+
+                <h3>Popular SYSLOG Tools</h3>
+                <div class="example-box">
+                    <ul>
+                        <li><strong>rsyslog:</strong> Enhanced syslog daemon with advanced filtering</li>
+                        <li><strong>syslog-ng:</strong> Next-generation syslog with powerful processing</li>
+                        <li><strong>Splunk:</strong> Commercial log analysis platform</li>
+                        <li><strong>ELK Stack:</strong> Elasticsearch, Logstash, Kibana for log analytics</li>
+                        <li><strong>Graylog:</strong> Open-source log management</li>
+                        <li><strong>Fluentd:</strong> Unified logging layer</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Analyzer Tab -->
+        <div id="analyzer" class="tab-content">
+            <div class="section">
+                <h2>🔍 SYSLOG Message Analyzer</h2>
+                
+                <div class="interactive-box">
+                    <h3>Paste a SYSLOG Message to Analyze</h3>
+                    <textarea id="analyze-input" placeholder="Paste your SYSLOG message here (e.g., &lt;34&gt;Oct 11 22:14:15 server1 su: 'su root' failed for user john)" 
+                              style="width: 100%; height: 100px; font-family: monospace; border: 2px solid #00aa00; padding: 10px;"
+                              onchange="analyzeMessage()"></textarea>
+                    <button onclick="analyzeMessage()">Analyze Message</button>
+                    <button onclick="loadSampleMessages()">Load Sample Messages</button>
+                </div>
+
+                <div class="interactive-box" id="analysis-results" style="display: none;">
+                    <h3>Analysis Results</h3>
+                    <div id="analysis-display"></div>
+                </div>
+
+                <div class="interactive-box">
+                    <h3>Practice Messages</h3>
+                    <div id="practice-messages">
+                        <button onclick="showPracticeMessage(1)">Security Alert</button>
+                        <button onclick="showPracticeMessage(2)">System Error</button>
+                        <button onclick="showPracticeMessage(3)">Application Info</button>
+                        <button onclick="showPracticeMessage(4)">Network Event</button>
+                    </div>
+                    <div id="practice-display" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample messages for practice
+        const practiceMessages = {
+            1: "&lt;133&gt;Feb 25 14:09:07 server1 sshd[2847]: Invalid user admin from 192.168.1.100 port 22",
+            2: "&lt;27&gt;Feb 25 14:10:22 db1 mysqld: Table './myapp/users' is marked as crashed",
+            3: "&lt;158&gt;Feb 25 14:11:45 web1 httpd: - - [25/Feb/2024:14:11:45] GET /api/status HTTP/1.1 200",
+            4: "&lt;165&gt;Feb 25 14:12:10 switch1 %LINK-5-CHANGED: Interface Gi0/1, changed state to up"
+        };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMessage();
+        });
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Hide all tab buttons
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content and button
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateMessage() {
+            const facility = parseInt(document.getElementById('facility').value);
+            const severity = parseInt(document.getElementById('severity').value);
+            const hostname = document.getElementById('hostname').value;
+            const tag = document.getElementById('tag').value;
+            const pid = document.getElementById('pid').value;
+            const message = document.getElementById('message').value;
+            
+            const priority = facility * 8 + severity;
+            const timestamp = new Date().toLocaleDateString('en-US', {
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(',', '');
+            
+            const syslogMessage = `&lt;${priority}&gt;${timestamp} ${hostname} ${tag}[${pid}]: ${message}`;
+            
+            document.getElementById('generated-message').innerHTML = syslogMessage;
+            
+            // Show breakdown
+            const breakdown = `
+                <h4>Message Breakdown:</h4>
+                <ul>
+                    <li><strong>Priority:</strong> ${priority} (Facility: ${facility}, Severity: ${severity})</li>
+                    <li><strong>Timestamp:</strong> ${timestamp}</li>
+                    <li><strong>Hostname:</strong> ${hostname}</li>
+                    <li><strong>Process:</strong> ${tag}[${pid}]</li>
+                    <li><strong>Message:</strong> ${message}</li>
+                </ul>
+            `;
+            document.getElementById('message-breakdown').innerHTML = breakdown;
+            
+            // Update priority calculator
+            document.getElementById('priority-calc').innerHTML = 
+                `<strong>${facility}</strong> × 8 + <strong>${severity}</strong> = <strong>${priority}</strong>`;
+        }
+
+        function generateRandomMessage() {
+            const facilities = [0, 1, 2, 3, 4, 5, 16, 17];
+            const severities = [0, 1, 2, 3, 4, 5, 6, 7];
+            const hostnames = ['server1', 'web1', 'db1', 'firewall1', 'router1'];
+            const tags = ['sshd', 'httpd', 'mysqld', 'kernel', 'postfix', 'named'];
+            const messages = [
+                'Authentication successful',
+                'Connection established',
+                'Database query completed',
+                'Service started successfully',
+                'Configuration reloaded',
+                'Backup completed',
+                'Network interface up',
+                'User login detected'
+            ];
+            
+            document.getElementById('facility').value = facilities[Math.floor(Math.random() * facilities.length)];
+            document.getElementById('severity').value = severities[Math.floor(Math.random() * severities.length)];
+            document.getElementById('hostname').value = hostnames[Math.floor(Math.random() * hostnames.length)];
+            document.getElementById('tag').value = tags[Math.floor(Math.random() * tags.length)];
+            document.getElementById('pid').value = Math.floor(Math.random() * 9999) + 1000;
+            document.getElementById('message').value = messages[Math.floor(Math.random() * messages.length)];
+            
+            updateMessage();
+        }
+
+        function resetFields() {
+            document.getElementById('facility').value = 4;
+            document.getElementById('severity').value = 6;
+            document.getElementById('hostname').value = 'server1';
+            document.getElementById('tag').value = 'sshd';
+            document.getElementById('pid').value = 1234;
+            document.getElementById('message').value = 'Authentication successful for user admin';
+            updateMessage();
+        }
+
+        function analyzeMessage() {
+            const input = document.getElementById('analyze-input').value.trim();
+            if (!input) return;
+            
+            // Parse SYSLOG message using regex
+            const regex = /^<(\d+)>(\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+(\S+)\s+(\S+?)(?:\[(\d+)\])?:\s*(.*)$/;
+            const match = input.match(regex);
+            
+            const resultsDiv = document.getElementById('analysis-results');
+            const displayDiv = document.getElementById('analysis-display');
+            
+            if (match) {
+                const [, priority, timestamp, hostname, tag, pid, message] = match;
+                const facility = Math.floor(priority / 8);
+                const severity = priority % 8;
+                
+                const facilityNames = {
+                    0: 'kernel', 1: 'user', 2: 'mail', 3: 'daemon', 4: 'auth',
+                    5: 'syslog', 6: 'lpr', 7: 'news', 8: 'uucp', 9: 'cron',
+                    10: 'authpriv', 11: 'ftp', 16: 'local0', 17: 'local1'
+                };
+                
+                const severityNames = [
+                    'Emergency', 'Alert', 'Critical', 'Error',
+                    'Warning', 'Notice', 'Info', 'Debug'
+                ];
+                
+                displayDiv.innerHTML = `
+                    <div class="message-display">${input}</div>
+                    <h4>Parsed Components:</h4>
+                    <ul>
+                        <li><strong>Priority Value:</strong> ${priority}</li>
+                        <li><strong>Facility:</strong> ${facility} (${facilityNames[facility] || 'Unknown'})</li>
+                        <li><strong>Severity:</strong> ${severity} (${severityNames[severity] || 'Unknown'})</li>
+                        <li><strong>Timestamp:</strong> ${timestamp}</li>
+                        <li><strong>Hostname:</strong> ${hostname}</li>
+                        <li><strong>Process Tag:</strong> ${tag}</li>
+                        <li><strong>Process ID:</strong> ${pid || 'Not specified'}</li>
+                        <li><strong>Message:</strong> ${message}</li>
+                    </ul>
+                    <h4>Priority Calculation:</h4>
+                    <p>Facility (${facility}) × 8 + Severity (${severity}) = ${priority}</p>
+                `;
+                resultsDiv.style.display = 'block';
+            } else {
+                displayDiv.innerHTML = `
+                    <div style="color: red;">
+                        <h4>❌ Invalid SYSLOG Format</h4>
+                        <p>The message doesn't match the expected SYSLOG format.</p>
+                        <p><strong>Expected format:</strong> &lt;PRI&gt;TIMESTAMP HOSTNAME TAG[PID]: MESSAGE</p>
+                    </div>
+                `;
+                resultsDiv.style.display = 'block';
+            }
+        }
+
+        function loadSampleMessages() {
+            const samples = [
+                "&lt;34&gt;Oct 11 22:14:15 server1 su: 'su root' failed for user john",
+                "&lt;133&gt;Feb 25 14:09:07 firewall1 pf: BLOCK IN on em0: 192.168.1.100",
+                "&lt;142&gt;Dec 15 10:45:32 web1 apache: GET /api/users HTTP/1.1 500",
+                "&lt;165&gt;Dec 15 11:12:45 switch1 LINK-3-UPDOWN: Interface GigE0/1 down"
+            ];
+            
+            document.getElementById('analyze-input').value = samples[Math.floor(Math.random() * samples.length)];
+            analyzeMessage();
+        }
+
+        function showPracticeMessage(num) {
+            const practiceDisplay = document.getElementById('practice-display');
+            practiceDisplay.innerHTML = `
+                <h4>Practice Message ${num}:</h4>
+                <div class="message-display">${practiceMessages[num]}</div>
+                <button onclick="copyToPractice(${num})">Analyze This Message</button>
+            `;
+        }
+
+        function copyToPractice(num) {
+            document.getElementById('analyze-input').value = practiceMessages[num];
+            analyzeMessage();
+        }
+    </script>
+</body>
+</html>
