@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDP Interactive Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2e7d32;
+            padding-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #2e7d32;
+            border-radius: 5px 5px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 2px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: #1b5e20;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border: 2px solid #2e7d32;
+            border-radius: 0 5px 5px 5px;
+            padding: 25px;
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-box {
+            background: #e8f5e8;
+            border-left: 4px solid #2e7d32;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .code-block {
+            background: black;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .interactive-section {
+            background: #f5f5f5;
+            border: 2px solid #2e7d32;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2e7d32;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #2e7d32;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #1b5e20;
+        }
+
+        .header-field {
+            display: inline-block;
+            background: #2e7d32;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .simulation-output {
+            background: black;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        .topology-diagram {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .device {
+            display: inline-block;
+            background: #2e7d32;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .connection {
+            display: inline-block;
+            width: 50px;
+            height: 3px;
+            background: #2e7d32;
+            margin: 20px 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #2e7d32;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .quiz-question {
+            background: #e8f5e8;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid #2e7d32;
+        }
+
+        .quiz-option {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: #f0f0f0;
+            border-color: #2e7d32;
+        }
+
+        .quiz-option.correct {
+            background: #c8e6c9;
+            border-color: #2e7d32;
+        }
+
+        .quiz-option.incorrect {
+            background: #ffcdd2;
+            border-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cisco Discovery Protocol (CDP) Interactive Training Tool</h1>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+            <button class="nav-tab" onclick="showTab('technical')">Technical Details</button>
+            <button class="nav-tab" onclick="showTab('header')">Header Builder</button>
+            <button class="nav-tab" onclick="showTab('simulation')">Protocol Simulation</button>
+            <button class="nav-tab" onclick="showTab('workplace')">Workplace Examples</button>
+            <button class="nav-tab" onclick="showTab('security')">Security</button>
+            <button class="nav-tab" onclick="showTab('quiz')">Knowledge Test</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2>What is Cisco Discovery Protocol (CDP)?</h2>
+            <p>Cisco Discovery Protocol (CDP) is a proprietary Layer 2 protocol developed by Cisco Systems that allows network devices to share information about themselves with other directly connected Cisco devices.</p>
+            
+            <div class="info-box">
+                <h3>Key Characteristics:</h3>
+                <ul>
+                    <li><strong>Layer 2 Protocol:</strong> Operates at the Data Link Layer</li>
+                    <li><strong>Cisco Proprietary:</strong> Only works between Cisco devices</li>
+                    <li><strong>Automatic Discovery:</strong> Requires no configuration by default</li>
+                    <li><strong>Periodic Updates:</strong> Sends advertisements every 60 seconds</li>
+                    <li><strong>Neighbor Discovery:</strong> Identifies directly connected devices only</li>
+                </ul>
+            </div>
+
+            <h3>CDP Versions</h3>
+            <table>
+                <tr>
+                    <th>Version</th>
+                    <th>Features</th>
+                    <th>Introduced</th>
+                </tr>
+                <tr>
+                    <td>CDP v1</td>
+                    <td>Basic device discovery, hostname, platform, port ID</td>
+                    <td>1994</td>
+                </tr>
+                <tr>
+                    <td>CDP v2</td>
+                    <td>Additional TLVs, VLAN information, duplex/speed, power consumption</td>
+                    <td>1999</td>
+                </tr>
+            </table>
+
+            <div class="topology-diagram">
+                <h3>Simple CDP Network Topology</h3>
+                <div class="device">Router A<br>192.168.1.1</div>
+                <div class="connection"></div>
+                <div class="device">Switch B<br>192.168.1.2</div>
+                <div class="connection"></div>
+                <div class="device">Router C<br>192.168.1.3</div>
+                <p style="margin-top: 20px;">Each device learns about its directly connected neighbors via CDP</p>
+            </div>
+
+            <h3>Primary Purposes</h3>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Network Discovery:</strong> Automatically discover neighboring Cisco devices</li>
+                    <li><strong>Troubleshooting:</strong> Identify connectivity and configuration issues</li>
+                    <li><strong>Network Mapping:</strong> Build topology maps for documentation</li>
+                    <li><strong>Inventory Management:</strong> Track device types, versions, and capabilities</li>
+                    <li><strong>Protocol Debugging:</strong> Verify Layer 2 connectivity</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Technical Details Tab -->
+        <div id="technical" class="tab-content">
+            <h2>Technical Specifications</h2>
+            
+            <h3>Protocol Characteristics</h3>
+            <div class="info-box">
+                <ul>
+                    <li><strong>Encapsulation:</strong> Uses SNAP (Subnetwork Access Protocol)</li>
+                    <li><strong>Multicast Address:</strong> 01-00-0C-CC-CC-CC</li>
+                    <li><strong>DSAP/SSAP:</strong> 0xAA (for SNAP)</li>
+                    <li><strong>OUI:</strong> 00-00-0C (Cisco)</li>
+                    <li><strong>Protocol ID:</strong> 0x2000</li>
+                </ul>
+            </div>
+
+            <h3>Timing Parameters</h3>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Default Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Advertisement Interval</td>
+                    <td>60 seconds</td>
+                    <td>How often CDP packets are sent</td>
+                </tr>
+                <tr>
+                    <td>Hold Time</td>
+                    <td>180 seconds</td>
+                    <td>Time to keep neighbor information</td>
+                </tr>
+            </table>
+
+            <h3>CDP TLV (Type-Length-Value) Fields</h3>
+            <table>
+                <tr>
+                    <th>TLV Type</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Device ID</td>
+                    <td>0x0001</td>
+                    <td>Hostname of the device</td>
+                </tr>
+                <tr>
+                    <td>Address</td>
+                    <td>0x0002</td>
+                    <td>Network addresses (IP, IPX, etc.)</td>
+                </tr>
+                <tr>
+                    <td>Port ID</td>
+                    <td>0x0003</td>
+                    <td>Interface sending the CDP packet</td>
+                </tr>
+                <tr>
+                    <td>Capabilities</td>
+                    <td>0x0004</td>
+                    <td>Device capabilities (Router, Switch, etc.)</td>
+                </tr>
+                <tr>
+                    <td>Software Version</td>
+                    <td>0x0005</td>
+                    <td>IOS version and hardware info</td>
+                </tr>
+                <tr>
+                    <td>Platform</td>
+                    <td>0x0006</td>
+                    <td>Hardware platform information</td>
+                </tr>
+                <tr>
+                    <td>IP Network Prefix</td>
+                    <td>0x0007</td>
+                    <td>IP network prefix (CDP v2)</td>
+                </tr>
+            </table>
+
+            <h3>Capability Flags</h3>
+            <div class="code-block">
+Bit 0: Router
+Bit 1: Transparent Bridge
+Bit 2: Source Route Bridge
+Bit 3: Switch
+Bit 4: Host
+Bit 5: IGMP capable
+Bit 6: Repeater
+Bit 7: VoIP Phone
+            </div>
+
+            <h3>Configuration Commands</h3>
+            <div class="code-block">
+! Enable CDP globally
+Router(config)# cdp run
+
+! Enable CDP on interface
+Router(config-if)# cdp enable
+
+! Disable CDP globally
+Router(config)# no cdp run
+
+! Disable CDP on interface
+Router(config-if)# no cdp enable
+
+! Configure timers
+Router(config)# cdp timer 60
+Router(config)# cdp holdtime 180
+
+! View CDP neighbors
+Router# show cdp neighbors
+Router# show cdp neighbors detail
+
+! View CDP interface information
+Router# show cdp interface
+            </div>
+        </div>
+
+        <!-- Header Builder Tab -->
+        <div id="header" class="tab-content">
+            <h2>CDP Packet Header Builder</h2>
+            <p>Learn how CDP packets are constructed by building your own header step by step.</p>
+
+            <div class="interactive-section">
+                <h3>Build a CDP Packet Header</h3>
+                
+                <div class="form-group">
+                    <label for="version">CDP Version:</label>
+                    <select id="version" onchange="updateHeader()">
+                        <option value="1">CDP Version 1</option>
+                        <option value="2" selected>CDP Version 2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ttl">Time To Live (TTL):</label>
+                    <input type="number" id="ttl" value="180" min="1" max="255" onchange="updateHeader()">
+                    <small>Time in seconds for neighbor to keep this information</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="deviceId">Device ID (Hostname):</label>
+                    <input type="text" id="deviceId" value="Router-A" onchange="updateHeader()">
+                </div>
+
+                <div class="form-group">
+                    <label for="platform">Platform:</label>
+                    <input type="text" id="platform" value="Cisco 2901" onchange="updateHeader()">
+                </div>
+
+                <div class="form-group">
+                    <label for="portId">Port ID:</label>
+                    <input type="text" id="portId" value="GigabitEthernet0/0" onchange="updateHeader()">
+                </div>
+
+                <div class="form-group">
+                    <label for="ipAddress">IP Address:</label>
+                    <input type="text" id="ipAddress" value="192.168.1.1" onchange="updateHeader()">
+                </div>
+
+                <div class="form-group">
+                    <label for="capabilities">Device Capabilities:</label>
+                    <div>
+                        <input type="checkbox" id="capRouter" checked onchange="updateHeader()"> Router
+                        <input type="checkbox" id="capSwitch" onchange="updateHeader()"> Switch
+                        <input type="checkbox" id="capBridge" onchange="updateHeader()"> Bridge
+                        <input type="checkbox" id="capHost" onchange="updateHeader()"> Host
+                    </div>
+                </div>
+
+                <button onclick="generatePacket()">Generate CDP Packet</button>
+                <button onclick="resetHeader()">Reset</button>
+
+                <h3>Generated CDP Packet Structure</h3>
+                <div id="packetOutput" class="code-block">
+Click "Generate CDP Packet" to see the packet structure
+                </div>
+
+                <h3>Packet Analysis</h3>
+                <div id="packetAnalysis" class="info-box">
+                    <p>Enter values above and generate a packet to see detailed analysis</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Protocol Simulation Tab -->
+        <div id="simulation" class="tab-content">
+            <h2>CDP Protocol Operation Simulator</h2>
+            <p>Watch how CDP works in a real network environment</p>
+
+            <div class="interactive-section">
+                <h3>Network Topology Setup</h3>
+                <div class="form-group">
+                    <label for="deviceCount">Number of Devices:</label>
+                    <select id="deviceCount" onchange="setupTopology()">
+                        <option value="3">3 Devices</option>
+                        <option value="4">4 Devices</option>
+                        <option value="5">5 Devices</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cdpInterval">CDP Advertisement Interval (seconds):</label>
+                    <input type="number" id="cdpInterval" value="60" min="5" max="300">
+                </div>
+
+                <div class="form-group">
+                    <label for="holdTime">Hold Time (seconds):</label>
+                    <input type="number" id="holdTime" value="180" min="10" max="600">
+                </div>
+
+                <button onclick="startSimulation()">Start CDP Simulation</button>
+                <button onclick="stopSimulation()">Stop Simulation</button>
+                <button onclick="clearLog()">Clear Log</button>
+                <button onclick="triggerUpdate()">Force CDP Update</button>
+
+                <h3>Simulation Output</h3>
+                <div id="simulationOutput" class="simulation-output">
+Network simulation will appear here...
+Click "Start CDP Simulation" to begin
+                </div>
+
+                <h3>Current Neighbor Table</h3>
+                <div id="neighborTable">
+                    <table id="neighborsDisplay">
+                        <tr>
+                            <th>Local Device</th>
+                            <th>Local Port</th>
+                            <th>Neighbor Device</th>
+                            <th>Neighbor Port</th>
+                            <th>Platform</th>
+                            <th>Hold Time</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workplace Examples Tab -->
+        <div id="workplace" class="tab-content">
+            <h2>Real-World CDP Applications</h2>
+
+            <h3>1. Network Documentation and Discovery</h3>
+            <div class="info-box">
+                <h4>Scenario:</h4>
+                <p>You're a new network engineer at a company with undocumented network infrastructure. You need to create an accurate network topology.</p>
+                
+                <h4>CDP Solution:</h4>
+                <div class="code-block">
+# Connect to core switch
+show cdp neighbors detail
+
+# Example output:
+Device ID: Router-HQ
+Entry address(es):
+  IP address: 10.1.1.1
+Platform: Cisco 2901, Capabilities: Router Switch IGMP
+Interface: GigabitEthernet1/0/1, Port ID: GigabitEthernet0/0
+Hold time: 156 sec
+
+# Use this to map the entire network
+show cdp neighbors | include Device ID
+                </div>
+                
+                <h4>Benefits:</h4>
+                <ul>
+                    <li>Quick topology discovery without physical cable tracing</li>
+                    <li>Identifies device models and capabilities</li>
+                    <li>Shows IP addresses and interface connections</li>
+                    <li>Helps create accurate network diagrams</li>
+                </ul>
+            </div>
+
+            <h3>2. Troubleshooting Connectivity Issues</h3>
+            <div class="info-box">
+                <h4>Scenario:</h4>
+                <p>Users report connectivity issues between two network segments. You suspect a problem with an intermediate switch.</p>
+                
+                <h4>CDP Troubleshooting Process:</h4>
+                <div class="code-block">
+# Check if devices can see each other
+show cdp neighbors
+
+# If neighbor missing, check interface status
+show cdp interface
+
+# Verify CDP is enabled
+show cdp
+
+# Check for duplex mismatches
+show cdp neighbors detail | include Duplex
+
+# Example troubleshooting output:
+Interface: Fa0/1 is up, line protocol is up
+  Encapsulation ARPA
+  Sending CDP packets every 60 seconds
+  Holdtime is 180 seconds
+                </div>
+                
+                <h4>Common Issues Detected:</h4>
+                <ul>
+                    <li>Physical connectivity problems</li>
+                    <li>Duplex/speed mismatches</li>
+                    <li>VLAN configuration errors</li>
+                    <li>Power over Ethernet issues</li>
+                </ul>
+            </div>
+
+            <h3>3. Network Inventory Management</h3>
+            <div class="info-box">
+                <h4>Scenario:</h4>
+                <p>IT management needs an audit of all network equipment including models, software versions, and capabilities.</p>
+                
+                <h4>CDP Inventory Script:</h4>
+                <div class="code-block">
+# Automated inventory collection
+show cdp neighbors detail | include Device ID|Platform|Software|IP address
+
+# Create inventory report
+Device ID: SW-Floor2
+Platform: cisco WS-C2960-24TT-L, Capabilities: Switch IGMP
+Software version: Cisco IOS Software, Version 12.2(55)SE9
+
+Device ID: AP-Conference
+Platform: cisco AIR-AP1242AG-A-K9, Capabilities: Switch IGMP
+Software version: Cisco IOS Software, Version 12.4(25d)JA2
+                </div>
+                
+                <h4>Inventory Data Collected:</h4>
+                <ul>
+                    <li>Device hostnames and models</li>
+                    <li>Software versions for patch management</li>
+                    <li>IP addresses for management access</li>
+                    <li>Device capabilities and roles</li>
+                </ul>
+            </div>
+
+            <h3>4. VoIP Phone Management</h3>
+            <div class="info-box">
+                <h4>Scenario:</h4>
+                <p>Managing hundreds of Cisco IP phones across multiple floors and buildings.</p>
+                
+                <h4>CDP for VoIP Management:</h4>
+                <div class="code-block">
+# Find all connected IP phones
+show cdp neighbors | include Phone
+
+# Check phone power consumption
+show cdp neighbors detail | include Phone|Power
+
+# Example phone information:
+Device ID: SEP001DA2123456
+Platform: Cisco IP Phone 7940, Capabilities: Host Phone
+Interface: FastEthernet0/12, Port ID: Port 1
+Power drawn: 6.300 Watts
+                </div>
+                
+                <h4>VoIP Use Cases:</h4>
+                <ul>
+                    <li>Locate specific phones by MAC address</li>
+                    <li>Monitor power consumption for PoE planning</li>
+                    <li>Verify phone-to-switch connections</li>
+                    <li>Troubleshoot voice quality issues</li>
+                </ul>
+            </div>
+
+            <h3>5. Security and Compliance Auditing</h3>
+            <div class="warning-box">
+                <h4>Security Considerations:</h4>
+                <p>While CDP is useful, it can be a security risk as it reveals network topology information.</p>
+                
+                <h4>Best Practices:</h4>
+                <ul>
+                    <li>Disable CDP on interfaces facing untrusted networks</li>
+                    <li>Use LLDP (IEEE standard) when interoperating with non-Cisco devices</li>
+                    <li>Regular audits of CDP-enabled interfaces</li>
+                    <li>Monitor for unauthorized devices appearing in CDP tables</li>
+                </ul>
+                
+                <div class="code-block">
+# Disable CDP on external interfaces
+interface GigabitEthernet0/0
+ no cdp enable
+
+# Enable only where needed
+interface range fa0/1-24
+ cdp enable
+                </div>
+            </div>
+
+            <h3>Case Study: Large Enterprise Network</h3>
+            <div class="info-box">
+                <h4>Organization:</h4>
+                <p>Global corporation with 50+ locations, 10,000+ network devices</p>
+                
+                <h4>CDP Implementation:</h4>
+                <ul>
+                    <li><strong>Automated Discovery:</strong> Scripts collect CDP data hourly</li>
+                    <li><strong>CMDB Integration:</strong> CDP data feeds configuration management database</li>
+                    <li><strong>Change Detection:</strong> Alerts when topology changes detected</li>
+                    <li><strong>Compliance:</strong> Ensures only authorized devices connect</li>
+                    <li><strong>Capacity Planning:</strong> Power and port utilization tracking</li>
+                </ul>
+                
+                <h4>Results:</h4>
+                <ul>
+                    <li>95% reduction in manual network documentation time</li>
+                    <li>Faster problem resolution (average 30% improvement)</li>
+                    <li>Improved security through unauthorized device detection</li>
+                    <li>Better capacity planning and resource allocation</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Security Tab -->
+        <div id="security" class="tab-content">
+            <h2>CDP Security Considerations</h2>
+
+            <div class="warning-box">
+                <h3>⚠️ Security Risks</h3>
+                <p>CDP can expose sensitive network information to potential attackers. Understanding these risks is crucial for proper network security.</p>
+            </div>
+
+            <h3>Information Disclosure Risks</h3>
+            <div class="info-box">
+                <h4>CDP Reveals:</h4>
+                <ul>
+                    <li><strong>Network Topology:</strong> Device connections and layout</li>
+                    <li><strong>Device Information:</strong> Models, software versions, capabilities</li>
+                    <li><strong>IP Addresses:</strong> Management and interface addresses</li>
+                    <li><strong>Interface Details:</strong> Port names, speeds, duplex settings</li>
+                    <li><strong>VLAN Information:</strong> Native VLANs and trunking details</li>
+                </ul>
+            </div>
+
+            <h3>Attack Scenarios</h3>
+            <div class="warning-box">
+                <h4>1. Network Reconnaissance</h4>
+                <p>Attackers can use CDP to map network infrastructure without authorized access.</p>
+                <div class="code-block">
+# Attacker connects unauthorized device
+# Immediately receives CDP advertisements
+# Learns network topology and device information
+show cdp neighbors detail
+                </div>
+
+                <h4>2. Vulnerability Exploitation</h4>
+                <p>Software version information helps attackers identify vulnerable devices.</p>
+                <div class="code-block">
+# CDP reveals exact IOS versions
+Software version: Cisco IOS Software, Version 12.2(55)SE9
+# Attacker searches for known vulnerabilities in this version
+                </div>
+
+                <h4>3. Social Engineering</h4>
+                <p>Device hostnames and IP addresses can be used for targeted attacks.</p>
+            </div>
+
+            <h3>Security Best Practices</h3>
+            <div class="interactive-section">
+                <h4>1. Selective CDP Deployment</h4>
+                <div class="code-block">
+# Disable CDP globally, enable only where needed
+no cdp run
+
+# Enable CDP only on internal links
+interface range gi0/1-24
+ cdp enable
+
+# Keep CDP disabled on external/DMZ interfaces
+interface gi0/0
+ no cdp enable
+                </div>
+
+                <h4>2. Interface-Level Control</h4>
+                <div class="code-block">
+# Disable CDP on access ports
+interface range fa0/1-48
+ switchport mode access
+ no cdp enable
+
+# Enable only on trunk/management ports
+interface gi0/1
+ switchport mode trunk
+ cdp enable
+                </div>
+
+                <h4>3. Regular Security Audits</h4>
+                <div class="code-block">
+# Audit CDP-enabled interfaces
+show cdp interface
+
+# Check for unexpected neighbors
+show cdp neighbors
+
+# Monitor for unauthorized devices
+show cdp neighbors detail | include Device ID
+                </div>
+
+                <h4>4. Alternative Protocols</h4>
+                <div class="info-box">
+                    <h5>LLDP (Link Layer Discovery Protocol)</h5>
+                    <ul>
+                        <li>IEEE 802.1AB standard</li>
+                        <li>Vendor-neutral alternative to CDP</li>
+                        <li>More granular security controls</li>
+                        <li>Better for mixed-vendor environments</li>
+                    </ul>
+                    <div class="code-block">
+# Enable LLDP instead of CDP
+lldp run
+interface gi0/1
+ lldp transmit
+ lldp receive
+                    </div>
+                </div>
+            </div>
+
+            <h3>Compliance and Policy</h3>
+            <div class="info-box">
+                <h4>Organizational CDP Policy Example:</h4>
+                <ul>
+                    <li><strong>Default State:</strong> CDP disabled by default on all new devices</li>
+                    <li><strong>Internal Use Only:</strong> CDP enabled only on internal management networks</li>
+                    <li><strong>Documentation:</strong> All CDP-enabled interfaces must be documented</li>
+                    <li><strong>Review Cycle:</strong> Quarterly review of CDP configuration</li>
+                    <li><strong>Incident Response:</strong> Unauthorized CDP neighbors trigger security investigation</li>
+                </ul>
+            </div>
+
+            <h3>Monitoring and Detection</h3>
+            <div class="interactive-section">
+                <h4>Automated Security Monitoring</h4>
+                <div class="code-block">
+# Script to detect new CDP neighbors
+#!/bin/bash
+# Check for new devices in CDP table
+CURRENT_NEIGHBORS=$(show cdp neighbors | grep "Device ID")
+if [ "$CURRENT_NEIGHBORS" != "$STORED_NEIGHBORS" ]; then
+    echo "New CDP neighbor detected - investigate immediately"
+    # Send alert to security team
+fi
+                </div>
+
+                <h4>SIEM Integration</h4>
+                <ul>
+                    <li>Log CDP neighbor additions/removals</li>
+                    <li>Alert on unexpected device types</li>
+                    <li>Correlate with physical access logs</li>
+                    <li>Track configuration changes</li>
+                </ul>
+            </div>
+
+            <button onclick="runSecurityAudit()">Run CDP Security Audit</button>
+            <div id="securityAuditResult" class="code-block" style="display:none;">
+Security audit results will appear here...
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <h2>CDP Knowledge Assessment</h2>
+            <p>Test your understanding of Cisco Discovery Protocol with these interactive questions.</p>
+
+            <div id="quizContainer">
+                <!-- Quiz questions will be generated here -->
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="startQuiz()">Start Quiz</button>
+                <button onclick="resetQuiz()">Reset Quiz</button>
+                <div id="quizScore" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let simulationInterval;
+        let simulationRunning = false;
+        let simulationTime = 0;
+        let devices = [];
+        let neighborTables = {};
+        let currentQuizQuestion = 0;
+        let quizScore = 0;
+        let quizAnswered = [];
+
+        // Quiz questions database
+        const quizQuestions = [
+            {
+                question: "What OSI layer does CDP operate at?",
+                options: ["Physical Layer", "Data Link Layer", "Network Layer", "Transport Layer"],
+                correct: 1,
+                explanation: "CDP operates at Layer 2 (Data Link Layer) to discover directly connected neighbors."
+            },
+            {
+                question: "What is the default CDP advertisement interval?",
+                options: ["30 seconds", "60 seconds", "90 seconds", "120 seconds"],
+                correct: 1,
+                explanation: "CDP sends advertisements every 60 seconds by default."
+            },
+            {
+                question: "Which multicast address does CDP use?",
+                options: ["01-00-0C-CC-CC-CC", "01-80-C2-00-00-0E", "FF-FF-FF-FF-FF-FF", "01-00-5E-00-00-16"],
+                correct: 0,
+                explanation: "CDP uses the multicast MAC address 01-00-0C-CC-CC-CC."
+            },
+            {
+                question: "What is the main security concern with CDP?",
+                options: ["High bandwidth usage", "CPU overhead", "Information disclosure", "Protocol conflicts"],
+                correct: 2,
+                explanation: "CDP's main security concern is information disclosure - it reveals network topology and device details."
+            },
+            {
+                question: "Which command disables CDP on a specific interface?",
+                options: ["no cdp run", "cdp disable", "no cdp enable", "disable cdp"],
+                correct: 2,
+                explanation: "The command 'no cdp enable' disables CDP on a specific interface."
+            }
+        ];
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+
+        // Header builder functionality
+        function updateHeader() {
+            // This function updates the visual representation
+            // Real implementation would show hex values
+        }
+
+        function generatePacket() {
+            const version = document.getElementById('version').value;
+            const ttl = document.getElementById('ttl').value;
+            const deviceId = document.getElementById('deviceId').value;
+            const platform = document.getElementById('platform').value;
+            const portId = document.getElementById('portId').value;
+            const ipAddress = document.getElementById('ipAddress').value;
+            
+            // Generate capabilities
+            let capabilities = 0;
+            if (document.getElementById('capRouter').checked) capabilities |= 0x01;
+            if (document.getElementById('capSwitch').checked) capabilities |= 0x08;
+            if (document.getElementById('capBridge').checked) capabilities |= 0x02;
+            if (document.getElementById('capHost').checked) capabilities |= 0x10;
+
+            const packetStructure = `
+CDP Packet Structure:
+====================
+Version: ${version}
+TTL: ${ttl}
+Checksum: 0x1234 (calculated)
+
+TLV Fields:
+-----------
+Device ID TLV:
+  Type: 0x0001  Length: ${deviceId.length + 4}  Value: ${deviceId}
+
+Address TLV:
+  Type: 0x0002  Length: 13  Value: IP ${ipAddress}
+
+Port ID TLV:
+  Type: 0x0003  Length: ${portId.length + 4}  Value: ${portId}
+
+Capabilities TLV:
+  Type: 0x0004  Length: 8  Value: 0x${capabilities.toString(16).padStart(8, '0')}
+
+Platform TLV:
+  Type: 0x0006  Length: ${platform.length + 4}  Value: ${platform}
+
+Packet Size: ${calculatePacketSize(deviceId, platform, portId, ipAddress)} bytes
+            `;
+
+            document.getElementById('packetOutput').textContent = packetStructure;
+            
+            // Update analysis
+            const analysis = `
+                <h4>Packet Analysis:</h4>
+                <ul>
+                    <li><strong>Device Identification:</strong> ${deviceId} running on ${platform}</li>
+                    <li><strong>Network Information:</strong> Reachable at ${ipAddress} via ${portId}</li>
+                    <li><strong>Capabilities:</strong> ${getCapabilityString(capabilities)}</li>
+                    <li><strong>Hold Time:</strong> Neighbor will keep this info for ${ttl} seconds</li>
+                    <li><strong>Protocol Version:</strong> Using CDP v${version} features</li>
+                </ul>
+            `;
+            document.getElementById('packetAnalysis').innerHTML = analysis;
+        }
+
+        function calculatePacketSize(deviceId, platform, portId, ipAddress) {
+            // Basic CDP header + TLV sizes
+            return 8 + (deviceId.length + 4) + (platform.length + 4) + (portId.length + 4) + 13 + 8;
+        }
+
+        function getCapabilityString(capabilities) {
+            const caps = [];
+            if (capabilities & 0x01) caps.push('Router');
+            if (capabilities & 0x02) caps.push('Bridge');
+            if (capabilities & 0x08) caps.push('Switch');
+            if (capabilities & 0x10) caps.push('Host');
+            return caps.join(', ') || 'None';
+        }
+
+        function resetHeader() {
+            document.getElementById('version').value = '2';
+            document.getElementById('ttl').value = '180';
+            document.getElementById('deviceId').value = 'Router-A';
+            document.getElementById('platform').value = 'Cisco 2901';
+            document.getElementById('portId').value = 'GigabitEthernet0/0';
+            document.getElementById('ipAddress').value = '192.168.1.1';
+            document.getElementById('capRouter').checked = true;
+            document.getElementById('capSwitch').checked = false;
+            document.getElementById('capBridge').checked = false;
+            document.getElementById('capHost').checked = false;
+            
+            document.getElementById('packetOutput').textContent = 'Click "Generate CDP Packet" to see the packet structure';
+            document.getElementById('packetAnalysis').innerHTML = '<p>Enter values above and generate a packet to see detailed analysis</p>';
+        }
+
+        // Simulation functionality
+        function setupTopology() {
+            const deviceCount = parseInt(document.getElementById('deviceCount').value);
+            devices = [];
+            neighborTables = {};
+            
+            // Create devices
+            for (let i = 0; i < deviceCount; i++) {
+                const device = {
+                    id: `Device-${String.fromCharCode(65 + i)}`,
+                    ip: `192.168.1.${i + 1}`,
+                    platform: i % 2 === 0 ? 'Cisco 2901' : 'Cisco Catalyst 2960',
+                    interfaces: [`Gi0/${i}`, `Gi0/${i + 1}`],
+                    lastSeen: {}
+                };
+                devices.push(device);
+                neighborTables[device.id] = [];
+            }
+            
+            updateNeighborTable();
+        }
+
+        function startSimulation() {
+            if (simulationRunning) return;
+            
+            simulationRunning = true;
+            simulationTime = 0;
+            const interval = parseInt(document.getElementById('cdpInterval').value) * 1000;
+            const holdTime = parseInt(document.getElementById('holdTime').value);
+            
+            setupTopology();
+            logMessage('=== CDP Simulation Started ===');
+            logMessage(`Advertisement Interval: ${interval/1000}s, Hold Time: ${holdTime}s`);
+            
+            simulationInterval = setInterval(() => {
+                simulationTime += interval / 1000;
+                sendCDPUpdates();
+                updateHoldTimers();
+                updateNeighborTable();
+            }, interval);
+        }
+
+        function stopSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationRunning = false;
+                logMessage('=== CDP Simulation Stopped ===');
+            }
+        }
+
+        function sendCDPUpdates() {
+            devices.forEach((device, index) => {
+                // Each device sends to its neighbors
+                const neighbors = getNeighbors(index);
+                neighbors.forEach(neighborIndex => {
+                    const neighbor = devices[neighborIndex];
+                    const cdpInfo = {
+                        deviceId: device.id,
+                        ip: device.ip,
+                        platform: device.platform,
+                        port: device.interfaces[0],
+                        capabilities: device.platform.includes('2901') ? ['Router'] : ['Switch'],
+                        timestamp: simulationTime,
+                        holdTime: parseInt(document.getElementById('holdTime').value)
+                    };
+                    
+                    // Add to neighbor's table
+                    updateNeighborInfo(neighbor.id, cdpInfo);
+                    logMessage(`${device.id} -> ${neighbor.id}: CDP Advertisement sent via ${device.interfaces[0]}`);
+                });
+            });
+        }
+
+        function getNeighbors(deviceIndex) {
+            // Simple linear topology for demonstration
+            const neighbors = [];
+            if (deviceIndex > 0) neighbors.push(deviceIndex - 1);
+            if (deviceIndex < devices.length - 1) neighbors.push(deviceIndex + 1);
+            return neighbors;
+        }
+
+        function updateNeighborInfo(deviceId, cdpInfo) {
+            if (!neighborTables[deviceId]) neighborTables[deviceId] = [];
+            
+            // Remove existing entry for this device
+            neighborTables[deviceId] = neighborTables[deviceId].filter(
+                entry => entry.deviceId !== cdpInfo.deviceId
+            );
+            
+            // Add new entry
+            neighborTables[deviceId].push(cdpInfo);
+        }
+
+        function updateHoldTimers() {
+            Object.keys(neighborTables).forEach(deviceId => {
+                neighborTables[deviceId] = neighborTables[deviceId].filter(entry => {
+                    const elapsed = simulationTime - entry.timestamp;
+                    const remaining = entry.holdTime - elapsed;
+                    entry.remainingHoldTime = Math.max(0, remaining);
+                    
+                    if (remaining <= 0) {
+                        logMessage(`${deviceId}: Neighbor ${entry.deviceId} aged out (hold time expired)`);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+        }
+
+        function updateNeighborTable() {
+            const table = document.getElementById('neighborsDisplay');
+            // Clear existing rows except header
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            
+            Object.keys(neighborTables).forEach(deviceId => {
+                neighborTables[deviceId].forEach(neighbor => {
+                    const row = table.insertRow();
+                    row.insertCell(0).textContent = deviceId;
+                    row.insertCell(1).textContent = 'Gi0/0';
+                    row.insertCell(2).textContent = neighbor.deviceId;
+                    row.insertCell(3).textContent = neighbor.port;
+                    row.insertCell(4).textContent = neighbor.platform;
+                    row.insertCell(5).textContent = `${neighbor.remainingHoldTime || neighbor.holdTime}s`;
+                });
+            });
+        }
+
+        function triggerUpdate() {
+            if (simulationRunning) {
+                sendCDPUpdates();
+                updateNeighborTable();
+                logMessage('=== Manual CDP Update Triggered ===');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('simulationOutput').textContent = 'Simulation log cleared...\n';
+        }
+
+        function logMessage(message) {
+            const output = document.getElementById('simulationOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Security audit functionality
+        function runSecurityAudit() {
+            const result = document.getElementById('securityAuditResult');
+            result.style.display = 'block';
+            
+            const auditResults = `
+CDP Security Audit Results
+==========================
+Date: ${new Date().toLocaleString()}
+
+Interface Analysis:
+  - Total interfaces: 48
+  - CDP enabled: 24 (50%)
+  - Recommended: Disable on access ports
+
+External Facing Interfaces:
+  - Gi0/0: CDP DISABLED ✓
+  - Gi0/1: CDP DISABLED ✓
+  - Se0/0/0: CDP DISABLED ✓
+
+Internal Interfaces:
+  - Gi1/0/1-24: CDP ENABLED (Review needed)
+  - Fa0/1-48: CDP ENABLED (Consider disabling on access ports)
+
+Security Recommendations:
+  1. Disable CDP on all access ports
+  2. Enable only on trunk/management links
+  3. Consider using LLDP for mixed environments
+  4. Implement monitoring for new neighbors
+  5. Regular configuration audits
+
+Risk Level: MEDIUM
+Action Required: Review access port configuration
+            `;
+            
+            result.textContent = auditResults;
+        }
+
+        // Quiz functionality
+        function startQuiz() {
+            currentQuizQuestion = 0;
+            quizScore = 0;
+            quizAnswered = [];
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentQuizQuestion >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuizQuestion];
+            const container = document.getElementById('quizContainer');
+            
+            container.innerHTML = `
+                <div class="quiz-question">
+                    <h3>Question ${currentQuizQuestion + 1} of ${quizQuestions.length}</h3>
+                    <p><strong>${question.question}</strong></p>
+                    <div id="options">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option" onclick="selectOption(${index})">
+                                ${String.fromCharCode(65 + index)}. ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="explanation" style="display:none; margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 5px;"></div>
+                </div>
+            `;
+        }
+
+        function selectOption(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            const explanation = document.getElementById('explanation');
+            
+            // Disable all options
+            options.forEach((option, index) => {
+                option.style.pointerEvents = 'none';
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Show explanation
+            explanation.style.display = 'block';
+            explanation.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+            
+            // Update score
+            if (selectedIndex === question.correct) {
+                quizScore++;
+            }
+            
+            quizAnswered.push({
+                question: currentQuizQuestion,
+                selected: selectedIndex,
+                correct: question.correct,
+                isCorrect: selectedIndex === question.correct
+            });
+            
+            // Move to next question after delay
+            setTimeout(() => {
+                currentQuizQuestion++;
+                showQuizQuestion();
+            }, 3000);
+        }
+
+        function showQuizResults() {
+            const container = document.getElementById('quizContainer');
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            
+            let grade = 'Needs Improvement';
+            if (percentage >= 90) grade = 'Excellent';
+            else if (percentage >= 80) grade = 'Good';
+            else if (percentage >= 70) grade = 'Fair';
+            
+            container.innerHTML = `
+                <div class="quiz-question">
+                    <h3>Quiz Complete!</h3>
+                    <div style="text-align: center; font-size: 24px; margin: 20px 0;">
+                        Score: ${quizScore}/${quizQuestions.length} (${percentage}%)
+                    </div>
+                    <div style="text-align: center; font-size: 18px; color: #2e7d32; margin: 10px 0;">
+                        Grade: ${grade}
+                    </div>
+                    <h4>Review:</h4>
+                    ${quizAnswered.map((answer, index) => `
+                        <div style="margin: 10px 0; padding: 10px; background: ${answer.isCorrect ? '#c8e6c9' : '#ffcdd2'}; border-radius: 5px;">
+                            <strong>Q${index + 1}:</strong> ${answer.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('quizScore').textContent = `Final Score: ${quizScore}/${quizQuestions.length} (${percentage}%)`;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quizContainer').innerHTML = '<p>Click "Start Quiz" to begin the CDP knowledge assessment.</p>';
+            document.getElementById('quizScore').textContent = '';
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTopology();
+            resetQuiz();
+        });
+    </script>
+</body>
+</html>
