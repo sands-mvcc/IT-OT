@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC Address Protocol Interactive Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 10px;
+            text-align: center;
+            background: #e8e8e8;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: black;
+        }
+
+        .nav-tab:hover {
+            background: #d4edda;
+        }
+
+        .nav-tab.active {
+            background: #28a745;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #e8e8e8;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .mac-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.4em;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px solid #28a745;
+        }
+
+        .mac-part {
+            padding: 5px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .oui {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .nic {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #28a745;
+            outline: none;
+        }
+
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .info-box {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .frame-builder {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .frame-field {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .frame-field label {
+            width: 150px;
+            font-weight: bold;
+        }
+
+        .frame-field input {
+            flex: 1;
+            margin-left: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .quiz-container {
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px solid #28a745;
+        }
+
+        .quiz-options {
+            margin: 15px 0;
+        }
+
+        .quiz-option {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #28a745;
+            background: #e8f5e8;
+        }
+
+        .quiz-option.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .quiz-option.correct {
+            border-color: #28a745;
+            background: #d1e7dd;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .workplace-example {
+            background: #e8f4fd;
+            border: 2px solid #0066cc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .workplace-example h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #28a745;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e8e8e8;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #4caf50);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .frame-field {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .frame-field label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .frame-field input {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 MAC Address Protocol Trainer</h1>
+            <p class="subtitle">Complete Interactive Guide to Media Access Control Addresses</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('fundamentals')">Fundamentals</button>
+            <button class="nav-tab" onclick="showTab('format')">Format & Types</button>
+            <button class="nav-tab" onclick="showTab('frame-builder')">Frame Builder</button>
+            <button class="nav-tab" onclick="showTab('operations')">Operations</button>
+            <button class="nav-tab" onclick="showTab('workplace')">Workplace Apps</button>
+            <button class="nav-tab" onclick="showTab('quiz')">Training Quiz</button>
+        </div>
+
+        <!-- Fundamentals Tab -->
+        <div id="fundamentals" class="tab-content active">
+            <h2>🎯 MAC Address Fundamentals</h2>
+            
+            <div class="info-box">
+                <h3>What is a MAC Address?</h3>
+                <p>A Media Access Control (MAC) address is a unique 48-bit identifier assigned to network interface controllers (NICs). It operates at Layer 2 (Data Link Layer) of the OSI model and ensures unique identification of devices within a network segment.</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🏢 IEEE Standards (2025)</h3>
+                    <ul>
+                        <li><strong>IEEE 802.3:</strong> Ethernet standards</li>
+                        <li><strong>IEEE 802.11:</strong> Wi-Fi specifications</li>
+                        <li><strong>IEEE 802c-2017:</strong> SLAP (Structured Local Address Plan)</li>
+                        <li><strong>IEEE 802.1AE:</strong> MACsec encryption</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Allocation Sizes</h3>
+                    <ul>
+                        <li><strong>MA-L (Large):</strong> ~16 million addresses</li>
+                        <li><strong>MA-M (Medium):</strong> ~65K addresses</li>
+                        <li><strong>MA-S (Small):</strong> ~4K addresses</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🔐 Key Properties</h3>
+                    <ul>
+                        <li>48-bit (6 bytes) length</li>
+                        <li>Hexadecimal notation</li>
+                        <li>Flat addressing structure</li>
+                        <li>Non-routable across networks</li>
+                        <li>Manufacturer assigned (usually)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🌐 Applications</h3>
+                    <ul>
+                        <li>Ethernet networking</li>
+                        <li>Wi-Fi communications</li>
+                        <li>Bluetooth connections</li>
+                        <li>Network switching</li>
+                        <li>Wake-on-LAN</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ 2025 Privacy Trend: MAC Randomization</h3>
+                <p>Modern devices increasingly use randomized MAC addresses to prevent tracking. This affects network management and requires new approaches for device identification and access control.</p>
+            </div>
+        </div>
+
+        <!-- Format & Types Tab -->
+        <div id="format" class="tab-content">
+            <h2>🔍 MAC Address Format & Analysis</h2>
+
+            <div class="input-group">
+                <label for="macInput">Enter a MAC Address to Analyze:</label>
+                <input type="text" id="macInput" placeholder="e.g., 00:1B:44:11:3A:B7" oninput="analyzeMacAddress()">
+            </div>
+
+            <div id="macAnalysis"></div>
+
+            <div class="info-box">
+                <h3>MAC Address Structure</h3>
+                <div class="mac-display">
+                    <span class="mac-part oui">XX:XX:XX</span>:<span class="mac-part nic">YY:YY:YY</span>
+                </div>
+                <p><strong>First 24 bits (OUI):</strong> Organizationally Unique Identifier - identifies manufacturer</p>
+                <p><strong>Last 24 bits (NIC):</strong> Network Interface Controller specific - unique device identifier</p>
+            </div>
+
+            <h3>🏭 OUI Lookup Tool</h3>
+            <div class="input-group">
+                <label for="ouiInput">Enter OUI (first 3 bytes):</label>
+                <input type="text" id="ouiInput" placeholder="e.g., 00:1B:44" oninput="lookupOUI()">
+            </div>
+            <div id="ouiResult"></div>
+
+            <h3>🎲 MAC Address Generator</h3>
+            <div class="input-group">
+                <label for="vendorSelect">Select Vendor:</label>
+                <select id="vendorSelect">
+                    <option value="random">Random</option>
+                    <option value="00:1B:44">Apple Inc.</option>
+                    <option value="00:50:56">VMware Inc.</option>
+                    <option value="08:00:27">Oracle VirtualBox</option>
+                    <option value="00:0C:29">VMware Inc. (ESX)</option>
+                    <option value="02:00:00">Locally Administered</option>
+                </select>
+            </div>
+            <button class="btn" onclick="generateMacAddress()">Generate MAC Address</button>
+            <div id="generatedMac"></div>
+
+            <div class="info-box">
+                <h3>🏷️ MAC Address Types</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Unicast</h4>
+                        <p>LSB of first octet = 0<br>Identifies single device<br>Example: 00:1B:44:11:3A:B7</p>
+                    </div>
+                    <div class="card">
+                        <h4>Multicast</h4>
+                        <p>LSB of first octet = 1<br>Group communication<br>Example: 01:00:5E:00:00:00</p>
+                    </div>
+                    <div class="card">
+                        <h4>Broadcast</h4>
+                        <p>All bits set to 1<br>All devices in segment<br>FF:FF:FF:FF:FF:FF</p>
+                    </div>
+                    <div class="card">
+                        <h4>Locally Administered</h4>
+                        <p>2nd LSB of first octet = 1<br>Software assigned<br>Example: 02:XX:XX:XX:XX:XX</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frame Builder Tab -->
+        <div id="frame-builder" class="tab-content">
+            <h2>🏗️ Ethernet Frame Builder</h2>
+
+            <div class="info-box">
+                <h3>Build and Analyze Ethernet Frames</h3>
+                <p>Understand how MAC addresses are used in actual network communication by constructing Ethernet frames.</p>
+            </div>
+
+            <div class="frame-builder">
+                <h3>Ethernet Frame Constructor</h3>
+                
+                <div class="frame-field">
+                    <label>Destination MAC:</label>
+                    <input type="text" id="destMac" placeholder="FF:FF:FF:FF:FF:FF" oninput="updateFrame()">
+                </div>
+
+                <div class="frame-field">
+                    <label>Source MAC:</label>
+                    <input type="text" id="srcMac" placeholder="00:1B:44:11:3A:B7" oninput="updateFrame()">
+                </div>
+
+                <div class="frame-field">
+                    <label>EtherType:</label>
+                    <select id="etherType" onchange="updateFrame()">
+                        <option value="0x0800">IPv4 (0x0800)</option>
+                        <option value="0x86DD">IPv6 (0x86DD)</option>
+                        <option value="0x0806">ARP (0x0806)</option>
+                        <option value="0x8137">IPX (0x8137)</option>
+                    </select>
+                </div>
+
+                <div class="frame-field">
+                    <label>Payload (hex):</label>
+                    <input type="text" id="payload" placeholder="Sample data payload" oninput="updateFrame()">
+                </div>
+
+                <button class="btn" onclick="generateSampleFrame()">Generate Sample Frame</button>
+                <button class="btn btn-secondary" onclick="clearFrame()">Clear</button>
+            </div>
+
+            <div id="frameOutput"></div>
+
+            <div class="info-box">
+                <h3>📋 Frame Analysis</h3>
+                <div id="frameAnalysis"></div>
+            </div>
+
+            <div class="workplace-example">
+                <h3>💼 Real-World Example: Network Troubleshooting</h3>
+                <p>When troubleshooting network issues, analyzing frames helps identify:</p>
+                <ul>
+                    <li>Source and destination of communications</li>
+                    <li>Protocol types being used</li>
+                    <li>Network loops or broadcast storms</li>
+                    <li>Unauthorized devices on the network</li>
+                </ul>
+                <div class="code-block">
+# Example Wireshark filter for MAC analysis
+eth.addr == 00:1B:44:11:3A:B7    # Filter by specific MAC
+eth.dst == ff:ff:ff:ff:ff:ff      # Show broadcast frames
+eth.src[0:3] == 00:1B:44          # Filter by OUI
+                </div>
+            </div>
+        </div>
+
+        <!-- Operations Tab -->
+        <div id="operations" class="tab-content">
+            <h2>⚙️ Protocol Operations</h2>
+
+            <div class="info-box">
+                <h3>MAC Address Resolution Process (ARP)</h3>
+                <p>Understanding how IP addresses are mapped to MAC addresses in local networks.</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🔄 ARP Process</h3>
+                    <ol>
+                        <li>Host needs to send packet to IP address</li>
+                        <li>Checks ARP cache for MAC address</li>
+                        <li>If not found, sends ARP request (broadcast)</li>
+                        <li>Target host responds with ARP reply</li>
+                        <li>Sender caches MAC address mapping</li>
+                        <li>Communication proceeds using MAC addresses</li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <h3>🌉 Switch Learning</h3>
+                    <ol>
+                        <li>Frame arrives at switch port</li>
+                        <li>Switch examines source MAC address</li>
+                        <li>Updates MAC address table with port mapping</li>
+                        <li>Checks destination MAC in table</li>
+                        <li>Forwards to specific port or floods if unknown</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>🎮 Interactive ARP Simulator</h3>
+            <div class="frame-builder">
+                <div class="frame-field">
+                    <label>Source IP:</label>
+                    <input type="text" id="srcIP" value="192.168.1.10" placeholder="192.168.1.10">
+                </div>
+                <div class="frame-field">
+                    <label>Target IP:</label>
+                    <input type="text" id="targetIP" value="192.168.1.20" placeholder="192.168.1.20">
+                </div>
+                <div class="frame-field">
+                    <label>Source MAC:</label>
+                    <input type="text" id="arpSrcMac" value="00:1B:44:11:3A:B7" placeholder="00:1B:44:11:3A:B7">
+                </div>
+                <button class="btn" onclick="simulateARP()">Simulate ARP Request</button>
+                <div id="arpSimulation"></div>
+            </div>
+
+            <div class="workplace-example">
+                <h3>💼 Network Operations Commands</h3>
+                <div class="code-block">
+# Windows - View ARP table
+arp -a
+
+# Linux/macOS - View ARP table  
+arp -a
+ip neighbor show
+
+# Clear ARP cache
+arp -d *                    # Windows
+sudo ip neighbor flush all  # Linux
+
+# View MAC address table on Cisco switch
+show mac address-table
+
+# Clear MAC address table
+clear mac address-table dynamic
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>🔒 Security Considerations</h3>
+                <ul>
+                    <li><strong>ARP Spoofing:</strong> Attackers can forge ARP responses</li>
+                    <li><strong>MAC Flooding:</strong> Overwhelming switch MAC table</li>
+                    <li><strong>MAC Cloning:</strong> Duplicating legitimate MAC addresses</li>
+                    <li><strong>Privacy:</strong> MAC addresses can be used for tracking</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Workplace Applications Tab -->
+        <div id="workplace" class="tab-content">
+            <h2>💼 Workplace Applications</h2>
+
+            <div class="grid">
+                <div class="workplace-example">
+                    <h3>🖨️ DHCP Reservations</h3>
+                    <p>Assign fixed IP addresses to specific devices using MAC addresses.</p>
+                    <div class="code-block">
+# Windows Server DHCP
+Add-DhcpServerv4Reservation -ScopeId 192.168.1.0 `
+  -IPAddress 192.168.1.100 `
+  -ClientId "00-50-56-12-34-56" `
+  -Description "Main Printer"
+
+# Cisco IOS DHCP
+ip dhcp pool PRINTER
+ host 192.168.1.100 255.255.255.0
+ client-identifier 0100.5056.1234.56
+                    </div>
+                </div>
+
+                <div class="workplace-example">
+                    <h3>🔐 Network Access Control</h3>
+                    <p>Use MAC addresses for device authentication and access control.</p>
+                    <div class="code-block">
+# Cisco switch port security
+interface FastEthernet0/1
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address 0050.5612.3456
+ switchport port-security violation restrict
+
+# pfSense firewall rule by MAC
+pass in on $lan_if from 00:50:56:12:34:56 to any
+                    </div>
+                </div>
+
+                <div class="workplace-example">
+                    <h3>📊 Network Monitoring</h3>
+                    <p>Track device behavior and network usage by MAC address.</p>
+                    <div class="code-block">
+# PRTG Network Monitor - MAC tracking
+# Monitor bandwidth usage per MAC address
+# Set up alerts for unknown MAC addresses
+
+# Nagios monitoring
+define host{
+    host_name       server01
+    address         192.168.1.50
+    check_command   check-host-alive
+    # Custom field for MAC tracking
+    _MAC_ADDRESS    00:50:56:12:34:56
+}
+                    </div>
+                </div>
+
+                <div class="workplace-example">
+                    <h3>⚡ Wake-on-LAN</h3>
+                    <p>Remotely power on devices using their MAC addresses.</p>
+                    <div class="code-block">
+# PowerShell Wake-on-LAN
+$mac = "00-50-56-12-34-56"
+$bytes = $mac.Split('-') | ForEach-Object {[byte]"0x$_"}
+$packet = (,0xFF * 6) + ($bytes * 16)
+$udp = New-Object System.Net.Sockets.UdpClient
+$udp.Send($packet, 102, "192.168.1.255", 9)
+
+# Linux wakeonlan command
+wakeonlan 00:50:56:12:34:56
+                    </div>
+                </div>
+            </div>
+
+            <h3>🎯 MAC Address Management Tools</h3>
+            <div class="input-group">
+                <label>Device Name:</label>
+                <input type="text" id="deviceName" placeholder="Office Printer">
+            </div>
+            <div class="input-group">
+                <label>MAC Address:</label>
+                <input type="text" id="deviceMac" placeholder="00:50:56:12:34:56">
+            </div>
+            <div class="input-group">
+                <label>IP Address:</label>
+                <input type="text" id="deviceIP" placeholder="192.168.1.100">
+            </div>
+            <div class="input-group">
+                <label>Purpose:</label>
+                <select id="devicePurpose">
+                    <option value="dhcp">DHCP Reservation</option>
+                    <option value="access">Access Control</option>
+                    <option value="monitoring">Network Monitoring</option>
+                    <option value="wol">Wake-on-LAN</option>
+                </select>
+            </div>
+            <button class="btn" onclick="generateWorkplaceConfig()">Generate Configuration</button>
+            <div id="workplaceConfig"></div>
+
+            <div class="info-box">
+                <h3>📋 Best Practices for MAC Address Management</h3>
+                <ul>
+                    <li><strong>Documentation:</strong> Maintain accurate MAC address inventory</li>
+                    <li><strong>Standardization:</strong> Use consistent naming conventions</li>
+                    <li><strong>Security:</strong> Regularly audit MAC address tables</li>
+                    <li><strong>Monitoring:</strong> Set up alerts for unknown devices</li>
+                    <li><strong>Backup:</strong> Keep backups of DHCP reservations and ACLs</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <h2>🧠 MAC Address Training Quiz</h2>
+            
+            <div class="info-box">
+                <h3>Test Your Knowledge</h3>
+                <p>Complete this interactive quiz to test your understanding of MAC addresses and their applications.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quizProgress" style="width: 0%"></div>
+                </div>
+                <p id="progressText">Question 0 of 10</p>
+            </div>
+
+            <div class="quiz-container" id="quizContainer">
+                <!-- Quiz questions will be populated by JavaScript -->
+            </div>
+
+            <div class="quiz-controls">
+                <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+                <button class="btn" id="restartBtn" onclick="restartQuiz()" style="display: none;">Restart Quiz</button>
+            </div>
+
+            <div id="quizResults" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTab = 'fundamentals';
+        let currentQuestion = 0;
+        let quizScore = 0;
+        let selectedAnswer = null;
+
+        // Common OUI database
+        const ouiDatabase = {
+            '00:1B:44': 'Apple Inc.',
+            '00:50:56': 'VMware Inc.',
+            '08:00:27': 'Oracle VirtualBox',
+            '00:0C:29': 'VMware Inc. (ESX)',
+            '00:15:5D': 'Microsoft Corporation',
+            '52:54:00': 'QEMU Virtual Machine',
+            '00:16:3E': 'Xensource Inc.',
+            '00:1C:42': 'Parallels Inc.',
+            '00:03:FF': 'Microsoft Corporation (Hyper-V)',
+            '00:50:F2': 'Microsoft Corporation',
+            '8C:85:90': 'Apple Inc.',
+            '3C:07:54': 'Apple Inc.',
+            'F4:CB:52': 'Apple Inc.',
+            '00:25:00': 'Apple Inc.',
+            'DC:A6:32': 'Apple Inc.'
+        };
+
+        // Quiz questions
+        const quizQuestions = [
+            {
+                question: "How many bits are in a MAC address?",
+                options: ["32 bits", "48 bits", "64 bits", "128 bits"],
+                correct: 1,
+                explanation: "MAC addresses are 48 bits (6 bytes) long, providing approximately 281 trillion unique addresses."
+            },
+            {
+                question: "What does OUI stand for in MAC addresses?",
+                options: ["Original User Identifier", "Organizationally Unique Identifier", "Optical Unit Interface", "Operating Unit Index"],
+                correct: 1,
+                explanation: "OUI stands for Organizationally Unique Identifier and represents the first 24 bits of a MAC address, identifying the manufacturer."
+            },
+            {
+                question: "Which MAC address type is used for broadcast communication?",
+                options: ["00:00:00:00:00:00", "FF:FF:FF:FF:FF:FF", "01:00:00:00:00:00", "02:00:00:00:00:00"],
+                correct: 1,
+                explanation: "FF:FF:FF:FF:FF:FF is the broadcast MAC address where all bits are set to 1, reaching all devices in the network segment."
+            },
+            {
+                question: "At which OSI layer do MAC addresses operate?",
+                options: ["Layer 1 (Physical)", "Layer 2 (Data Link)", "Layer 3 (Network)", "Layer 4 (Transport)"],
+                correct: 1,
+                explanation: "MAC addresses operate at Layer 2 (Data Link Layer) of the OSI model, specifically in the MAC sublayer."
+            },
+            {
+                question: "What protocol is used to resolve IP addresses to MAC addresses?",
+                options: ["DNS", "DHCP", "ARP", "ICMP"],
+                correct: 2,
+                explanation: "ARP (Address Resolution Protocol) is used to map IP addresses to MAC addresses within a local network segment."
+            },
+            {
+                question: "How can you identify a locally administered MAC address?",
+                options: ["First bit is 1", "Second bit is 1", "Last bit is 1", "All bits are 1"],
+                correct: 1,
+                explanation: "The second least significant bit (second bit) of the first octet being set to 1 indicates a locally administered address."
+            },
+            {
+                question: "What is the primary workplace application of MAC addresses in DHCP?",
+                options: ["IP address assignment", "DNS resolution", "Network routing", "Bandwidth allocation"],
+                correct: 0,
+                explanation: "DHCP reservations use MAC addresses to assign specific IP addresses to particular devices consistently."
+            },
+            {
+                question: "Which IEEE standard covers Ethernet MAC addressing?",
+                options: ["IEEE 802.1", "IEEE 802.2", "IEEE 802.3", "IEEE 802.11"],
+                correct: 2,
+                explanation: "IEEE 802.3 is the standard that covers Ethernet, including MAC addressing specifications."
+            },
+            {
+                question: "What is the main security concern with MAC addresses in 2025?",
+                options: ["Encryption strength", "Privacy tracking", "Network speed", "Power consumption"],
+                correct: 1,
+                explanation: "Privacy tracking is a major concern, leading to widespread adoption of MAC address randomization in modern devices."
+            },
+            {
+                question: "How many unique addresses are available with an MA-L allocation?",
+                options: ["4,096", "65,536", "16,777,216", "4,294,967,296"],
+                correct: 2,
+                explanation: "MA-L (Large) allocations provide 2^24 = 16,777,216 (approximately 16 million) unique addresses."
+            }
+        ];
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
+            }
+
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('nav-tab');
+            for (let tab of tabs) {
+                tab.classList.remove('active');
+            }
+
+            // Show selected tab and mark as active
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            currentTab = tabName;
+        }
+
+        // MAC address analysis
+        function analyzeMacAddress() {
+            const input = document.getElementById('macInput').value.trim();
+            const analysisDiv = document.getElementById('macAnalysis');
+            
+            if (!input) {
+                analysisDiv.innerHTML = '';
+                return;
+            }
+
+            // Normalize MAC address format
+            const normalizedMac = input.replace(/[-:.\s]/g, '').toUpperCase();
+            
+            if (normalizedMac.length !== 12 || !/^[0-9A-F]+$/.test(normalizedMac)) {
+                analysisDiv.innerHTML = '<div class="error-box">Invalid MAC address format. Use format: XX:XX:XX:XX:XX:XX</div>';
+                return;
+            }
+
+            // Format as standard notation
+            const formattedMac = normalizedMac.match(/.{2}/g).join(':');
+            const oui = formattedMac.substring(0, 8);
+            const nic = formattedMac.substring(9);
+
+            // Analyze bits
+            const firstByte = parseInt(normalizedMac.substring(0, 2), 16);
+            const isUnicast = (firstByte & 1) === 0;
+            const isLocallyAdministered = (firstByte & 2) !== 0;
+
+            // Look up vendor
+            const vendor = ouiDatabase[oui] || 'Unknown Vendor';
+
+            analysisDiv.innerHTML = `
+                <div class="info-box">
+                    <h3>📊 MAC Address Analysis</h3>
+                    <div class="mac-display">
+                        <span class="mac-part oui">${oui}</span>:<span class="mac-part nic">${nic}</span>
+                    </div>
+                    <div class="grid">
+                        <div class="card">
+                            <h4>Format</h4>
+                            <p><strong>Standard:</strong> ${formattedMac}</p>
+                            <p><strong>Canonical:</strong> ${normalizedMac}</p>
+                        </div>
+                        <div class="card">
+                            <h4>Type</h4>
+                            <p><strong>Address Type:</strong> ${isUnicast ? 'Unicast' : 'Multicast/Broadcast'}</p>
+                            <p><strong>Administration:</strong> ${isLocallyAdministered ? 'Locally Administered' : 'Universally Administered'}</p>
+                        </div>
+                        <div class="card">
+                            <h4>Vendor Information</h4>
+                            <p><strong>OUI:</strong> ${oui}</p>
+                            <p><strong>Vendor:</strong> ${vendor}</p>
+                        </div>
+                        <div class="card">
+                            <h4>Binary Analysis</h4>
+                            <p><strong>First Byte:</strong> ${firstByte.toString(2).padStart(8, '0')}</p>
+                            <p><strong>U/L Bit:</strong> ${isLocallyAdministered ? '1' : '0'} (${isLocallyAdministered ? 'Local' : 'Universal'})</p>
+                            <p><strong>I/G Bit:</strong> ${(firstByte & 1)} (${isUnicast ? 'Individual' : 'Group'})</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // OUI lookup
+        function lookupOUI() {
+            const input = document.getElementById('ouiInput').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('ouiResult');
+            
+            if (!input) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+
+            const normalizedOui = input.replace(/[-:.\s]/g, '');
+            if (normalizedOui.length !== 6) {
+                resultDiv.innerHTML = '<div class="warning-box">Enter complete OUI (6 hex digits)</div>';
+                return;
+            }
+
+            const formattedOui = normalizedOui.match(/.{2}/g).join(':');
+            const vendor = ouiDatabase[formattedOui] || 'Unknown Vendor - Not in local database';
+
+            resultDiv.innerHTML = `
+                <div class="info-box">
+                    <h4>🏭 Vendor Lookup Result</h4>
+                    <p><strong>OUI:</strong> ${formattedOui}</p>
+                    <p><strong>Vendor:</strong> ${vendor}</p>
+                </div>
+            `;
+        }
+
+        // MAC address generator
+        function generateMacAddress() {
+            const vendorSelect = document.getElementById('vendorSelect');
+            const resultDiv = document.getElementById('generatedMac');
+            
+            let oui = vendorSelect.value;
+            if (oui === 'random') {
+                // Generate random OUI with locally administered bit set
+                const randomOui = [
+                    '02', // Locally administered
+                    Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase(),
+                    Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase()
+                ].join(':');
+                oui = randomOui;
+            }
+
+            // Generate random NIC portion
+            const nic = [
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase(),
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase(),
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase()
+            ].join(':');
+
+            const fullMac = `${oui}:${nic}`;
+            const vendor = ouiDatabase[oui] || 'Custom/Random';
+
+            resultDiv.innerHTML = `
+                <div class="info-box">
+                    <h4>🎲 Generated MAC Address</h4>
+                    <div class="mac-display">${fullMac}</div>
+                    <p><strong>Vendor:</strong> ${vendor}</p>
+                    <button class="btn btn-secondary" onclick="copyToClipboard('${fullMac}')">Copy to Clipboard</button>
+                </div>
+            `;
+        }
+
+        // Frame building functionality
+        function updateFrame() {
+            const destMac = document.getElementById('destMac').value || 'FF:FF:FF:FF:FF:FF';
+            const srcMac = document.getElementById('srcMac').value || '00:1B:44:11:3A:B7';
+            const etherType = document.getElementById('etherType').value;
+            const payload = document.getElementById('payload').value || 'Sample data';
+
+            // Convert payload to hex
+            const payloadHex = Array.from(payload).map(c => 
+                c.charCodeAt(0).toString(16).padStart(2, '0')
+            ).join(' ').toUpperCase();
+
+            const frameOutput = document.getElementById('frameOutput');
+            const frameAnalysis = document.getElementById('frameAnalysis');
+
+            frameOutput.innerHTML = `
+                <div class="info-box">
+                    <h4>🏗️ Constructed Ethernet Frame</h4>
+                    <div class="code-block">
+Destination MAC: ${destMac}
+Source MAC:      ${srcMac}
+EtherType:       ${etherType}
+Payload:         ${payloadHex}
+                    </div>
+                </div>
+            `;
+
+            // Analyze frame
+            const destType = destMac === 'FF:FF:FF:FF:FF:FF' ? 'Broadcast' : 
+                            destMac.startsWith('01:') ? 'Multicast' : 'Unicast';
+            
+            const etherTypeDesc = {
+                '0x0800': 'IPv4 packet',
+                '0x86DD': 'IPv6 packet',
+                '0x0806': 'ARP packet',
+                '0x8137': 'IPX packet'
+            };
+
+            frameAnalysis.innerHTML = `
+                <p><strong>Frame Type:</strong> ${destType} communication</p>
+                <p><strong>Protocol:</strong> ${etherTypeDesc[etherType] || 'Unknown protocol'}</p>
+                <p><strong>Direction:</strong> From ${ouiDatabase[srcMac.substring(0, 8)] || 'Unknown'} to ${destType === 'Broadcast' ? 'All devices' : (ouiDatabase[destMac.substring(0, 8)] || 'Unknown')}</p>
+                <p><strong>Frame Size:</strong> ${14 + payload.length} bytes (header: 14, payload: ${payload.length})</p>
+            `;
+        }
+
+        function generateSampleFrame() {
+            document.getElementById('destMac').value = 'FF:FF:FF:FF:FF:FF';
+            document.getElementById('srcMac').value = '00:1B:44:11:3A:B7';
+            document.getElementById('etherType').value = '0x0806';
+            document.getElementById('payload').value = 'ARP request: Who has 192.168.1.1?';
+            updateFrame();
+        }
+
+        function clearFrame() {
+            document.getElementById('destMac').value = '';
+            document.getElementById('srcMac').value = '';
+            document.getElementById('payload').value = '';
+            document.getElementById('frameOutput').innerHTML = '';
+            document.getElementById('frameAnalysis').innerHTML = '';
+        }
+
+        // ARP simulation
+        function simulateARP() {
+            const srcIP = document.getElementById('srcIP').value;
+            const targetIP = document.getElementById('targetIP').value;
+            const srcMac = document.getElementById('arpSrcMac').value;
+            const simulationDiv = document.getElementById('arpSimulation');
+
+            // Generate random target MAC
+            const targetMac = '00:50:56:' + 
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0') + ':' +
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0') + ':' +
+                Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+
+            simulationDiv.innerHTML = `
+                <div class="info-box">
+                    <h4>🔄 ARP Simulation Results</h4>
+                    <div class="code-block">
+Step 1: ARP Request (Broadcast)
+From: ${srcMac} (${srcIP})
+To:   FF:FF:FF:FF:FF:FF (broadcast)
+Message: "Who has ${targetIP}? Tell ${srcIP}"
+
+Step 2: ARP Reply (Unicast)
+From: ${targetMac} (${targetIP})
+To:   ${srcMac} (${srcIP})
+Message: "${targetIP} is at ${targetMac}"
+
+Step 3: Cache Update
+${srcIP} now knows: ${targetIP} = ${targetMac}
+Communication can proceed using MAC addresses
+                    </div>
+                </div>
+            `;
+        }
+
+        // Workplace configuration generator
+        function generateWorkplaceConfig() {
+            const deviceName = document.getElementById('deviceName').value || 'Unknown Device';
+            const deviceMac = document.getElementById('deviceMac').value || '00:00:00:00:00:00';
+            const deviceIP = document.getElementById('deviceIP').value || '192.168.1.100';
+            const purpose = document.getElementById('devicePurpose').value;
+
+            const configDiv = document.getElementById('workplaceConfig');
+
+            let config = '';
+            switch (purpose) {
+                case 'dhcp':
+                    config = `
+<div class="code-block">
+# Windows Server DHCP PowerShell
+Add-DhcpServerv4Reservation -ScopeId 192.168.1.0 \\
+  -IPAddress ${deviceIP} \\
+  -ClientId "${deviceMac.replace(/:/g, '-')}" \\
+  -Description "${deviceName}"
+
+# Cisco IOS DHCP Pool
+ip dhcp pool ${deviceName.replace(/\s+/g, '_').toUpperCase()}
+ host ${deviceIP} 255.255.255.0
+ client-identifier 01${deviceMac.replace(/:/g, '').toLowerCase()}
+
+# Linux ISC DHCP
+host ${deviceName.replace(/\s+/g, '-').toLowerCase()} {
+    hardware ethernet ${deviceMac.toLowerCase()};
+    fixed-address ${deviceIP};
+}
+</div>`;
+                    break;
+                case 'access':
+                    config = `
+<div class="code-block">
+# Cisco Switch Port Security
+interface GigabitEthernet0/1
+ description ${deviceName}
+ switchport mode access
+ switchport port-security
+ switchport port-security mac-address ${deviceMac.replace(/:/g, '.')}
+ switchport port-security violation restrict
+
+# pfSense Firewall Rule
+pass in on $lan_if from ${deviceMac.replace(/:/g, ':')} to any
+block in on $lan_if from !${deviceMac.replace(/:/g, ':')} to any port 22
+</div>`;
+                    break;
+                case 'monitoring':
+                    config = `
+<div class="code-block">
+# SNMP Monitoring Configuration
+# Monitor interface with MAC ${deviceMac}
+define host{
+    host_name       ${deviceName.replace(/\s+/g, '-').toLowerCase()}
+    address         ${deviceIP}
+    check_command   check-host-alive
+    # Custom variables
+    _MAC_ADDRESS    ${deviceMac}
+    _DEVICE_TYPE    ${deviceName}
+}
+
+# PRTG Sensor for MAC-based monitoring
+# Device: ${deviceName}
+# MAC: ${deviceMac}
+# IP: ${deviceIP}
+</div>`;
+                    break;
+                case 'wol':
+                    config = `
+<div class="code-block">
+# PowerShell Wake-on-LAN
+$mac = "${deviceMac.replace(/:/g, '-')}"
+$bytes = $mac.Split('-') | ForEach-Object {[byte]"0x$_"}
+$packet = (,0xFF * 6) + ($bytes * 16)
+$udp = New-Object System.Net.Sockets.UdpClient
+$udp.Send($packet, 102, "192.168.1.255", 9)
+
+# Linux wakeonlan
+wakeonlan ${deviceMac.toLowerCase()}
+
+# Python Wake-on-LAN
+import socket
+mac = "${deviceMac.replace(/:/g, '')}"
+data = 'FF' * 6 + mac * 16
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+sock.sendto(bytes.fromhex(data), ('255.255.255.255', 9))
+</div>`;
+                    break;
+            }
+
+            configDiv.innerHTML = `
+                <div class="info-box">
+                    <h4>⚙️ Generated Configuration - ${deviceName}</h4>
+                    ${config}
+                    <button class="btn btn-secondary" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy Configuration</button>
+                </div>
+            `;
+        }
+
+        // Quiz functionality
+        function startQuiz() {
+            currentQuestion = 0;
+            quizScore = 0;
+            selectedAnswer = null;
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+
+            const question = quizQuestions[currentQuestion];
+            const container = document.getElementById('quizContainer');
+            
+            container.innerHTML = `
+                <div class="quiz-question">
+                    <h3>Question ${currentQuestion + 1}</h3>
+                    <p>${question.question}</p>
+                    <div class="quiz-options">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option" onclick="selectAnswer(${index})" id="option-${index}">
+                                ${String.fromCharCode(65 + index)}. ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="btn" onclick="submitAnswer()" id="submitBtn" style="display: none; margin-top: 15px;">Submit Answer</button>
+                    <div id="questionResult" style="margin-top: 15px;"></div>
+                </div>
+            `;
+
+            // Update progress
+            const progress = ((currentQuestion) / quizQuestions.length) * 100;
+            document.getElementById('quizProgress').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+        }
+
+        function selectAnswer(answerIndex) {
+            // Clear previous selections
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => option.classList.remove('selected'));
+
+            // Select current answer
+            document.getElementById(`option-${answerIndex}`).classList.add('selected');
+            selectedAnswer = answerIndex;
+            document.getElementById('submitBtn').style.display = 'inline-block';
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer === null) return;
+
+            const question = quizQuestions[currentQuestion];
+            const isCorrect = selectedAnswer === question.correct;
+            
+            if (isCorrect) {
+                quizScore++;
+            }
+
+            // Show results
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedAnswer && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+
+            document.getElementById('questionResult').innerHTML = `
+                <div class="${isCorrect ? 'info-box' : 'warning-box'}">
+                    <p><strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect!'}</strong></p>
+                    <p>${question.explanation}</p>
+                </div>
+            `;
+
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            selectedAnswer = null;
+            document.getElementById('nextBtn').style.display = 'none';
+            displayQuestion();
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            const container = document.getElementById('quizContainer');
+            
+            let resultClass = 'error-box';
+            let resultMessage = 'Keep studying!';
+            
+            if (percentage >= 80) {
+                resultClass = 'info-box';
+                resultMessage = 'Excellent! You have mastered MAC addresses!';
+            } else if (percentage >= 60) {
+                resultClass = 'warning-box';
+                resultMessage = 'Good job! Review the areas you missed.';
+            }
+
+            container.innerHTML = `
+                <div class="${resultClass}">
+                    <h3>🎓 Quiz Complete!</h3>
+                    <p><strong>Your Score: ${quizScore} out of ${quizQuestions.length} (${percentage}%)</strong></p>
+                    <p>${resultMessage}</p>
+                </div>
+            `;
+
+            // Update progress to 100%
+            document.getElementById('quizProgress').style.width = '100%';
+            document.getElementById('progressText').textContent = `Completed: ${quizScore}/${quizQuestions.length} correct`;
+            document.getElementById('restartBtn').style.display = 'inline-block';
+        }
+
+        function restartQuiz() {
+            document.getElementById('restartBtn').style.display = 'none';
+            startQuiz();
+        }
+
+        // Utility functions
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success message
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start quiz on quiz tab
+            startQuiz();
+            
+            // Add event listeners for frame builder
+            updateFrame();
+            
+            // Set up tab navigation with keyboard support
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key >= '1' && e.key <= '6') {
+                    const tabs = ['fundamentals', 'format', 'frame-builder', 'operations', 'workplace', 'quiz'];
+                    const tabIndex = parseInt(e.key) - 1;
+                    if (tabs[tabIndex]) {
+                        showTab(tabs[tabIndex]);
+                        document.querySelector(`[onclick="showTab('${tabs[tabIndex]}')"]`).focus();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
