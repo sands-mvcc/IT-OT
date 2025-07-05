@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP & UDP Protocol Interactive Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1, h2, h3 {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2d5a2d;
+            padding-bottom: 10px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: #f0f0f0;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background-color: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button.active {
+            background-color: #2d5a2d;
+            color: white;
+        }
+        
+        .tab-button:hover {
+            background-color: #4a7a4a;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: #f9f9f9;
+            border: 2px solid #2d5a2d;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .protocol-card {
+            background-color: white;
+            border: 2px solid #2d5a2d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header-field {
+            background-color: #e8f5e8;
+            border: 1px solid #2d5a2d;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .field-input {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #2d5a2d;
+            border-radius: 3px;
+        }
+        
+        .simulation-area {
+            background-color: black;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            min-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .btn {
+            background-color: #2d5a2d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #4a7a4a;
+        }
+        
+        .btn-secondary {
+            background-color: #666;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #888;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 2px solid #2d5a2d;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: #2d5a2d;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f0f8f0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: #e0e0e0;
+            margin: 0 2px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .step.active {
+            background-color: #2d5a2d;
+            color: white;
+        }
+        
+        .workplace-example {
+            background-color: #f0f8f0;
+            border-left: 5px solid #2d5a2d;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            background-color: #ffff99;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #2d5a2d;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 TCP & UDP Protocol Interactive Trainer</h1>
+        
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="showTab('overview')">Protocol Overview</button>
+            <button class="tab-button" onclick="showTab('headers')">Header Construction</button>
+            <button class="tab-button" onclick="showTab('simulation')">Communication Simulation</button>
+            <button class="tab-button" onclick="showTab('workplace')">Workplace Applications</button>
+            <button class="tab-button" onclick="showTab('quiz')">Interactive Quiz</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2>Protocol Comparison: TCP vs UDP</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>TCP (Transmission Control Protocol)</th>
+                        <th>UDP (User Datagram Protocol)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Connection Type</strong></td>
+                        <td>Connection-oriented (reliable)</td>
+                        <td>Connectionless (unreliable)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reliability</strong></td>
+                        <td>Guaranteed delivery, error checking, retransmission</td>
+                        <td>Best effort delivery, no guarantees</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Speed</strong></td>
+                        <td>Slower due to overhead</td>
+                        <td>Faster, minimal overhead</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Header Size</strong></td>
+                        <td>20-60 bytes (variable)</td>
+                        <td>8 bytes (fixed)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flow Control</strong></td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use Cases</strong></td>
+                        <td>Web browsing, email, file transfer</td>
+                        <td>Gaming, streaming, DNS queries</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="protocol-card">
+                <h3>🔄 TCP - The Reliable Protocol</h3>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li><span class="highlight">Three-way handshake</span> for connection establishment</li>
+                    <li><span class="highlight">Sequence numbers</span> for ordered delivery</li>
+                    <li><span class="highlight">Acknowledgments</span> for reliability</li>
+                    <li><span class="highlight">Flow control</span> to prevent overwhelming receiver</li>
+                    <li><span class="highlight">Congestion control</span> to manage network traffic</li>
+                </ul>
+            </div>
+
+            <div class="protocol-card">
+                <h3>⚡ UDP - The Fast Protocol</h3>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li><span class="highlight">Minimal overhead</span> for maximum speed</li>
+                    <li><span class="highlight">No connection setup</span> required</li>
+                    <li><span class="highlight">Best effort delivery</span> - send and forget</li>
+                    <li><span class="highlight">Broadcast/multicast</span> support</li>
+                    <li><span class="highlight">Application-level reliability</span> if needed</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Headers Tab -->
+        <div id="headers" class="tab-content">
+            <h2>Interactive Header Construction</h2>
+            
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <h3>🔧 TCP Header Builder</h3>
+                    <div class="protocol-card">
+                        <div class="header-field">
+                            <span>Source Port (16 bits):</span>
+                            <input type="number" class="field-input" id="tcp-src-port" min="0" max="65535" value="80">
+                        </div>
+                        <div class="header-field">
+                            <span>Destination Port (16 bits):</span>
+                            <input type="number" class="field-input" id="tcp-dst-port" min="0" max="65535" value="8080">
+                        </div>
+                        <div class="header-field">
+                            <span>Sequence Number (32 bits):</span>
+                            <input type="number" class="field-input" id="tcp-seq" min="0" value="1000">
+                        </div>
+                        <div class="header-field">
+                            <span>Acknowledgment Number (32 bits):</span>
+                            <input type="number" class="field-input" id="tcp-ack" min="0" value="2000">
+                        </div>
+                        <div class="header-field">
+                            <span>Window Size (16 bits):</span>
+                            <input type="number" class="field-input" id="tcp-window" min="0" max="65535" value="64240">
+                        </div>
+                        <div class="header-field">
+                            <span>Flags:</span>
+                            <div>
+                                <label><input type="checkbox" id="tcp-syn"> SYN</label>
+                                <label><input type="checkbox" id="tcp-ack-flag"> ACK</label>
+                                <label><input type="checkbox" id="tcp-fin"> FIN</label>
+                                <label><input type="checkbox" id="tcp-rst"> RST</label>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="buildTCPHeader()">Build TCP Header</button>
+                    </div>
+                </div>
+
+                <div style="flex: 1;">
+                    <h3>⚡ UDP Header Builder</h3>
+                    <div class="protocol-card">
+                        <div class="header-field">
+                            <span>Source Port (16 bits):</span>
+                            <input type="number" class="field-input" id="udp-src-port" min="0" max="65535" value="53">
+                        </div>
+                        <div class="header-field">
+                            <span>Destination Port (16 bits):</span>
+                            <input type="number" class="field-input" id="udp-dst-port" min="0" max="65535" value="5353">
+                        </div>
+                        <div class="header-field">
+                            <span>Length (16 bits):</span>
+                            <input type="number" class="field-input" id="udp-length" min="8" value="28">
+                        </div>
+                        <div class="header-field">
+                            <span>Checksum (16 bits):</span>
+                            <input type="text" class="field-input" id="udp-checksum" value="0x1A2B" readonly>
+                        </div>
+                        <button class="btn" onclick="buildUDPHeader()">Build UDP Header</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-area" id="header-output">
+                Click "Build Header" buttons above to see the constructed headers...
+            </div>
+        </div>
+
+        <!-- Simulation Tab -->
+        <div id="simulation" class="tab-content">
+            <h2>Protocol Communication Simulation</h2>
+            
+            <div class="step-indicator">
+                <div class="step" id="step1">1. Connection Setup</div>
+                <div class="step" id="step2">2. Data Transfer</div>
+                <div class="step" id="step3">3. Flow Control</div>
+                <div class="step" id="step4">4. Connection Close</div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="simulateTCP()">🔄 Simulate TCP Communication</button>
+                <button class="btn" onclick="simulateUDP()">⚡ Simulate UDP Communication</button>
+                <button class="btn btn-secondary" onclick="clearSimulation()">Clear</button>
+            </div>
+
+            <div class="simulation-area" id="simulation-output">
+                Welcome to the Protocol Simulator!
+                Choose a protocol to simulate communication...
+                
+                🔄 TCP: Reliable, connection-oriented communication
+                ⚡ UDP: Fast, connectionless communication
+            </div>
+        </div>
+
+        <!-- Workplace Tab -->
+        <div id="workplace" class="tab-content">
+            <h2>Real-World Workplace Applications</h2>
+            
+            <div class="workplace-example">
+                <h3>🌐 Web Development & HTTP/HTTPS</h3>
+                <p><strong>Protocol:</strong> TCP</p>
+                <p><strong>Use Case:</strong> All web traffic uses TCP for reliable delivery of HTML, CSS, JavaScript, and API responses.</p>
+                <p><strong>Why TCP:</strong> Web pages must arrive complete and in order. Missing packets would break the user experience.</p>
+                <p><strong>Example:</strong> When you load a company website, TCP ensures all resources load correctly.</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>📧 Email Systems (SMTP, IMAP, POP3)</h3>
+                <p><strong>Protocol:</strong> TCP</p>
+                <p><strong>Use Case:</strong> Email delivery requires guaranteed, ordered transmission.</p>
+                <p><strong>Why TCP:</strong> Email content must arrive intact - no missing words or corrupted attachments.</p>
+                <p><strong>Example:</strong> Corporate email servers use TCP to ensure business communications are reliable.</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>🎮 Real-time Gaming & Live Streaming</h3>
+                <p><strong>Protocol:</strong> UDP</p>
+                <p><strong>Use Case:</strong> Online games and live video need speed over reliability.</p>
+                <p><strong>Why UDP:</strong> Better to skip a frame than wait for retransmission and cause lag.</p>
+                <p><strong>Example:</strong> Corporate video conferencing, online training sessions, webinars.</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>🔍 DNS (Domain Name System)</h3>
+                <p><strong>Protocol:</strong> UDP (primary), TCP (fallback)</p>
+                <p><strong>Use Case:</strong> Quick domain name resolution for web browsing.</p>
+                <p><strong>Why UDP:</strong> DNS queries are small and fast response is critical.</p>
+                <p><strong>Example:</strong> When employees access company.com, DNS quickly resolves the IP address.</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>📁 File Transfer (FTP, SFTP)</h3>
+                <p><strong>Protocol:</strong> TCP</p>
+                <p><strong>Use Case:</strong> Uploading/downloading files, backups, software deployment.</p>
+                <p><strong>Why TCP:</strong> Files must transfer completely without corruption.</p>
+                <p><strong>Example:</strong> IT deploying software updates or backing up company data.</p>
+            </div>
+
+            <div class="workplace-example">
+                <h3>📊 Network Monitoring & SNMP</h3>
+                <p><strong>Protocol:</strong> UDP</p>
+                <p><strong>Use Case:</strong> Collecting network statistics and device status.</p>
+                <p><strong>Why UDP:</strong> Monitoring data is frequent and temporary - speed matters more than perfect delivery.</p>
+                <p><strong>Example:</strong> IT monitoring server performance and network health.</p>
+            </div>
+
+            <h3>🎯 Choosing the Right Protocol</h3>
+            <div class="protocol-card">
+                <p><strong>Use TCP when you need:</strong></p>
+                <ul>
+                    <li>Guaranteed delivery (financial transactions, email)</li>
+                    <li>Data integrity (file downloads, web pages)</li>
+                    <li>Ordered delivery (streaming video files)</li>
+                </ul>
+                
+                <p><strong>Use UDP when you need:</strong></p>
+                <ul>
+                    <li>Speed over reliability (gaming, live video)</li>
+                    <li>Low latency (DNS queries, time synchronization)</li>
+                    <li>Broadcast/multicast (network discovery)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <h2>Interactive Knowledge Quiz</h2>
+            
+            <div class="protocol-card">
+                <h3>Question <span id="question-number">1</span> of 5</h3>
+                <p id="question-text">Loading question...</p>
+                
+                <div id="quiz-options" style="margin: 20px 0;">
+                    <!-- Options will be inserted here -->
+                </div>
+                
+                <div id="quiz-feedback" style="margin: 20px 0; min-height: 50px;">
+                    <!-- Feedback will appear here -->
+                </div>
+                
+                <button class="btn" onclick="checkAnswer()" id="submit-btn">Submit Answer</button>
+                <button class="btn btn-secondary" onclick="nextQuestion()" id="next-btn" style="display: none;">Next Question</button>
+                <button class="btn" onclick="restartQuiz()" id="restart-btn" style="display: none;">Restart Quiz</button>
+            </div>
+            
+            <div class="protocol-card">
+                <h3>📊 Quiz Progress</h3>
+                <p>Score: <span id="quiz-score">0</span>/5</p>
+                <div style="background-color: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                    <div id="progress-bar" style="background-color: #2d5a2d; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab and activate button
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // TCP Header Builder
+        function buildTCPHeader() {
+            const srcPort = document.getElementById('tcp-src-port').value;
+            const dstPort = document.getElementById('tcp-dst-port').value;
+            const seqNum = document.getElementById('tcp-seq').value;
+            const ackNum = document.getElementById('tcp-ack').value;
+            const windowSize = document.getElementById('tcp-window').value;
+            
+            const flags = [];
+            if (document.getElementById('tcp-syn').checked) flags.push('SYN');
+            if (document.getElementById('tcp-ack-flag').checked) flags.push('ACK');
+            if (document.getElementById('tcp-fin').checked) flags.push('FIN');
+            if (document.getElementById('tcp-rst').checked) flags.push('RST');
+            
+            const output = `
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                              TCP HEADER (20+ bytes)                          ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║ Source Port: ${srcPort.padStart(5)} (0x${parseInt(srcPort).toString(16).toUpperCase().padStart(4, '0')})    │    Destination Port: ${dstPort.padStart(5)} (0x${parseInt(dstPort).toString(16).toUpperCase().padStart(4, '0')}) ║
+║                                                                               ║
+║ Sequence Number: ${seqNum.padStart(10)} (0x${parseInt(seqNum).toString(16).toUpperCase().padStart(8, '0')})                    ║
+║                                                                               ║
+║ Acknowledgment Number: ${ackNum.padStart(8)} (0x${parseInt(ackNum).toString(16).toUpperCase().padStart(8, '0')})                  ║
+║                                                                               ║
+║ Header Length: 20 bytes  │  Flags: ${flags.join(', ') || 'None'}                        ║
+║                                                                               ║
+║ Window Size: ${windowSize.padStart(5)} (0x${parseInt(windowSize).toString(16).toUpperCase().padStart(4, '0')})     │     Checksum: [Calculated]       ║
+║                                                                               ║
+║ Urgent Pointer: 0        │     Options: [None]                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+📊 Analysis:
+✅ Header Size: 20 bytes (minimum TCP header)
+✅ Port Range: Both ports are valid (0-65535)
+✅ Flags Set: ${flags.length > 0 ? flags.join(', ') : 'No flags set'}
+✅ Window Size: ${windowSize} bytes (flow control)
+            `;
+            
+            document.getElementById('header-output').innerHTML = output;
+        }
+
+        // UDP Header Builder
+        function buildUDPHeader() {
+            const srcPort = document.getElementById('udp-src-port').value;
+            const dstPort = document.getElementById('udp-dst-port').value;
+            const length = document.getElementById('udp-length').value;
+            const checksum = document.getElementById('udp-checksum').value;
+            
+            const output = `
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                               UDP HEADER (8 bytes)                           ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║ Source Port: ${srcPort.padStart(5)} (0x${parseInt(srcPort).toString(16).toUpperCase().padStart(4, '0')})    │    Destination Port: ${dstPort.padStart(5)} (0x${parseInt(dstPort).toString(16).toUpperCase().padStart(4, '0')}) ║
+║                                                                               ║
+║ Length: ${length.padStart(8)} bytes        │    Checksum: ${checksum.padStart(8)}                  ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+📊 Analysis:
+✅ Header Size: 8 bytes (fixed UDP header)
+✅ Port Range: Both ports are valid (0-65535)
+✅ Length: ${length} bytes (header + data)
+✅ Data Size: ${length - 8} bytes
+${parseInt(length) < 8 ? '❌ Error: Length must be at least 8 bytes' : ''}
+${parseInt(srcPort) === 53 || parseInt(dstPort) === 53 ? '🔍 DNS traffic detected!' : ''}
+${parseInt(srcPort) === 80 || parseInt(dstPort) === 80 ? '🌐 HTTP traffic detected!' : ''}
+
+💡 UDP Advantages:
+• Minimal overhead (only 8 bytes)
+• No connection setup required
+• Perfect for real-time applications
+            `;
+            
+            document.getElementById('header-output').innerHTML = output;
+        }
+
+        // TCP Simulation
+        function simulateTCP() {
+            let output = '';
+            let step = 0;
+            
+            const steps = [
+                '🤝 THREE-WAY HANDSHAKE',
+                '📤 DATA TRANSMISSION',
+                '🔄 FLOW CONTROL',
+                '👋 CONNECTION TERMINATION'
+            ];
+            
+            function animateStep() {
+                if (step < steps.length) {
+                    // Update step indicator
+                    document.querySelectorAll('.step').forEach((el, i) => {
+                        el.classList.toggle('active', i === step);
+                    });
+                    
+                    switch(step) {
+                        case 0:
+                            output += `
+${steps[step]}
+════════════════════════════════════════════════════════════════════════════════
+Client → Server: SYN (seq=1000)
+    ╭─────────────────────────────────────────────────╮
+    │ "Hey Server, I want to establish a connection!" │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: SYN-ACK (seq=2000, ack=1001)
+    ╭─────────────────────────────────────────────────╮
+    │ "Sure! I acknowledge your request and here's    │
+    │  my sequence number for the connection."        │
+    ╰─────────────────────────────────────────────────╯
+
+Client → Server: ACK (seq=1001, ack=2001)
+    ╭─────────────────────────────────────────────────╮
+    │ "Great! Connection established successfully!"   │
+    ╰─────────────────────────────────────────────────╯
+
+✅ CONNECTION ESTABLISHED - Ready for data transfer!
+
+`;
+                            break;
+                        case 1:
+                            output += `
+${steps[step]}
+════════════════════════════════════════════════════════════════════════════════
+Client → Server: DATA (seq=1001, len=500, "HTTP GET /index.html")
+    ╭─────────────────────────────────────────────────╮
+    │ Sending: "GET /index.html HTTP/1.1\\r\\n         │
+    │          Host: example.com\\r\\n\\r\\n"            │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: ACK (ack=1501)
+    ╭─────────────────────────────────────────────────╮
+    │ "Got your HTTP request! Processing..."          │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: DATA (seq=2001, len=2048, "HTTP 200 OK + HTML")
+    ╭─────────────────────────────────────────────────╮
+    │ Sending: "HTTP/1.1 200 OK\\r\\n                  │
+    │          Content-Length: 1500\\r\\n               │
+    │          <html><body>Welcome!</body></html>"     │
+    ╰─────────────────────────────────────────────────╯
+
+Client → Server: ACK (ack=4049)
+    ╭─────────────────────────────────────────────────╮
+    │ "Received the webpage! Thanks!"                 │
+    ╰─────────────────────────────────────────────────╯
+
+✅ DATA TRANSFER COMPLETE - 2048 bytes received reliably!
+
+`;
+                            break;
+                        case 2:
+                            output += `
+${steps[step]}
+════════════════════════════════════════════════════════════════════════════════
+Server → Client: DATA (Window=32768)
+    ╭─────────────────────────────────────────────────╮
+    │ "I can receive up to 32KB more data"            │
+    ╰─────────────────────────────────────────────────╯
+
+Client → Server: DATA (Large chunk - 64KB)
+    ╭─────────────────────────────────────────────────╮
+    │ "Sending 64KB of data... whoops, too much!"     │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: Window Update (Window=0)
+    ╭─────────────────────────────────────────────────╮
+    │ "STOP! My buffer is full. Wait for me to        │
+    │  process the data before sending more."         │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: Window Update (Window=65535)
+    ╭─────────────────────────────────────────────────╮
+    │ "OK, buffer cleared! You can send more now."    │
+    ╰─────────────────────────────────────────────────╯
+
+✅ FLOW CONTROL WORKING - Preventing buffer overflow!
+
+`;
+                            break;
+                        case 3:
+                            output += `
+${steps[step]}
+════════════════════════════════════════════════════════════════════════════════
+Client → Server: FIN (seq=5000)
+    ╭─────────────────────────────────────────────────╮
+    │ "I'm done sending data. Let's close this        │
+    │  connection gracefully."                        │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: ACK (ack=5001)
+    ╭─────────────────────────────────────────────────╮
+    │ "Acknowledged. I'll close my side too."         │
+    ╰─────────────────────────────────────────────────╯
+
+Server → Client: FIN (seq=6000)
+    ╭─────────────────────────────────────────────────╮
+    │ "I'm also done. Ready to terminate."            │
+    ╰─────────────────────────────────────────────────╯
+
+Client → Server: ACK (ack=6001)
+    ╭─────────────────────────────────────────────────╮
+    │ "Connection closed successfully!"               │
+    ╰─────────────────────────────────────────────────╯
+
+✅ CONNECTION CLOSED - All data delivered reliably!
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 TCP SIMULATION COMPLETE!
+
+📊 Summary:
+• Reliable delivery: ✅ All data acknowledged
+• Ordered delivery: ✅ Sequence numbers maintained  
+• Flow control: ✅ Prevented buffer overflow
+• Error recovery: ✅ Ready for retransmissions
+• Clean shutdown: ✅ Graceful connection termination
+
+💼 Perfect for: Web browsing, email, file transfers, database connections
+`;
+                            break;
+                    }
+                    
+                    document.getElementById('simulation-output').innerHTML = output;
+                    step++;
+                    setTimeout(animateStep, 2000);
+                }
+            }
+            
+            output = 'Starting TCP Communication Simulation...\n\n';
+            document.getElementById('simulation-output').innerHTML = output;
+            setTimeout(animateStep, 1000);
+        }
+
+        // UDP Simulation
+        function simulateUDP() {
+            const output = `
+⚡ UDP COMMUNICATION SIMULATION
+════════════════════════════════════════════════════════════════════════════════
+
+🚀 INSTANT MESSAGING (No handshake needed!)
+
+Client → Server: UDP Packet #1 (Port 5060, 512 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ "INVITE sip:bob@company.com SIP/2.0"            │
+    │ Timestamp: 14:30:15.123                         │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ SENT (no ACK needed)
+
+Client → Server: UDP Packet #2 (Port 5060, 256 bytes)  
+    ╭─────────────────────────────────────────────────╮
+    │ "Voice data: [compressed audio stream]"         │
+    │ Timestamp: 14:30:15.143                         │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ SENT (20ms later)
+
+Client → Server: UDP Packet #3 (Port 5060, 256 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ "Voice data: [compressed audio stream]"         │
+    │ Timestamp: 14:30:15.163                         │
+    ╰─────────────────────────────────────────────────╯
+    Status: ❌ LOST (network congestion)
+
+Client → Server: UDP Packet #4 (Port 5060, 256 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ "Voice data: [compressed audio stream]"         │
+    │ Timestamp: 14:30:15.183                         │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ SENT (conversation continues)
+
+🔍 DNS QUERY EXAMPLE:
+
+Client → DNS Server: Query (Port 53, 32 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ "What's the IP address for www.company.com?"    │
+    │ Query ID: 0x1A2B                                │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ SENT
+
+DNS Server → Client: Response (Port 53, 48 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ "www.company.com = 192.168.1.100"               │
+    │ Query ID: 0x1A2B (matching request)             │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ RECEIVED (2ms round trip)
+
+🎮 GAMING PACKET EXAMPLE:
+
+Client → Game Server: Player Position (Port 7777, 64 bytes)
+    ╭─────────────────────────────────────────────────╮
+    │ Player: "John_Doe"                              │
+    │ Position: X=125.3, Y=67.8, Z=45.1               │
+    │ Health: 95/100, Ammo: 24/30                     │
+    │ Timestamp: 14:30:15.201                         │
+    ╰─────────────────────────────────────────────────╯
+    Status: ✅ SENT (16ms ping)
+
+═══════════════════════════════════════════════════════════════════════════════
+⚡ UDP SIMULATION COMPLETE!
+
+📊 Summary:
+• Speed: ✅ Ultra-fast delivery (no handshakes)
+• Overhead: ✅ Minimal (8-byte header only)
+• Reliability: ❌ Best effort (packet #3 lost)
+• Recovery: 🤷 Application must handle losses
+• Use case: ✅ Perfect for real-time applications
+
+💼 Perfect for: Gaming, VoIP, live streaming, DNS queries, IoT sensors
+
+🔧 Developer Note:
+In the lost packet scenario, the VoIP application would either:
+• Skip the missing audio frame (barely noticeable)
+• Use error concealment techniques
+• Request retransmission at application layer if critical
+            `;
+            
+            document.getElementById('simulation-output').innerHTML = output;
+        }
+
+        function clearSimulation() {
+            document.getElementById('simulation-output').innerHTML = `
+Welcome to the Protocol Simulator!
+Choose a protocol to simulate communication...
+
+🔄 TCP: Reliable, connection-oriented communication
+⚡ UDP: Fast, connectionless communication
+            `;
+            
+            // Reset step indicators
+            document.querySelectorAll('.step').forEach(el => {
+                el.classList.remove('active');
+            });
+        }
+
+        // Quiz functionality
+        const quizQuestions = [
+            {
+                question: "Which protocol provides guaranteed delivery of data?",
+                options: ["TCP", "UDP", "Both", "Neither"],
+                correct: 0,
+                explanation: "TCP provides guaranteed delivery through acknowledgments and retransmissions. UDP is 'best effort' only."
+            },
+            {
+                question: "What is the size of a UDP header?",
+                options: ["4 bytes", "8 bytes", "20 bytes", "Variable"],
+                correct: 1,
+                explanation: "UDP has a fixed 8-byte header containing: Source Port (2), Destination Port (2), Length (2), and Checksum (2)."
+            },
+            {
+                question: "Which protocol would be best for a video game requiring real-time player positions?",
+                options: ["TCP - for reliability", "UDP - for speed", "Both equally", "HTTP"],
+                correct: 1,
+                explanation: "UDP is better for gaming because speed is more important than perfect delivery. Missing one position update won't break the game."
+            },
+            {
+                question: "What does the TCP three-way handshake establish?",
+                options: ["Connection termination", "Data transfer", "Connection establishment", "Error correction"],
+                correct: 2,
+                explanation: "The three-way handshake (SYN, SYN-ACK, ACK) establishes a reliable connection before data transfer begins."
+            },
+            {
+                question: "Which protocol is typically used for DNS queries?",
+                options: ["TCP only", "UDP primarily", "HTTP", "FTP"],
+                correct: 1,
+                explanation: "DNS primarily uses UDP for fast queries. TCP is used as fallback for large responses or zone transfers."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let quizScore = 0;
+        let selectedAnswer = -1;
+
+        function initQuiz() {
+            currentQuestion = 0;
+            quizScore = 0;
+            selectedAnswer = -1;
+            updateQuizDisplay();
+        }
+
+        function updateQuizDisplay() {
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('question-number').textContent = currentQuestion + 1;
+            document.getElementById('question-text').textContent = question.question;
+            
+            const optionsHtml = question.options.map((option, index) => `
+                <label style="display: block; margin: 10px 0; cursor: pointer;">
+                    <input type="radio" name="quiz-option" value="${index}" onchange="selectAnswer(${index})">
+                    ${option}
+                </label>
+            `).join('');
+            
+            document.getElementById('quiz-options').innerHTML = optionsHtml;
+            document.getElementById('quiz-feedback').innerHTML = '';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'none';
+            
+            updateProgress();
+        }
+
+        function selectAnswer(index) {
+            selectedAnswer = index;
+        }
+
+        function checkAnswer() {
+            if (selectedAnswer === -1) {
+                document.getElementById('quiz-feedback').innerHTML = '<span class="error">Please select an answer!</span>';
+                return;
+            }
+            
+            const question = quizQuestions[currentQuestion];
+            const isCorrect = selectedAnswer === question.correct;
+            
+            if (isCorrect) {
+                quizScore++;
+                document.getElementById('quiz-feedback').innerHTML = `
+                    <span class="success">✅ Correct!</span><br>
+                    ${question.explanation}
+                `;
+            } else {
+                document.getElementById('quiz-feedback').innerHTML = `
+                    <span class="error">❌ Incorrect.</span><br>
+                    The correct answer is: <strong>${question.options[question.correct]}</strong><br>
+                    ${question.explanation}
+                `;
+            }
+            
+            document.getElementById('submit-btn').style.display = 'none';
+            
+            if (currentQuestion < quizQuestions.length - 1) {
+                document.getElementById('next-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('restart-btn').style.display = 'inline-block';
+                showFinalScore();
+            }
+            
+            updateProgress();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            selectedAnswer = -1;
+            updateQuizDisplay();
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        function updateProgress() {
+            document.getElementById('quiz-score').textContent = quizScore;
+            const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        function showFinalScore() {
+            const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+            let message = '';
+            
+            if (percentage >= 80) {
+                message = '🎉 Excellent! You have a strong understanding of TCP/UDP protocols!';
+            } else if (percentage >= 60) {
+                message = '👍 Good job! Review the concepts you missed to improve further.';
+            } else {
+                message = '📚 Keep studying! Understanding these protocols is crucial for networking.';
+            }
+            
+            document.getElementById('quiz-feedback').innerHTML += `
+                <br><br>
+                <strong>Final Score: ${quizScore}/${quizQuestions.length} (${percentage}%)</strong><br>
+                ${message}
+            `;
+        }
+
+        // Initialize quiz when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuiz();
+        });
+    </script>
+</body>
+</html>
