@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT/OT Cybersecurity Convergence Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5a3d, #4a7c4a);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            background: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 0 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: black;
+        }
+
+        .tab-button:hover {
+            background: #e8f5e8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-button.active {
+            background: #2d5a3d;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .domain-card {
+            border: 2px solid #2d5a3d;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .domain-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(45, 90, 61, 0.2);
+            border-color: #4a7c4a;
+        }
+
+        .domain-card.expanded {
+            background: #f8fff8;
+            border-color: #4a7c4a;
+        }
+
+        .domain-title {
+            color: #2d5a3d;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .domain-description {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .domain-description.visible {
+            display: block;
+        }
+
+        .framework-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .framework-card {
+            background: linear-gradient(145deg, #f8fff8, #e8f5e8);
+            border: 2px solid #2d5a3d;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .framework-title {
+            color: #2d5a3d;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .quiz-container {
+            background: linear-gradient(145deg, #f8fff8, #e8f5e8);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d5a3d;
+        }
+
+        .answer-option {
+            background: white;
+            border: 2px solid #2d5a3d;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-option:hover {
+            background: #e8f5e8;
+            transform: translateX(5px);
+        }
+
+        .answer-option.correct {
+            background: #4a7c4a;
+            color: white;
+        }
+
+        .answer-option.incorrect {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2d5a3d, #4a7c4a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .interactive-diagram {
+            position: relative;
+            background: linear-gradient(145deg, #f8fff8, #e8f5e8);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram-element {
+            background: white;
+            border: 2px solid #2d5a3d;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .diagram-element:hover {
+            background: #2d5a3d;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .section-title {
+            color: #2d5a3d;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #2d5a3d;
+            padding-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(145deg, #e8f5e8, #d4edd4);
+            border-left: 5px solid #2d5a3d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid #2d5a3d;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d5a3d;
+        }
+
+        .btn-primary {
+            background: #2d5a3d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #4a7c4a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .checklist-item.completed {
+            background: #e8f5e8;
+            border-color: #2d5a3d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>IT/OT Cybersecurity Convergence Training</h1>
+            <p>Interactive Learning Tool for Security Professionals</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+            <button class="tab-button" onclick="showTab('frameworks')">Frameworks</button>
+            <button class="tab-button" onclick="showTab('domains')">Nine Domains</button>
+            <button class="tab-button" onclick="showTab('assessment')">Assessment</button>
+            <button class="tab-button" onclick="showTab('quiz')">Knowledge Check</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <h2 class="section-title">IT/OT Convergence Overview</h2>
+            
+            <div class="highlight-box">
+                <h3>What is IT/OT Convergence?</h3>
+                <p>IT/OT convergence is the integration of Information Technology (IT) systems with Operational Technology (OT) systems, enabling physical processes to communicate with digital networks and creating unified cyber-physical systems.</p>
+            </div>
+
+            <div class="stats-display">
+                <div class="stat-card">
+                    <div class="stat-number">41.6B</div>
+                    <div>Connected IoT devices by 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50%</div>
+                    <div>OT attacks originate from IT networks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">75%</div>
+                    <div>Industrial controllers have unpatched vulnerabilities</div>
+                </div>
+            </div>
+
+            <div class="interactive-diagram">
+                <h3>Click on each component to learn more:</h3>
+                <div class="diagram-element" onclick="showInfo('it-systems')">IT Systems</div>
+                <div class="diagram-element" onclick="showInfo('network')">Network</div>
+                <div class="diagram-element" onclick="showInfo('ot-systems')">OT Systems</div>
+                <div class="diagram-element" onclick="showInfo('physical')">Physical Processes</div>
+                
+                <div id="info-display" style="margin-top: 20px; padding: 20px; background: white; border-radius: 10px; display: none;">
+                    <div id="info-content"></div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="overview-progress"></div>
+            </div>
+        </div>
+
+        <!-- Frameworks Tab -->
+        <div id="frameworks" class="tab-content">
+            <h2 class="section-title">Cybersecurity Frameworks</h2>
+            
+            <div class="framework-comparison">
+                <div class="framework-card">
+                    <div class="framework-title">NIST SP 800-82</div>
+                    <p><strong>Focus:</strong> Guide to Industrial Control Systems Security</p>
+                    <p><strong>Scope:</strong> OT-specific security controls</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul style="text-align: left; margin-top: 10px;">
+                        <li>Risk-based approach</li>
+                        <li>OT overlay for NIST 800-53</li>
+                        <li>Lifecycle management</li>
+                        <li>Incident response</li>
+                    </ul>
+                </div>
+
+                <div class="framework-card">
+                    <div class="framework-title">IEC 62443</div>
+                    <p><strong>Focus:</strong> Industrial Automation & Control Systems</p>
+                    <p><strong>Scope:</strong> Comprehensive OT security</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul style="text-align: left; margin-top: 10px;">
+                        <li>Zone & conduit model</li>
+                        <li>Security Levels (SL1-SL4)</li>
+                        <li>Component requirements</li>
+                        <li>System development</li>
+                    </ul>
+                </div>
+
+                <div class="framework-card">
+                    <div class="framework-title">ISO 27001</div>
+                    <p><strong>Focus:</strong> Information Security Management</p>
+                    <p><strong>Scope:</strong> Enterprise-wide ISMS</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul style="text-align: left; margin-top: 10px;">
+                        <li>PDCA cycle</li>
+                        <li>Risk management</li>
+                        <li>Continuous improvement</li>
+                        <li>Certification framework</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Framework Integration Strategy</h3>
+                <p>Modern organizations typically implement a combination of these frameworks:</p>
+                <ul>
+                    <li><strong>ISO 27001:</strong> Provides enterprise governance and policy framework</li>
+                    <li><strong>NIST CSF + SP 800-82:</strong> Offers operational guidance for IT/OT environments</li>
+                    <li><strong>IEC 62443:</strong> Delivers detailed OT-specific technical requirements</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Nine Domains Tab -->
+        <div id="domains" class="tab-content">
+            <h2 class="section-title">KPMG's Nine Security Domains</h2>
+            
+            <p style="text-align: center; margin-bottom: 30px; font-size: 1.1em;">
+                Based on leading standards (NIST SP 800-82, IEC 62443, ISO 27001, NERC CIP), these domains define comprehensive security for IT/OT convergence.
+            </p>
+
+            <div class="domain-grid">
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">1. Leadership & Governance</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Risk management ownership and governance mechanisms</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Executive sponsorship and accountability</li>
+                            <li>Risk appetite definition</li>
+                            <li>Governance structure for IT/OT convergence</li>
+                            <li>Resource allocation and budgeting</li>
+                            <li>Performance measurement and KPIs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">2. Security Operations</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Proactive identification and prevention of cyber threats</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>24/7 security monitoring</li>
+                            <li>Threat intelligence integration</li>
+                            <li>Security incident response</li>
+                            <li>Vulnerability management</li>
+                            <li>Penetration testing and assessments</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">3. Information Risk Management</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Assessment and monitoring of information risks</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Risk assessment methodologies</li>
+                            <li>Risk register maintenance</li>
+                            <li>Impact and probability analysis</li>
+                            <li>Risk treatment strategies</li>
+                            <li>Continuous risk monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">4. Security Architecture</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Secure design of information systems</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Network segmentation and zoning</li>
+                            <li>Secure-by-design principles</li>
+                            <li>Defense-in-depth strategy</li>
+                            <li>Access control frameworks</li>
+                            <li>Encryption and data protection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">5. Human Factors</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Security culture, skills, and awareness</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Security awareness training</li>
+                            <li>Role-based training programs</li>
+                            <li>Cultural transformation initiatives</li>
+                            <li>Competency development</li>
+                            <li>Change management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">6. Technical Security</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Implementation of technical controls to mitigate risks</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Endpoint protection and antimalware</li>
+                            <li>Network security controls</li>
+                            <li>Identity and access management</li>
+                            <li>Patch management processes</li>
+                            <li>Security configuration management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">7. Third Parties</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Managing supplier and third-party risks</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Vendor risk assessments</li>
+                            <li>Supply chain security</li>
+                            <li>Contract security requirements</li>
+                            <li>Third-party monitoring</li>
+                            <li>Shared responsibility models</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">8. Compliance</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Demonstrating adherence to regulatory and certification standards</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Regulatory mapping and analysis</li>
+                            <li>Compliance monitoring and reporting</li>
+                            <li>Audit management</li>
+                            <li>Documentation and evidence</li>
+                            <li>Continuous compliance improvement</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="domain-card" onclick="toggleDomain(this)">
+                    <div class="domain-title">9. Resilience</div>
+                    <div class="domain-description">
+                        <p><strong>Purpose:</strong> Ensuring the ability to defend and recover from cyberattacks</p>
+                        <p><strong>Key Elements:</strong></p>
+                        <ul>
+                            <li>Business continuity planning</li>
+                            <li>Disaster recovery procedures</li>
+                            <li>Crisis management</li>
+                            <li>Backup and recovery testing</li>
+                            <li>Lessons learned integration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Tab -->
+        <div id="assessment" class="tab-content">
+            <h2 class="section-title">Security Maturity Assessment</h2>
+            
+            <div class="highlight-box">
+                <h3>Evaluate Your IT/OT Security Posture</h3>
+                <p>Use this checklist to assess your organization's readiness across the nine security domains:</p>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h3 style="color: #2d5a3d; margin-bottom: 15px;">Leadership & Governance</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Executive leadership is engaged and accountable for IT/OT security</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Clear governance structure exists for IT/OT convergence decisions</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Risk appetite and tolerance levels are defined and communicated</label>
+                </div>
+
+                <h3 style="color: #2d5a3d; margin: 20px 0 15px 0;">Security Operations</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>24/7 security monitoring covers both IT and OT environments</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Incident response procedures are tested and regularly updated</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Threat intelligence is integrated into security operations</label>
+                </div>
+
+                <h3 style="color: #2d5a3d; margin: 20px 0 15px 0;">Information Risk Management</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Risk assessments cover IT/OT convergence scenarios</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Risk register is maintained and regularly reviewed</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Risk treatment plans are implemented and monitored</label>
+                </div>
+
+                <h3 style="color: #2d5a3d; margin: 20px 0 15px 0;">Security Architecture</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Network segmentation separates IT and OT environments</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Zero-trust principles are implemented</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Secure remote access solutions are deployed</label>
+                </div>
+
+                <h3 style="color: #2d5a3d; margin: 20px 0 15px 0;">Human Factors</h3>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Security awareness training includes OT-specific scenarios</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Cross-functional teams bridge IT and OT knowledge gaps</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" onchange="updateProgress()">
+                    <label>Security culture promotes collaboration between IT and OT teams</label>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="assessment-progress"></div>
+            </div>
+            <p style="text-align: center; margin-top: 10px;" id="progress-text">Progress: 0% Complete</p>
+
+            <button class="btn-primary" onclick="generateReport()" style="display: block; margin: 20px auto;">Generate Assessment Report</button>
+            
+            <div id="assessment-report" style="display: none; margin-top: 20px; padding: 20px; background: #f8fff8; border-radius: 10px; border: 2px solid #2d5a3d;">
+                <h3 style="color: #2d5a3d;">Assessment Results</h3>
+                <div id="report-content"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <h2 class="section-title">Knowledge Check Quiz</h2>
+            
+            <div class="quiz-container" id="quiz-container">
+                <div class="question" id="question">Question will appear here</div>
+                <div id="answers"></div>
+                <button class="btn-primary" onclick="nextQuestion()" id="next-btn" style="display: none; margin-top: 15px;">Next Question</button>
+            </div>
+
+            <div class="stats-display" id="quiz-stats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="final-score">0</div>
+                    <div>Final Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="correct-answers">0</div>
+                    <div>Correct Answers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-questions">0</div>
+                    <div>Total Questions</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="restartQuiz()" id="restart-btn" style="display: none; margin: 20px auto;">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Domain card functionality
+        function toggleDomain(card) {
+            const description = card.querySelector('.domain-description');
+            const isExpanded = card.classList.contains('expanded');
+            
+            // Close all other cards
+            document.querySelectorAll('.domain-card').forEach(c => {
+                c.classList.remove('expanded');
+                c.querySelector('.domain-description').classList.remove('visible');
+            });
+            
+            // Toggle current card
+            if (!isExpanded) {
+                card.classList.add('expanded');
+                description.classList.add('visible');
+            }
+        }
+
+        // Interactive diagram
+        function showInfo(component) {
+            const infoDisplay = document.getElementById('info-display');
+            const infoContent = document.getElementById('info-content');
+            
+            const componentInfo = {
+                'it-systems': {
+                    title: 'IT Systems',
+                    content: 'Information Technology systems handle data processing, storage, and communication. They include servers, databases, networks, and applications that manage business information and digital assets.'
+                },
+                'network': {
+                    title: 'Network Infrastructure',
+                    content: 'The network layer connects IT and OT systems, enabling data flow and communication. Proper segmentation and security controls are critical to prevent lateral movement of threats.'
+                },
+                'ot-systems': {
+                    title: 'OT Systems',
+                    content: 'Operational Technology systems control physical processes and equipment. They include SCADA, PLC, HMI, and other industrial control systems that monitor and control manufacturing and infrastructure operations.'
+                },
+                'physical': {
+                    title: 'Physical Processes',
+                    content: 'Physical processes are the actual industrial operations being controlled - manufacturing lines, power generation, water treatment, etc. These represent the ultimate target that cyber threats aim to disrupt.'
+                }
+            };
+            
+            const info = componentInfo[component];
+            infoContent.innerHTML = `<h4 style="color: #2d5a3d;">${info.title}</h4><p>${info.content}</p>`;
+            infoDisplay.style.display = 'block';
+            
+            // Update progress
+            const progress = document.getElementById('overview-progress');
+            const currentWidth = parseFloat(progress.style.width) || 0;
+            if (currentWidth < 100) {
+                progress.style.width = Math.min(100, currentWidth + 25) + '%';
+            }
+        }
+
+        // Assessment functionality
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('#assessment input[type="checkbox"]');
+            const checked = document.querySelectorAll('#assessment input[type="checkbox"]:checked');
+            const progress = (checked.length / checkboxes.length) * 100;
+            
+            document.getElementById('assessment-progress').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `Progress: ${Math.round(progress)}% Complete`;
+            
+            // Update checklist item styling
+            checkboxes.forEach(checkbox => {
+                const item = checkbox.parentElement;
+                if (checkbox.checked) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            });
+        }
+
+        function generateReport() {
+            const checkboxes = document.querySelectorAll('#assessment input[type="checkbox"]');
+            const checked = document.querySelectorAll('#assessment input[type="checkbox"]:checked');
+            const progress = (checked.length / checkboxes.length) * 100;
+            
+            const report = document.getElementById('assessment-report');
+            const content = document.getElementById('report-content');
+            
+            let maturityLevel = 'Initial';
+            let recommendations = [];
+            
+            if (progress >= 80) {
+                maturityLevel = 'Optimized';
+                recommendations = ['Continue monitoring and improvement', 'Share best practices with industry peers'];
+            } else if (progress >= 60) {
+                maturityLevel = 'Managed';
+                recommendations = ['Focus on continuous improvement', 'Implement advanced monitoring capabilities'];
+            } else if (progress >= 40) {
+                maturityLevel = 'Defined';
+                recommendations = ['Enhance security operations', 'Improve incident response capabilities'];
+            } else if (progress >= 20) {
+                maturityLevel = 'Repeatable';
+                recommendations = ['Establish formal governance', 'Implement security architecture standards'];
+            } else {
+                recommendations = ['Start with leadership engagement', 'Conduct comprehensive risk assessment'];
+            }
+            
+            content.innerHTML = `
+                <p><strong>Completion:</strong> ${Math.round(progress)}%</p>
+                <p><strong>Maturity Level:</strong> ${maturityLevel}</p>
+                <p><strong>Key Recommendations:</strong></p>
+                <ul>
+                    ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+            `;
+            
+            report.style.display = 'block';
+        }
+
+        // Quiz functionality
+        const quizQuestions = [
+            {
+                question: "What is the primary benefit of IT/OT convergence?",
+                answers: [
+                    "Reduced security risks",
+                    "Enhanced operational efficiency and real-time decision making",
+                    "Lower technology costs",
+                    "Simplified network architecture"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which framework is specifically designed for industrial control systems?",
+                answers: [
+                    "ISO 27001",
+                    "NIST CSF",
+                    "IEC 62443",
+                    "COBIT"
+                ],
+                correct: 2
+            },
+            {
+                question: "What percentage of OT attacks typically originate from IT networks?",
+                answers: [
+                    "25%",
+                    "35%",
+                    "50%",
+                    "75%"
+                ],
+                correct: 2
+            },
+            {
+                question: "Which KPMG domain focuses on 'Security culture, skills, and awareness'?",
+                answers: [
+                    "Technical Security",
+                    "Human Factors",
+                    "Security Operations",
+                    "Leadership & Governance"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does NIST SP 800-82 primarily address?",
+                answers: [
+                    "Enterprise IT security",
+                    "Cloud security",
+                    "Industrial Control Systems security",
+                    "Mobile device security"
+                ],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('question').textContent = question.question;
+            
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.textContent = answer;
+                answerDiv.onclick = () => selectAnswer(index);
+                answersDiv.appendChild(answerDiv);
+            });
+            
+            document.getElementById('next-btn').style.display = 'none';
+            answered = false;
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+            
+            answered = true;
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === question.correct) {
+                score++;
+            }
+            
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('quiz-stats').style.display = 'grid';
+            document.getElementById('restart-btn').style.display = 'block';
+            
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            document.getElementById('final-score').textContent = percentage + '%';
+            document.getElementById('correct-answers').textContent = score;
+            document.getElementById('total-questions').textContent = quizQuestions.length;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('quiz-stats').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'none';
+            
+            loadQuestion();
+        }
+
+        // Initialize quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
