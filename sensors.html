@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Sensor Education Hub</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            min-height: 100vh;
+        }
+
+        .header {
+            grid-area: header;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            padding: 2rem 0;
+            transition: transform 0.3s ease;
+        }
+
+        .sensor-list {
+            list-style: none;
+        }
+
+        .sensor-item {
+            padding: 0.75rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sensor-item:hover {
+            background: #f1f5f9;
+            border-left-color: var(--accent-color);
+        }
+
+        .sensor-item.active {
+            background: #eff6ff;
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .main-content {
+            grid-area: main;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .sensor-simulation {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .sensor-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sensor-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .sensor-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .simulation-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .controls-panel {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .output-panel {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .control-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .output-display {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .output-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .output-unit {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-normal { background: var(--success-color); }
+        .status-warning { background: var(--warning-color); }
+        .status-danger { background: var(--danger-color); }
+
+        .visual-display {
+            width: 100%;
+            height: 200px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc),
+                        linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        .sensor-visual {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .thermometer {
+            width: 20px;
+            height: 100px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thermometer-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #ef4444, #f59e0b, #10b981);
+            border-radius: 10px;
+            transition: height 0.5s ease;
+        }
+
+        .proximity-object {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transition: all 0.5s ease;
+        }
+
+        .sensor-beam {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: var(--warning-color);
+            top: 50%;
+            left: 20px;
+            opacity: 0.7;
+        }
+
+        .gas-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 1; }
+        }
+
+        .flame {
+            width: 30px;
+            height: 40px;
+            background: radial-gradient(circle, #ff6b35 0%, #f7931e 50%, #ff0000 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flicker 0.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: rotate(-2deg) scale(1); }
+            100% { transform: rotate(2deg) scale(1.05); }
+        }
+
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: var(--accent-color);
+            border-radius: 0 0 8px 8px;
+            transition: height 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 280px;
+                height: calc(100vh - 80px);
+                transform: translateX(-100%);
+                z-index: 999;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .simulation-area {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .sensor-simulation {
+                padding: 1rem;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">🔬 Sensor Education Hub</div>
+            <div class="hamburger" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </header>
+
+        <nav class="sidebar" id="sidebar">
+            <ul class="sensor-list">
+                <li class="sensor-item active" onclick="showSensor('smart')">Smart Sensors</li>
+                <li class="sensor-item" onclick="showSensor('temperature')">Temperature Sensors</li>
+                <li class="sensor-item" onclick="showSensor('humidity')">Humidity Sensors</li>
+                <li class="sensor-item" onclick="showSensor('vibration')">Vibration Sensors</li>
+                <li class="sensor-item" onclick="showSensor('pressure')">Pressure Sensors</li>
+                <li class="sensor-item" onclick="showSensor('proximity')">Proximity Sensors</li>
+                <li class="sensor-item" onclick="showSensor('gas')">Gas Sensors</li>
+                <li class="sensor-item" onclick="showSensor('chemical')">Chemical Sensors</li>
+                <li class="sensor-item" onclick="showSensor('fluid')">Fluid Level Sensors</li>
+                <li class="sensor-item" onclick="showSensor('fire')">Fire Detection Sensors</li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <!-- Smart Sensors -->
+            <div id="smart-sensor" class="sensor-simulation">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Smart Sensors</h1>
+                    <p class="sensor-description">
+                        Smart sensors combine traditional sensing elements with built-in processing capabilities, communication interfaces, and decision-making algorithms. They can process data locally, communicate wirelessly, and adapt their behavior based on environmental conditions.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Control Panel</h3>
+                        <div class="control-group">
+                            <label class="control-label">Data Processing Mode</label>
+                            <select class="control-input" id="smart-mode" onchange="updateSmartSensor()">
+                                <option value="basic">Basic Mode</option>
+                                <option value="advanced">Advanced Processing</option>
+                                <option value="ai">AI-Enhanced</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Communication Protocol</label>
+                            <select class="control-input" id="smart-protocol" onchange="updateSmartSensor()">
+                                <option value="wifi">Wi-Fi</option>
+                                <option value="bluetooth">Bluetooth</option>
+                                <option value="zigbee">ZigBee</option>
+                                <option value="lora">LoRa</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Power Management</label>
+                            <input type="range" class="slider" id="smart-power" min="10" max="100" value="75" onchange="updateSmartSensor()">
+                            <span id="smart-power-val">75%</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Smart Sensor Output</h3>
+                        <div class="output-display">
+                            <div class="output-value" id="smart-efficiency">85%</div>
+                            <div class="output-unit">Processing Efficiency</div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="smart-latency">12ms</div>
+                            <div class="output-unit">Response Latency</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="smart-status"></span>
+                            <span id="smart-status-text">Optimal Performance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperature Sensor -->
+            <div id="temperature-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Temperature Sensors</h1>
+                    <p class="sensor-description">
+                        Temperature sensors measure thermal energy and convert it into electrical signals. They're essential for climate control, industrial processes, and safety monitoring in automated environments.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Environmental Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Ambient Temperature (°C)</label>
+                            <input type="range" class="slider" id="temp-ambient" min="-30" max="50" value="22" onchange="updateTemperature()">
+                            <span id="temp-ambient-val">22°C</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Heat Source</label>
+                            <button class="btn" onclick="toggleHeatSource()">Toggle Heat Source</button>
+                            <span id="heat-status">OFF</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Sensor Type</label>
+                            <select class="control-input" id="temp-type" onchange="updateTemperature()">
+                                <option value="thermocouple">Thermocouple</option>
+                                <option value="rtd">RTD</option>
+                                <option value="thermistor">Thermistor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Temperature Reading</h3>
+                        <div class="visual-display">
+                            <div class="thermometer">
+                                <div class="thermometer-fill" id="temp-fill"></div>
+                            </div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="temp-reading">22.0°C</div>
+                            <div class="output-unit">Current Temperature</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="temp-status"></span>
+                            <span id="temp-status-text">Normal Range</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Humidity Sensor -->
+            <div id="humidity-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Humidity Sensors</h1>
+                    <p class="sensor-description">
+                        Humidity sensors measure the amount of water vapor in the air. They're crucial for maintaining optimal conditions in manufacturing, storage, and comfort control systems.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Humidity Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Relative Humidity (%)</label>
+                            <input type="range" class="slider" id="humidity-level" min="0" max="100" value="45" onchange="updateHumidity()">
+                            <span id="humidity-val">45%</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Temperature (°C)</label>
+                            <input type="range" class="slider" id="humidity-temp" min="0" max="40" value="23" onchange="updateHumidity()">
+                            <span id="humidity-temp-val">23°C</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Humidifier</label>
+                            <button class="btn" onclick="toggleHumidifier()">Toggle Humidifier</button>
+                            <span id="humidifier-status">OFF</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Humidity Readings</h3>
+                        <div class="output-display">
+                            <div class="output-value" id="humidity-reading">45%</div>
+                            <div class="output-unit">Relative Humidity</div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="dew-point">10.9°C</div>
+                            <div class="output-unit">Dew Point</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="humidity-status"></span>
+                            <span id="humidity-status-text">Optimal Range</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vibration Sensor -->
+            <div id="vibration-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Vibration Sensors</h1>
+                    <p class="sensor-description">
+                        Vibration sensors detect mechanical oscillations and movements. They're essential for machinery monitoring, predictive maintenance, and structural health assessment in industrial automation.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Vibration Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Machinery Speed (RPM)</label>
+                            <input type="range" class="slider" id="vibration-speed" min="0" max="3000" value="1500" onchange="updateVibration()">
+                            <span id="vibration-speed-val">1500 RPM</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Load Factor</label>
+                            <input type="range" class="slider" id="vibration-load" min="10" max="100" value="50" onchange="updateVibration()">
+                            <span id="vibration-load-val">50%</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Simulate Fault</label>
+                            <button class="btn" onclick="toggleVibrationFault()">Toggle Bearing Fault</button>
+                            <span id="fault-status">Normal</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Vibration Analysis</h3>
+                        <div class="output-display">
+                            <div class="output-value" id="vibration-amplitude">2.5</div>
+                            <div class="output-unit">mm/s RMS</div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="vibration-frequency">25</div>
+                            <div class="output-unit">Hz Dominant</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="vibration-status"></span>
+                            <span id="vibration-status-text">Normal Operation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pressure Sensor -->
+            <div id="pressure-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Pressure Sensors</h1>
+                    <p class="sensor-description">
+                        Pressure sensors measure force per unit area applied to their sensing element. They're vital for hydraulic systems, pneumatic controls, and process monitoring in automated environments.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Pressure Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">System Pressure (Bar)</label>
+                            <input type="range" class="slider" id="pressure-level" min="0" max="50" value="15" onchange="updatePressure()">
+                            <span id="pressure-val">15 Bar</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Pressure Type</label>
+                            <select class="control-input" id="pressure-type" onchange="updatePressure()">
+                                <option value="gauge">Gauge Pressure</option>
+                                <option value="absolute">Absolute Pressure</option>
+                                <option value="differential">Differential Pressure</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Relief Valve</label>
+                            <button class="btn" onclick="toggleReliefValve()">Open Relief Valve</button>
+                            <span id="relief-status">Closed</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Pressure Readings</h3>
+                        <div class="output-display">
+                            <div class="output-value" id="pressure-reading">15.0</div>
+                            <div class="output-unit">Bar</div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="pressure-psi">217.6</div>
+                            <div class="output-unit">PSI</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="pressure-status"></span>
+                            <span id="pressure-status-text">Normal Pressure</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proximity Sensor -->
+            <div id="proximity-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Proximity Sensors</h1>
+                    <p class="sensor-description">
+                        Proximity sensors detect the presence or absence of objects without physical contact. They're essential for automation, safety systems, and object detection in manufacturing processes.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Proximity Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Object Distance (cm)</label>
+                            <input type="range" class="slider" id="proximity-distance" min="0" max="100" value="50" onchange="updateProximity()">
+                            <span id="proximity-distance-val">50 cm</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Detection Range (cm)</label>
+                            <input type="range" class="slider" id="proximity-range" min="5" max="50" value="20" onchange="updateProximity()">
+                            <span id="proximity-range-val">20 cm</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Sensor Type</label>
+                            <select class="control-input" id="proximity-type" onchange="updateProximity()">
+                                <option value="inductive">Inductive</option>
+                                <option value="capacitive">Capacitive</option>
+                                <option value="ultrasonic">Ultrasonic</option>
+                                <option value="photoelectric">Photoelectric</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Detection Status</h3>
+                        <div class="visual-display">
+                            <div class="sensor-beam"></div>
+                            <div class="proximity-object" id="proximity-object"></div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="proximity-detected">NOT DETECTED</div>
+                            <div class="output-unit">Object Status</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="proximity-status"></span>
+                            <span id="proximity-status-text">Sensor Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gas Sensor -->
+            <div id="gas-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Gas Sensors</h1>
+                    <p class="sensor-description">
+                        Gas sensors detect and measure the concentration of gases in the environment. They're critical for safety monitoring, emissions control, and environmental protection in industrial settings.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Gas Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Gas Concentration (PPM)</label>
+                            <input type="range" class="slider" id="gas-concentration" min="0" max="1000" value="50" onchange="updateGas()">
+                            <span id="gas-concentration-val">50 PPM</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Gas Type</label>
+                            <select class="control-input" id="gas-type" onchange="updateGas()">
+                                <option value="co">Carbon Monoxide (CO)</option>
+                                <option value="co2">Carbon Dioxide (CO₂)</option>
+                                <option value="ch4">Methane (CH₄)</option>
+                                <option value="h2s">Hydrogen Sulfide (H₂S)</option>
+                                <option value="no2">Nitrogen Dioxide (NO₂)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Ventilation</label>
+                            <button class="btn" onclick="toggleVentilation()">Toggle Ventilation</button>
+                            <span id="ventilation-status">OFF</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Gas Detection</h3>
+                        <div class="visual-display">
+                            <div class="gas-particles" id="gas-particles"></div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="gas-reading">50</div>
+                            <div class="output-unit">PPM</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="gas-status"></span>
+                            <span id="gas-status-text">Safe Levels</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chemical Sensor -->
+            <div id="chemical-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Chemical Sensors</h1>
+                    <p class="sensor-description">
+                        Chemical sensors detect specific chemical compounds and measure their concentrations. They're essential for process control, quality assurance, and environmental monitoring in chemical industries.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Chemical Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">pH Level</label>
+                            <input type="range" class="slider" id="chemical-ph" min="0" max="14" value="7" step="0.1" onchange="updateChemical()">
+                            <span id="chemical-ph-val">7.0</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Conductivity (μS/cm)</label>
+                            <input type="range" class="slider" id="chemical-conductivity" min="0" max="2000" value="500" onchange="updateChemical()">
+                            <span id="chemical-conductivity-val">500 μS/cm</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Solution Type</label>
+                            <select class="control-input" id="chemical-type" onchange="updateChemical()">
+                                <option value="water">Pure Water</option>
+                                <option value="acid">Acidic Solution</option>
+                                <option value="base">Basic Solution</option>
+                                <option value="salt">Salt Solution</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Chemical Analysis</h3>
+                        <div class="output-display">
+                            <div class="output-value" id="chemical-ph-reading">7.0</div>
+                            <div class="output-unit">pH</div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="chemical-conductivity-reading">500</div>
+                            <div class="output-unit">μS/cm</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="chemical-status"></span>
+                            <span id="chemical-status-text">Neutral Solution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fluid Level Sensor -->
+            <div id="fluid-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Fluid Level Detection Sensors</h1>
+                    <p class="sensor-description">
+                        Fluid level sensors monitor the level of liquids in tanks, reservoirs, and containers. They're crucial for inventory management, overflow prevention, and automated filling systems.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Tank Controls</h3>
+                        <div class="control-group">
+                            <label class="control-label">Fluid Level (%)</label>
+                            <input type="range" class="slider" id="fluid-level" min="0" max="100" value="60" onchange="updateFluid()">
+                            <span id="fluid-level-val">60%</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Tank Capacity (L)</label>
+                            <input type="range" class="slider" id="fluid-capacity" min="100" max="10000" value="1000" onchange="updateFluid()">
+                            <span id="fluid-capacity-val">1000 L</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Pump Control</label>
+                            <button class="btn" onclick="togglePump()">Toggle Pump</button>
+                            <span id="pump-status">OFF</span>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Level Monitoring</h3>
+                        <div class="visual-display">
+                            <div class="water-level" id="water-level"></div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="fluid-reading">600</div>
+                            <div class="output-unit">Liters</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="fluid-status"></span>
+                            <span id="fluid-status-text">Normal Level</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fire Detection Sensor -->
+            <div id="fire-sensor" class="sensor-simulation hidden">
+                <div class="sensor-header">
+                    <h1 class="sensor-title">Fire Detection Sensors</h1>
+                    <p class="sensor-description">
+                        Fire detection sensors identify the presence of fire through smoke, heat, or flame detection. They're essential for life safety systems and property protection in automated buildings and industrial facilities.
+                    </p>
+                </div>
+                <div class="simulation-area">
+                    <div class="controls-panel">
+                        <h3>Fire Simulation</h3>
+                        <div class="control-group">
+                            <label class="control-label">Smoke Density (%)</label>
+                            <input type="range" class="slider" id="fire-smoke" min="0" max="100" value="0" onchange="updateFire()">
+                            <span id="fire-smoke-val">0%</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Heat Level (°C)</label>
+                            <input type="range" class="slider" id="fire-heat" min="20" max="200" value="25" onchange="updateFire()">
+                            <span id="fire-heat-val">25°C</span>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Fire Simulation</label>
+                            <button class="btn" onclick="simulateFire()">Simulate Fire Event</button>
+                            <button class="btn" onclick="resetFire()">Reset System</button>
+                        </div>
+                    </div>
+                    <div class="output-panel">
+                        <h3>Detection Status</h3>
+                        <div class="visual-display">
+                            <div class="flame hidden" id="flame-visual"></div>
+                        </div>
+                        <div class="output-display">
+                            <div class="output-value" id="fire-risk">LOW</div>
+                            <div class="output-unit">Fire Risk Level</div>
+                        </div>
+                        <div>
+                            <span class="status-indicator status-normal" id="fire-status"></span>
+                            <span id="fire-status-text">System Normal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSensor = 'smart';
+        let heatSourceOn = false;
+        let humidifierOn = false;
+        let vibrationFault = false;
+        let reliefValveOpen = false;
+        let ventilationOn = false;
+        let pumpOn = false;
+        let fireSimulation = false;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSensor('smart');
+            updateSmartSensor();
+        });
+
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const hamburger = document.querySelector('.hamburger');
+            sidebar.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        // Show selected sensor
+        function showSensor(sensorType) {
+            // Hide all sensors
+            const sensors = document.querySelectorAll('.sensor-simulation');
+            sensors.forEach(sensor => sensor.classList.add('hidden'));
+
+            // Show selected sensor
+            document.getElementById(sensorType + '-sensor').classList.remove('hidden');
+
+            // Update active menu item
+            const menuItems = document.querySelectorAll('.sensor-item');
+            menuItems.forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            currentSensor = sensorType;
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Smart Sensor Functions
+        function updateSmartSensor() {
+            const mode = document.getElementById('smart-mode').value;
+            const protocol = document.getElementById('smart-protocol').value;
+            const power = document.getElementById('smart-power').value;
+            
+            document.getElementById('smart-power-val').textContent = power + '%';
+            
+            let efficiency = 50;
+            let latency = 50;
+            
+            // Calculate efficiency based on mode
+            switch(mode) {
+                case 'basic': efficiency = 60; break;
+                case 'advanced': efficiency = 80; break;
+                case 'ai': efficiency = 95; break;
+            }
+            
+            // Adjust for protocol
+            switch(protocol) {
+                case 'wifi': latency = 15; break;
+                case 'bluetooth': latency = 8; break;
+                case 'zigbee': latency = 5; break;
+                case 'lora': latency = 25; break;
+            }
+            
+            // Power affects performance
+            efficiency = Math.min(100, efficiency * (power / 100));
+            latency = latency * (100 / power);
+            
+            document.getElementById('smart-efficiency').textContent = Math.round(efficiency) + '%';
+            document.getElementById('smart-latency').textContent = Math.round(latency) + 'ms';
+            
+            // Update status
+            const status = document.getElementById('smart-status');
+            const statusText = document.getElementById('smart-status-text');
+            
+            if (efficiency > 80 && latency < 20) {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Optimal Performance';
+            } else if (efficiency > 60) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'Reduced Performance';
+            } else {
+                status.className = 'status-indicator status-danger';
+                statusText.textContent = 'Poor Performance';
+            }
+        }
+
+        // Temperature Sensor Functions
+        function updateTemperature() {
+            let temp = parseFloat(document.getElementById('temp-ambient').value);
+            const type = document.getElementById('temp-type').value;
+            
+            if (heatSourceOn) {
+                temp += 15;
+            }
+            
+            // Add sensor-specific characteristics
+            switch(type) {
+                case 'thermocouple':
+                    temp += (Math.random() - 0.5) * 0.5; // ±0.25°C noise
+                    break;
+                case 'rtd':
+                    temp += (Math.random() - 0.5) * 0.2; // ±0.1°C noise
+                    break;
+                case 'thermistor':
+                    temp += (Math.random() - 0.5) * 0.3; // ±0.15°C noise
+                    break;
+            }
+            
+            document.getElementById('temp-ambient-val').textContent = document.getElementById('temp-ambient').value + '°C';
+            document.getElementById('temp-reading').textContent = temp.toFixed(1) + '°C';
+            
+            // Update thermometer visual
+            const fillHeight = Math.max(0, Math.min(100, (temp + 20) / 70 * 100));
+            document.getElementById('temp-fill').style.height = fillHeight + '%';
+            
+            // Update status
+            const status = document.getElementById('temp-status');
+            const statusText = document.getElementById('temp-status-text');
+            
+            if (temp < 0 || temp > 40) {
+                status.className = 'status-indicator status-danger';
+                statusText.textContent = 'Extreme Temperature';
+            } else if (temp < 10 || temp > 30) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'Outside Normal Range';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Normal Range';
+            }
+        }
+
+        function toggleHeatSource() {
+            heatSourceOn = !heatSourceOn;
+            document.getElementById('heat-status').textContent = heatSourceOn ? 'ON' : 'OFF';
+            updateTemperature();
+        }
+
+        // Humidity Sensor Functions
+        function updateHumidity() {
+            let humidity = parseFloat(document.getElementById('humidity-level').value);
+            const temp = parseFloat(document.getElementById('humidity-temp').value);
+            
+            if (humidifierOn) {
+                humidity = Math.min(100, humidity + 10);
+                document.getElementById('humidity-level').value = humidity;
+            }
+            
+            // Calculate dew point
+            const a = 17.27;
+            const b = 237.7;
+            const alpha = ((a * temp) / (b + temp)) + Math.log(humidity / 100);
+            const dewPoint = (b * alpha) / (a - alpha);
+            
+            document.getElementById('humidity-val').textContent = humidity + '%';
+            document.getElementById('humidity-temp-val').textContent = temp + '°C';
+            document.getElementById('humidity-reading').textContent = humidity.toFixed(1) + '%';
+            document.getElementById('dew-point').textContent = dewPoint.toFixed(1) + '°C';
+            
+            // Update status
+            const status = document.getElementById('humidity-status');
+            const statusText = document.getElementById('humidity-status-text');
+            
+            if (humidity < 30 || humidity > 70) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = humidity < 30 ? 'Too Dry' : 'Too Humid';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Optimal Range';
+            }
+        }
+
+        function toggleHumidifier() {
+            humidifierOn = !humidifierOn;
+            document.getElementById('humidifier-status').textContent = humidifierOn ? 'ON' : 'OFF';
+            updateHumidity();
+        }
+
+        // Vibration Sensor Functions
+        function updateVibration() {
+            const speed = parseFloat(document.getElementById('vibration-speed').value);
+            const load = parseFloat(document.getElementById('vibration-load').value);
+            
+            let amplitude = (speed / 3000) * (load / 100) * 5;
+            let frequency = speed / 60; // Convert RPM to Hz
+            
+            if (vibrationFault) {
+                amplitude *= 3;
+                frequency += Math.sin(Date.now() / 1000) * 5; // Add irregular component
+            }
+            
+            document.getElementById('vibration-speed-val').textContent = speed + ' RPM';
+            document.getElementById('vibration-load-val').textContent = load + '%';
+            document.getElementById('vibration-amplitude').textContent = amplitude.toFixed(1);
+            document.getElementById('vibration-frequency').textContent = frequency.toFixed(0);
+            
+            // Update status
+            const status = document.getElementById('vibration-status');
+            const statusText = document.getElementById('vibration-status-text');
+            
+            if (amplitude > 10 || vibrationFault) {
+                status.className = 'status-indicator status-danger';
+                statusText.textContent = 'Fault Detected';
+            } else if (amplitude > 5) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'High Vibration';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Normal Operation';
+            }
+        }
+
+        function toggleVibrationFault() {
+            vibrationFault = !vibrationFault;
+            document.getElementById('fault-status').textContent = vibrationFault ? 'Bearing Fault' : 'Normal';
+            updateVibration();
+        }
+
+        // Pressure Sensor Functions
+        function updatePressure() {
+            let pressure = parseFloat(document.getElementById('pressure-level').value);
+            const type = document.getElementById('pressure-type').value;
+            
+            if (reliefValveOpen) {
+                pressure = Math.max(0, pressure - 5);
+                document.getElementById('pressure-level').value = pressure;
+            }
+            
+            // Convert to PSI
+            const psi = pressure * 14.504;
+            
+            document.getElementById('pressure-val').textContent = pressure + ' Bar';
+            document.getElementById('pressure-reading').textContent = pressure.toFixed(1);
+            document.getElementById('pressure-psi').textContent = psi.toFixed(1);
+            
+            // Update status
+            const status = document.getElementById('pressure-status');
+            const statusText = document.getElementById('pressure-status-text');
+            
+            if (pressure > 40) {
+                status.className = 'status-indicator status-danger';
+                statusText.textContent = 'Overpressure';
+            } else if (pressure > 30) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'High Pressure';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Normal Pressure';
+            }
+        }
+
+        function toggleReliefValve() {
+            reliefValveOpen = !reliefValveOpen;
+            document.getElementById('relief-status').textContent = reliefValveOpen ? 'Open' : 'Closed';
+            updatePressure();
+        }
+
+        // Proximity Sensor Functions
+        function updateProximity() {
+            const distance = parseFloat(document.getElementById('proximity-distance').value);
+            const range = parseFloat(document.getElementById('proximity-range').value);
+            const type = document.getElementById('proximity-type').value;
+            
+            const detected = distance <= range;
+            
+            document.getElementById('proximity-distance-val').textContent = distance + ' cm';
+            document.getElementById('proximity-range-val').textContent = range + ' cm';
+            document.getElementById('proximity-detected').textContent = detected ? 'DETECTED' : 'NOT DETECTED';
+            
+            // Update visual
+            const object = document.getElementById('proximity-object');
+            const objectPosition = Math.min(80, distance * 0.8);
+            object.style.left = objectPosition + '%';
+            object.style.background = detected ? 'var(--success-color)' : 'var(--accent-color)';
+            
+            // Update status
+            const status = document.getElementById('proximity-status');
+            const statusText = document.getElementById('proximity-status-text');
+            
+            status.className = 'status-indicator status-normal';
+            statusText.textContent = detected ? 'Object Detected' : 'Sensor Active';
+        }
+
+        // Gas Sensor Functions
+        function updateGas() {
+            let concentration = parseFloat(document.getElementById('gas-concentration').value);
+            const gasType = document.getElementById('gas-type').value;
+            
+            if (ventilationOn) {
+                concentration = Math.max(0, concentration - 10);
+                document.getElementById('gas-concentration').value = concentration;
+            }
+            
+            document.getElementById('gas-concentration-val').textContent = concentration + ' PPM';
+            document.getElementById('gas-reading').textContent = concentration;
+            
+            // Update gas particles visual
+            updateGasParticles(concentration);
+            
+            // Gas-specific thresholds
+            let warningLevel, dangerLevel;
+            switch(gasType) {
+                case 'co': warningLevel = 50; dangerLevel = 200; break;
+                case 'co2': warningLevel = 5000; dangerLevel = 40000; break;
+                case 'ch4': warningLevel = 1000; dangerLevel = 5000; break;
+                case 'h2s': warningLevel = 10; dangerLevel = 100; break;
+                case 'no2': warningLevel = 5; dangerLevel = 20; break;
+                default: warningLevel = 100; dangerLevel = 500;
+            }
+            
+            // Update status
+            const status = document.getElementById('gas-status');
+            const statusText = document.getElementById('gas-status-text');
+            
+            if (concentration > dangerLevel) {
+                status.className = 'status-indicator status-danger';
+                statusText.textContent = 'Dangerous Levels';
+            } else if (concentration > warningLevel) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'Warning Levels';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Safe Levels';
+            }
+        }
+
+        function updateGasParticles(concentration) {
+            const container = document.getElementById('gas-particles');
+            container.innerHTML = '';
+            
+            const particleCount = Math.min(20, concentration / 10);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function toggleVentilation() {
+            ventilationOn = !ventilationOn;
+            document.getElementById('ventilation-status').textContent = ventilationOn ? 'ON' : 'OFF';
+            updateGas();
+        }
+
+        // Chemical Sensor Functions
+        function updateChemical() {
+            const ph = parseFloat(document.getElementById('chemical-ph').value);
+            const conductivity = parseFloat(document.getElementById('chemical-conductivity').value);
+            const type = document.getElementById('chemical-type').value;
+            
+            document.getElementById('chemical-ph-val').textContent = ph.toFixed(1);
+            document.getElementById('chemical-conductivity-val').textContent = conductivity + ' μS/cm';
+            document.getElementById('chemical-ph-reading').textContent = ph.toFixed(1);
+            document.getElementById('chemical-conductivity-reading').textContent = conductivity;
+            
+            // Update status based on pH
+            const status = document.getElementById('chemical-status');
+            const statusText = document.getElementById('chemical-status-text');
+            
+            if (ph < 6 || ph > 8) {
+                if (ph < 3 || ph > 11) {
+                    status.className = 'status-indicator status-danger';
+                    statusText.textContent = ph < 3 ? 'Highly Acidic' : 'Highly Basic';
+                } else {
+                    status.className = 'status-indicator status-warning';
+                    statusText.textContent = ph < 6 ? 'Acidic Solution' : 'Basic Solution';
+                }
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Neutral Solution';
+            }
+        }
+
+        // Fluid Level Sensor Functions
+        function updateFluid() {
+            let level = parseFloat(document.getElementById('fluid-level').value);
+            const capacity = parseFloat(document.getElementById('fluid-capacity').value);
+            
+            if (pumpOn) {
+                level = Math.min(100, level + 2);
+                document.getElementById('fluid-level').value = level;
+            }
+            
+            const volume = (level / 100) * capacity;
+            
+            document.getElementById('fluid-level-val').textContent = level + '%';
+            document.getElementById('fluid-capacity-val').textContent = capacity + ' L';
+            document.getElementById('fluid-reading').textContent = Math.round(volume);
+            
+            // Update visual
+            document.getElementById('water-level').style.height = level + '%';
+            
+            // Update status
+            const status = document.getElementById('fluid-status');
+            const statusText = document.getElementById('fluid-status-text');
+            
+            if (level > 90) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'Tank Nearly Full';
+            } else if (level < 10) {
+                status.className = 'status-indicator status-warning';
+                statusText.textContent = 'Low Fluid Level';
+            } else {
+                status.className = 'status-indicator status-normal';
+                statusText.textContent = 'Normal Level';
+            }
+        }
+
+        function togglePump() {
+            pumpOn = !pumpOn;
+            document.getElementById('pump-status').textContent = pumpOn ? 'ON' : 'OFF';
+            updateFluid();
+        }
+
+        // Fire Detection Sensor Functions
+        function updateFire() {
+            const smoke = parseFloat(document.getElementById('fire-smoke').value);
+            const heat = parseFloat(document.getElementById('fire-heat').value);
+            
+            document.getElementById('fire-smoke-val').textContent = smoke + '%';
+            document.getElementById('fire-heat-val').textContent = heat + '°C';
+            
+            let riskLevel = 'LOW';
+            let statusClass = 'status-normal';
+            let statusText = 'System Normal';
+            
+            if (smoke > 50 || heat > 60) {
+                riskLevel = 'HIGH';
+                statusClass = 'status-danger';
+                statusText = 'Fire Detected!';
+            } else if (smoke > 20 || heat > 40) {
+                riskLevel = 'MEDIUM';
+                statusClass = 'status-warning';
+                statusText = 'Smoke/Heat Detected';
+            }
+            
+            document.getElementById('fire-risk').textContent = riskLevel;
+            document.getElementById('fire-status').className = 'status-indicator ' + statusClass;
+            document.getElementById('fire-status-text').textContent = statusText;
+            
+            // Show/hide flame visual
+            const flame = document.getElementById('flame-visual');
+            if (smoke > 30 || heat > 50) {
+                flame.classList.remove('hidden');
+            } else {
+                flame.classList.add('hidden');
+            }
+        }
+
+        function simulateFire() {
+            fireSimulation = true;
+            document.getElementById('fire-smoke').value = 75;
+            document.getElementById('fire-heat').value = 85;
+            updateFire();
+        }
+
+        function resetFire() {
+            fireSimulation = false;
+            document.getElementById('fire-smoke').value = 0;
+            document.getElementById('fire-heat').value = 25;
+            updateFire();
+        }
+
+        // Auto-update functions for dynamic simulations
+        setInterval(() => {
+            if (currentSensor === 'temperature') updateTemperature();
+            if (currentSensor === 'humidity') updateHumidity();
+            if (currentSensor === 'vibration') updateVibration();
+            if (currentSensor === 'pressure') updatePressure();
+            if (currentSensor === 'gas') updateGas();
+            if (currentSensor === 'fluid') updateFluid();
+        }, 1000);
+    </script>
+</body>
+</html>
