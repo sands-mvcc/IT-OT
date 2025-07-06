@@ -1,0 +1,1078 @@
+
+Research the IEC 62443 framework. Analyze the focus on industrial automation & control systems security zones, levels, and conduit model. Also examine the component requirements. Create an interactive webpage using HTML and JavaScript that enables students to navigate the framework. Use a white background and green and black coloring.
+
+Edit
+
+Probing IEC 62443 framework's security zones and levels
+2s
+
+
+
+
+I'll research the IEC 62443 framework comprehensively and then create an interactive educational webpage. This is a complex industrial cybersecurity standard, so I'll need to gather detailed information from multiple sources.
+
+
+IEC 62443 framework industrial automation control systems security
+10 results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Great! I now have comprehensive information about the IEC 62443 framework.
+0s
+
+
+
+IEC 62443 zones conduits security architecture model
+10 results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Excellent! Now I have comprehensive information about the IEC 62443 framework, zones and conduits,
+1s
+
+
+
+IEC 62443-4 component requirements development lifecycle security
+10 results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Perfect! I now have comprehensive information about the IEC 62443 framework.
+0s
+
+
+
+IEC 62443 foundational requirements FR1 FR2 FR3 FR4 FR5 FR6 FR7
+10 results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Decoded IEC 62443 framework for industrial cybersecurity zones.
+18s
+
+
+
+
+
+
+
+
+Now I'll create an interactive educational webpage that allows students to navigate and explore the IEC 62443 framework. Based on my research, I have comprehensive information about the framework's structure, security zones and conduits model, security levels, foundational requirements, and component requirements.
+
+
+IEC 62443 Framework Interactive Learning Tool
+Interactive artifact 
+
+Engineered interactive webpage to illuminate IEC 62443 framework
+5s
+
+
+
+
+I've created a comprehensive interactive educational webpage for students to explore the IEC 62443 framework. Based on my extensive research, this tool covers all the key aspects you requested:
+
+Key Features of the Interactive Tool:
+📋 Framework Coverage:
+
+Complete overview of IEC 62443's purpose and development
+Four main categories: General, Policies & Procedures, System, and Component requirements
+Detailed explanation of the zones and conduits security architecture model
+All four security levels (SL-0 through SL-4) with threat scenarios
+Seven foundational requirements (FR1-FR7) with interactive modals
+Component security requirements and secure development lifecycle
+🎯 Interactive Elements:
+
+Clickable navigation between six main sections
+Interactive zone diagram showing network segmentation
+Modal popups with detailed information for each component
+Hover effects and smooth animations for engagement
+Mobile-responsive design for accessibility
+🔒 Educational Content Based on Research:
+
+Security zones and conduits model for network segmentation and defense-in-depth
+Fortinet
+International Society of Automation
+Four security levels addressing different threat actors from unintentional misuse to nation-state attacks
+Wikipedia
+Fortinet
+Seven foundational requirements covering identification, access control, integrity, confidentiality, data flow restriction, event response, and availability
+Complying with the ISA/IEC-62443 Framework | Claroty
+Component requirements including secure development lifecycle and technical security requirements
+Accuenergy
+Spe-aberdeen
+🎨 Design Specifications:*
+Clean white background as requested
+Green and black color scheme for professional appearance
+Intuitive navigation suitable for students
+Comprehensive yet accessible content organization
+The tool enables students to understand how IEC 62443 improves reliability, integrity, and security of Industrial Automation and Control Systems using a risk-based, methodical process, wh 
+Key Concepts of ISA/IEC 62443: Zones & Security Levels | Dragos
+ile providing hands-on exploration of the framework's key concepts like zones, conduits, security levels, and foundational requirements.
+
+
+
+
+Retry
+
+You’re almost out of usage - your limits will reset at 1:00 PM
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEC 62443 Framework - Interactive Learning Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: #2d2d2d;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a5f3f, #2d8f5f);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d8f5f, #1a5f3f);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(135deg, #1a5f3f, #0d3326);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #333, #111);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border: 2px solid #2d8f5f;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #1a5f3f;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #2d8f5f;
+            padding-bottom: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #2d8f5f;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: #1a5f3f;
+            box-shadow: 0 6px 16px rgba(45, 143, 95, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            color: #1a5f3f;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .security-level {
+            background: linear-gradient(135deg, #f0f8f4, #e6f3ea);
+            border-left: 4px solid #2d8f5f;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .sl-number {
+            font-weight: bold;
+            color: #1a5f3f;
+            font-size: 1.1rem;
+        }
+
+        .interactive-diagram {
+            background: white;
+            border: 2px solid #2d8f5f;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .zone {
+            display: inline-block;
+            background: linear-gradient(135deg, #e6f3ea, #d4e8dc);
+            border: 2px solid #2d8f5f;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .zone:hover {
+            background: linear-gradient(135deg, #2d8f5f, #1a5f3f);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .conduit {
+            width: 60px;
+            height: 4px;
+            background: #333;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .conduit::before {
+            content: '↔';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .foundational-req {
+            background: white;
+            border: 2px solid #2d8f5f;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .foundational-req:hover {
+            background: #f0f8f4;
+            border-color: #1a5f3f;
+        }
+
+        .fr-title {
+            color: #1a5f3f;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .component-lifecycle {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .lifecycle-stage {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            border: 2px solid #2d8f5f;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lifecycle-stage:hover {
+            background: #e6f3ea;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(45, 143, 95, 0.2);
+        }
+
+        .stage-number {
+            background: #2d8f5f;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 5% auto;
+            position: relative;
+            border: 3px solid #2d8f5f;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #2d8f5f;
+            font-weight: bold;
+        }
+
+        .close-modal:hover {
+            color: #1a5f3f;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #e6f3ea, #d4e8dc);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #2d8f5f;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .component-lifecycle {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="header-title">IEC 62443 Framework</h1>
+            <p class="header-subtitle">Interactive Learning Tool for Industrial Automation & Control Systems Security</p>
+        </header>
+
+        <nav class="navigation">
+            <button class="nav-button active" onclick="showSection('overview')">Overview</button>
+            <button class="nav-button" onclick="showSection('structure')">Framework Structure</button>
+            <button class="nav-button" onclick="showSection('zones-conduits')">Zones & Conduits</button>
+            <button class="nav-button" onclick="showSection('security-levels')">Security Levels</button>
+            <button class="nav-button" onclick="showSection('foundational-req')">Foundational Requirements</button>
+            <button class="nav-button" onclick="showSection('components')">Component Requirements</button>
+        </nav>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <h2 class="section-title">IEC 62443 Framework Overview</h2>
+            
+            <div class="highlight">
+                <strong>IEC 62443</strong> is a comprehensive series of international standards specifically designed to secure Industrial Automation and Control Systems (IACS) throughout their entire lifecycle.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Purpose</div>
+                    <div class="card-description">Provides cybersecurity guidance for industrial automation and control systems, addressing unique OT requirements different from traditional IT security.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Development</div>
+                    <div class="card-description">Developed jointly by ISA99 committee and IEC TC65 WG10, originally known as ISA99 standards, now internationally recognized as IEC 62443.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Scope</div>
+                    <div class="card-description">Covers all aspects of IACS security including risk assessment, secure development, system design, and ongoing maintenance across 20+ industry sectors.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Approach</div>
+                    <div class="card-description">Takes a holistic, risk-based approach emphasizing defense-in-depth strategies, zone segmentation, and shared responsibility among stakeholders.</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Key Principle:</strong> Shared responsibility among asset owners, product suppliers, integrators, and service providers to ensure comprehensive cybersecurity coverage.
+            </div>
+        </div>
+
+        <!-- Framework Structure Section -->
+        <div id="structure" class="content-section">
+            <h2 class="section-title">Framework Structure</h2>
+            
+            <p>The IEC 62443 series is organized into four main categories, each addressing different aspects of industrial cybersecurity:</p>
+
+            <div class="grid">
+                <div class="card" onclick="showModal('general-modal')">
+                    <div class="card-title">1. General (IEC 62443-1)</div>
+                    <div class="card-description">Foundational concepts, terminology, and models used throughout the series. Defines the seven foundational requirements and basic security concepts.</div>
+                </div>
+                <div class="card" onclick="showModal('policies-modal')">
+                    <div class="card-title">2. Policies & Procedures (IEC 62443-2)</div>
+                    <div class="card-description">Security management systems, organizational requirements, and cybersecurity program implementation for asset owners and service providers.</div>
+                </div>
+                <div class="card" onclick="showModal('system-modal')">
+                    <div class="card-title">3. System (IEC 62443-3)</div>
+                    <div class="card-description">System-level security requirements, risk assessment processes, zones and conduits architecture, and technical security controls.</div>
+                </div>
+                <div class="card" onclick="showModal('component-modal')">
+                    <div class="card-title">4. Component (IEC 62443-4)</div>
+                    <div class="card-description">Secure development lifecycle requirements and technical security requirements for individual IACS components and products.</div>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Horizontal Standard:</strong> IEC has approved 62443 as a "horizontal standard," meaning it must be used as the foundation for OT security requirements across all industry sectors.
+            </div>
+        </div>
+
+        <!-- Zones and Conduits Section -->
+        <div id="zones-conduits" class="content-section">
+            <h2 class="section-title">Zones & Conduits Model</h2>
+            
+            <p>The zones and conduits model is a key architectural concept that enables flexible network segmentation for industrial systems.</p>
+
+            <div class="interactive-diagram">
+                <h3 style="color: #1a5f3f; margin-bottom: 1rem;">Interactive Network Architecture</h3>
+                
+                <div class="zone" onclick="showModal('zone-modal')">Corporate Zone</div>
+                <div class="conduit"></div>
+                <div class="zone" onclick="showModal('zone-modal')">DMZ Zone</div>
+                <div class="conduit"></div>
+                <div class="zone" onclick="showModal('zone-modal')">Control Zone</div>
+                <div class="conduit"></div>
+                <div class="zone" onclick="showModal('zone-modal')">Field Zone</div>
+                
+                <p style="margin-top: 2rem; color: #666;">Click on zones to learn more about their characteristics</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Zones</div>
+                    <div class="card-description">Groups of physical or logical assets sharing common security requirements with clearly defined boundaries. Enable targeted security controls based on criticality and risk.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Conduits</div>
+                    <div class="card-description">Communication paths between zones with security controls to manage data flow. Include firewalls, encryption, and access controls to protect inter-zone communication.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Segmentation Benefits</div>
+                    <div class="card-description">Limits attack propagation, enables targeted security measures, supports compliance requirements, and provides clear security boundaries.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Design Principles</div>
+                    <div class="card-description">Based on risk assessment, aligns with Purdue Model levels, supports defense-in-depth, and enables scalable security architecture.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Levels Section -->
+        <div id="security-levels" class="content-section">
+            <h2 class="section-title">Security Levels (SL)</h2>
+            
+            <p>Security Levels define the confidence that systems, zones, or conduits are free from vulnerabilities and function as intended, based on different threat scenarios.</p>
+
+            <div class="security-level">
+                <div class="sl-number">SL-0</div>
+                <strong>No Protection Required</strong><br>
+                No special cybersecurity protection or requirements needed.
+            </div>
+
+            <div class="security-level">
+                <div class="sl-number">SL-1</div>
+                <strong>Protection Against Unintentional Misuse</strong><br>
+                Guards against casual or coincidental violations, unintentional human errors, and non-malicious mistakes.
+            </div>
+
+            <div class="security-level">
+                <div class="sl-number">SL-2</div>
+                <strong>Protection Against Intentional Misuse (Simple Means)</strong><br>
+                Defends against threats from individuals with low motivation, basic resources, and simple tools and techniques.
+            </div>
+
+            <div class="security-level">
+                <div class="sl-number">SL-3</div>
+                <strong>Protection Against Sophisticated Attacks</strong><br>
+                Shields against intentional misuse using sophisticated means with moderate resources, automation-specific knowledge, and moderate motivation.
+            </div>
+
+            <div class="security-level">
+                <div class="sl-number">SL-4</div>
+                <strong>Protection Against Advanced Threats</strong><br>
+                Covers protection against intentional misuse using sophisticated means with extensive resources, automation-specific knowledge, and high motivation (nation-state level threats).
+            </div>
+
+            <div class="highlight">
+                <strong>Security Level Vector:</strong> Each zone or conduit has a seven-element vector representing the security level for each foundational requirement, allowing granular security tailoring.
+            </div>
+        </div>
+
+        <!-- Foundational Requirements Section -->
+        <div id="foundational-req" class="content-section">
+            <h2 class="section-title">Seven Foundational Requirements</h2>
+            
+            <p>The seven foundational requirements (FRs) form the core security framework that applies across all IEC 62443 standards:</p>
+
+            <div class="foundational-req" onclick="showModal('fr1-modal')">
+                <div class="fr-title">FR1: Identification and Authentication Control (IAC)</div>
+                Ensures reliable identification and authentication of all users (humans, software processes, devices) before granting access to IACS resources.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr2-modal')">
+                <div class="fr-title">FR2: Use Control (UC)</div>
+                Prevents unauthorized actions by verifying appropriate privileges before allowing users to perform specific functions or access resources.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr3-modal')">
+                <div class="fr-title">FR3: System Integrity (SI)</div>
+                Protects against unauthorized modifications to system data, software, and configurations by unauthorized persons or systems.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr4-modal')">
+                <div class="fr-title">FR4: Data Confidentiality (DC)</div>
+                Prevents unauthorized disclosure of sensitive information through encryption and access controls on communication channels and data repositories.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr5-modal')">
+                <div class="fr-title">FR5: Restricted Data Flow (RDF)</div>
+                Controls and limits data flow between zones and external networks through segmentation, conduits, and network access controls.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr6-modal')">
+                <div class="fr-title">FR6: Timely Response to Events (TRE)</div>
+                Ensures collection, reporting, and preservation of security event evidence to enable timely detection and corrective actions.
+            </div>
+
+            <div class="foundational-req" onclick="showModal('fr7-modal')">
+                <div class="fr-title">FR7: Resource Availability (RA)</div>
+                Maintains device and system functionality during normal operations and resilience against denial-of-service attacks and other availability threats.
+            </div>
+        </div>
+
+        <!-- Component Requirements Section -->
+        <div id="components" class="content-section">
+            <h2 class="section-title">Component Requirements</h2>
+            
+            <p>The Component (Part 4) standards define requirements for secure development and technical capabilities of IACS components:</p>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">IEC 62443-4-1</div>
+                    <div class="card-description">Secure Development Lifecycle (SDL) requirements for product suppliers. Covers design, coding, testing, patch management, and end-of-life processes.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">IEC 62443-4-2</div>
+                    <div class="card-description">Technical security requirements for IACS components including embedded devices, network components, host devices, and software applications.</div>
+                </div>
+            </div>
+
+            <h3 style="color: #1a5f3f; margin: 2rem 0 1rem;">Secure Development Lifecycle Stages</h3>
+            
+            <div class="component-lifecycle">
+                <div class="lifecycle-stage" onclick="showModal('sdl1-modal')">
+                    <div class="stage-number">1</div>
+                    <strong>Requirements</strong><br>
+                    Security requirements definition and analysis
+                </div>
+                <div class="lifecycle-stage" onclick="showModal('sdl2-modal')">
+                    <div class="stage-number">2</div>
+                    <strong>Design</strong><br>
+                    Secure architecture and design practices
+                </div>
+                <div class="lifecycle-stage" onclick="showModal('sdl3-modal')">
+                    <div class="stage-number">3</div>
+                    <strong>Implementation</strong><br>
+                    Secure coding guidelines and practices
+                </div>
+                <div class="lifecycle-stage" onclick="showModal('sdl4-modal')">
+                    <div class="stage-number">4</div>
+                    <strong>Verification</strong><br>
+                    Security testing and validation
+                </div>
+                <div class="lifecycle-stage" onclick="showModal('sdl5-modal')">
+                    <div class="stage-number">5</div>
+                    <strong>Maintenance</strong><br>
+                    Patch management and updates
+                </div>
+                <div class="lifecycle-stage" onclick="showModal('sdl6-modal')">
+                    <div class="stage-number">6</div>
+                    <strong>End-of-Life</strong><br>
+                    Secure retirement and decommissioning
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Certification:</strong> Components can be certified through ISASecure programs including CSA (Component Security Assurance), ICSA (Industrial IoT Component Security Assurance), and SDLA (Security Development Lifecycle Assurance).
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="general-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('general-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">General (IEC 62443-1)</h3>
+            <p><strong>IEC 62443-1-1:</strong> Terminology, concepts, and models including the seven foundational requirements</p>
+            <p><strong>IEC 62443-1-2:</strong> Master glossary of terms and abbreviations</p>
+            <p><strong>IEC 62443-1-3:</strong> System security compliance metrics</p>
+            <p><strong>IEC 62443-1-4:</strong> IACS security lifecycle and use cases</p>
+        </div>
+    </div>
+
+    <div id="policies-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('policies-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Policies & Procedures (IEC 62443-2)</h3>
+            <p><strong>IEC 62443-2-1:</strong> Security program requirements for asset owners</p>
+            <p><strong>IEC 62443-2-3:</strong> Patch management in IACS environments</p>
+            <p><strong>IEC 62443-2-4:</strong> Security program requirements for IACS service providers</p>
+            <p>These standards focus on organizational and management aspects of cybersecurity.</p>
+        </div>
+    </div>
+
+    <div id="system-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('system-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">System (IEC 62443-3)</h3>
+            <p><strong>IEC 62443-3-1:</strong> Security technologies for IACS</p>
+            <p><strong>IEC 62443-3-2:</strong> Security risk assessment and system design</p>
+            <p><strong>IEC 62443-3-3:</strong> System security requirements and security levels</p>
+            <p>These standards address system-level security architecture and implementation.</p>
+        </div>
+    </div>
+
+    <div id="component-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('component-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Component (IEC 62443-4)</h3>
+            <p><strong>IEC 62443-4-1:</strong> Secure product development lifecycle requirements</p>
+            <p><strong>IEC 62443-4-2:</strong> Technical security requirements for IACS components</p>
+            <p>These standards ensure components are developed securely and meet technical security requirements.</p>
+        </div>
+    </div>
+
+    <div id="zone-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('zone-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Security Zones</h3>
+            <p><strong>Definition:</strong> Groups of physical or logical assets that share common security requirements and have clearly defined boundaries.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Similar risk profiles and security needs</li>
+                <li>Clear physical or logical boundaries</li>
+                <li>Consistent security controls</li>
+                <li>Ability to monitor and control access</li>
+            </ul>
+            <p><strong>Examples:</strong> Corporate network, control room systems, field devices, wireless networks</p>
+        </div>
+    </div>
+
+    <div id="fr1-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr1-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR1: Identification and Authentication Control</h3>
+            <p><strong>Purpose:</strong> Verify the identity of users before granting access</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Unique identification for all users (human, software, devices)</li>
+                <li>Strong authentication mechanisms</li>
+                <li>Multi-factor authentication for higher security levels</li>
+                <li>Account management and lifecycle controls</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr2-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr2-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR2: Use Control</h3>
+            <p><strong>Purpose:</strong> Ensure users have appropriate privileges for their actions</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Role-based access control (RBAC)</li>
+                <li>Principle of least privilege</li>
+                <li>Authorization enforcement</li>
+                <li>Segregation of duties</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr3-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr3-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR3: System Integrity</h3>
+            <p><strong>Purpose:</strong> Prevent unauthorized modifications to systems and data</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Data integrity protection</li>
+                <li>Software integrity verification</li>
+                <li>Configuration change control</li>
+                <li>Malware protection</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr4-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr4-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR4: Data Confidentiality</h3>
+            <p><strong>Purpose:</strong> Protect sensitive information from unauthorized disclosure</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Encryption of data in transit and at rest</li>
+                <li>Cryptographic key management</li>
+                <li>Secure communication protocols</li>
+                <li>Data classification and handling</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr5-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr5-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR5: Restricted Data Flow</h3>
+            <p><strong>Purpose:</strong> Control and limit data flow between zones and networks</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Network segmentation and isolation</li>
+                <li>Firewall and filtering controls</li>
+                <li>Data diodes for one-way communication</li>
+                <li>DMZ implementation</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr6-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr6-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR6: Timely Response to Events</h3>
+            <p><strong>Purpose:</strong> Detect, report, and respond to security events</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Security event monitoring and logging</li>
+                <li>Incident detection and alerting</li>
+                <li>Audit trail preservation</li>
+                <li>Response procedures and reporting</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="fr7-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('fr7-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">FR7: Resource Availability</h3>
+            <p><strong>Purpose:</strong> Ensure system availability and resilience</p>
+            <p><strong>Key Requirements:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Denial-of-service protection</li>
+                <li>Resource management and allocation</li>
+                <li>Redundancy and backup systems</li>
+                <li>Recovery procedures</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl1-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl1-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Requirements Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Security requirements analysis</li>
+                <li>Threat modeling</li>
+                <li>Risk assessment</li>
+                <li>Security objectives definition</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl2-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl2-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Design Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Secure architecture design</li>
+                <li>Security controls specification</li>
+                <li>Design review processes</li>
+                <li>Security design patterns</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl3-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl3-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Implementation Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Secure coding practices</li>
+                <li>Code review processes</li>
+                <li>Static code analysis</li>
+                <li>Developer security training</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl4-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl4-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Verification Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Security testing</li>
+                <li>Penetration testing</li>
+                <li>Vulnerability assessment</li>
+                <li>Security validation</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl5-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl5-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">Maintenance Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Security patch development</li>
+                <li>Vulnerability management</li>
+                <li>Update deployment</li>
+                <li>Security monitoring</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sdl6-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('sdl6-modal')">&times;</span>
+            <h3 style="color: #1a5f3f;">End-of-Life Phase</h3>
+            <p><strong>Activities:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Secure decommissioning</li>
+                <li>Data sanitization</li>
+                <li>Migration planning</li>
+                <li>Legacy system support</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav buttons
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+Prompt Genie Logo
