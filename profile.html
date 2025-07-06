@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFlow Systems - Organizational Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016, #4a7c23);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-container {
+            background-color: #f8f9fa;
+            border-bottom: 3px solid #4a7c23;
+            padding: 1rem 0;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #5a8c33, #3d6526);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #6aa03f, #4a7c23);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .overview-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .overview-card:hover {
+            border-color: #4a7c23;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .overview-card h3 {
+            color: #2d5016;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a7c23;
+            padding-bottom: 0.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stat-value {
+            color: #4a7c23;
+            font-weight: 700;
+        }
+
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .facility-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #4a7c23;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .facility-card h4 {
+            color: #2d5016;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .editable {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            cursor: text;
+            transition: all 0.3s ease;
+        }
+
+        .editable:hover {
+            border-color: #4a7c23;
+            background: white;
+        }
+
+        .editable:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 5px rgba(74, 124, 35, 0.3);
+        }
+
+        .report-section {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .report-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .asset-table th {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .asset-table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .asset-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .risk-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-high {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .risk-medium {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .risk-low {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .save-button {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .save-button:hover {
+            background: linear-gradient(135deg, #5a8c33, #3d6526);
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a7c23;
+        }
+
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .employee-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            border-color: #4a7c23;
+            transform: translateY(-2px);
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+        }
+
+        .employee-title {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FreshFlow Systems</h1>
+        <p>Interactive Organizational Profile & Security Management</p>
+    </div>
+
+    <div class="nav-container">
+        <div class="nav">
+            <button class="nav-button active" onclick="showSection('overview')">Organization Overview</button>
+            <button class="nav-button" onclick="showSection('assets')">Asset Inventory Report</button>
+            <button class="nav-button" onclick="showSection('security')">System Security Plan</button>
+            <button class="nav-button" onclick="showSection('config')">Configuration Management</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Organization Overview Section -->
+        <div id="overview" class="content-section active">
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <h3>Company Statistics</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Employees:</span>
+                        <span class="stat-value editable" contenteditable="true">64</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Annual Growth:</span>
+                        <span class="stat-value editable" contenteditable="true">125%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Facilities:</span>
+                        <span class="stat-value editable" contenteditable="true">3</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Founded:</span>
+                        <span class="stat-value editable" contenteditable="true">2018</span>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <h3>Executive Leadership</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">CEO:</span>
+                        <span class="stat-value editable" contenteditable="true">Carla Jennings</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">COO:</span>
+                        <span class="stat-value editable" contenteditable="true">Marcus Lee</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">CISO:</span>
+                        <span class="stat-value editable" contenteditable="true">Dr. Nia Clarke</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Finance Director:</span>
+                        <span class="stat-value editable" contenteditable="true">Elaine Harper</span>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <h3>Security Overview</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Assets:</span>
+                        <span class="stat-value">89</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">High-Risk Assets:</span>
+                        <span class="stat-value">47</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">OT Systems:</span>
+                        <span class="stat-value">11</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Compliance Score:</span>
+                        <span class="stat-value">82%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="facility-grid">
+                <div class="facility-card">
+                    <h4>Headquarters Building</h4>
+                    <p><strong>Location:</strong> <span class="editable" contenteditable="true">1247 Industrial Parkway, Lima, Ohio 45805</span></p>
+                    <p><strong>Staff:</strong> <span class="editable" contenteditable="true">22</span> employees</p>
+                    <p><strong>Functions:</strong> <span class="editable" contenteditable="true">Executive offices, R&D labs, quality control, IT operations center</span></p>
+                    <p><strong>Key Systems:</strong> ERP system, CRM, financial management, email/collaboration tools</p>
+                </div>
+
+                <div class="facility-card">
+                    <h4>Packaging Facility</h4>
+                    <p><strong>Location:</strong> <span class="editable" contenteditable="true">1251 Industrial Parkway, Lima, Ohio 45805</span></p>
+                    <p><strong>Staff:</strong> <span class="editable" contenteditable="true">28</span> employees</p>
+                    <p><strong>Functions:</strong> <span class="editable" contenteditable="true">Automated packaging lines, quality inspection, labeling systems</span></p>
+                    <p><strong>Key Systems:</strong> 12 PLCs, 3 HMI stations, barcode scanners, weight verification systems</p>
+                </div>
+
+                <div class="facility-card">
+                    <h4>Warehouse & Shipping</h4>
+                    <p><strong>Location:</strong> <span class="editable" contenteditable="true">1255 Industrial Parkway, Lima, Ohio 45805</span></p>
+                    <p><strong>Staff:</strong> <span class="editable" contenteditable="true">14</span> employees</p>
+                    <p><strong>Functions:</strong> <span class="editable" contenteditable="true">Inventory management, order fulfillment, shipping coordination</span></p>
+                    <p><strong>Key Systems:</strong> WMS, automated sorting, RFID tracking, temperature monitoring</p>
+                </div>
+            </div>
+
+            <button class="save-button" onclick="saveData()">Save Changes</button>
+        </div>
+
+        <!-- Asset Inventory Section -->
+        <div id="assets" class="content-section">
+            <div class="report-section">
+                <div class="report-header">
+                    <h2>Asset Inventory & Categorization Report</h2>
+                    <p>Comprehensive catalog of organizational assets with risk classifications</p>
+                </div>
+
+                <h3>Operational Technology Assets</h3>
+                <table class="asset-table">
+                    <thead>
+                        <tr>
+                            <th>Asset ID</th>
+                            <th>Asset Name</th>
+                            <th>Facility</th>
+                            <th>Quantity</th>
+                            <th>Risk Level</th>
+                            <th>Function</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ot-assets">
+                        <tr>
+                            <td>OT-001</td>
+                            <td class="editable" contenteditable="true">Rockwell PLCs (ControlLogix)</td>
+                            <td>Packaging Facility</td>
+                            <td class="editable" contenteditable="true">12</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Controls automated packaging processes</td>
+                        </tr>
+                        <tr>
+                            <td>OT-002</td>
+                            <td class="editable" contenteditable="true">HMI Terminals</td>
+                            <td>Packaging Facility</td>
+                            <td class="editable" contenteditable="true">3</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Human-machine interface for operators</td>
+                        </tr>
+                        <tr>
+                            <td>OT-003</td>
+                            <td class="editable" contenteditable="true">Label Printers (Zebra Industrial)</td>
+                            <td>Packaging Facility</td>
+                            <td class="editable" contenteditable="true">4</td>
+                            <td><span class="risk-badge risk-medium">Medium</span></td>
+                            <td class="editable" contenteditable="true">High-speed label generation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Information Technology Assets</h3>
+                <table class="asset-table">
+                    <thead>
+                        <tr>
+                            <th>Asset ID</th>
+                            <th>Asset Name</th>
+                            <th>Facility</th>
+                            <th>Quantity</th>
+                            <th>Risk Level</th>
+                            <th>Function</th>
+                        </tr>
+                    </thead>
+                    <tbody id="it-assets">
+                        <tr>
+                            <td>IT-001</td>
+                            <td class="editable" contenteditable="true">Workstations (HP EliteDesk)</td>
+                            <td>All sites</td>
+                            <td class="editable" contenteditable="true">40</td>
+                            <td><span class="risk-badge risk-medium">Medium</span></td>
+                            <td class="editable" contenteditable="true">Employee work terminals</td>
+                        </tr>
+                        <tr>
+                            <td>IT-002</td>
+                            <td class="editable" contenteditable="true">Laptops (Dell Latitude)</td>
+                            <td>HQ / R&D</td>
+                            <td class="editable" contenteditable="true">20</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Mobile computing</td>
+                        </tr>
+                        <tr>
+                            <td>IT-003</td>
+                            <td class="editable" contenteditable="true">Servers (VMware Cluster)</td>
+                            <td>HQ Data Center</td>
+                            <td class="editable" contenteditable="true">5</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Internal hosting / AD / file services</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="save-button" onclick="addAsset()">Add New Asset</button>
+                <button class="save-button" onclick="saveAssets()">Save Asset Changes</button>
+            </div>
+        </div>
+
+        <!-- Security Plan Section -->
+        <div id="security" class="content-section">
+            <div class="report-section">
+                <div class="report-header">
+                    <h2>System Security Plan</h2>
+                    <p>Comprehensive security framework and control implementation</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Security Program Objectives</label>
+                    <textarea rows="4" class="editable">Protect Critical Assets: Safeguard intellectual property, financial data, and operational control systems
+Ensure Operational Continuity: Maintain <2-hour recovery time for production systems
+Enable Secure Growth: Scale security controls to support 125% annual expansion
+Achieve Compliance: Meet food safety, financial, and privacy regulatory requirements</textarea>
+                </div>
+
+                <h3>Security Control Framework</h3>
+                <table class="asset-table">
+                    <thead>
+                        <tr>
+                            <th>Control ID</th>
+                            <th>Control Name</th>
+                            <th>Implementation Status</th>
+                            <th>Risk Level</th>
+                            <th>Target Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ID-001</td>
+                            <td class="editable" contenteditable="true">MFA enforcement across cloud apps</td>
+                            <td class="editable" contenteditable="true">Pending</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Q3 2025</td>
+                        </tr>
+                        <tr>
+                            <td>ID-002</td>
+                            <td class="editable" contenteditable="true">OT network segmentation audit</td>
+                            <td class="editable" contenteditable="true">Planned</td>
+                            <td><span class="risk-badge risk-high">High</span></td>
+                            <td class="editable" contenteditable="true">Q3 2025</td>
+                        </tr>
+                        <tr>
+                            <td>ID-003</td>
+                            <td class="editable" contenteditable="true">Patch management deployment</td>
+                            <td class="editable" contenteditable="true">In Progress</td>
+                            <td><span class="risk-badge risk-medium">Medium</span></td>
+                            <td class="editable" contenteditable="true">Q4 2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Security Team Structure</h3>
+                <div class="employee-grid">
+                    <div class="employee-card">
+                        <div class="employee-name editable" contenteditable="true">Dr. Nia Clarke</div>
+                        <div class="employee-title editable" contenteditable="true">Chief Information Security Officer</div>
+                    </div>
+                    <div class="employee-card">
+                        <div class="employee-name editable" contenteditable="true">Jason Trujillo</div>
+                        <div class="employee-title editable" contenteditable="true">Network Administrator</div>
+                    </div>
+                    <div class="employee-card">
+                        <div class="employee-name editable" contenteditable="true">Regina Moore</div>
+                        <div class="employee-title editable" contenteditable="true">OT Systems Engineer</div>
+                    </div>
+                    <div class="employee-card">
+                        <div class="employee-name editable" contenteditable="true">Rachel Li</div>
+                        <div class="employee-title editable" contenteditable="true">Compliance & Risk Officer</div>
+                    </div>
+                </div>
+
+                <button class="save-button" onclick="saveSecurityPlan()">Save Security Plan</button>
+            </div>
+        </div>
+
+        <!-- Configuration Management Section -->
+        <div id="config" class="content-section">
+            <div class="report-section">
+                <div class="report-header">
+                    <h2>Configuration Management Plan</h2>
+                    <p>Standardized processes for maintaining secure, compliant configurations</p>
+                </div>
+
+                <h3>Configuration Control Board</h3>
+                <table class="asset-table">
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Authority Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Chair</td>
+                            <td class="editable" contenteditable="true">Dr. Nia Clarke</td>
+                            <td>IT Security</td>
+                            <td>Level 4 (Strategic)</td>
+                        </tr>
+                        <tr>
+                            <td>Technical Lead</td>
+                            <td class="editable" contenteditable="true">Jason Trujillo</td>
+                            <td>IT Operations</td>
+                            <td>Level 3 (Tactical)</td>
+                        </tr>
+                        <tr>
+                            <td>OT Representative</td>
+                            <td class="editable" contenteditable="true">Regina Moore</td>
+                            <td>Operations</td>
+                            <td>Level 3 (Tactical)</td>
+                        </tr>
+                        <tr>
+                            <td>Business Representative</td>
+                            <td class="editable" contenteditable="true">Marcus Lee</td>
+                            <td>Executive</td>
+                            <td>Level 4 (Strategic)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Change Management Categories</h3>
+                <div class="form-group">
+                    <label>Emergency Changes</label>
+                    <textarea rows="3" class="editable">Critical fixes required within 4 hours to prevent production impact. Approval by CISO or designated deputy with post-implementation CCB review.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Standard Changes</label>
+                    <textarea rows="3" class="editable">Low-risk, pre-approved changes following established procedures. Automated approval through pre-defined criteria with <24 hour processing time.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Normal Changes</label>
+                    <textarea rows="3" class="editable">Scheduled changes requiring CCB review and business coordination. Full CCB review with business impact assessment, 5-14 business days processing time.</textarea>
+                </div>
+
+                <h3>Configuration Baselines</h3>
+                <table class="asset-table">
+                    <thead>
+                        <tr>
+                            <th>System Type</th>
+                            <th>Baseline Standard</th>
+                            <th>Compliance Score</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Windows Workstations</td>
+                            <td class="editable" contenteditable="true">NIST SP 800-171</td>
+                            <td class="editable" contenteditable="true">85%</td>
+                            <td class="editable" contenteditable="true">2025-06-01</td>
+                        </tr>
+                        <tr>
+                            <td>Rockwell PLCs</td>
+                            <td class="editable" contenteditable="true">IEC 62443</td>
+                            <td class="editable" contenteditable="true">78%</td>
+                            <td class="editable" contenteditable="true">2025-05-15</td>
+                        </tr>
+                        <tr>
+                            <td>Network Infrastructure</td>
+                            <td class="editable" contenteditable="true">CIS Benchmark</td>
+                            <td class="editable" contenteditable="true">92%</td>
+                            <td class="editable" contenteditable="true">2025-06-15</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="save-button" onclick="saveConfigPlan()">Save Configuration Plan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update navigation buttons
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Save functionality for different sections
+        function saveData() {
+            const editableElements = document.querySelectorAll('#overview .editable');
+            const data = {};
+            
+            editableElements.forEach((element, index) => {
+                data[`element_${index}`] = element.textContent || element.innerHTML;
+            });
+            
+            // In a real application, this would send data to a server
+            localStorage.setItem('freshflow_overview', JSON.stringify(data));
+            
+            showNotification('Overview data saved successfully!');
+        }
+
+        function saveAssets() {
+            const assetRows = document.querySelectorAll('#assets .asset-table tbody tr');
+            const assets = [];
+            
+            assetRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const asset = {
+                    id: cells[0].textContent,
+                    name: cells[1].textContent,
+                    facility: cells[2].textContent,
+                    quantity: cells[3].textContent,
+                    risk: cells[4].textContent,
+                    function: cells[5].textContent
+                };
+                assets.push(asset);
+            });
+            
+            localStorage.setItem('freshflow_assets', JSON.stringify(assets));
+            showNotification('Asset inventory saved successfully!');
+        }
+
+        function saveSecurityPlan() {
+            const securityData = {
+                objectives: document.querySelector('#security textarea').value,
+                controls: [],
+                team: []
+            };
+            
+            // Save control data
+            const controlRows = document.querySelectorAll('#security .asset-table tbody tr');
+            controlRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                securityData.controls.push({
+                    id: cells[0].textContent,
+                    name: cells[1].textContent,
+                    status: cells[2].textContent,
+                    risk: cells[3].textContent,
+                    target: cells[4].textContent
+                });
+            });
+            
+            // Save team data
+            const teamCards = document.querySelectorAll('#security .employee-card');
+            teamCards.forEach(card => {
+                securityData.team.push({
+                    name: card.querySelector('.employee-name').textContent,
+                    title: card.querySelector('.employee-title').textContent
+                });
+            });
+            
+            localStorage.setItem('freshflow_security', JSON.stringify(securityData));
+            showNotification('Security plan saved successfully!');
+        }
+
+        function saveConfigPlan() {
+            const configData = {
+                board: [],
+                changes: {},
+                baselines: []
+            };
+            
+            // Save board data
+            const boardRows = document.querySelectorAll('#config .asset-table tbody tr');
+            boardRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                configData.board.push({
+                    role: cells[0].textContent,
+                    name: cells[1].textContent,
+                    department: cells[2].textContent,
+                    authority: cells[3].textContent
+                });
+            });
+            
+            // Save change descriptions
+            const textareas = document.querySelectorAll('#config textarea');
+            configData.changes = {
+                emergency: textareas[0].value,
+                standard: textareas[1].value,
+                normal: textareas[2].value
+            };
+            
+            localStorage.setItem('freshflow_config', JSON.stringify(configData));
+            showNotification('Configuration plan saved successfully!');
+        }
+
+        function addAsset() {
+            const tableBody = document.querySelector('#ot-assets');
+            const newRow = document.createElement('tr');
+            
+            newRow.innerHTML = `
+                <td class="editable" contenteditable="true">NEW-001</td>
+                <td class="editable" contenteditable="true">New Asset</td>
+                <td class="editable" contenteditable="true">Facility</td>
+                <td class="editable" contenteditable="true">1</td>
+                <td><span class="risk-badge risk-medium">Medium</span></td>
+                <td class="editable" contenteditable="true">Asset function</td>
+            `;
+            
+            tableBody.appendChild(newRow);
+            showNotification('New asset row added. Please edit the details.');
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #4a7c23, #2d5016);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Load saved data on page load
+        function loadSavedData() {
+            // Load overview data
+            const savedOverview = localStorage.getItem('freshflow_overview');
+            if (savedOverview) {
+                const data = JSON.parse(savedOverview);
+                const editableElements = document.querySelectorAll('#overview .editable');
+                editableElements.forEach((element, index) => {
+                    if (data[`element_${index}`]) {
+                        element.textContent = data[`element_${index}`];
+                    }
+                });
+            }
+            
+            // Load other saved data similarly...
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+            showNotification('FreshFlow Systems profile loaded successfully!');
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                const activeSection = document.querySelector('.content-section.active');
+                if (activeSection.id === 'overview') saveData();
+                else if (activeSection.id === 'assets') saveAssets();
+                else if (activeSection.id === 'security') saveSecurityPlan();
+                else if (activeSection.id === 'config') saveConfigPlan();
+            }
+        });
+    </script>
+</body>
+</html>
