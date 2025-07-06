@@ -75,7 +75,7 @@
             position: relative;
             margin: 20px 0;
             border: 3px solid #333;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .conveyor::before {
@@ -90,12 +90,137 @@
                 #fff 0px, #fff 20px,
                 transparent 20px, transparent 40px
             );
-            animation: conveyorMove 2s linear infinite;
+            animation: none;
         }
 
-        @keyframes conveyorMove {
+        .conveyor-forward::before {
+            animation: conveyorMoveForward var(--conveyor-speed, 2s) linear infinite;
+        }
+
+        .conveyor-reverse::before {
+            animation: conveyorMoveReverse var(--conveyor-speed, 2s) linear infinite;
+        }
+
+        .conveyor-stopped::before {
+            animation: none;
+        }
+
+        @keyframes conveyorMoveForward {
             0% { transform: translateX(-40px); }
             100% { transform: translateX(0); }
+        }
+
+        @keyframes conveyorMoveReverse {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-40px); }
+        }
+
+        .conveyor-controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .speed-control {
+            margin: 15px 0;
+        }
+
+        .speed-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .speed-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .direction-controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .direction-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .direction-btn.forward {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .direction-btn.reverse {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .direction-btn.stop {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .direction-btn.active {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .direction-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .vfd-display {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            border: 2px solid #333;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
         }
 
         .bottle {
@@ -106,7 +231,25 @@
             border-radius: 5px 5px 8px 8px;
             position: absolute;
             top: 10px;
-            transition: all 0.3s ease;
+            transition: none; /* Remove transition for physics-based movement */
+            z-index: 10;
+        }
+
+        .bottle-multiple {
+            opacity: 0.9;
+        }
+
+        .bottle.stopped {
+            transition: all 0.5s ease; /* Add transition when stopped for positioning */
+        }
+
+        .station-marker {
+            position: absolute;
+            top: -10px;
+            width: 2px;
+            height: 100px;
+            background: rgba(255, 215, 0, 0.5);
+            border-left: 2px dashed #ffd700;
         }
 
         .bottle.filled {
@@ -371,7 +514,16 @@
                 
                 <!-- Conveyor Belt -->
                 <div class="conveyor" id="conveyor">
-                    <div class="bottle" id="bottle" style="left: 50px;"></div>
+                    <!-- Station Markers -->
+                    <div class="station-marker" style="left: 100px;" title="Loading Position"></div>
+                    <div class="station-marker" style="left: 300px;" title="Filling Station"></div>
+                    <div class="station-marker" style="left: 500px;" title="Capping Station"></div>
+                    <div class="station-marker" style="left: 700px;" title="Exit Position"></div>
+                    
+                    <!-- Bottles -->
+                    <div class="bottle" id="bottle1" data-bottle-id="1"></div>
+                    <div class="bottle bottle-multiple" id="bottle2" data-bottle-id="2"></div>
+                    <div class="bottle bottle-multiple" id="bottle3" data-bottle-id="3"></div>
                 </div>
 
                 <!-- Filling Station -->
@@ -419,8 +571,55 @@
                 </div>
 
                 <div class="control-group">
+                    <h3>🔄 Conveyor Control (VFD)</h3>
+                    <div class="conveyor-controls">
+                        <div class="vfd-display" id="vfdDisplay">
+                            FREQ: 50.0 Hz | SPD: 0 RPM
+                            DIR: STOP | STATUS: READY
+                        </div>
+                        
+                        <div class="speed-control">
+                            <label>Speed Control: <span id="speedValue">50</span>%</label>
+                            <input type="range" class="speed-slider" id="speedSlider" 
+                                   min="0" max="100" value="50" 
+                                   onchange="updateConveyorSpeed(this.value)">
+                        </div>
+                        
+                        <div class="direction-controls">
+                            <button class="direction-btn forward" id="forwardBtn" 
+                                    onclick="setConveyorDirection('forward')">
+                                ▶️ FWD
+                            </button>
+                            <button class="direction-btn stop active" id="stopBtn" 
+                                    onclick="setConveyorDirection('stop')">
+                                ⏹️ STOP
+                            </button>
+                            <button class="direction-btn reverse" id="reverseBtn" 
+                                    onclick="setConveyorDirection('reverse')">
+                                ◀️ REV
+                            </button>
+                        </div>
+                        
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="status-indicator" id="motorStatus"></span>Motor Ready
+                            </div>
+                            <div class="status-item">
+                                <span class="status-indicator" id="vfdStatus"></span>VFD Online
+                            </div>
+                            <div class="status-item">
+                                <span class="status-indicator" id="directionStatus"></span>Direction Lock
+                            </div>
+                            <div class="status-item">
+                                <span class="status-indicator" id="speedStatus"></span>At Speed
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
                     <h3>Manual Override</h3>
-                    <button class="btn" onclick="moveConveyor()">🔄 Move Conveyor</button>
+                    <button class="btn" onclick="moveConveyor()">🔄 Advance Position</button>
                     <button class="btn" onclick="toggleFilling()">💧 Toggle Filling</button>
                     <button class="btn" onclick="toggleCapping()">🔧 Toggle Capping</button>
                 </div>
@@ -502,16 +701,24 @@
                         <p><strong>Control:</strong> PWM signal or 4-20mA for valve position</p>
                     </div>
                     <div class="info-card">
-                        <h4>Conveyor Motor</h4>
-                        <p><strong>Type:</strong> Digital Output</p>
-                        <p><strong>Function:</strong> Moves bottles between stations</p>
-                        <p><strong>Control:</strong> On/Off with speed control via VFD</p>
+                        <h4>Conveyor Motor + VFD</h4>
+                        <p><strong>Type:</strong> Analog Output (Variable Frequency Drive)</p>
+                        <p><strong>Function:</strong> Variable speed control with direction</p>
+                        <p><strong>Control:</strong> 0-10V or 4-20mA for speed, Digital for direction</p>
+                        <p><strong>Features:</strong> Ramp up/down, emergency stop, feedback</p>
                     </div>
                     <div class="info-card">
                         <h4>Capping Arm Actuator</h4>
                         <p><strong>Type:</strong> Digital Output</p>
                         <p><strong>Function:</strong> Pneumatic/servo motor for cap placement</p>
                         <p><strong>Control:</strong> Extend/Retract commands</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>VFD Parameters</h4>
+                        <p><strong>Speed Range:</strong> 0-100% (0-60Hz typical)</p>
+                        <p><strong>Direction:</strong> Forward/Reverse via logic signals</p>
+                        <p><strong>Safety:</strong> Must stop before direction change</p>
+                        <p><strong>Feedback:</strong> Speed confirmation, fault monitoring</p>
                     </div>
                 </div>
             </div>
@@ -586,6 +793,481 @@
     </div>
 
     <script>
+        // Physics-based conveyor system with continuous bottle movement
+        class ConveyorController {
+            constructor() {
+                this.speed = 50; // Percentage (0-100%)
+                this.direction = 'stop'; // 'forward', 'reverse', 'stop'
+                this.isRunning = false;
+                this.motorReady = true;
+                this.vfdOnline = true;
+                this.safetyLocked = false;
+                this.rampTime = 1000; // Time to reach target speed (ms)
+                
+                // Physics properties
+                this.currentSpeed = 0; // Actual speed (may differ during ramping)
+                this.targetSpeed = 0;  // Target speed
+                this.pixelsPerSecond = 0; // Current movement rate
+                this.lastUpdateTime = Date.now();
+                
+                this.initializeVFD();
+                this.startPhysicsEngine();
+            }
+            
+            initializeVFD() {
+                // Initialize VFD status indicators
+                document.getElementById('motorStatus').classList.add('active');
+                document.getElementById('vfdStatus').classList.add('active');
+                this.updateVFDDisplay();
+            }
+            
+            startPhysicsEngine() {
+                // Start continuous physics update loop
+                this.physicsInterval = setInterval(() => {
+                    this.updatePhysics();
+                }, 16); // 60 FPS updates
+            }
+            
+            updatePhysics() {
+                const now = Date.now();
+                const deltaTime = (now - this.lastUpdateTime) / 1000; // Convert to seconds
+                this.lastUpdateTime = now;
+                
+                // Speed ramping (acceleration/deceleration)
+                if (this.currentSpeed !== this.targetSpeed) {
+                    const rampRate = 100 / (this.rampTime / 1000); // % per second
+                    const speedDiff = this.targetSpeed - this.currentSpeed;
+                    const speedChange = Math.sign(speedDiff) * Math.min(Math.abs(speedDiff), rampRate * deltaTime);
+                    
+                    this.currentSpeed += speedChange;
+                    this.updateVFDDisplay();
+                }
+                
+                // Calculate pixels per second based on current speed and direction
+                const baseSpeed = 100; // pixels per second at 100% speed
+                this.pixelsPerSecond = (this.currentSpeed / 100) * baseSpeed;
+                
+                if (this.direction === 'reverse') {
+                    this.pixelsPerSecond *= -1;
+                }
+                
+                // Update bottle positions if conveyor is running
+                if (this.isRunning && this.pixelsPerSecond !== 0) {
+                    conveyorSystem.updateBottlePhysics(this.pixelsPerSecond * deltaTime);
+                }
+            }
+            
+            updateVFDDisplay() {
+                const frequency = (this.currentSpeed * 0.6).toFixed(1); // 0-60 Hz
+                const rpm = this.isRunning ? Math.round(this.currentSpeed * 18) : 0; // 0-1800 RPM
+                const status = this.safetyLocked ? 'LOCKED' : (this.isRunning ? 'RUNNING' : 'READY');
+                
+                document.getElementById('vfdDisplay').innerHTML = 
+                    `FREQ: ${frequency} Hz | SPD: ${rpm} RPM<br>DIR: ${this.direction.toUpperCase()} | STATUS: ${status}`;
+            }
+            
+            setSpeed(speedPercent) {
+                if (this.safetyLocked) {
+                    log("ERROR: Cannot change speed - Safety locked");
+                    return false;
+                }
+                
+                const oldSpeed = this.speed;
+                this.speed = Math.max(0, Math.min(100, speedPercent));
+                
+                // Update target speed for ramping
+                if (this.isRunning) {
+                    this.targetSpeed = this.speed;
+                } else {
+                    this.currentSpeed = 0;
+                    this.targetSpeed = 0;
+                }
+                
+                // Update slider display
+                document.getElementById('speedValue').textContent = this.speed;
+                document.getElementById('speedSlider').value = this.speed;
+                
+                // Update speed status indicator
+                const speedStatus = document.getElementById('speedStatus');
+                if (this.speed > 0 && this.isRunning) {
+                    speedStatus.classList.add('active');
+                } else {
+                    speedStatus.classList.remove('active');
+                }
+                
+                // Apply speed change to conveyor animation
+                this.updateConveyorAnimation();
+                
+                log(`Conveyor speed command: ${oldSpeed}% → ${this.speed}%`);
+                return true;
+            }
+            
+            setDirection(newDirection) {
+                if (this.safetyLocked) {
+                    log("ERROR: Cannot change direction - Safety locked");
+                    return false;
+                }
+                
+                // Safety interlock: Must stop before changing direction
+                if (this.isRunning && newDirection !== 'stop' && this.direction !== newDirection) {
+                    log("SAFETY: Must stop conveyor before changing direction");
+                    this.stop();
+                    return false;
+                }
+                
+                const oldDirection = this.direction;
+                this.direction = newDirection;
+                
+                // Update direction button states
+                document.querySelectorAll('.direction-btn').forEach(btn => btn.classList.remove('active'));
+                
+                if (newDirection === 'forward') {
+                    document.getElementById('forwardBtn').classList.add('active');
+                    document.getElementById('directionStatus').classList.add('active');
+                    this.start();
+                } else if (newDirection === 'reverse') {
+                    document.getElementById('reverseBtn').classList.add('active');
+                    document.getElementById('directionStatus').classList.add('active');
+                    this.start();
+                } else {
+                    document.getElementById('stopBtn').classList.add('active');
+                    document.getElementById('directionStatus').classList.remove('active');
+                    this.stop();
+                }
+                
+                this.updateConveyorAnimation();
+                
+                if (oldDirection !== newDirection) {
+                    log(`Conveyor direction: ${oldDirection.toUpperCase()} → ${newDirection.toUpperCase()}`);
+                }
+                
+                return true;
+            }
+            
+            start() {
+                if (this.direction === 'stop' || this.speed === 0) {
+                    return false;
+                }
+                
+                this.isRunning = true;
+                this.targetSpeed = this.speed;
+                
+                document.getElementById('conveyorStatus').classList.add('active');
+                document.getElementById('speedStatus').classList.add('active');
+                
+                this.updateConveyorAnimation();
+                
+                log(`Conveyor started - Speed: ${this.speed}%, Direction: ${this.direction}`);
+                return true;
+            }
+            
+            stop() {
+                this.isRunning = false;
+                this.targetSpeed = 0;
+                
+                document.getElementById('conveyorStatus').classList.remove('active');
+                document.getElementById('speedStatus').classList.remove('active');
+                
+                this.updateConveyorAnimation();
+                
+                log("Conveyor stopped");
+                return true;
+            }
+            
+            emergencyStop() {
+                this.safetyLocked = true;
+                this.isRunning = false;
+                this.direction = 'stop';
+                this.currentSpeed = 0;
+                this.targetSpeed = 0;
+                this.pixelsPerSecond = 0;
+                
+                // Update all status indicators
+                document.getElementById('conveyorStatus').classList.remove('active');
+                document.getElementById('speedStatus').classList.remove('active');
+                document.getElementById('directionStatus').classList.remove('active');
+                
+                // Reset direction buttons
+                document.querySelectorAll('.direction-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.disabled = true;
+                });
+                document.getElementById('stopBtn').classList.add('active');
+                
+                // Disable speed control
+                document.getElementById('speedSlider').disabled = true;
+                
+                this.updateConveyorAnimation();
+                this.updateVFDDisplay();
+                
+                log("🚨 Conveyor emergency stopped - All movement halted");
+            }
+            
+            reset() {
+                this.safetyLocked = false;
+                this.currentSpeed = 0;
+                this.targetSpeed = 0;
+                this.pixelsPerSecond = 0;
+                
+                // Re-enable controls
+                document.querySelectorAll('.direction-btn').forEach(btn => {
+                    btn.disabled = false;
+                });
+                document.getElementById('speedSlider').disabled = false;
+                
+                this.updateVFDDisplay();
+                log("Conveyor controls reset and unlocked");
+            }
+            
+            updateConveyorAnimation() {
+                const conveyor = document.getElementById('conveyor');
+                
+                // Calculate animation duration based on current speed (inverse relationship)
+                const duration = this.currentSpeed > 0 ? (100 / this.currentSpeed) * 0.5 : 2; // 0.5-50 seconds
+                
+                // Set CSS custom property for animation duration
+                conveyor.style.setProperty('--conveyor-speed', `${duration}s`);
+                
+                // Remove all animation classes
+                conveyor.classList.remove('conveyor-forward', 'conveyor-reverse', 'conveyor-stopped');
+                
+                // Apply appropriate animation class
+                if (this.isRunning && this.currentSpeed > 0) {
+                    if (this.direction === 'forward') {
+                        conveyor.classList.add('conveyor-forward');
+                    } else if (this.direction === 'reverse') {
+                        conveyor.classList.add('conveyor-reverse');
+                    }
+                } else {
+                    conveyor.classList.add('conveyor-stopped');
+                }
+            }
+            
+            getCurrentMovementRate() {
+                return this.pixelsPerSecond;
+            }
+            
+            isAtSpeed() {
+                return Math.abs(this.currentSpeed - this.targetSpeed) < 1;
+            }
+        }
+
+        // Physics-based bottle system that follows conveyor movement
+        class ConveyorSystem {
+            constructor(conveyorController) {
+                this.controller = conveyorController;
+                
+                // Station positions (left offset in pixels)
+                this.stations = {
+                    LOADING: 100,
+                    FILLING: 300,
+                    CAPPING: 500,
+                    EXIT: 700,
+                    RESET: -50
+                };
+                
+                // Conveyor bounds
+                this.conveyorBounds = {
+                    left: -100,
+                    right: 800
+                };
+                
+                // Bottle management
+                this.bottles = new Map();
+                this.activeBottle = null;
+                this.nextBottleId = 1;
+                
+                this.initializeBottles();
+                this.setupConveyor();
+                this.startBottleFeeder();
+            }
+            
+            initializeBottles() {
+                // Initialize bottles at different positions
+                const bottle1 = document.getElementById('bottle1');
+                const bottle2 = document.getElementById('bottle2');
+                const bottle3 = document.getElementById('bottle3');
+                
+                this.bottles.set('bottle1', {
+                    element: bottle1,
+                    position: this.stations.LOADING,
+                    state: 'empty',
+                    isActive: true,
+                    onConveyor: true
+                });
+                
+                this.bottles.set('bottle2', {
+                    element: bottle2,
+                    position: this.stations.LOADING - 150,
+                    state: 'empty',
+                    isActive: false,
+                    onConveyor: true
+                });
+                
+                this.bottles.set('bottle3', {
+                    element: bottle3,
+                    position: this.stations.LOADING - 300,
+                    state: 'empty',
+                    isActive: false,
+                    onConveyor: true
+                });
+                
+                this.updateBottlePositions();
+                this.activeBottle = this.bottles.get('bottle1');
+            }
+            
+            setupConveyor() {
+                const conveyor = document.getElementById('conveyor');
+                conveyor.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('bottle')) {
+                        this.selectBottle(e.target.id);
+                    }
+                });
+            }
+            
+            startBottleFeeder() {
+                // Automatically feed new bottles onto the conveyor
+                setInterval(() => {
+                    this.feedNewBottle();
+                }, 5000); // New bottle every 5 seconds
+            }
+            
+            feedNewBottle() {
+                // Find bottles that are off the left side and reset them
+                this.bottles.forEach((bottle, id) => {
+                    if (bottle.position < this.conveyorBounds.left) {
+                        bottle.position = this.stations.LOADING - 300 - (Math.random() * 100);
+                        bottle.state = 'empty';
+                        bottle.onConveyor = true;
+                        this.updateBottlePositions();
+                    }
+                });
+            }
+            
+            updateBottlePhysics(pixelMovement) {
+                // Move all bottles that are on the conveyor
+                this.bottles.forEach((bottle, id) => {
+                    if (bottle.onConveyor) {
+                        bottle.position += pixelMovement;
+                        
+                        // Remove bottles that have gone off the right side
+                        if (bottle.position > this.conveyorBounds.right) {
+                            bottle.position = this.conveyorBounds.left - 50;
+                            bottle.state = 'empty';
+                            bottle.isActive = false;
+                        }
+                        
+                        // Auto-select bottle at filling station
+                        if (!bottle.isActive && this.isBottleAtStation(bottle, 'FILLING')) {
+                            // Deactivate other bottles
+                            this.bottles.forEach(b => b.isActive = false);
+                            bottle.isActive = true;
+                            this.activeBottle = bottle;
+                            log(`Auto-selected ${id} at filling station`);
+                        }
+                    }
+                });
+                
+                this.updateBottlePositions();
+            }
+            
+            updateBottlePositions() {
+                this.bottles.forEach((bottle, id) => {
+                    bottle.element.style.left = bottle.position + 'px';
+                    
+                    // Update visual state
+                    bottle.element.classList.remove('filled', 'capped');
+                    if (bottle.state === 'filled') {
+                        bottle.element.classList.add('filled');
+                    } else if (bottle.state === 'capped') {
+                        bottle.element.classList.add('filled', 'capped');
+                    }
+                    
+                    // Highlight active bottle
+                    bottle.element.style.border = bottle.isActive ? '3px solid #ffd700' : '2px solid #333';
+                    bottle.element.style.boxShadow = bottle.isActive ? '0 0 15px rgba(255, 215, 0, 0.5)' : 'none';
+                    
+                    // Hide bottles that are too far off screen
+                    if (bottle.position < -150 || bottle.position > 850) {
+                        bottle.element.style.opacity = '0.3';
+                    } else {
+                        bottle.element.style.opacity = '1';
+                    }
+                });
+            }
+            
+            selectBottle(bottleId) {
+                // Set all bottles as inactive
+                this.bottles.forEach(bottle => bottle.isActive = false);
+                
+                // Set selected bottle as active
+                const selectedBottle = this.bottles.get(bottleId);
+                if (selectedBottle) {
+                    selectedBottle.isActive = true;
+                    this.activeBottle = selectedBottle;
+                    this.updateBottlePositions();
+                    log(`Manually selected ${bottleId} for operation`);
+                }
+            }
+            
+            stopBottleAtStation(bottleData, stationName) {
+                // Temporarily remove bottle from conveyor movement
+                bottleData.onConveyor = false;
+                
+                // Add transition for smooth positioning
+                bottleData.element.classList.add('stopped');
+                
+                // Position exactly at station
+                bottleData.position = this.stations[stationName];
+                this.updateBottlePositions();
+                
+                log(`Bottle stopped at ${stationName} station for processing`);
+            }
+            
+            releaseBottleToConveyor(bottleData) {
+                // Remove transition for physics movement
+                bottleData.element.classList.remove('stopped');
+                
+                // Put bottle back on conveyor movement
+                bottleData.onConveyor = true;
+                log("Bottle released back to conveyor movement");
+            }
+            
+            isBottleAtStation(bottleData, stationName) {
+                const stationPos = this.stations[stationName];
+                return Math.abs(bottleData.position - stationPos) < 30; // Larger tolerance for moving bottles
+            }
+            
+            getBottleAtStation(stationName) {
+                for (let [id, bottle] of this.bottles) {
+                    if (this.isBottleAtStation(bottle, stationName)) {
+                        return bottle;
+                    }
+                }
+                return null;
+            }
+            
+            getNearestBottleToStation(stationName) {
+                const stationPos = this.stations[stationName];
+                let nearestBottle = null;
+                let nearestDistance = Infinity;
+                
+                this.bottles.forEach((bottle, id) => {
+                    const distance = Math.abs(bottle.position - stationPos);
+                    if (distance < nearestDistance && distance < 100) {
+                        nearestDistance = distance;
+                        nearestBottle = bottle;
+                    }
+                });
+                
+                return nearestBottle;
+            }
+        }
+        
+        // Initialize the enhanced conveyor system
+        const conveyorController = new ConveyorController();
+        const conveyorSystem = new ConveyorSystem(conveyorController);
+        
         // Simulation state variables
         let systemRunning = false;
         let currentStep = 0;
@@ -616,7 +1298,25 @@
 <br>Step 6: Advance conveyor ${step >= 6 ? '✓' : '○'}`;
         }
         
-        function startCycle() {
+        // New conveyor control functions
+        function updateConveyorSpeed(speedValue) {
+            if (conveyorController.setSpeed(parseInt(speedValue))) {
+                log(`VFD speed command: ${speedValue}%`);
+            }
+        }
+        
+        function setConveyorDirection(direction) {
+            if (conveyorController.setDirection(direction)) {
+                const directionNames = {
+                    'forward': 'Forward',
+                    'reverse': 'Reverse', 
+                    'stop': 'Stop'
+                };
+                log(`Conveyor direction: ${directionNames[direction]}`);
+            }
+        }
+        
+        async function startCycle() {
             if (emergencyStopActive) {
                 log("ERROR: Cannot start - Emergency stop active");
                 return;
@@ -627,55 +1327,94 @@
                 return;
             }
             
+            if (conveyorController.safetyLocked) {
+                log("ERROR: Cannot start - Conveyor safety locked");
+                return;
+            }
+            
+            // Start the conveyor if not running
+            if (!conveyorController.isRunning) {
+                conveyorController.setDirection('forward');
+                conveyorController.setSpeed(50); // Default speed
+                log("Conveyor started for production cycle");
+            }
+            
             systemRunning = true;
             currentStep = 1;
-            log("Production cycle started");
+            log("🏭 Production cycle started - Monitoring for bottles");
             
-            // Enable conveyor
-            document.getElementById('conveyorStatus').classList.add('active');
-            
-            executeStep1();
+            // Start monitoring for bottles at filling station
+            monitorForBottles();
         }
         
-        function executeStep1() {
-            // Wait for bottle presence
-            updateLadderLogic(1, "waiting for bottle");
-            log("Step 1: Waiting for bottle presence...");
+        function monitorForBottles() {
+            if (!systemRunning) return;
             
-            setTimeout(() => {
-                if (!systemRunning) return;
-                
-                // Simulate bottle detection
-                document.getElementById('bottleSensor').classList.add('active');
-                log("Bottle detected at filling station");
-                currentStep = 2;
-                executeStep2();
-            }, 1000);
+            // Check for bottles approaching or at filling station
+            const bottleAtFilling = conveyorSystem.getBottleAtStation('FILLING');
+            const nearestBottle = conveyorSystem.getNearestBottleToStation('FILLING');
+            
+            if (bottleAtFilling && bottleAtFilling.state === 'empty') {
+                // Found empty bottle at filling station - start processing
+                conveyorSystem.activeBottle = bottleAtFilling;
+                bottleAtFilling.isActive = true;
+                conveyorSystem.updateBottlePositions();
+                executeStep1();
+            } else if (nearestBottle && nearestBottle.state === 'empty' && 
+                      Math.abs(nearestBottle.position - conveyorSystem.stations.FILLING) < 50) {
+                // Bottle approaching - prepare for capture
+                log("Bottle approaching filling station...");
+            }
+            
+            // Continue monitoring
+            setTimeout(monitorForBottles, 100); // Check every 100ms
         }
         
-        function executeStep2() {
+        async function executeStep1() {
+            if (!systemRunning) return;
+            
+            updateLadderLogic(1, "bottle detected - stopping for filling");
+            log("Step 1: Bottle detected at filling station");
+            
+            // Stop the bottle at the filling station
+            conveyorSystem.stopBottleAtStation(conveyorSystem.activeBottle, 'FILLING');
+            
+            // Simulate bottle detection sensor
+            document.getElementById('bottleSensor').classList.add('active');
+            log("Bottle sensor activated - bottle positioned for filling");
+            
+            currentStep = 2;
+            setTimeout(() => executeStep2(), 1000);
+        }
+        
+        async function executeStep2() {
+            if (!systemRunning) return;
+            
             // Start filling
-            updateLadderLogic(2, "filling");
+            updateLadderLogic(2, "filling in progress");
             log("Step 2: Opening filling valve...");
             
             document.getElementById('fillingStatus').classList.add('active');
             document.getElementById('liquidStream').classList.add('active');
             
+            // Simulate filling process
             setTimeout(() => {
                 if (!systemRunning) return;
                 
-                // Simulate filling progress
-                const bottle = document.getElementById('bottle');
-                bottle.classList.add('filled');
+                conveyorSystem.activeBottle.state = 'filled';
+                conveyorSystem.updateBottlePositions();
+                log("Bottle filled with liquid");
                 currentStep = 3;
                 executeStep3();
-            }, 2000);
+            }, 2500);
         }
         
-        function executeStep3() {
+        async function executeStep3() {
+            if (!systemRunning) return;
+            
             // Monitor fill level
-            updateLadderLogic(3, "monitoring level");
-            log("Step 3: Monitoring fill level...");
+            updateLadderLogic(3, "monitoring fill level");
+            log("Step 3: Verifying fill level...");
             
             setTimeout(() => {
                 if (!systemRunning) return;
@@ -683,32 +1422,51 @@
                 document.getElementById('levelSensor').classList.add('active');
                 document.getElementById('liquidStream').classList.remove('active');
                 document.getElementById('fillingStatus').classList.remove('active');
-                log("Target fill level reached");
+                log("Fill level verified - target reached");
                 currentStep = 4;
                 executeStep4();
             }, 1500);
         }
         
-        function executeStep4() {
-            // Move to capping
-            updateLadderLogic(4, "moving to capping");
-            log("Step 4: Moving bottle to capping station...");
+        async function executeStep4() {
+            if (!systemRunning) return;
             
-            const bottle = document.getElementById('bottle');
-            bottle.style.left = '350px';
+            // Release bottle back to conveyor
+            updateLadderLogic(4, "releasing to conveyor");
+            log("Step 4: Releasing bottle to conveyor for capping...");
             
-            setTimeout(() => {
-                if (!systemRunning) return;
-                
-                currentStep = 5;
-                executeStep5();
-            }, 1000);
+            // Reset filling sensors
+            document.getElementById('bottleSensor').classList.remove('active');
+            document.getElementById('levelSensor').classList.remove('active');
+            
+            // Release bottle back to conveyor movement
+            conveyorSystem.releaseBottleToConveyor(conveyorSystem.activeBottle);
+            
+            currentStep = 5;
+            // Wait for bottle to reach capping station
+            waitForBottleAtCapping();
         }
         
-        function executeStep5() {
-            // Apply cap
-            updateLadderLogic(5, "capping");
-            log("Step 5: Applying cap...");
+        function waitForBottleAtCapping() {
+            if (!systemRunning) return;
+            
+            const bottle = conveyorSystem.activeBottle;
+            if (conveyorSystem.isBottleAtStation(bottle, 'CAPPING')) {
+                executeStep5();
+            } else {
+                // Keep waiting
+                setTimeout(waitForBottleAtCapping, 200);
+            }
+        }
+        
+        async function executeStep5() {
+            if (!systemRunning) return;
+            
+            // Stop bottle at capping station
+            updateLadderLogic(5, "capping in progress");
+            log("Step 5: Bottle at capping station - applying cap...");
+            
+            conveyorSystem.stopBottleAtStation(conveyorSystem.activeBottle, 'CAPPING');
             
             document.getElementById('cappingStatus').classList.add('active');
             document.getElementById('cappingArm').classList.add('active');
@@ -716,8 +1474,8 @@
             setTimeout(() => {
                 if (!systemRunning) return;
                 
-                const bottle = document.getElementById('bottle');
-                bottle.classList.add('capped');
+                conveyorSystem.activeBottle.state = 'capped';
+                conveyorSystem.updateBottlePositions();
                 document.getElementById('capSensor').classList.add('active');
                 log("Cap successfully applied and verified");
                 
@@ -728,59 +1486,66 @@
                     document.getElementById('cappingStatus').classList.remove('active');
                     currentStep = 6;
                     executeStep6();
-                }, 1000);
+                }, 1500);
             }, 2000);
         }
         
-        function executeStep6() {
-            // Advance conveyor
-            updateLadderLogic(6, "advancing conveyor");
-            log("Step 6: Advancing conveyor...");
+        async function executeStep6() {
+            if (!systemRunning) return;
             
-            const bottle = document.getElementById('bottle');
-            bottle.style.left = '600px';
+            // Release bottle to exit
+            updateLadderLogic(6, "releasing completed bottle");
+            log("Step 6: Releasing completed bottle to exit...");
             
-            setTimeout(() => {
-                if (!systemRunning) return;
-                
-                // Reset for next cycle
-                bottleCount++;
-                document.getElementById('bottleCount').textContent = bottleCount;
-                
-                const progressPercent = (bottleCount % 10) * 10;
-                document.getElementById('progressFill').style.width = progressPercent + '%';
-                
-                log(`Bottle #${bottleCount} completed successfully`);
-                
-                // Reset bottle position and state
-                setTimeout(() => {
-                    if (!systemRunning) return;
-                    
-                    bottle.style.left = '50px';
-                    bottle.classList.remove('filled', 'capped');
-                    
-                    // Reset sensors
-                    document.querySelectorAll('.sensor').forEach(sensor => {
-                        sensor.classList.remove('active');
-                    });
-                    
-                    currentStep = 1;
-                    executeStep1();
-                }, 1000);
-            }, 1000);
+            // Reset capping sensors
+            document.getElementById('capSensor').classList.remove('active');
+            
+            // Release bottle back to conveyor
+            conveyorSystem.releaseBottleToConveyor(conveyorSystem.activeBottle);
+            
+            // Update production count
+            bottleCount++;
+            document.getElementById('bottleCount').textContent = bottleCount;
+            
+            const progressPercent = (bottleCount % 10) * 10;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            log(`✅ Bottle #${bottleCount} completed successfully`);
+            
+            // Deactivate completed bottle
+            conveyorSystem.activeBottle.isActive = false;
+            conveyorSystem.activeBottle = null;
+            conveyorSystem.updateBottlePositions();
+            
+            // Reset for next cycle
+            currentStep = 1;
+            updateLadderLogic(0, "waiting for next bottle");
+            
+            // Continue monitoring for next bottle
+            setTimeout(monitorForBottles, 2000);
         }
         
         function stopCycle() {
             systemRunning = false;
-            log("Production cycle stopped by operator");
+            log("🛑 Production cycle stopped by operator");
+            
+            // Release any stopped bottles back to conveyor
+            if (conveyorSystem.activeBottle) {
+                conveyorSystem.releaseBottleToConveyor(conveyorSystem.activeBottle);
+            }
+            
             resetSystem();
         }
         
         function emergencyStop() {
             emergencyStopActive = true;
             systemRunning = false;
+            
+            // Emergency stop the conveyor controller
+            conveyorController.emergencyStop();
+            
             log("🚨 EMERGENCY STOP ACTIVATED 🚨");
-            log("All operations halted immediately");
+            log("All operations halted immediately - Bottles stopped in place");
             
             // Clear all timers
             stepTimers.forEach(timer => clearTimeout(timer));
@@ -795,17 +1560,23 @@
             document.getElementById('cappingArm').classList.remove('active');
             
             document.querySelectorAll('.status-indicator').forEach(indicator => {
-                if (indicator.id !== 'powerStatus') {
+                if (indicator.id !== 'powerStatus' && 
+                    indicator.id !== 'motorStatus' && 
+                    indicator.id !== 'vfdStatus') {
                     indicator.classList.remove('active');
                 }
             });
             
             updateLadderLogic(0, "EMERGENCY STOP");
             
-            // Add reset button
+            // Add reset instructions
             setTimeout(() => {
-                log("Press 'Start Cycle' to reset and resume operations");
+                log("To reset system:");
+                log("1. Clear emergency condition");
+                log("2. Press 'Start Cycle' to unlock and resume");
+                log("3. Bottles will resume conveyor movement");
                 emergencyStopActive = false;
+                conveyorController.reset();
             }, 3000);
         }
         
@@ -819,26 +1590,38 @@
             document.getElementById('cappingArm').classList.remove('active');
             
             document.querySelectorAll('.status-indicator').forEach(indicator => {
-                if (indicator.id !== 'powerStatus') {
+                if (indicator.id !== 'powerStatus' && 
+                    indicator.id !== 'motorStatus' && 
+                    indicator.id !== 'vfdStatus') {
                     indicator.classList.remove('active');
                 }
             });
             
-            const bottle = document.getElementById('bottle');
-            bottle.style.left = '50px';
-            bottle.classList.remove('filled', 'capped');
+            // Release any stopped bottles
+            conveyorSystem.bottles.forEach(bottle => {
+                bottle.onConveyor = true;
+            });
             
             updateLadderLogic(0, "idle");
         }
         
-        // Manual override functions
-        function moveConveyor() {
-            if (emergencyStopActive) return;
+        // Enhanced manual override functions
+        async function moveConveyor() {
+            if (emergencyStopActive || conveyorController.safetyLocked) return;
             
-            log("Manual conveyor advance");
-            const bottle = document.getElementById('bottle');
-            const currentLeft = parseInt(bottle.style.left) || 50;
-            bottle.style.left = Math.min(currentLeft + 100, 600) + 'px';
+            if (!conveyorController.isRunning) {
+                // Start conveyor in forward direction
+                conveyorController.setDirection('forward');
+                log("Manual conveyor start - Forward direction");
+            } else {
+                // Toggle direction if running
+                const newDirection = conveyorController.direction === 'forward' ? 'reverse' : 'forward';
+                conveyorController.setDirection('stop');
+                setTimeout(() => {
+                    conveyorController.setDirection(newDirection);
+                    log(`Manual direction change to ${newDirection}`);
+                }, 500);
+            }
         }
         
         function toggleFilling() {
@@ -852,9 +1635,23 @@
                 status.classList.remove('active');
                 log("Manual filling stopped");
             } else {
-                stream.classList.add('active');
-                status.classList.add('active');
-                log("Manual filling started");
+                // Check for any bottle near filling station
+                const nearestBottle = conveyorSystem.getNearestBottleToStation('FILLING');
+                if (nearestBottle && Math.abs(nearestBottle.position - conveyorSystem.stations.FILLING) < 50) {
+                    stream.classList.add('active');
+                    status.classList.add('active');
+                    
+                    // Stop bottle for manual filling
+                    conveyorSystem.stopBottleAtStation(nearestBottle, 'FILLING');
+                    nearestBottle.state = 'filled';
+                    nearestBottle.isActive = true;
+                    conveyorSystem.activeBottle = nearestBottle;
+                    conveyorSystem.updateBottlePositions();
+                    
+                    log("Manual filling started - bottle stopped at station");
+                } else {
+                    log("ERROR: No bottle near filling station");
+                }
             }
         }
         
@@ -868,10 +1665,30 @@
                 arm.classList.remove('active');
                 status.classList.remove('active');
                 log("Manual capping retracted");
+                
+                // Release bottle if there is one
+                if (conveyorSystem.activeBottle && 
+                    conveyorSystem.isBottleAtStation(conveyorSystem.activeBottle, 'CAPPING')) {
+                    conveyorSystem.releaseBottleToConveyor(conveyorSystem.activeBottle);
+                }
             } else {
-                arm.classList.add('active');
-                status.classList.add('active');
-                log("Manual capping activated");
+                // Check for bottle near capping station
+                const nearestBottle = conveyorSystem.getNearestBottleToStation('CAPPING');
+                if (nearestBottle && Math.abs(nearestBottle.position - conveyorSystem.stations.CAPPING) < 50) {
+                    arm.classList.add('active');
+                    status.classList.add('active');
+                    
+                    // Stop bottle for manual capping
+                    conveyorSystem.stopBottleAtStation(nearestBottle, 'CAPPING');
+                    nearestBottle.state = 'capped';
+                    nearestBottle.isActive = true;
+                    conveyorSystem.activeBottle = nearestBottle;
+                    conveyorSystem.updateBottlePositions();
+                    
+                    log("Manual capping activated - bottle stopped at station");
+                } else {
+                    log("ERROR: No bottle near capping station");
+                }
             }
         }
         
@@ -894,12 +1711,37 @@
             event.target.classList.add('active');
         }
         
-        // Initialize with welcome message
+        // Initialize with enhanced welcome message
         setTimeout(() => {
-            log("Welcome to the ICS Bottle Filling Simulator!");
-            log("Press 'Start Cycle' to begin automated production");
-            log("Use manual controls to test individual components");
-        }, 500);
+            log("🏭 Physics-Based ICS Bottle Filling Simulator v3.0!");
+            log("🎯 PHYSICS ENGINE FEATURES:");
+            log("⚡ Real-time conveyor belt movement");
+            log("🍼 Bottles move continuously with belt");
+            log("🛑 Stop/start bottles at processing stations");
+            log("🔄 Automatic bottle feeding system");
+            log("📊 Speed ramping and acceleration control");
+            log("");
+            log("🎮 OPERATION:");
+            log("• Bottles move with conveyor belt physics");
+            log("• Production cycle captures bottles at stations");
+            log("• Manual controls work with moving bottles");
+            log("• Speed control affects bottle movement rate");
+            log("• Direction changes affect all bottles");
+            log("");
+            log("⚙️ REALISTIC FEATURES:");
+            log("• Bottles automatically fed onto conveyor");
+            log("• Continuous movement until stopped for processing");
+            log("• Physics-based positioning and timing");
+            log("• Auto-selection of bottles at stations");
+            log("");
+            log("🚀 START OPERATION:");
+            log("1. Set conveyor speed (0-100%)");
+            log("2. Select Forward direction");
+            log("3. Press 'Start Cycle' for automated production");
+            log("4. Watch bottles flow through the system!");
+            log("");
+            log("Ready for realistic conveyor operation!");
+        }, 1000);
     </script>
 </body>
 </html>
