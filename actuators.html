@@ -26,15 +26,16 @@
         /* Sidebar Styles */
         .sidebar {
             width: 280px;
-            background: #1a1a1a;
+            background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
             color: white;
             padding: 2rem 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            transform: translateX(-100%);
+            transform: translateX(0);
             transition: transform 0.3s ease;
             z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
         }
 
         .sidebar.open {
@@ -47,6 +48,15 @@
             font-weight: 700;
             border-bottom: 1px solid #333;
             color: #22c55e;
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar h1::after {
+            content: "📚";
+            display: block;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
         }
 
         .nav-menu {
@@ -65,6 +75,20 @@
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-menu a::before {
+            content: "▶";
+            opacity: 0;
+            margin-right: 0.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-menu a:hover::before,
+        .nav-menu a.active::before {
+            opacity: 1;
         }
 
         .nav-menu a:hover,
@@ -72,6 +96,12 @@
             background: #333;
             border-left-color: #22c55e;
             color: #22c55e;
+            transform: translateX(4px);
+        }
+
+        .nav-menu a:active {
+            background: #22c55e;
+            color: white;
         }
 
         /* Mobile menu button */
@@ -88,6 +118,11 @@
             cursor: pointer;
             color: white;
             font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .menu-toggle:hover {
+            background: #16a34a;
         }
 
         /* Main content */
@@ -193,6 +228,14 @@
             cursor: not-allowed;
         }
 
+        .control-group button.stop-btn {
+            background: #ef4444;
+        }
+
+        .control-group button.stop-btn:hover {
+            background: #dc2626;
+        }
+
         /* Output displays */
         .output-panel {
             background: #1a1a1a;
@@ -202,7 +245,9 @@
             margin: 1.5rem 0;
             font-family: 'Courier New', monospace;
             min-height: 150px;
+            max-height: 300px;
             overflow-y: auto;
+            font-size: 0.9rem;
         }
 
         .status-indicator {
@@ -231,6 +276,7 @@
             font-size: 4rem;
             color: #22c55e;
             margin-bottom: 1rem;
+            display: inline-block;
         }
 
         .progress-bar {
@@ -246,6 +292,7 @@
             height: 100%;
             background: #22c55e;
             transition: width 0.3s ease;
+            width: 0%;
         }
 
         /* Map for RTLS */
@@ -253,11 +300,17 @@
             position: relative;
             width: 100%;
             height: 300px;
-            background: #f8f9fa;
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
             border: 2px solid #dee2e6;
             border-radius: 8px;
             overflow: hidden;
             margin: 1rem 0;
+            cursor: crosshair;
         }
 
         .asset-marker {
@@ -274,6 +327,7 @@
 
         .asset-marker:hover {
             transform: scale(1.2);
+            z-index: 10;
         }
 
         /* Dashboard grid for HMI */
@@ -307,6 +361,11 @@
 
             .sidebar {
                 width: 100%;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
             }
 
             .main-content {
@@ -325,6 +384,20 @@
             .dashboard-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .device-icon {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-icon {
+                font-size: 2.5rem;
+            }
         }
 
         /* Animations */
@@ -333,9 +406,9 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .rotate {
@@ -346,23 +419,57 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        /* Overlay for mobile menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Additional visual cue for mobile menu button */
+        .menu-toggle::after {
+            content: " Menu";
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .menu-toggle::after {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="overlay" id="overlay"></div>
+    
     <div class="container">
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <button class="menu-toggle" id="menuToggle">☰</button>
         
         <nav class="sidebar" id="sidebar">
             <h1>IIoT Education</h1>
-            <ul class="nav-menu">
-                <li><a href="#overview" onclick="showSection('overview')" class="active">Overview</a></li>
-                <li><a href="#rfid" onclick="showSection('rfid')">RFID Trackers</a></li>
-                <li><a href="#edge" onclick="showSection('edge')">Edge Devices</a></li>
-                <li><a href="#gateway" onclick="showSection('gateway')">Industrial Gateways</a></li>
-                <li><a href="#plc" onclick="showSection('plc')">PLCs</a></li>
-                <li><a href="#hmi" onclick="showSection('hmi')">HMIs</a></li>
-                <li><a href="#monitoring" onclick="showSection('monitoring')">Condition Monitoring</a></li>
-                <li><a href="#rtls" onclick="showSection('rtls')">Asset Tracking & RTLS</a></li>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#" data-section="overview" class="nav-link active">Overview</a></li>
+                <li><a href="#" data-section="rfid" class="nav-link">RFID Trackers</a></li>
+                <li><a href="#" data-section="edge" class="nav-link">Edge Devices</a></li>
+                <li><a href="#" data-section="gateway" class="nav-link">Industrial Gateways</a></li>
+                <li><a href="#" data-section="plc" class="nav-link">PLCs</a></li>
+                <li><a href="#" data-section="hmi" class="nav-link">HMIs</a></li>
+                <li><a href="#" data-section="monitoring" class="nav-link">Condition Monitoring</a></li>
+                <li><a href="#" data-section="rtls" class="nav-link">Asset Tracking & RTLS</a></li>
             </ul>
         </nav>
 
@@ -382,6 +489,19 @@
                         <div class="device-icon">⚙️</div>
                         <h4>Digital Signal → Physical Action</h4>
                         <p>Click on any device type in the sidebar to explore interactive simulations</p>
+                        
+                        <div class="dashboard-grid" style="margin-top: 2rem;">
+                            <div class="dashboard-widget">
+                                <h4>Device Types</h4>
+                                <div class="dashboard-value">7</div>
+                                <p>Interactive Simulations</p>
+                            </div>
+                            <div class="dashboard-widget">
+                                <h4>Learning Modules</h4>
+                                <div class="dashboard-value">15+</div>
+                                <p>Hands-on Activities</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -398,25 +518,29 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Tag ID to Scan:</label>
+                            <label for="rfidTagId">Tag ID to Scan:</label>
                             <input type="text" id="rfidTagId" placeholder="Enter Tag ID (e.g., RF001234)">
                         </div>
                         <div class="control-group">
                             <label>Scanner Action:</label>
-                            <button onclick="scanRFID()">Scan Tag</button>
+                            <button type="button" id="scanRfidBtn">Scan Tag</button>
+                        </div>
+                        <div class="control-group">
+                            <label>Quick Scan:</label>
+                            <button type="button" id="quickScanBtn">Scan Available Tags</button>
                         </div>
                     </div>
 
                     <div class="device-visual">
                         <div class="device-icon" id="rfidIcon">📡</div>
-                        <div class="status-indicator" id="rfidStatus"></div>
-                        <span id="rfidStatusText">Ready to scan</span>
+                        <div>
+                            <span class="status-indicator" id="rfidStatus"></span>
+                            <span id="rfidStatusText">Ready to scan</span>
+                        </div>
                     </div>
 
-                    <div class="output-panel" id="rfidOutput">
-                        RFID Scanner Ready...
-                        Available Tags: RF001234, RF005678, RF009012
-                    </div>
+                    <div class="output-panel" id="rfidOutput">RFID Scanner Ready...
+Available Tags: RF001234, RF005678, RF009012</div>
                 </div>
             </section>
 
@@ -432,7 +556,7 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Data Source:</label>
+                            <label for="edgeDataSource">Data Source:</label>
                             <select id="edgeDataSource">
                                 <option value="temperature">Temperature Sensor</option>
                                 <option value="pressure">Pressure Sensor</option>
@@ -440,7 +564,7 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <label>Processing Mode:</label>
+                            <label for="edgeProcessingMode">Processing Mode:</label>
                             <select id="edgeProcessingMode">
                                 <option value="local">Local Processing</option>
                                 <option value="cloud">Cloud Processing</option>
@@ -448,14 +572,17 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <button onclick="processEdgeData()">Process Data</button>
+                            <button type="button" id="processEdgeBtn">Process Data</button>
+                        </div>
+                        <div class="control-group">
+                            <button type="button" id="startEdgeBtn">Start Continuous Processing</button>
                         </div>
                     </div>
 
                     <div class="dashboard-grid">
                         <div class="dashboard-widget">
                             <h4>Local Processing</h4>
-                            <div class="dashboard-value" id="localLatency">< 1ms</div>
+                            <div class="dashboard-value" id="localLatency">&lt; 1ms</div>
                             <p>Latency</p>
                         </div>
                         <div class="dashboard-widget">
@@ -468,12 +595,15 @@
                             <div class="dashboard-value" id="dataProcessed">0</div>
                             <p>Packets</p>
                         </div>
+                        <div class="dashboard-widget">
+                            <h4>Efficiency</h4>
+                            <div class="dashboard-value" id="edgeEfficiency">0%</div>
+                            <p>Processing</p>
+                        </div>
                     </div>
 
-                    <div class="output-panel" id="edgeOutput">
-                        Edge Device Ready...
-                        Benefits: Real-time processing, reduced bandwidth, improved reliability
-                    </div>
+                    <div class="output-panel" id="edgeOutput">Edge Device Ready...
+Benefits: Real-time processing, reduced bandwidth, improved reliability</div>
                 </div>
             </section>
 
@@ -489,7 +619,7 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Source Protocol:</label>
+                            <label for="sourceProtocol">Source Protocol:</label>
                             <select id="sourceProtocol">
                                 <option value="modbus">Modbus RTU</option>
                                 <option value="profibus">Profibus</option>
@@ -497,7 +627,7 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <label>Target Protocol:</label>
+                            <label for="targetProtocol">Target Protocol:</label>
                             <select id="targetProtocol">
                                 <option value="mqtt">MQTT</option>
                                 <option value="opcua">OPC UA</option>
@@ -505,32 +635,30 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <label>Data Value:</label>
-                            <input type="number" id="gatewayData" placeholder="Enter sensor value">
+                            <label for="gatewayData">Data Value:</label>
+                            <input type="number" id="gatewayData" placeholder="Enter sensor value" value="25.4">
                         </div>
                         <div class="control-group">
-                            <button onclick="translateProtocol()">Translate Data</button>
+                            <button type="button" id="translateBtn">Translate Data</button>
                         </div>
                     </div>
 
                     <div class="device-visual">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div style="text-align: center;">
                                 <div class="device-icon">🏭</div>
                                 <p>Legacy System</p>
                             </div>
-                            <div class="device-icon rotate" id="gatewayIcon">🔄</div>
-                            <div>
+                            <div class="device-icon" id="gatewayIcon">🔄</div>
+                            <div style="text-align: center;">
                                 <div class="device-icon">☁️</div>
                                 <p>Cloud/Network</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="output-panel" id="gatewayOutput">
-                        Gateway Ready...
-                        Supported Protocols: Modbus, Profibus, Ethernet/IP → MQTT, OPC UA, HTTP
-                    </div>
+                    <div class="output-panel" id="gatewayOutput">Gateway Ready...
+Supported Protocols: Modbus, Profibus, Ethernet/IP → MQTT, OPC UA, HTTP</div>
                 </div>
             </section>
 
@@ -546,20 +674,20 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Input 1 (Start Button):</label>
-                            <input type="checkbox" id="plcInput1" onchange="updatePLC()">
+                            <label for="plcInput1">Input 1 (Start Button):</label>
+                            <input type="checkbox" id="plcInput1" style="width: auto; margin: 0.5rem 0;">
                         </div>
                         <div class="control-group">
-                            <label>Input 2 (Safety Switch):</label>
-                            <input type="checkbox" id="plcInput2" onchange="updatePLC()" checked>
+                            <label for="plcInput2">Input 2 (Safety Switch):</label>
+                            <input type="checkbox" id="plcInput2" style="width: auto; margin: 0.5rem 0;" checked>
                         </div>
                         <div class="control-group">
-                            <label>Input 3 (Temperature OK):</label>
-                            <input type="checkbox" id="plcInput3" onchange="updatePLC()" checked>
+                            <label for="plcInput3">Input 3 (Temperature OK):</label>
+                            <input type="checkbox" id="plcInput3" style="width: auto; margin: 0.5rem 0;" checked>
                         </div>
                         <div class="control-group">
-                            <label>Motor Speed (%):</label>
-                            <input type="range" id="motorSpeed" min="0" max="100" value="0" onchange="updatePLC()">
+                            <label for="motorSpeed">Motor Speed (%):</label>
+                            <input type="range" id="motorSpeed" min="0" max="100" value="0">
                             <span id="speedValue">0%</span>
                         </div>
                     </div>
@@ -567,25 +695,34 @@
                     <div class="dashboard-grid">
                         <div class="dashboard-widget">
                             <h4>Motor Status</h4>
-                            <div class="status-indicator" id="motorStatus"></div>
-                            <span id="motorStatusText">OFF</span>
+                            <div>
+                                <span class="status-indicator" id="motorStatus"></span>
+                                <span id="motorStatusText">OFF</span>
+                            </div>
                         </div>
                         <div class="dashboard-widget">
                             <h4>Safety Status</h4>
-                            <div class="status-indicator" id="safetyStatus"></div>
-                            <span id="safetyStatusText">SAFE</span>
+                            <div>
+                                <span class="status-indicator" id="safetyStatus"></span>
+                                <span id="safetyStatusText">SAFE</span>
+                            </div>
                         </div>
                         <div class="dashboard-widget">
                             <h4>System Ready</h4>
-                            <div class="status-indicator" id="systemStatus"></div>
-                            <span id="systemStatusText">READY</span>
+                            <div>
+                                <span class="status-indicator" id="systemStatus"></span>
+                                <span id="systemStatusText">READY</span>
+                            </div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Output Power</h4>
+                            <div class="dashboard-value" id="outputPower">0W</div>
+                            <p>Current Draw</p>
                         </div>
                     </div>
 
-                    <div class="output-panel" id="plcOutput">
-                        PLC Logic: Motor = Start AND Safety AND Temperature_OK
-                        System Status: Monitoring inputs...
-                    </div>
+                    <div class="output-panel" id="plcOutput">PLC Logic: Motor = Start AND Safety AND Temperature_OK
+System Status: Monitoring inputs...</div>
                 </div>
             </section>
 
@@ -601,21 +738,21 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>System Mode:</label>
-                            <select id="systemMode" onchange="updateHMI()">
+                            <label for="systemMode">System Mode:</label>
+                            <select id="systemMode">
                                 <option value="manual">Manual</option>
                                 <option value="auto">Automatic</option>
                                 <option value="maintenance">Maintenance</option>
                             </select>
                         </div>
                         <div class="control-group">
-                            <button onclick="startProduction()">Start Production</button>
+                            <button type="button" id="startProdBtn">Start Production</button>
                         </div>
                         <div class="control-group">
-                            <button onclick="stopProduction()" class="stop-btn">Stop Production</button>
+                            <button type="button" id="stopProdBtn" class="stop-btn">Stop Production</button>
                         </div>
                         <div class="control-group">
-                            <button onclick="resetAlarms()">Reset Alarms</button>
+                            <button type="button" id="resetAlarmsBtn">Reset Alarms</button>
                         </div>
                     </div>
 
@@ -644,10 +781,8 @@
                         </div>
                     </div>
 
-                    <div class="output-panel" id="hmiOutput">
-                        HMI Dashboard Ready...
-                        System in Manual mode - Waiting for operator input
-                    </div>
+                    <div class="output-panel" id="hmiOutput">HMI Dashboard Ready...
+System in Manual mode - Waiting for operator input</div>
                 </div>
             </section>
 
@@ -663,23 +798,23 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Equipment Type:</label>
-                            <select id="equipmentType" onchange="updateMonitoring()">
+                            <label for="equipmentType">Equipment Type:</label>
+                            <select id="equipmentType">
                                 <option value="motor">Electric Motor</option>
                                 <option value="pump">Centrifugal Pump</option>
                                 <option value="compressor">Air Compressor</option>
                             </select>
                         </div>
                         <div class="control-group">
-                            <label>Operating Hours:</label>
-                            <input type="range" id="operatingHours" min="0" max="8760" value="1000" onchange="updateMonitoring()">
+                            <label for="operatingHours">Operating Hours:</label>
+                            <input type="range" id="operatingHours" min="0" max="8760" value="1000">
                             <span id="hoursValue">1000 hrs</span>
                         </div>
                         <div class="control-group">
-                            <button onclick="runDiagnostics()">Run Diagnostics</button>
+                            <button type="button" id="runDiagBtn">Run Diagnostics</button>
                         </div>
                         <div class="control-group">
-                            <button onclick="scheduleMaintenace()">Schedule Maintenance</button>
+                            <button type="button" id="schedMainBtn">Schedule Maintenance</button>
                         </div>
                     </div>
 
@@ -708,10 +843,8 @@
                         </div>
                     </div>
 
-                    <div class="output-panel" id="monitoringOutput">
-                        Condition Monitoring Active...
-                        Predictive analytics: Normal operation detected
-                    </div>
+                    <div class="output-panel" id="monitoringOutput">Condition Monitoring Active...
+Predictive analytics: Normal operation detected</div>
                 </div>
             </section>
 
@@ -727,7 +860,7 @@
                     
                     <div class="control-panel">
                         <div class="control-group">
-                            <label>Asset Type:</label>
+                            <label for="assetType">Asset Type:</label>
                             <select id="assetType">
                                 <option value="forklift">Forklift</option>
                                 <option value="tool">Tool Cart</option>
@@ -736,26 +869,26 @@
                             </select>
                         </div>
                         <div class="control-group">
-                            <label>Asset ID:</label>
-                            <input type="text" id="assetId" placeholder="Enter Asset ID">
+                            <label for="assetId">Asset ID:</label>
+                            <input type="text" id="assetId" placeholder="Enter Asset ID" value="FLT-001">
                         </div>
                         <div class="control-group">
-                            <button onclick="trackAsset()">Track Asset</button>
+                            <button type="button" id="trackAssetBtn">Track Asset</button>
                         </div>
                         <div class="control-group">
-                            <button onclick="updateAssetLocation()">Update Location</button>
+                            <button type="button" id="updateLocationBtn">Update Location</button>
                         </div>
                     </div>
 
-                    <div class="facility-map" onclick="moveAsset(event)">
+                    <div class="facility-map" id="facilityMap">
                         <div class="asset-marker" id="asset1" style="top: 50px; left: 50px;" title="Forklift-001"></div>
                         <div class="asset-marker" id="asset2" style="top: 150px; left: 200px;" title="Tool-Cart-A"></div>
                         <div class="asset-marker" id="asset3" style="top: 100px; left: 350px;" title="Material-P001"></div>
                         
                         <!-- Facility zones -->
-                        <div style="position: absolute; top: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Production Floor</div>
-                        <div style="position: absolute; top: 10px; right: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Storage Area</div>
-                        <div style="position: absolute; bottom: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Shipping Dock</div>
+                        <div style="position: absolute; top: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px; font-size: 0.8rem;">Production Floor</div>
+                        <div style="position: absolute; top: 10px; right: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px; font-size: 0.8rem;">Storage Area</div>
+                        <div style="position: absolute; bottom: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px; font-size: 0.8rem;">Shipping Dock</div>
                     </div>
 
                     <div class="dashboard-grid">
@@ -781,69 +914,150 @@
                         </div>
                     </div>
 
-                    <div class="output-panel" id="rtlsOutput">
-                        RTLS System Online...
-                        Click on the facility map to move assets or track new locations
-                    </div>
+                    <div class="output-panel" id="rtlsOutput">RTLS System Online...
+Click on the facility map to move assets or track new locations</div>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        // Global variables
-        let currentSection = 'overview';
-        let productionRunning = false;
-        let monitoringInterval;
-        let dataProcessedCount = 0;
+        // Application state
+        const AppState = {
+            currentSection: 'overview',
+            productionRunning: false,
+            edgeProcessingActive: false,
+            monitoringInterval: null,
+            edgeInterval: null,
+            dataProcessedCount: 0
+        };
 
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', function() {
-            updatePLC();
-            updateHMI();
-            updateMonitoring();
-        });
+        // Utility functions
+        function addToOutput(elementId, message) {
+            const output = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `\n[${timestamp}] ${message}`;
+            output.scrollTop = output.scrollHeight;
+        }
 
-        // Navigation functions
-        function showSection(sectionId) {
+        function clearOutput(elementId) {
+            const output = document.getElementById(elementId);
+            output.innerHTML = '';
+        }
+
+        // Navigation System
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            // Initialize sidebar state based on screen size
+            function initializeSidebarState() {
+                if (window.innerWidth > 768) {
+                    // Desktop: sidebar always visible, no overlay
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                } else {
+                    // Mobile: sidebar hidden by default
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                }
+            }
+
+            // Call on load
+            initializeSidebarState();
+
+            // Navigation link click handlers
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId, this);
+                });
+            });
+
+            // Mobile menu toggle
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('active');
+                }
+            });
+
+            // Close menu when clicking overlay (mobile only)
+            overlay.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                initializeSidebarState();
+            });
+
+            // Close mobile menu when clicking on nav links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        function showSection(sectionId, linkElement) {
             // Hide all sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             
-            // Remove active class from nav links
-            document.querySelectorAll('.nav-menu a').forEach(link => {
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
             
             // Show selected section
-            document.getElementById(sectionId).classList.add('active');
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
             
             // Add active class to clicked nav link
-            event.target.classList.add('active');
+            if (linkElement) {
+                linkElement.classList.add('active');
+            }
             
-            currentSection = sectionId;
+            AppState.currentSection = sectionId;
             
-            // Close mobile menu
+            // Close mobile menu when switching sections
             if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('overlay').classList.remove('active');
             }
         }
 
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
+        // RFID Functions
+        function initializeRFID() {
+            const scanBtn = document.getElementById('scanRfidBtn');
+            const quickScanBtn = document.getElementById('quickScanBtn');
+
+            scanBtn.addEventListener('click', scanRFID);
+            quickScanBtn.addEventListener('click', quickScanRFID);
         }
 
-        // RFID Functions
         function scanRFID() {
-            const tagId = document.getElementById('rfidTagId').value;
-            const output = document.getElementById('rfidOutput');
+            const tagId = document.getElementById('rfidTagId').value.trim();
             const icon = document.getElementById('rfidIcon');
             const status = document.getElementById('rfidStatus');
             const statusText = document.getElementById('rfidStatusText');
             
             if (!tagId) {
-                output.innerHTML += '\nError: Please enter a Tag ID';
+                addToOutput('rfidOutput', 'Error: Please enter a Tag ID');
                 return;
             }
             
@@ -856,78 +1070,124 @@
                 icon.classList.remove('pulse');
                 
                 // Simulate different responses based on tag ID
-                if (['RF001234', 'RF005678', 'RF009012'].includes(tagId)) {
+                const knownTags = {
+                    'RF001234': { name: 'Laptop Computer', location: 'Office A-201', status: 'Checked Out' },
+                    'RF005678': { name: 'Tool Set #5', location: 'Workshop B', status: 'Available' },
+                    'RF009012': { name: 'Safety Equipment', location: 'Safety Station', status: 'Available' }
+                };
+                
+                if (knownTags[tagId]) {
                     status.className = 'status-indicator status-online';
                     statusText.textContent = 'Tag Found';
                     
-                    const assetData = {
-                        'RF001234': { name: 'Laptop Computer', location: 'Office A-201', status: 'Checked Out' },
-                        'RF005678': { name: 'Tool Set #5', location: 'Workshop B', status: 'Available' },
-                        'RF009012': { name: 'Safety Equipment', location: 'Safety Station', status: 'Available' }
-                    };
-                    
-                    const asset = assetData[tagId];
-                    output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tag Scanned: ${tagId}`;
-                    output.innerHTML += `\nAsset: ${asset.name}`;
-                    output.innerHTML += `\nLocation: ${asset.location}`;
-                    output.innerHTML += `\nStatus: ${asset.status}`;
-                    output.innerHTML += '\n------------------------';
+                    const asset = knownTags[tagId];
+                    addToOutput('rfidOutput', `Tag Scanned: ${tagId}`);
+                    addToOutput('rfidOutput', `Asset: ${asset.name}`);
+                    addToOutput('rfidOutput', `Location: ${asset.location}`);
+                    addToOutput('rfidOutput', `Status: ${asset.status}`);
+                    addToOutput('rfidOutput', '------------------------');
                 } else {
                     status.className = 'status-indicator status-offline';
                     statusText.textContent = 'Tag Not Found';
-                    output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tag ${tagId}: NOT FOUND`;
+                    addToOutput('rfidOutput', `Tag ${tagId}: NOT FOUND`);
+                    addToOutput('rfidOutput', 'Please check Tag ID and try again');
                 }
-                
-                output.scrollTop = output.scrollHeight;
             }, 1500);
         }
 
+        function quickScanRFID() {
+            const knownTags = ['RF001234', 'RF005678', 'RF009012'];
+            const randomTag = knownTags[Math.floor(Math.random() * knownTags.length)];
+            
+            document.getElementById('rfidTagId').value = randomTag;
+            scanRFID();
+        }
+
         // Edge Device Functions
+        function initializeEdge() {
+            const processBtn = document.getElementById('processEdgeBtn');
+            const startBtn = document.getElementById('startEdgeBtn');
+
+            processBtn.addEventListener('click', processEdgeData);
+            startBtn.addEventListener('click', toggleEdgeProcessing);
+        }
+
         function processEdgeData() {
             const dataSource = document.getElementById('edgeDataSource').value;
             const processingMode = document.getElementById('edgeProcessingMode').value;
-            const output = document.getElementById('edgeOutput');
             
-            dataProcessedCount++;
-            document.getElementById('dataProcessed').textContent = dataProcessedCount;
+            AppState.dataProcessedCount++;
+            document.getElementById('dataProcessed').textContent = AppState.dataProcessedCount;
             
             const sourceData = {
-                'temperature': Math.random() * 50 + 20,
-                'pressure': Math.random() * 100 + 100,
-                'vibration': Math.random() * 5 + 1
+                'temperature': (Math.random() * 50 + 20).toFixed(2),
+                'pressure': (Math.random() * 100 + 100).toFixed(2),
+                'vibration': (Math.random() * 5 + 1).toFixed(2)
             };
             
-            const value = sourceData[dataSource].toFixed(2);
+            const value = sourceData[dataSource];
             
             // Update latency based on processing mode
             if (processingMode === 'local') {
                 document.getElementById('localLatency').textContent = '< 1ms';
                 document.getElementById('cloudLatency').textContent = 'N/A';
+                document.getElementById('edgeEfficiency').textContent = '95%';
             } else if (processingMode === 'cloud') {
                 document.getElementById('localLatency').textContent = 'N/A';
                 document.getElementById('cloudLatency').textContent = '~50ms';
+                document.getElementById('edgeEfficiency').textContent = '70%';
             } else {
                 document.getElementById('localLatency').textContent = '< 1ms';
                 document.getElementById('cloudLatency').textContent = '~25ms';
+                document.getElementById('edgeEfficiency').textContent = '85%';
             }
             
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] ${dataSource}: ${value}`;
-            output.innerHTML += `\nProcessing: ${processingMode.toUpperCase()} mode`;
-            output.innerHTML += `\nLatency: ${processingMode === 'local' ? '<1ms' : processingMode === 'cloud' ? '~50ms' : '~25ms'}`;
-            output.innerHTML += '\n------------------------';
-            output.scrollTop = output.scrollHeight;
+            addToOutput('edgeOutput', `${dataSource}: ${value}`);
+            addToOutput('edgeOutput', `Processing: ${processingMode.toUpperCase()} mode`);
+            addToOutput('edgeOutput', `Latency: ${processingMode === 'local' ? '<1ms' : processingMode === 'cloud' ? '~50ms' : '~25ms'}`);
+            addToOutput('edgeOutput', '------------------------');
+        }
+
+        function toggleEdgeProcessing() {
+            const startBtn = document.getElementById('startEdgeBtn');
+            
+            if (!AppState.edgeProcessingActive) {
+                AppState.edgeProcessingActive = true;
+                startBtn.textContent = 'Stop Processing';
+                startBtn.style.background = '#ef4444';
+                
+                AppState.edgeInterval = setInterval(() => {
+                    processEdgeData();
+                }, 3000);
+                
+                addToOutput('edgeOutput', 'Continuous processing STARTED');
+            } else {
+                AppState.edgeProcessingActive = false;
+                startBtn.textContent = 'Start Continuous Processing';
+                startBtn.style.background = '#22c55e';
+                
+                if (AppState.edgeInterval) {
+                    clearInterval(AppState.edgeInterval);
+                }
+                
+                addToOutput('edgeOutput', 'Continuous processing STOPPED');
+            }
         }
 
         // Gateway Functions
+        function initializeGateway() {
+            const translateBtn = document.getElementById('translateBtn');
+            translateBtn.addEventListener('click', translateProtocol);
+        }
+
         function translateProtocol() {
             const sourceProtocol = document.getElementById('sourceProtocol').value;
             const targetProtocol = document.getElementById('targetProtocol').value;
             const dataValue = document.getElementById('gatewayData').value;
-            const output = document.getElementById('gatewayOutput');
             const icon = document.getElementById('gatewayIcon');
             
             if (!dataValue) {
-                output.innerHTML += '\nError: Please enter a data value';
+                addToOutput('gatewayOutput', 'Error: Please enter a data value');
                 return;
             }
             
@@ -949,15 +1209,28 @@
                     'http': `POST /api/sensors HTTP/1.1\nContent-Type: application/json\n{"sensorId": "001", "value": ${dataValue}}`
                 };
                 
-                output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Protocol Translation:`;
-                output.innerHTML += `\nSource (${sourceProtocol.toUpperCase()}): ${translations[sourceProtocol]}`;
-                output.innerHTML += `\nTarget (${targetProtocol.toUpperCase()}): ${outputs[targetProtocol]}`;
-                output.innerHTML += '\n------------------------';
-                output.scrollTop = output.scrollHeight;
+                addToOutput('gatewayOutput', 'Protocol Translation:');
+                addToOutput('gatewayOutput', `Source (${sourceProtocol.toUpperCase()}): ${translations[sourceProtocol]}`);
+                addToOutput('gatewayOutput', `Target (${targetProtocol.toUpperCase()}): ${outputs[targetProtocol]}`);
+                addToOutput('gatewayOutput', '------------------------');
             }, 1000);
         }
 
         // PLC Functions
+        function initializePLC() {
+            const inputs = ['plcInput1', 'plcInput2', 'plcInput3'];
+            const motorSpeed = document.getElementById('motorSpeed');
+
+            inputs.forEach(inputId => {
+                document.getElementById(inputId).addEventListener('change', updatePLC);
+            });
+            
+            motorSpeed.addEventListener('input', updatePLC);
+            
+            // Initial update
+            updatePLC();
+        }
+
         function updatePLC() {
             const input1 = document.getElementById('plcInput1').checked;
             const input2 = document.getElementById('plcInput2').checked;
@@ -1002,37 +1275,54 @@
                 systemStatusText.textContent = 'NOT READY';
             }
             
+            // Update power output
+            const outputPower = document.getElementById('outputPower');
+            if (motorRunning) {
+                const power = Math.round((motorSpeed / 100) * 1500); // Max 1500W
+                outputPower.textContent = power + 'W';
+            } else {
+                outputPower.textContent = '0W';
+            }
+            
             // Update output
             const output = document.getElementById('plcOutput');
-            output.innerHTML = `PLC Logic: Motor = Start(${input1}) AND Safety(${input2}) AND Temperature_OK(${input3})`;
-            output.innerHTML += `\nMotor Status: ${motorRunning ? 'RUNNING' : 'STOPPED'}`;
-            output.innerHTML += `\nSpeed Setting: ${motorSpeed}%`;
-            output.innerHTML += `\nSafety: ${input2 ? 'OK' : 'FAULT'}`;
+            output.innerHTML = `PLC Logic: Motor = Start(${input1}) AND Safety(${input2}) AND Temperature_OK(${input3})
+Motor Status: ${motorRunning ? 'RUNNING' : 'STOPPED'}
+Speed Setting: ${motorSpeed}%
+Safety: ${input2 ? 'OK' : 'FAULT'}
+Power Output: ${motorRunning ? Math.round((motorSpeed / 100) * 1500) : 0}W`;
         }
 
         // HMI Functions
+        function initializeHMI() {
+            const systemMode = document.getElementById('systemMode');
+            const startBtn = document.getElementById('startProdBtn');
+            const stopBtn = document.getElementById('stopProdBtn');
+            const resetBtn = document.getElementById('resetAlarmsBtn');
+
+            systemMode.addEventListener('change', updateHMI);
+            startBtn.addEventListener('click', startProduction);
+            stopBtn.addEventListener('click', stopProduction);
+            resetBtn.addEventListener('click', resetAlarms);
+        }
+
         function updateHMI() {
             const mode = document.getElementById('systemMode').value;
-            const output = document.getElementById('hmiOutput');
-            
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] System mode changed to: ${mode.toUpperCase()}`;
-            output.scrollTop = output.scrollHeight;
+            addToOutput('hmiOutput', `System mode changed to: ${mode.toUpperCase()}`);
         }
 
         function startProduction() {
-            if (productionRunning) return;
+            if (AppState.productionRunning) return;
             
-            productionRunning = true;
-            const output = document.getElementById('hmiOutput');
-            
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Production STARTED`;
+            AppState.productionRunning = true;
+            addToOutput('hmiOutput', 'Production STARTED');
             
             // Simulate production metrics
             let rate = 0;
             let efficiency = 0;
             let temperature = 22;
             
-            monitoringInterval = setInterval(() => {
+            AppState.monitoringInterval = setInterval(() => {
                 rate = Math.min(rate + Math.random() * 10, 85 + Math.random() * 15);
                 efficiency = Math.min(efficiency + Math.random() * 5, 95);
                 temperature = 22 + Math.random() * 20;
@@ -1042,18 +1332,17 @@
                 document.getElementById('efficiencyBar').style.width = efficiency + '%';
                 document.getElementById('hmiTemperature').textContent = Math.round(temperature) + '°C';
             }, 2000);
-            
-            output.scrollTop = output.scrollHeight;
         }
 
         function stopProduction() {
-            if (!productionRunning) return;
+            if (!AppState.productionRunning) return;
             
-            productionRunning = false;
-            clearInterval(monitoringInterval);
+            AppState.productionRunning = false;
+            if (AppState.monitoringInterval) {
+                clearInterval(AppState.monitoringInterval);
+            }
             
-            const output = document.getElementById('hmiOutput');
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Production STOPPED`;
+            addToOutput('hmiOutput', 'Production STOPPED');
             
             // Reset values
             setTimeout(() => {
@@ -1061,18 +1350,29 @@
                 document.getElementById('efficiency').textContent = '0%';
                 document.getElementById('efficiencyBar').style.width = '0%';
             }, 1000);
-            
-            output.scrollTop = output.scrollHeight;
         }
 
         function resetAlarms() {
             document.getElementById('alarmCount').textContent = '0';
-            const output = document.getElementById('hmiOutput');
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] All alarms RESET`;
-            output.scrollTop = output.scrollHeight;
+            addToOutput('hmiOutput', 'All alarms RESET');
         }
 
         // Condition Monitoring Functions
+        function initializeMonitoring() {
+            const equipmentType = document.getElementById('equipmentType');
+            const operatingHours = document.getElementById('operatingHours');
+            const runDiagBtn = document.getElementById('runDiagBtn');
+            const schedMainBtn = document.getElementById('schedMainBtn');
+
+            equipmentType.addEventListener('change', updateMonitoring);
+            operatingHours.addEventListener('input', updateMonitoring);
+            runDiagBtn.addEventListener('click', runDiagnostics);
+            schedMainBtn.addEventListener('click', scheduleMaintenance);
+            
+            // Initial update
+            updateMonitoring();
+        }
+
         function updateMonitoring() {
             const equipmentType = document.getElementById('equipmentType').value;
             const hours = document.getElementById('operatingHours').value;
@@ -1103,49 +1403,53 @@
         }
 
         function runDiagnostics() {
-            const output = document.getElementById('monitoringOutput');
             const equipmentType = document.getElementById('equipmentType').value;
             
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Running diagnostics on ${equipmentType}...`;
+            addToOutput('monitoringOutput', `Running diagnostics on ${equipmentType}...`);
             
             setTimeout(() => {
-                output.innerHTML += `\nDiagnostics Complete:`;
-                output.innerHTML += `\n- Bearing condition: Good`;
-                output.innerHTML += `\n- Alignment: Within tolerance`;
-                output.innerHTML += `\n- Lubrication: Adequate`;
-                output.innerHTML += `\n- Electrical connections: Normal`;
-                output.innerHTML += '\n------------------------';
-                output.scrollTop = output.scrollHeight;
+                addToOutput('monitoringOutput', 'Diagnostics Complete:');
+                addToOutput('monitoringOutput', '- Bearing condition: Good');
+                addToOutput('monitoringOutput', '- Alignment: Within tolerance');
+                addToOutput('monitoringOutput', '- Lubrication: Adequate');
+                addToOutput('monitoringOutput', '- Electrical connections: Normal');
+                addToOutput('monitoringOutput', '------------------------');
             }, 2000);
         }
 
-        function scheduleMaintenace() {
-            const output = document.getElementById('monitoringOutput');
+        function scheduleMaintenance() {
             const nextMaintenance = document.getElementById('nextMaintenance').textContent;
             
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Maintenance scheduled in ${nextMaintenance} days`;
-            output.innerHTML += `\nWork order created: WO-${Math.floor(Math.random() * 10000)}`;
-            output.innerHTML += `\nTechnician assigned: Auto-assigned`;
-            output.scrollTop = output.scrollHeight;
+            addToOutput('monitoringOutput', `Maintenance scheduled in ${nextMaintenance} days`);
+            addToOutput('monitoringOutput', `Work order created: WO-${Math.floor(Math.random() * 10000)}`);
+            addToOutput('monitoringOutput', 'Technician assigned: Auto-assigned');
         }
 
         // RTLS Functions
+        function initializeRTLS() {
+            const trackBtn = document.getElementById('trackAssetBtn');
+            const updateBtn = document.getElementById('updateLocationBtn');
+            const facilityMap = document.getElementById('facilityMap');
+
+            trackBtn.addEventListener('click', trackAsset);
+            updateBtn.addEventListener('click', updateAssetLocation);
+            facilityMap.addEventListener('click', moveAsset);
+        }
+
         function trackAsset() {
             const assetType = document.getElementById('assetType').value;
-            const assetId = document.getElementById('assetId').value;
-            const output = document.getElementById('rtlsOutput');
+            const assetId = document.getElementById('assetId').value.trim();
             
             if (!assetId) {
-                output.innerHTML += '\nError: Please enter an Asset ID';
+                addToOutput('rtlsOutput', 'Error: Please enter an Asset ID');
                 return;
             }
             
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tracking ${assetType}: ${assetId}`;
-            output.innerHTML += `\nLocation: Production Floor (Zone A)`;
-            output.innerHTML += `\nLast update: ${new Date().toLocaleTimeString()}`;
-            output.innerHTML += `\nStatus: Active`;
-            output.innerHTML += '\n------------------------';
-            output.scrollTop = output.scrollHeight;
+            addToOutput('rtlsOutput', `Tracking ${assetType}: ${assetId}`);
+            addToOutput('rtlsOutput', 'Location: Production Floor (Zone A)');
+            addToOutput('rtlsOutput', `Last update: ${new Date().toLocaleTimeString()}`);
+            addToOutput('rtlsOutput', 'Status: Active');
+            addToOutput('rtlsOutput', '------------------------');
         }
 
         function updateAssetLocation() {
@@ -1153,9 +1457,7 @@
             const currentCount = parseInt(trackedAssets.textContent);
             trackedAssets.textContent = currentCount + 1;
             
-            const output = document.getElementById('rtlsOutput');
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Asset location updated`;
-            output.scrollTop = output.scrollHeight;
+            addToOutput('rtlsOutput', 'Asset location updated');
         }
 
         function moveAsset(event) {
@@ -1165,32 +1467,28 @@
             
             // Move the first asset marker to clicked location
             const asset = document.getElementById('asset1');
-            asset.style.left = (x - 10) + 'px';
-            asset.style.top = (y - 10) + 'px';
+            asset.style.left = Math.max(0, Math.min(x - 10, rect.width - 20)) + 'px';
+            asset.style.top = Math.max(0, Math.min(y - 10, rect.height - 20)) + 'px';
             
-            const output = document.getElementById('rtlsOutput');
-            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Asset moved to coordinates (${x}, ${y})`;
-            output.scrollTop = output.scrollHeight;
+            addToOutput('rtlsOutput', `Asset moved to coordinates (${Math.round(x)}, ${Math.round(y)})`);
         }
 
-        // Responsive design handling
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const menuToggle = document.querySelector('.menu-toggle');
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing IIoT Education Platform...');
             
-            if (window.innerWidth <= 768 && 
-                sidebar.classList.contains('open') && 
-                !sidebar.contains(event.target) && 
-                !menuToggle.contains(event.target)) {
-                sidebar.classList.remove('open');
-            }
+            initializeNavigation();
+            initializeRFID();
+            initializeEdge();
+            initializeGateway();
+            initializePLC();
+            initializeHMI();
+            initializeMonitoring();
+            initializeRTLS();
+            
+            console.log('IIoT Education Platform initialized successfully');
+            console.log('Current section:', AppState.currentSection);
+            console.log('Navigation links found:', document.querySelectorAll('.nav-link').length);
         });
     </script>
 </body>
