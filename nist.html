@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIST SP 800-82 Rev 2 - Industrial Control Systems Security</title>
+    <style>
+        :root {
+            --primary-green: #1a5f2e;
+            --secondary-green: #2d8f3f;
+            --primary-red: #8B0000;
+            --secondary-red: #DC143C;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--medium-gray) 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: var(--white);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(8px);
+        }
+
+        .nav-link i {
+            margin-right: 0.8rem;
+            width: 20px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        .mobile-header {
+            display: none;
+            background: var(--white);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            margin: -2rem -2rem 2rem -2rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-toggle {
+            background: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+            border-left: 5px solid var(--primary-green);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            color: var(--primary-green);
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            opacity: 0.9;
+        }
+
+        /* Mind Map Styles */
+        .mind-map-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .mind-map {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hub-button {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--secondary-red) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            height: 60px;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hub-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .branch-button {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            height: 60px;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .branch-button:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Topic Cards */
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .topic-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .topic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .topic-card h3 {
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .topic-card p {
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-header h2 {
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: var(--medium-gray);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark-gray);
+        }
+
+        .option {
+            background: var(--white);
+            border: 2px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: var(--primary-green);
+            background: rgba(26, 95, 46, 0.05);
+        }
+
+        .option.selected {
+            border-color: var(--primary-green);
+            background: rgba(26, 95, 46, 0.1);
+        }
+
+        .option.correct {
+            border-color: var(--primary-green);
+            background: rgba(26, 95, 46, 0.2);
+        }
+
+        .option.incorrect {
+            border-color: var(--primary-red);
+            background: rgba(139, 0, 0, 0.1);
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .quiz-btn {
+            background: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover {
+            background: var(--secondary-green);
+            transform: translateY(-2px);
+        }
+
+        .quiz-btn:disabled {
+            background: var(--medium-gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-results {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        .score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .mind-map {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hub-button,
+            .branch-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.visible {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section-header {
+                padding: 1.5rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>NIST SP 800-82</h1>
+                <p>Industrial Control Systems Security</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">
+                        <i>📋</i> Overview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="principles">
+                        <i>🔐</i> Basic Principles
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="compliance">
+                        <i>📜</i> Compliance & Standards
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="challenges">
+                        <i>⚠️</i> Emerging Challenges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="architecture">
+                        <i>🏗️</i> ICS Architecture
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="applications">
+                        <i>🔧</i> Applications
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="quiz">
+                        <i>🎯</i> Knowledge Quiz
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <h1>NIST SP 800-82 Rev 2</h1>
+                <button class="mobile-toggle" id="mobileToggle">☰</button>
+            </div>
+
+            <!-- Overview Section -->
+            <section class="content-section active" id="overview">
+                <div class="section-header">
+                    <h2>📋 Overview</h2>
+                    <p>NIST SP 800-82 Rev 2 provides comprehensive guidance for securing Industrial Control Systems (ICS) across various critical infrastructure sectors.</p>
+                </div>
+
+                <div class="mind-map-container">
+                    <div class="mind-map">
+                        <button class="hub-button">NIST SP 800-82 Rev 2</button>
+                        <button class="branch-button" data-section="principles">Basic Principles</button>
+                        <button class="branch-button" data-section="compliance">Compliance & Standards</button>
+                        <button class="branch-button" data-section="challenges">Emerging Challenges</button>
+                        <button class="branch-button" data-section="architecture">ICS Architecture</button>
+                        <button class="branch-button" data-section="applications">Applications</button>
+                    </div>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>Purpose and Scope</h3>
+                        <p>Provides security guidance for industrial control systems, including SCADA systems, distributed control systems (DCS), and programmable logic controllers (PLC) used in critical infrastructure.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Target Audience</h3>
+                        <p>Designed for control systems engineers, security professionals, managers, and anyone responsible for the security of industrial control systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Key Updates in Rev 2</h3>
+                        <p>Enhanced threat landscape analysis, updated security controls, improved incident response guidance, and integration with NIST Cybersecurity Framework.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Critical Infrastructure Focus</h3>
+                        <p>Addresses security concerns across energy, water, transportation, manufacturing, and other critical infrastructure sectors relying on ICS technologies.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Basic Principles Section -->
+            <section class="content-section" id="principles">
+                <div class="section-header">
+                    <h2>🔐 Basic Principles</h2>
+                    <p>Fundamental security principles and best practices for protecting industrial control systems from cyber threats.</p>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>Defense in Depth</h3>
+                        <p>Implementing multiple layers of security controls to protect ICS environments. This includes network segmentation, access controls, monitoring, and physical security measures.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Least Privilege</h3>
+                        <p>Granting users and systems only the minimum access rights needed to perform their functions. Critical for limiting the impact of compromised accounts or systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Risk Management</h3>
+                        <p>Systematic approach to identifying, assessing, and mitigating security risks specific to industrial control systems and operational technology environments.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Security Awareness</h3>
+                        <p>Training and education programs for personnel working with ICS to recognize threats, follow security procedures, and respond appropriately to incidents.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Incident Response</h3>
+                        <p>Preparing for, detecting, and responding to cybersecurity incidents that could impact industrial operations and safety systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Continuous Monitoring</h3>
+                        <p>Ongoing assessment of security controls and system behavior to detect anomalies, vulnerabilities, and potential threats in real-time.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compliance & Standards Section -->
+            <section class="content-section" id="compliance">
+                <div class="section-header">
+                    <h2>📜 Compliance & Standards</h2>
+                    <p>Integration with regulatory frameworks, industry standards, and compliance requirements for ICS security.</p>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>NIST Cybersecurity Framework</h3>
+                        <p>Alignment with the NIST CSF core functions: Identify, Protect, Detect, Respond, and Recover for comprehensive cybersecurity management.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>NERC CIP Standards</h3>
+                        <p>Critical Infrastructure Protection standards for electric utility companies, ensuring grid reliability and security through mandatory cybersecurity requirements.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>IEC 62443 Series</h3>
+                        <p>International standards for industrial communication networks security, providing a comprehensive framework for ICS security management.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>ISA/IEC 62443</h3>
+                        <p>Security for industrial automation and control systems standards, focusing on zones, conduits, and security levels for industrial networks.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Regulatory Compliance</h3>
+                        <p>Meeting requirements from various regulatory bodies including TSA, FDA, EPA, and other sector-specific agencies governing critical infrastructure.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Risk Assessment Methods</h3>
+                        <p>Standardized approaches for conducting security risk assessments including FAIR, OCTAVE, and NIST RMF methodologies.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Emerging Challenges Section -->
+            <section class="content-section" id="challenges">
+                <div class="section-header">
+                    <h2>⚠️ Emerging Challenges</h2>
+                    <p>Modern threats and challenges facing industrial control systems in an increasingly connected world.</p>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>IoT Integration</h3>
+                        <p>Security challenges posed by integrating Internet of Things devices into industrial environments, including device management and network security.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Cloud Computing</h3>
+                        <p>Securing ICS data and operations that utilize cloud services, including hybrid cloud architectures and data sovereignty concerns.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Advanced Persistent Threats</h3>
+                        <p>Sophisticated, state-sponsored attacks targeting critical infrastructure, including custom malware and zero-day exploits.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Supply Chain Security</h3>
+                        <p>Ensuring the integrity of hardware and software components throughout the supply chain, from manufacturing to deployment.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Legacy System Integration</h3>
+                        <p>Securing older industrial systems that were not designed with cybersecurity in mind while maintaining operational functionality.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Remote Access Security</h3>
+                        <p>Protecting industrial systems accessible through remote connections, especially critical during emergencies and remote work scenarios.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ICS Architecture Section -->
+            <section class="content-section" id="architecture">
+                <div class="section-header">
+                    <h2>🏗️ ICS Architecture</h2>
+                    <p>Understanding the components, topology, and security considerations of industrial control system architectures.</p>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>Control System Components</h3>
+                        <p>Key elements including Human-Machine Interfaces (HMI), Programmable Logic Controllers (PLC), Distributed Control Systems (DCS), and SCADA systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Network Architecture</h3>
+                        <p>Layered network design with proper segmentation between corporate networks, DMZ, and control system networks to minimize attack surfaces.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Communication Protocols</h3>
+                        <p>Industrial protocols such as Modbus, DNP3, OPC, and Ethernet/IP, including their security characteristics and vulnerabilities.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Purdue Model</h3>
+                        <p>Reference model for industrial network segmentation with levels from field devices (Level 0) to enterprise systems (Level 4-5).</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Safety Systems</h3>
+                        <p>Safety Instrumented Systems (SIS) and their integration with security measures to ensure both safety and security objectives are met.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Wireless Networks</h3>
+                        <p>Security considerations for wireless communications in industrial environments, including mesh networks and cellular connections.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Applications Section -->
+            <section class="content-section" id="applications">
+                <div class="section-header">
+                    <h2>🔧 Applications</h2>
+                    <p>Practical implementation guidance and real-world applications of NIST SP 800-82 across various industry sectors.</p>
+                </div>
+
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3>Energy Sector</h3>
+                        <p>Securing power generation, transmission, and distribution systems including smart grid technologies and renewable energy integration.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Water Treatment</h3>
+                        <p>Protecting water and wastewater treatment facilities, including SCADA systems for monitoring and controlling treatment processes.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Manufacturing</h3>
+                        <p>Securing automated production lines, robotics, and quality control systems while maintaining operational efficiency and productivity.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Transportation</h3>
+                        <p>Railway signaling systems, traffic management, airport operations, and maritime port control systems security implementations.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Chemical Processing</h3>
+                        <p>Securing chemical plants and refineries with focus on safety-critical systems and hazardous material handling processes.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3>Building Automation</h3>
+                        <p>Protecting HVAC, lighting, fire safety, and security systems in commercial and industrial buildings.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section class="content-section" id="quiz">
+                <div class="section-header">
+                    <h2>🎯 Knowledge Assessment Quiz</h2>
+                    <p>Test your understanding of NIST SP 800-82 Rev 2 concepts and principles.</p>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <h2>NIST SP 800-82 Rev 2 Knowledge Quiz</h2>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></p>
+                    </div>
+
+                    <div id="quizContent">
+                        <!-- Quiz questions will be inserted here -->
+                    </div>
+
+                    <div class="quiz-controls">
+                        <button class="quiz-btn" id="prevBtn" disabled>Previous</button>
+                        <div id="questionInfo"></div>
+                        <button class="quiz-btn" id="nextBtn">Next</button>
+                    </div>
+
+                    <div class="quiz-results" id="quizResults" style="display: none;">
+                        <div class="score" id="finalScore">0%</div>
+                        <h3 id="resultMessage">Great effort!</h3>
+                        <p id="resultDetails">You've completed the NIST SP 800-82 Rev 2 knowledge assessment.</p>
+                        <button class="quiz-btn" id="restartBtn">Restart Quiz</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Quiz Data
+        const quizData = [
+            {
+                question: "What is the primary purpose of NIST SP 800-82 Rev 2?",
+                options: [
+                    "To provide guidance for securing Industrial Control Systems",
+                    "To establish network security protocols for IT systems",
+                    "To define safety requirements for manufacturing equipment",
+                    "To regulate cybersecurity practices in government agencies"
+                ],
+                correct: 0
+            },
+            {
+                question: "Which security principle involves implementing multiple layers of protection in ICS environments?",
+                options: [
+                    "Least Privilege",
+                    "Defense in Depth",
+                    "Zero Trust",
+                    "Risk Assessment"
+                ],
+                correct: 1
+            },
+            {
+                question: "What does the Purdue Model define in industrial control systems?",
+                options: [
+                    "Communication protocols between devices",
+                    "Safety requirements for critical operations",
+                    "Network segmentation and reference architecture",
+                    "Incident response procedures"
+                ],
+                correct: 2
+            },
+            {
+                question: "Which of the following is NOT typically considered part of an ICS environment?",
+                options: [
+                    "SCADA systems",
+                    "Programmable Logic Controllers (PLCs)",
+                    "Human-Machine Interfaces (HMIs)",
+                    "Enterprise Resource Planning (ERP) systems"
+                ],
+                correct: 3
+            },
+            {
+                question: "What is a key difference between IT and OT (Operational Technology) security priorities?",
+                options: [
+                    "IT prioritizes confidentiality, OT prioritizes availability and safety",
+                    "IT focuses on performance, OT focuses on cost reduction",
+                    "IT uses wireless networks, OT uses only wired connections",
+                    "IT requires more frequent updates than OT systems"
+                ],
+                correct: 0
+            }
+        ];
+
+        // Application State
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizCompleted = false;
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const branchButtons = document.querySelectorAll('.branch-button');
+
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Remove active class from all nav links and sections
+            navLinks.forEach(link => link.classList.remove('active'));
+            contentSections.forEach(section => section.classList.remove('active'));
+
+            // Add active class to current nav link and section
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            document.getElementById(sectionId).classList.add('active');
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('visible');
+            }
+        }
+
+        // Event listeners for navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // Mind map branch buttons
+        branchButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const sectionId = button.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        // Mobile toggle
+        mobileToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('visible');
+        });
+
+        // Quiz functionality
+        function renderQuestion() {
+            const question = quizData[currentQuestionIndex];
+            const quizContent = document.getElementById('quizContent');
+            
+            quizContent.innerHTML = `
+                <div class="question-card">
+                    <div class="question-text">${question.question}</div>
+                    ${question.options.map((option, index) => `
+                        <div class="option" data-index="${index}">
+                            ${option}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Add click listeners to options
+            const options = quizContent.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    
+                    // Store answer
+                    userAnswers[currentQuestionIndex] = parseInt(option.getAttribute('data-index'));
+                    
+                    // Enable next button
+                    document.getElementById('nextBtn').disabled = false;
+                });
+            });
+
+            // Update progress
+            updateProgress();
+            updateControls();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = quizData.length;
+        }
+
+        function updateControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.textContent = 'Complete Quiz';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+            
+            // Check if current question is answered
+            if (userAnswers[currentQuestionIndex] === undefined) {
+                nextBtn.disabled = true;
+            }
+        }
+
+        function showResults() {
+            const score = calculateScore();
+            const quizContent = document.getElementById('quizContent');
+            const quizControls = document.querySelector('.quiz-controls');
+            const quizResults = document.getElementById('quizResults');
+            
+            // Hide quiz content and controls
+            quizContent.style.display = 'none';
+            quizControls.style.display = 'none';
+            
+            // Show results
+            quizResults.style.display = 'block';
+            document.getElementById('finalScore').textContent = score + '%';
+            
+            // Set result message based on score
+            const resultMessage = document.getElementById('resultMessage');
+            const resultDetails = document.getElementById('resultDetails');
+            
+            if (score >= 80) {
+                resultMessage.textContent = 'Excellent Work!';
+                resultDetails.textContent = 'You have a strong understanding of NIST SP 800-82 Rev 2 concepts and ICS security principles.';
+            } else if (score >= 60) {
+                resultMessage.textContent = 'Good Job!';
+                resultDetails.textContent = 'You have a solid foundation in ICS security. Consider reviewing the materials for areas of improvement.';
+            } else {
+                resultMessage.textContent = 'Keep Learning!';
+                resultDetails.textContent = 'Review the NIST SP 800-82 Rev 2 materials and take the quiz again to improve your understanding.';
+            }
+        }
+
+        function calculateScore() {
+            let correct = 0;
+            quizData.forEach((question, index) => {
+                if (userAnswers[index] === question.correct) {
+                    correct++;
+                }
+            });
+            return Math.round((correct / quizData.length) * 100);
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            quizCompleted = false;
+            
+            // Show quiz content and controls
+            document.getElementById('quizContent').style.display = 'block';
+            document.querySelector('.quiz-controls').style.display = 'flex';
+            document.getElementById('quizResults').style.display = 'none';
+            
+            renderQuestion();
+        }
+
+        // Quiz event listeners
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', resetQuiz);
+
+        // Initialize quiz
+        renderQuestion();
+
+        // Responsive behavior
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('visible');
+            }
+        });
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure overview section is active on load
+            showSection('overview');
+        });
+    </script>
+</body>
+</html>
