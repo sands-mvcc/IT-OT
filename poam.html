@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFlow Systems - POA&M Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016, #4a7c23);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #4a7c23;
+            transform: translateY(-5px);
+        }
+
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d5016;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .controls-bar {
+            background: #f8f9fa;
+            border: 2px solid #4a7c23;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #5a8c33, #3d6526);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #666, #444);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #4a7c23;
+        }
+
+        .poam-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .poam-table th {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .poam-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+            font-size: 0.9rem;
+        }
+
+        .poam-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .poam-table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .editable {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: text;
+            transition: all 0.3s ease;
+            min-height: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .editable:hover {
+            border-color: #4a7c23;
+            background: white;
+        }
+
+        .editable:focus {
+            outline: none;
+            border-color: #2d5016;
+            box-shadow: 0 0 5px rgba(74, 124, 35, 0.3);
+            background: white;
+        }
+
+        .risk-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .risk-critical {
+            background-color: #721c24;
+            color: white;
+        }
+
+        .risk-high {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .risk-medium {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .risk-low {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .status-not-started {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .status-planned {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-in-progress {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .status-completed {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-overdue {
+            background-color: #dc3545;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7c23, #2d5016);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .milestone-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .milestone-item {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85rem;
+        }
+
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+
+        .milestone-date {
+            color: #4a7c23;
+            font-weight: 600;
+        }
+
+        .cost-cell {
+            text-align: right;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #4a7c23;
+        }
+
+        .modal-header h2 {
+            color: #2d5016;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #2d5016;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a7c23;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4a7c23, #2d5016);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .export-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                justify-content: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .poam-table {
+                font-size: 0.8rem;
+            }
+
+            .poam-table th,
+            .poam-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FreshFlow Systems POA&M</h1>
+        <p>Plan of Action & Milestones - Security Remediation Tracking</p>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Metrics -->
+        <div class="dashboard-grid">
+            <div class="metric-card">
+                <div class="metric-number" id="total-items">12</div>
+                <div class="metric-label">Total Items</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number risk-high" id="critical-high">5</div>
+                <div class="metric-label">Critical/High Risk</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="overdue-items">2</div>
+                <div class="metric-label">Overdue Items</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="completion-rate">58%</div>
+                <div class="metric-label">Completion Rate</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-bar">
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter" class="filter-select" onchange="filterTable()">
+                    <option value="">All Statuses</option>
+                    <option value="Not Started">Not Started</option>
+                    <option value="Planned">Planned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Overdue">Overdue</option>
+                </select>
+
+                <label for="risk-filter">Risk:</label>
+                <select id="risk-filter" class="filter-select" onchange="filterTable()">
+                    <option value="">All Risk Levels</option>
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <label for="poc-filter">POC:</label>
+                <select id="poc-filter" class="filter-select" onchange="filterTable()">
+                    <option value="">All POCs</option>
+                    <option value="Dr. Nia Clarke">Dr. Nia Clarke</option>
+                    <option value="Jason Trujillo">Jason Trujillo</option>
+                    <option value="Regina Moore">Regina Moore</option>
+                    <option value="Rachel Li">Rachel Li</option>
+                </select>
+            </div>
+
+            <div class="export-options">
+                <button class="btn" onclick="openAddModal()">Add New Item</button>
+                <button class="btn btn-secondary" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
+                <button class="btn" onclick="saveData()">Save Changes</button>
+            </div>
+        </div>
+
+        <!-- POA&M Table -->
+        <div style="overflow-x: auto;">
+            <table class="poam-table" id="poam-table">
+                <thead>
+                    <tr>
+                        <th>POA&M ID</th>
+                        <th>Weakness/Deficiency</th>
+                        <th>Risk Level</th>
+                        <th>Source</th>
+                        <th>Corrective Actions</th>
+                        <th>Milestones</th>
+                        <th>Target Date</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>POC</th>
+                        <th>Est. Cost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="poam-tbody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New POA&M Item</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <form id="poam-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="poam-id">POA&M ID</label>
+                        <input type="text" id="poam-id" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="risk-level">Risk Level</label>
+                        <select id="risk-level" required>
+                            <option value="">Select Risk Level</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="weakness">Weakness/Deficiency Description</label>
+                        <textarea id="weakness" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source">Source of Discovery</label>
+                        <select id="source" required>
+                            <option value="">Select Source</option>
+                            <option value="Internal Audit">Internal Audit</option>
+                            <option value="External Audit">External Audit</option>
+                            <option value="Vulnerability Scan">Vulnerability Scan</option>
+                            <option value="Penetration Test">Penetration Test</option>
+                            <option value="Risk Assessment">Risk Assessment</option>
+                            <option value="Incident Response">Incident Response</option>
+                            <option value="Compliance Review">Compliance Review</option>
+                            <option value="Self-Assessment">Self-Assessment</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Not Started">Not Started</option>
+                            <option value="Planned">Planned</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Overdue">Overdue</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="corrective-actions">Planned Corrective Actions</label>
+                        <textarea id="corrective-actions" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="milestones">Key Milestones (one per line)</label>
+                        <textarea id="milestones" rows="3" placeholder="Format: YYYY-MM-DD - Description"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="target-date">Target Completion Date</label>
+                        <input type="date" id="target-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="poc">Point of Contact</label>
+                        <select id="poc" required>
+                            <option value="">Select POC</option>
+                            <option value="Dr. Nia Clarke">Dr. Nia Clarke (CISO)</option>
+                            <option value="Jason Trujillo">Jason Trujillo (Network Admin)</option>
+                            <option value="Regina Moore">Regina Moore (OT Engineer)</option>
+                            <option value="Rachel Li">Rachel Li (Compliance Officer)</option>
+                            <option value="Henry Brock">Henry Brock (Maintenance Manager)</option>
+                            <option value="Marcus Lee">Marcus Lee (COO)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="progress">Progress (%)</label>
+                        <input type="number" id="progress" min="0" max="100" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cost">Estimated Cost ($)</label>
+                        <input type="number" id="cost" min="0" step="100">
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn">Save POA&M Item</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample POA&M data based on FreshFlow Systems
+        let poamData = [
+            {
+                id: "FF-001",
+                weakness: "Multi-Factor Authentication not enforced across all cloud applications",
+                risk: "High",
+                source: "Compliance Review",
+                actions: "Deploy Duo Security MFA solution across SAP B1, Salesforce, Microsoft 365, and other cloud services",
+                milestones: ["2025-07-15 - Procure MFA licenses", "2025-08-01 - Deploy pilot group", "2025-09-15 - Full deployment"],
+                targetDate: "2025-09-30",
+                status: "Planned",
+                progress: 25,
+                poc: "Dr. Nia Clarke",
+                cost: 15000
+            },
+            {
+                id: "FF-002", 
+                weakness: "OT network lacks proper segmentation from IT network",
+                risk: "Critical",
+                source: "Risk Assessment",
+                actions: "Implement network segmentation between IT and OT environments with industrial firewall and monitoring",
+                milestones: ["2025-07-01 - Engage OT security consultant", "2025-08-15 - Design segmentation architecture", "2025-10-01 - Implement segmentation"],
+                targetDate: "2025-10-31",
+                status: "Planned",
+                progress: 15,
+                poc: "Regina Moore",
+                cost: 45000
+            },
+            {
+                id: "FF-003",
+                weakness: "Inconsistent patch management across IT and OT systems",
+                risk: "High", 
+                source: "Vulnerability Scan",
+                actions: "Deploy centralized patch management using WSUS for IT systems and establish OT firmware update procedures",
+                milestones: ["2025-06-01 - Deploy WSUS infrastructure", "2025-07-01 - OT patching procedures"],
+                targetDate: "2025-12-31",
+                status: "In Progress",
+                progress: 60,
+                poc: "Jason Trujillo",
+                cost: 12000
+            },
+            {
+                id: "FF-004",
+                weakness: "No incident response tabletop exercises conducted",
+                risk: "Medium",
+                source: "Internal Audit",
+                actions: "Conduct comprehensive IR tabletop exercise across all three facilities with IT/OT integration scenarios",
+                milestones: ["2025-09-01 - Develop exercise scenarios", "2025-10-15 - Conduct tabletop", "2025-11-01 - Update IR procedures"],
+                targetDate: "2025-12-15",
+                status: "Not Started",
+                progress: 0,
+                poc: "Dr. Nia Clarke",
+                cost: 8000
+            },
+            {
+                id: "FF-005",
+                weakness: "Role-Based Access Control review incomplete",
+                risk: "Medium",
+                source: "Self-Assessment",
+                actions: "Complete RBAC review and implement least privilege access controls across all systems",
+                milestones: ["2025-06-15 - Complete review", "2025-07-30 - Implement changes", "2025-08-15 - Validate controls"],
+                targetDate: "2025-08-31",
+                status: "In Progress", 
+                progress: 70,
+                poc: "Rachel Li",
+                cost: 5000
+            },
+            {
+                id: "FF-006",
+                weakness: "SCADA gateway lacks proper security hardening",
+                risk: "High",
+                source: "Penetration Test",
+                actions: "Implement security hardening for SCADA gateway including access controls, monitoring, and protocol filtering",
+                milestones: ["2025-07-01 - Security assessment", "2025-08-01 - Implement hardening", "2025-08-15 - Penetration retest"],
+                targetDate: "2025-08-31",
+                status: "Planned",
+                progress: 10,
+                poc: "Regina Moore",
+                cost: 18000
+            },
+            {
+                id: "FF-007",
+                weakness: "Backup systems lack offline/immutable storage",
+                risk: "High",
+                source: "Risk Assessment",
+                actions: "Implement 3-2-1 backup strategy with offline and immutable backup copies for ransomware protection",
+                milestones: ["2025-07-15 - Procure backup solution", "2025-09-01 - Deploy infrastructure", "2025-10-01 - Full implementation"],
+                targetDate: "2025-10-15",
+                status: "Not Started",
+                progress: 0,
+                poc: "Jason Trujillo",
+                cost: 25000
+            },
+            {
+                id: "FF-008",
+                weakness: "Third-party vendor risk assessments not conducted",
+                risk: "Medium",
+                source: "Compliance Review",
+                actions: "Establish vendor risk management program and conduct security assessments of critical vendors",
+                milestones: ["2025-07-01 - Develop VRM procedures", "2025-08-15 - Assess critical vendors", "2025-09-30 - Complete all assessments"],
+                targetDate: "2025-09-30",
+                status: "Not Started",
+                progress: 0,
+                poc: "Rachel Li",
+                cost: 12000
+            },
+            {
+                id: "FF-009",
+                weakness: "IoT devices lack proper security configuration",
+                risk: "Medium",
+                source: "Vulnerability Scan",
+                actions: "Implement IoT security standards and reconfigure temperature/humidity sensors and RFID systems",
+                milestones: ["2025-08-01 - Develop IoT standards", "2025-09-01 - Implement configurations", "2025-09-15 - Security validation"],
+                targetDate: "2025-09-30",
+                status: "Planned",
+                progress: 5,
+                poc: "Jason Trujillo",
+                cost: 8000
+            },
+            {
+                id: "FF-010",
+                weakness: "Security awareness training program insufficient",
+                risk: "Medium",
+                source: "Internal Audit",
+                actions: "Enhance security awareness training with role-based content and phishing simulation program",
+                milestones: ["2025-07-01 - Develop training content", "2025-08-01 - Deploy training platform", "2025-09-01 - Conduct initial training"],
+                targetDate: "2025-12-31",
+                status: "Planned",
+                progress: 20,
+                poc: "Dr. Nia Clarke",
+                cost: 10000
+            },
+            {
+                id: "FF-011",
+                weakness: "Data Loss Prevention controls not implemented",
+                risk: "High",
+                source: "Risk Assessment",
+                actions: "Deploy DLP solution to protect intellectual property and sensitive data across email, endpoints, and network",
+                milestones: ["2025-08-15 - Procure DLP solution", "2025-10-01 - Deploy and configure", "2025-11-01 - Full monitoring"],
+                targetDate: "2025-11-15",
+                status: "Not Started",
+                progress: 0,
+                poc: "Dr. Nia Clarke",
+                cost: 35000
+            },
+            {
+                id: "FF-012",
+                weakness: "Business continuity plan needs updating for rapid growth",
+                risk: "Medium",
+                source: "Self-Assessment",
+                actions: "Update BCP to reflect 125% growth, new systems, and enhanced recovery procedures",
+                milestones: ["2025-08-01 - BCP assessment", "2025-09-15 - Update procedures", "2025-10-30 - Conduct BCP test"],
+                targetDate: "2025-11-30",
+                status: "Not Started",
+                progress: 0,
+                poc: "Marcus Lee",
+                cost: 6000
+            }
+        ];
+
+        let currentEditIndex = -1;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+            populateTable();
+            updateDashboard();
+            showNotification('POA&M report loaded successfully!', 'success');
+        });
+
+        function populateTable() {
+            const tbody = document.getElementById('poam-tbody');
+            tbody.innerHTML = '';
+
+            poamData.forEach((item, index) => {
+                const row = createTableRow(item, index);
+                tbody.appendChild(row);
+            });
+
+            updateRowVisibility();
+        }
+
+        function createTableRow(item, index) {
+            const row = document.createElement('tr');
+            row.setAttribute('data-index', index);
+            
+            // Determine if item is overdue
+            const isOverdue = new Date(item.targetDate) < new Date() && item.status !== 'Completed';
+            const actualStatus = isOverdue ? 'Overdue' : item.status;
+
+            const milestonesList = item.milestones.map(m => 
+                `<div class="milestone-item"><span class="milestone-date">${m.split(' - ')[0]}</span> - ${m.split(' - ')[1]}</div>`
+            ).join('');
+
+            row.innerHTML = `
+                <td><strong>${item.id}</strong></td>
+                <td>
+                    <div class="editable" contenteditable="true" data-field="weakness">${item.weakness}</div>
+                </td>
+                <td>
+                    <span class="risk-badge risk-${item.risk.toLowerCase()}">${item.risk}</span>
+                </td>
+                <td>
+                    <div class="editable" contenteditable="true" data-field="source">${item.source}</div>
+                </td>
+                <td>
+                    <div class="editable" contenteditable="true" data-field="actions">${item.actions}</div>
+                </td>
+                <td>
+                    <div class="milestone-list">${milestonesList}</div>
+                </td>
+                <td>
+                    <div class="editable" contenteditable="true" data-field="targetDate">${item.targetDate}</div>
+                </td>
+                <td>
+                    <span class="status-badge status-${actualStatus.toLowerCase().replace(' ', '-')}">${actualStatus}</span>
+                </td>
+                <td>
+                    <div>${item.progress}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${item.progress}%"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="editable" contenteditable="true" data-field="poc">${item.poc}</div>
+                </td>
+                <td class="cost-cell">$${item.cost.toLocaleString()}</td>
+                <td>
+                    <button class="btn" style="padding: 5px 10px; font-size: 0.8rem;" onclick="editItem(${index})">Edit</button>
+                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="deleteItem(${index})">Delete</button>
+                </td>
+            `;
+
+            // Add event listeners for inline editing
+            const editableElements = row.querySelectorAll('.editable');
+            editableElements.forEach(element => {
+                element.addEventListener('blur', function() {
+                    const field = this.getAttribute('data-field');
+                    const value = this.textContent.trim();
+                    updateItemField(index, field, value);
+                });
+            });
+
+            return row;
+        }
+
+        function updateItemField(index, field, value) {
+            if (poamData[index]) {
+                poamData[index][field] = value;
+                updateDashboard();
+                showNotification('Field updated successfully!', 'success');
+            }
+        }
+
+        function updateDashboard() {
+            const totalItems = poamData.length;
+            const criticalHigh = poamData.filter(item => ['Critical', 'High'].includes(item.risk)).length;
+            const overdue = poamData.filter(item => 
+                new Date(item.targetDate) < new Date() && item.status !== 'Completed'
+            ).length;
+            const completed = poamData.filter(item => item.status === 'Completed').length;
+            const completionRate = totalItems > 0 ? Math.round((completed / totalItems) * 100) : 0;
+
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('critical-high').textContent = criticalHigh;
+            document.getElementById('overdue-items').textContent = overdue;
+            document.getElementById('completion-rate').textContent = completionRate + '%';
+        }
+
+        function filterTable() {
+            updateRowVisibility();
+        }
+
+        function updateRowVisibility() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const riskFilter = document.getElementById('risk-filter').value;
+            const pocFilter = document.getElementById('poc-filter').value;
+            
+            const rows = document.querySelectorAll('#poam-tbody tr');
+            
+            rows.forEach((row, index) => {
+                const item = poamData[index];
+                const isOverdue = new Date(item.targetDate) < new Date() && item.status !== 'Completed';
+                const actualStatus = isOverdue ? 'Overdue' : item.status;
+                
+                let showRow = true;
+                
+                if (statusFilter && actualStatus !== statusFilter) showRow = false;
+                if (riskFilter && item.risk !== riskFilter) showRow = false;
+                if (pocFilter && item.poc !== pocFilter) showRow = false;
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+
+        function openAddModal() {
+            currentEditIndex = -1;
+            document.getElementById('modal-title').textContent = 'Add New POA&M Item';
+            document.getElementById('poam-form').reset();
+            
+            // Generate next POA&M ID
+            const nextId = 'FF-' + String(poamData.length + 1).padStart(3, '0');
+            document.getElementById('poam-id').value = nextId;
+            
+            document.getElementById('itemModal').style.display = 'block';
+        }
+
+        function editItem(index) {
+            currentEditIndex = index;
+            const item = poamData[index];
+            
+            document.getElementById('modal-title').textContent = 'Edit POA&M Item';
+            document.getElementById('poam-id').value = item.id;
+            document.getElementById('weakness').value = item.weakness;
+            document.getElementById('risk-level').value = item.risk;
+            document.getElementById('source').value = item.source;
+            document.getElementById('corrective-actions').value = item.actions;
+            document.getElementById('milestones').value = item.milestones.join('\n');
+            document.getElementById('target-date').value = item.targetDate;
+            document.getElementById('status').value = item.status;
+            document.getElementById('poc').value = item.poc;
+            document.getElementById('progress').value = item.progress;
+            document.getElementById('cost').value = item.cost;
+            
+            document.getElementById('itemModal').style.display = 'block';
+        }
+
+        function deleteItem(index) {
+            if (confirm('Are you sure you want to delete this POA&M item?')) {
+                poamData.splice(index, 1);
+                populateTable();
+                updateDashboard();
+                showNotification('POA&M item deleted successfully!', 'success');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+
+        // Form submission
+        document.getElementById('poam-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: document.getElementById('poam-id').value,
+                weakness: document.getElementById('weakness').value,
+                risk: document.getElementById('risk-level').value,
+                source: document.getElementById('source').value,
+                actions: document.getElementById('corrective-actions').value,
+                milestones: document.getElementById('milestones').value.split('\n').filter(m => m.trim()),
+                targetDate: document.getElementById('target-date').value,
+                status: document.getElementById('status').value,
+                poc: document.getElementById('poc').value,
+                progress: parseInt(document.getElementById('progress').value) || 0,
+                cost: parseInt(document.getElementById('cost').value) || 0
+            };
+            
+            if (currentEditIndex >= 0) {
+                poamData[currentEditIndex] = formData;
+                showNotification('POA&M item updated successfully!', 'success');
+            } else {
+                poamData.push(formData);
+                showNotification('POA&M item added successfully!', 'success');
+            }
+            
+            populateTable();
+            updateDashboard();
+            closeModal();
+        });
+
+        function exportToCSV() {
+            const headers = ['POA&M ID', 'Weakness/Deficiency', 'Risk Level', 'Source', 'Corrective Actions', 'Target Date', 'Status', 'Progress', 'POC', 'Cost'];
+            const csvContent = [
+                headers.join(','),
+                ...poamData.map(item => [
+                    item.id,
+                    `"${item.weakness.replace(/"/g, '""')}"`,
+                    item.risk,
+                    item.source,
+                    `"${item.actions.replace(/"/g, '""')}"`,
+                    item.targetDate,
+                    item.status,
+                    item.progress + '%',
+                    item.poc,
+                    '$' + item.cost.toLocaleString()
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'freshflow_poam_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('POA&M exported to CSV successfully!', 'success');
+        }
+
+        function generateReport() {
+            const reportWindow = window.open('', '_blank');
+            const reportHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>FreshFlow Systems POA&M Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #2d5016; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #4a7c23; color: white; }
+                        .risk-critical { background-color: #721c24; color: white; padding: 4px 8px; border-radius: 4px; }
+                        .risk-high { background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; }
+                        .risk-medium { background-color: #ffc107; color: black; padding: 4px 8px; border-radius: 4px; }
+                        .risk-low { background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>FreshFlow Systems - Plan of Action & Milestones Report</h1>
+                    <p>Generated on: ${new Date().toLocaleDateString()}</p>
+                    <p>Total Items: ${poamData.length}</p>
+                    <p>Critical/High Risk Items: ${poamData.filter(item => ['Critical', 'High'].includes(item.risk)).length}</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>POA&M ID</th>
+                                <th>Weakness/Deficiency</th>
+                                <th>Risk Level</th>
+                                <th>Target Date</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>POC</th>
+                                <th>Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${poamData.map(item => `
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.weakness}</td>
+                                    <td><span class="risk-${item.risk.toLowerCase()}">${item.risk}</span></td>
+                                    <td>${item.targetDate}</td>
+                                    <td>${item.status}</td>
+                                    <td>${item.progress}%</td>
+                                    <td>${item.poc}</td>
+                                    <td>$${item.cost.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+            
+            reportWindow.document.write(reportHTML);
+            reportWindow.document.close();
+            
+            showNotification('Report generated successfully!', 'success');
+        }
+
+        function saveData() {
+            localStorage.setItem('freshflow_poam', JSON.stringify(poamData));
+            showNotification('POA&M data saved successfully!', 'success');
+        }
+
+        function loadSavedData() {
+            const savedData = localStorage.getItem('freshflow_poam');
+            if (savedData) {
+                poamData = JSON.parse(savedData);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('itemModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveData();
+            }
+        });
+    </script>
+</body>
+</html>
