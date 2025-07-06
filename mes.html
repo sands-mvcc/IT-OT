@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES Integration Educational Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a5f2e 0%, #2d8f3f 100%);
+            color: white;
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 1rem;
+        }
+
+        .nav-item {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(10px);
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: #1a5f2e;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.full-width {
+            margin-left: 0;
+        }
+
+        /* Mind Map Section */
+        .mind-map-container {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .mind-map-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1a5f2e;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .mind-map {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            min-height: 120px;
+        }
+
+        .hub-button {
+            height: 60px;
+            min-width: 180px;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(139,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hub-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139,0,0,0.4);
+        }
+
+        .branch-button {
+            height: 60px;
+            min-width: 140px;
+            background: linear-gradient(135deg, #1a5f2e 0%, #2d8f3f 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(26,95,46,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .branch-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(26,95,46,0.4);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #1a5f2e;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #1a5f2e;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #1a5f2e;
+            font-weight: 700;
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #1a5f2e;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left-color: #DC143C;
+        }
+
+        .topic-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a5f2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-title {
+            font-size: 2rem;
+            color: #1a5f2e;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #1a5f2e 0%, #2d8f3f 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .answers {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .answer {
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .answer:hover {
+            border-color: #1a5f2e;
+            background: #f8f9fa;
+        }
+
+        .answer.selected {
+            border-color: #1a5f2e;
+            background: #1a5f2e;
+            color: white;
+        }
+
+        .answer.correct {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .answer.incorrect {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .quiz-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn.primary {
+            background: #1a5f2e;
+            color: white;
+        }
+
+        .quiz-btn.primary:hover {
+            background: #2d8f3f;
+        }
+
+        .quiz-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .quiz-btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        .quiz-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quiz-results {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .quiz-results.active {
+            display: block;
+        }
+
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1a5f2e;
+            margin-bottom: 1rem;
+        }
+
+        .performance-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 4rem;
+            }
+
+            .mind-map {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .mind-map-title {
+                font-size: 2rem;
+            }
+
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mind-map-container {
+                padding: 2rem 1rem;
+            }
+
+            .hub-button, .branch-button {
+                min-width: 200px;
+                margin-bottom: 0.5rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .section-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+            }
+
+            .quiz-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+        
+        <nav class="sidebar" id="sidebar">
+            <h2>📊 MES Integration</h2>
+            <a href="#mind-map" class="nav-item active" onclick="showSection('mind-map')">🗺️ Mind Map</a>
+            <a href="#overview" class="nav-item" onclick="showSection('overview')">📋 Overview</a>
+            <a href="#principles" class="nav-item" onclick="showSection('principles')">⚡ Basic Principles</a>
+            <a href="#capability" class="nav-item" onclick="showSection('capability')">🔧 Capability</a>
+            <a href="#security" class="nav-item" onclick="showSection('security')">🔒 Security Implications</a>
+            <a href="#integration" class="nav-item" onclick="showSection('integration')">🔗 Key Areas</a>
+            <a href="#implementation" class="nav-item" onclick="showSection('implementation')">⚙️ Implementation</a>
+            <a href="#quiz" class="nav-item" onclick="showSection('quiz')">🎯 Knowledge Quiz</a>
+        </nav>
+
+        <main class="main-content full-width" id="mainContent">
+            <!-- Mind Map Section -->
+            <section id="mind-map" class="content-section active">
+                <div class="mind-map-container">
+                    <h1 class="mind-map-title">Manufacturing Execution System Integration</h1>
+                    <div class="mind-map">
+                        <button class="hub-button">MES</button>
+                        <button class="branch-button" onclick="showSection('overview')">Overview</button>
+                        <button class="branch-button" onclick="showSection('principles')">Basic Principles</button>
+                        <button class="branch-button" onclick="showSection('capability')">Capability</button>
+                        <button class="branch-button" onclick="showSection('security')">Security</button>
+                        <button class="branch-button" onclick="showSection('integration')">Key Areas</button>
+                        <button class="branch-button" onclick="showSection('implementation')">Implementation</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Overview Section -->
+            <section id="overview" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <div>
+                        <h2 class="section-title">Overview</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    Manufacturing Execution Systems (MES) serve as the critical bridge between enterprise planning systems and shop floor operations, providing real-time visibility and control over manufacturing processes.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">What is MES?</h3>
+                        <p class="topic-description">A computerized system that tracks and documents the transformation of raw materials to finished goods, providing real-time feedback on manufacturing operations.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Core Functions</h3>
+                        <p class="topic-description">Production scheduling, quality management, resource allocation, performance analysis, and regulatory compliance tracking across manufacturing operations.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Business Value</h3>
+                        <p class="topic-description">Reduces operational costs, improves product quality, increases equipment efficiency, and ensures regulatory compliance through data-driven decision making.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Industry Applications</h3>
+                        <p class="topic-description">Pharmaceutical, automotive, food & beverage, electronics, and chemical industries leverage MES for process optimization and regulatory compliance.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Basic Principles Section -->
+            <section id="principles" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">⚡</div>
+                    <div>
+                        <h2 class="section-title">Basic Principles</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    MES integration follows fundamental principles that ensure seamless connectivity between production systems and enterprise applications while maintaining data integrity and operational efficiency.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">Real-Time Data Flow</h3>
+                        <p class="topic-description">Continuous bi-directional communication between shop floor devices and enterprise systems, ensuring immediate visibility into production status and performance metrics.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Standardized Communication</h3>
+                        <p class="topic-description">Implementation of industry standards like OPC-UA, MQTT, and ISA-95 to ensure interoperability between diverse manufacturing systems and equipment.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Data Contextualization</h3>
+                        <p class="topic-description">Transformation of raw machine data into meaningful business information through proper data modeling, tagging, and semantic enrichment processes.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Workflow Orchestration</h3>
+                        <p class="topic-description">Automated coordination of manufacturing processes, quality checks, and material movements based on predefined business rules and production schedules.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Capability Section -->
+            <section id="capability" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div>
+                        <h2 class="section-title">Capability</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    Modern MES platforms offer comprehensive capabilities that span from production execution to advanced analytics, enabling manufacturers to optimize operations and drive continuous improvement.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">Production Management</h3>
+                        <p class="topic-description">Work order management, production scheduling, resource allocation, and real-time production tracking with automatic adjustment capabilities based on changing conditions.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Quality Control</h3>
+                        <p class="topic-description">Integrated quality management with real-time SPC, automated defect detection, root cause analysis, and CAPA (Corrective and Preventive Action) workflow management.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Traceability & Genealogy</h3>
+                        <p class="topic-description">Complete product genealogy tracking from raw materials to finished goods, supporting regulatory compliance and enabling rapid response to quality issues.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Performance Analytics</h3>
+                        <p class="topic-description">Real-time KPI monitoring, OEE calculation, predictive analytics, and advanced reporting with customizable dashboards for different organizational levels.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Mobile Operations</h3>
+                        <p class="topic-description">Mobile-enabled operator interfaces, remote monitoring capabilities, and field-based data collection supporting modern workforce flexibility and efficiency.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">AI/ML Integration</h3>
+                        <p class="topic-description">Machine learning algorithms for predictive maintenance, quality prediction, optimization recommendations, and anomaly detection in manufacturing processes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Security Implications Section -->
+            <section id="security" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">🔒</div>
+                    <div>
+                        <h2 class="section-title">Security Implications</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    MES integration introduces critical security considerations that must be addressed to protect manufacturing operations, intellectual property, and ensure business continuity in an increasingly connected environment.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">Network Segmentation</h3>
+                        <p class="topic-description">Implementation of DMZ zones, VLANs, and firewalls to isolate manufacturing networks from corporate IT systems while enabling controlled data exchange.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Authentication & Authorization</h3>
+                        <p class="topic-description">Multi-factor authentication, role-based access control, and identity management systems to ensure only authorized personnel can access critical manufacturing systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Data Encryption</h3>
+                        <p class="topic-description">End-to-end encryption for data in transit and at rest, secure communication protocols, and digital certificates to protect sensitive manufacturing data and intellectual property.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Vulnerability Management</h3>
+                        <p class="topic-description">Regular security assessments, patch management processes, and continuous monitoring to identify and remediate potential security vulnerabilities in OT systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Incident Response</h3>
+                        <p class="topic-description">Comprehensive incident response plans, backup and recovery procedures, and business continuity strategies to minimize impact of security breaches or system failures.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Compliance Requirements</h3>
+                        <p class="topic-description">Adherence to industry standards like IEC 62443, NIST Cybersecurity Framework, and regulatory requirements for data protection and operational security.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Areas of Integration Section -->
+            <section id="integration" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">🔗</div>
+                    <div>
+                        <h2 class="section-title">Key Areas of MES Integration</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    Successful MES integration requires careful attention to multiple integration points across the manufacturing technology stack, from shop floor devices to enterprise systems.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">ERP Integration</h3>
+                        <p class="topic-description">Seamless connection with Enterprise Resource Planning systems for production planning, inventory management, and financial integration using standardized interfaces and data mapping.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">SCADA/HMI Systems</h3>
+                        <p class="topic-description">Integration with Supervisory Control and Data Acquisition systems and Human Machine Interfaces for real-time process monitoring and control coordination.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Laboratory Systems</h3>
+                        <p class="topic-description">Connection with LIMS (Laboratory Information Management Systems) for automated quality data collection, analysis results integration, and certificate of analysis generation.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Warehouse Management</h3>
+                        <p class="topic-description">Integration with WMS for material tracking, automated inventory updates, and coordinated material movements between warehouse and production areas.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">PLM Systems</h3>
+                        <p class="topic-description">Product Lifecycle Management integration for recipe/formula management, engineering change control, and production documentation synchronization.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Historian & Analytics</h3>
+                        <p class="topic-description">Data historian integration for long-term data storage, trend analysis, and advanced analytics platforms for predictive insights and operational intelligence.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Implementation Section -->
+            <section id="implementation" class="content-section">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <div>
+                        <h2 class="section-title">Implementation & Best Practices</h2>
+                    </div>
+                </div>
+                <div class="section-intro">
+                    Successful MES implementation requires a structured approach, proper planning, and adherence to industry best practices to ensure maximum return on investment and operational benefits.
+                </div>
+                <div class="topic-grid">
+                    <div class="topic-card">
+                        <h3 class="topic-title">Phased Approach</h3>
+                        <p class="topic-description">Implement MES in phases starting with pilot areas, gradually expanding to full production while minimizing operational disruption and enabling lessons learned integration.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Change Management</h3>
+                        <p class="topic-description">Comprehensive training programs, user adoption strategies, and organizational change management to ensure successful technology adoption and user acceptance.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Data Governance</h3>
+                        <p class="topic-description">Establish data quality standards, master data management processes, and data lifecycle policies to ensure reliable and consistent information across systems.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Performance Monitoring</h3>
+                        <p class="topic-description">Define key performance indicators, establish baseline measurements, and implement continuous monitoring to track implementation success and identify improvement opportunities.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Vendor Partnership</h3>
+                        <p class="topic-description">Select experienced implementation partners, establish clear service level agreements, and maintain ongoing support relationships for system optimization and enhancement.</p>
+                    </div>
+                    <div class="topic-card">
+                        <h3 class="topic-title">Continuous Improvement</h3>
+                        <p class="topic-description">Regular system reviews, user feedback collection, and incremental enhancements to maximize system value and adapt to changing business requirements.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quiz" class="quiz-container">
+                <div class="quiz-header">
+                    <h2 class="quiz-title">Knowledge Assessment Quiz</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <p>Question <span id="questionNumber">1</span> of 5</p>
+                </div>
+
+                <div class="question-container" id="questionContainer">
+                    <!-- Questions will be loaded dynamically -->
+                </div>
+
+                <div class="quiz-controls">
+                    <button class="quiz-btn secondary" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+                    <div id="questionInfo"></div>
+                    <button class="quiz-btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+                </div>
+
+                <div class="quiz-results" id="quizResults">
+                    <div class="score" id="finalScore">0/5</div>
+                    <div class="performance-message" id="performanceMessage"></div>
+                    <button class="quiz-btn primary" onclick="restartQuiz()">Retake Quiz</button>
+                    <button class="quiz-btn secondary" onclick="showSection('mind-map')">Back to Mind Map</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                question: "What is the primary function of a Manufacturing Execution System (MES)?",
+                answers: [
+                    "To replace ERP systems in manufacturing",
+                    "To bridge enterprise planning systems and shop floor operations",
+                    "To control individual machines on the production line",
+                    "To manage human resources in manufacturing"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which communication standard is commonly used for MES integration with shop floor devices?",
+                answers: [
+                    "HTTP/HTTPS only",
+                    "FTP protocol",
+                    "OPC-UA and MQTT",
+                    "Email-based communication"
+                ],
+                correct: 2
+            },
+            {
+                question: "What is a critical security consideration when implementing MES integration?",
+                answers: [
+                    "Using only wireless connections",
+                    "Network segmentation and DMZ implementation",
+                    "Removing all firewalls for better connectivity",
+                    "Sharing passwords across all systems"
+                ],
+                correct: 1
+            },
+            {
+                question: "Which system integration is essential for automated inventory management in MES?",
+                answers: [
+                    "Social media platforms",
+                    "Warehouse Management Systems (WMS)",
+                    "Customer relationship management",
+                    "Email servers"
+                ],
+                correct: 1
+            },
+            {
+                question: "What is the recommended approach for MES implementation?",
+                answers: [
+                    "Implement everything at once across all facilities",
+                    "Start with the most complex processes first",
+                    "Use a phased approach starting with pilot areas",
+                    "Skip pilot testing and go directly to production"
+                ],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let quizCompleted = false;
+
+        // Navigation Functions
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section, .quiz-container');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeNav = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeNav) {
+                activeNav.classList.add('active');
+            }
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 1024) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+
+            // Initialize quiz if quiz section is selected
+            if (sectionId === 'quiz' && !quizCompleted) {
+                initializeQuiz();
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Quiz Functions
+        function initializeQuiz() {
+            currentQuestion = 0;
+            userAnswers = [];
+            quizCompleted = false;
+            document.getElementById('quizResults').classList.remove('active');
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = quizQuestions[currentQuestion];
+            const questionContainer = document.getElementById('questionContainer');
+            
+            questionContainer.innerHTML = `
+                <div class="question">${question.question}</div>
+                <div class="answers" id="answers">
+                    ${question.answers.map((answer, index) => `
+                        <div class="answer" onclick="selectAnswer(${index})" data-index="${index}">
+                            ${answer}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // Update progress
+            const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = currentQuestion === quizQuestions.length - 1 ? 'Complete' : 'Next';
+
+            // Restore previous answer if exists
+            if (userAnswers[currentQuestion] !== undefined) {
+                const answerElements = document.querySelectorAll('.answer');
+                answerElements[userAnswers[currentQuestion]].classList.add('selected');
+            }
+        }
+
+        function selectAnswer(answerIndex) {
+            // Remove previous selection
+            const answers = document.querySelectorAll('.answer');
+            answers.forEach(answer => answer.classList.remove('selected'));
+
+            // Add selection to clicked answer
+            answers[answerIndex].classList.add('selected');
+            userAnswers[currentQuestion] = answerIndex;
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            if (currentQuestion === quizQuestions.length - 1) {
+                completeQuiz();
+            } else {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function completeQuiz() {
+            quizCompleted = true;
+            
+            // Calculate score
+            let correctAnswers = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizQuestions[index].correct) {
+                    correctAnswers++;
+                }
+            });
+
+            // Show results
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('quizResults').classList.add('active');
+
+            document.getElementById('finalScore').textContent = `${correctAnswers}/5`;
+
+            // Performance message
+            let message = '';
+            if (correctAnswers === 5) {
+                message = '🎉 Excellent! You have mastered MES Integration concepts!';
+            } else if (correctAnswers >= 4) {
+                message = '👏 Great job! You have a solid understanding of MES Integration.';
+            } else if (correctAnswers >= 3) {
+                message = '👍 Good work! Consider reviewing the material for better understanding.';
+            } else {
+                message = '📚 Keep learning! Review the content sections to improve your knowledge.';
+            }
+
+            document.getElementById('performanceMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            initializeQuiz();
+        }
+
+        // Initialize page
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            
+            if (window.innerWidth <= 1024 && 
+                !sidebar.contains(event.target) && 
+                !mobileToggle.contains(event.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
