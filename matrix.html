@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFlow Systems - Access Control Matrix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: white;
+            color: black;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid green;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: green;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: black;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        select, button, input {
+            padding: 8px 12px;
+            border: 2px solid green;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: green;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #006600;
+        }
+        
+        .matrix-container {
+            overflow-x: auto;
+            border: 2px solid green;
+            border-radius: 8px;
+            background-color: white;
+        }
+        
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        .matrix-table th,
+        .matrix-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .matrix-table th {
+            background-color: green;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .matrix-table th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 11;
+            min-width: 200px;
+        }
+        
+        .matrix-table td:first-child {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            position: sticky;
+            left: 0;
+            z-index: 9;
+            min-width: 200px;
+            text-align: left;
+        }
+        
+        .permission-cell {
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            min-width: 80px;
+            height: 30px;
+        }
+        
+        .permission-none {
+            background-color: white;
+            color: black;
+        }
+        
+        .permission-read {
+            background-color: #90EE90;
+            color: black;
+        }
+        
+        .permission-write {
+            background-color: #32CD32;
+            color: white;
+        }
+        
+        .permission-admin {
+            background-color: #006400;
+            color: white;
+        }
+        
+        .permission-control {
+            background-color: #228B22;
+            color: white;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid green;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 1px solid black;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-card {
+            border: 2px solid green;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: green;
+        }
+        
+        .filter-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid green;
+            border-radius: 8px;
+        }
+        
+        .department-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .dept-executive { background-color: #FFD700; color: black; }
+        .dept-it { background-color: #1E90FF; color: white; }
+        .dept-rd { background-color: #9370DB; color: white; }
+        .dept-packaging { background-color: #FF6347; color: white; }
+        .dept-warehouse { background-color: #32CD32; color: white; }
+        .dept-qc { background-color: #FF69B4; color: white; }
+        .dept-maintenance { background-color: #8B4513; color: white; }
+        .dept-support { background-color: #708090; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FreshFlow Systems</h1>
+        <p>Interactive Access Control Matrix</p>
+        <p>IT/OT Convergence Security Management</p>
+    </div>
+
+    <div class="filter-section">
+        <div class="controls">
+            <div class="control-group">
+                <label for="departmentFilter">Filter by Department:</label>
+                <select id="departmentFilter">
+                    <option value="all">All Departments</option>
+                    <option value="Executive">Executive</option>
+                    <option value="IT">IT/Cybersecurity</option>
+                    <option value="R&D">R&D</option>
+                    <option value="Packaging">Packaging/Production</option>
+                    <option value="Warehouse">Warehouse</option>
+                    <option value="QC">Quality Control</option>
+                    <option value="Maintenance">Maintenance & OT</option>
+                    <option value="Support">General Support</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="facilityFilter">Filter by Facility:</label>
+                <select id="facilityFilter">
+                    <option value="all">All Facilities</option>
+                    <option value="headquarters">Headquarters</option>
+                    <option value="packaging">Packaging Facility</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button onclick="exportMatrix()">Export Matrix</button>
+                <button onclick="resetMatrix()">Reset All</button>
+                <button onclick="generateReport()">Security Report</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="matrix-container">
+        <table class="matrix-table" id="accessMatrix">
+            <thead>
+                <tr>
+                    <th>Employee / Role</th>
+                    <th>ERP System</th>
+                    <th>CRM System</th>
+                    <th>Strategic Dashboard</th>
+                    <th>Active Directory</th>
+                    <th>Firewall</th>
+                    <th>GitLab</th>
+                    <th>R&D Server</th>
+                    <th>Email System</th>
+                    <th>HMI Systems</th>
+                    <th>Label Scanner</th>
+                    <th>PLCs</th>
+                    <th>Edge Gateway</th>
+                    <th>SCADA System</th>
+                    <th>WMS</th>
+                    <th>RFID System</th>
+                    <th>Shipping Dashboard</th>
+                    <th>Security Cameras</th>
+                    <th>Building Access</th>
+                    <th>Network Monitoring</th>
+                </tr>
+            </thead>
+            <tbody id="matrixBody">
+                <!-- Matrix rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color permission-none"></div>
+            <span>None - No Access</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color permission-read"></div>
+            <span>Read - View Only</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color permission-write"></div>
+            <span>Write - Read/Write</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color permission-control"></div>
+            <span>Control - Operational Control</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color permission-admin"></div>
+            <span>Admin - Full Administrative</span>
+        </div>
+    </div>
+
+    <div class="stats" id="statsContainer">
+        <!-- Statistics will be populated by JavaScript -->
+    </div>
+
+    <script>
+        const employees = [
+            // Executive & Admin (6) - Headquarters
+            { name: "Carla Jennings", role: "CEO", department: "Executive", facility: "headquarters" },
+            { name: "Marcus Lee", role: "COO", department: "Executive", facility: "headquarters" },
+            { name: "Sandra Vega", role: "Executive Assistant", department: "Executive", facility: "headquarters" },
+            { name: "James Olmstead", role: "HR Manager", department: "Executive", facility: "headquarters" },
+            { name: "Elaine Harper", role: "Finance Director", department: "Executive", facility: "headquarters" },
+            { name: "Tiffany Cheng", role: "Office Coordinator", department: "Executive", facility: "headquarters" },
+            
+            // IT / Cybersecurity (4) - Headquarters
+            { name: "Jason Trujillo", role: "Network Administrator", department: "IT", facility: "headquarters" },
+            { name: "Priya Nair", role: "Systems Analyst", department: "IT", facility: "headquarters" },
+            { name: "Victor Santos", role: "Cybersecurity Analyst", department: "IT", facility: "headquarters" },
+            { name: "Michelle Donovan", role: "Help Desk Technician", department: "IT", facility: "headquarters" },
+            
+            // R&D (5) - Headquarters
+            { name: "Dr. Kenji Matsuda", role: "Director of R&D", department: "R&D", facility: "headquarters" },
+            { name: "Elena Roberts", role: "Product Development Engineer", department: "R&D", facility: "headquarters" },
+            { name: "Jonah Patel", role: "Materials Scientist", department: "R&D", facility: "headquarters" },
+            { name: "Zoe Kim", role: "R&D Lab Technician", department: "R&D", facility: "headquarters" },
+            { name: "Derek Yoon", role: "Data Scientist", department: "R&D", facility: "headquarters" },
+            
+            // Quality Control (3) - Headquarters
+            { name: "Ronetta Bell", role: "QC Manager", department: "QC", facility: "headquarters" },
+            { name: "Xavier Holmes", role: "QC Analyst", department: "QC", facility: "headquarters" },
+            { name: "Mia Alvarez", role: "Documentation Specialist", department: "QC", facility: "headquarters" },
+            
+            // General Support (4) - Headquarters
+            { name: "Paul Nguyen", role: "Receptionist", department: "Support", facility: "headquarters" },
+            { name: "Angela Dixon", role: "Facilities Manager", department: "Support", facility: "headquarters" },
+            { name: "Brian Murphy", role: "Supply Chain Analyst", department: "Support", facility: "headquarters" },
+            { name: "Hanna Crain", role: "Executive Intern", department: "Support", facility: "headquarters" },
+            
+            // Production (14) - Packaging Facility
+            { name: "Alan Gutierrez", role: "Shift Supervisor", department: "Packaging", facility: "packaging" },
+            { name: "Tonya Blake", role: "Line Operator", department: "Packaging", facility: "packaging" },
+            { name: "Eric Schultz", role: "Line Operator", department: "Packaging", facility: "packaging" },
+            { name: "Nathan Rhodes", role: "Line Operator", department: "Packaging", facility: "packaging" },
+            { name: "Shanice Holloway", role: "Packaging Tech", department: "Packaging", facility: "packaging" },
+            { name: "Thomas O'Brien", role: "Packaging Tech", department: "Packaging", facility: "packaging" },
+            { name: "Jamie Lin", role: "Label Machine Operator", department: "Packaging", facility: "packaging" },
+            { name: "Pablo Garcia", role: "Inspector", department: "Packaging", facility: "packaging" },
+            { name: "Diane Wills", role: "Inspector", department: "Packaging", facility: "packaging" },
+            { name: "Aisha Ali", role: "Assembler", department: "Packaging", facility: "packaging" },
+            { name: "Nick Romano", role: "Assembler", department: "Packaging", facility: "packaging" },
+            { name: "Andrea Lopez", role: "QA Technician", department: "Packaging", facility: "packaging" },
+            { name: "George Wright", role: "Forklift Operator", department: "Packaging", facility: "packaging" },
+            { name: "Carl Simmons", role: "Safety Officer", department: "Packaging", facility: "packaging" },
+            
+            // Maintenance & OT (5) - Packaging Facility
+            { name: "Henry Brock", role: "Maintenance Manager", department: "Maintenance", facility: "packaging" },
+            { name: "Chen Liu", role: "PLC Technician", department: "Maintenance", facility: "packaging" },
+            { name: "Kevin Patel", role: "HMI Specialist", department: "Maintenance", facility: "packaging" },
+            { name: "Regina Moore", role: "OT Systems Engineer", department: "Maintenance", facility: "packaging" },
+            { name: "Felipe Contreras", role: "Machine Mechanic", department: "Maintenance", facility: "packaging" },
+            
+            // Supervision/Admin (3) - Packaging Facility
+            { name: "Lydia Torres", role: "Operations Coordinator", department: "Warehouse", facility: "packaging" },
+            { name: "Malik Johnson", role: "Scheduling Analyst", department: "Warehouse", facility: "packaging" },
+            { name: "Julia Serrano", role: "Facility Clerk", department: "Warehouse", facility: "packaging" }
+        ];
+
+        const systems = [
+            "ERP System", "CRM System", "Strategic Dashboard", "Active Directory", "Firewall",
+            "GitLab", "R&D Server", "Email System", "HMI Systems", "Label Scanner",
+            "PLCs", "Edge Gateway", "SCADA System", "WMS", "RFID System",
+            "Shipping Dashboard", "Security Cameras", "Building Access", "Network Monitoring"
+        ];
+
+        const permissionLevels = ["none", "read", "write", "control", "admin"];
+        let accessMatrix = {};
+
+        // Initialize access matrix with default permissions
+        function initializeMatrix() {
+            employees.forEach(employee => {
+                accessMatrix[employee.name] = {};
+                systems.forEach(system => {
+                    accessMatrix[employee.name][system] = getDefaultPermission(employee, system);
+                });
+            });
+        }
+
+        // Define default permissions based on roles
+        function getDefaultPermission(employee, system) {
+            const role = employee.role;
+            const dept = employee.department;
+            
+            // CEO gets admin on most systems
+            if (role === "CEO") {
+                if (system.includes("PLC") || system.includes("SCADA") || system.includes("HMI")) return "read";
+                return "admin";
+            }
+            
+            // CISO/Cybersecurity gets read/audit on all, admin on security systems
+            if (role === "Cybersecurity Analyst") {
+                if (system.includes("Firewall") || system.includes("Network") || system.includes("Security")) return "admin";
+                return "read";
+            }
+            
+            // Network Admin
+            if (role === "Network Administrator") {
+                if (system.includes("Active Directory") || system.includes("Firewall") || system.includes("ERP")) return "admin";
+                if (system.includes("PLC") || system.includes("SCADA")) return "none";
+                return "read";
+            }
+            
+            // R&D roles
+            if (dept === "R&D") {
+                if (system.includes("GitLab") || system.includes("R&D Server") || system.includes("Email")) return "write";
+                if (system.includes("ERP") || system.includes("CRM")) return "read";
+                return "none";
+            }
+            
+            // OT/Maintenance roles
+            if (dept === "Maintenance") {
+                if (system.includes("PLC") || system.includes("SCADA") || system.includes("HMI") || system.includes("Edge")) return "admin";
+                if (system.includes("Email")) return "read";
+                return "none";
+            }
+            
+            // Packaging/Production roles
+            if (dept === "Packaging") {
+                if (role.includes("Inspector") || role.includes("QA")) {
+                    if (system.includes("HMI") || system.includes("Label")) return "control";
+                }
+                if (role.includes("Operator") || role.includes("Tech")) {
+                    if (system.includes("HMI")) return "read";
+                    if (system.includes("Label")) return "control";
+                }
+                if (system.includes("Email")) return "read";
+                return "none";
+            }
+            
+            // Warehouse roles
+            if (dept === "Warehouse") {
+                if (system.includes("WMS") || system.includes("RFID") || system.includes("Shipping")) return "write";
+                if (system.includes("Email")) return "read";
+                return "none";
+            }
+            
+            // Default permissions for other roles
+            if (system.includes("Email")) return "read";
+            if (dept === "Executive" && (system.includes("ERP") || system.includes("CRM") || system.includes("Strategic"))) return "write";
+            
+            return "none";
+        }
+
+        // Create matrix table
+        function createMatrix() {
+            const tbody = document.getElementById('matrixBody');
+            tbody.innerHTML = '';
+            
+            const filteredEmployees = filterEmployees();
+            
+            filteredEmployees.forEach(employee => {
+                const row = document.createElement('tr');
+                
+                // Employee name cell with department badge
+                const nameCell = document.createElement('td');
+                nameCell.innerHTML = `${employee.name} <span class="department-badge dept-${employee.department.toLowerCase().replace('&', '').replace(/\s+/g, '')}">${employee.department}</span>`;
+                row.appendChild(nameCell);
+                
+                // Permission cells
+                systems.forEach(system => {
+                    const cell = document.createElement('td');
+                    cell.className = 'permission-cell';
+                    cell.dataset.employee = employee.name;
+                    cell.dataset.system = system;
+                    
+                    updatePermissionCell(cell, accessMatrix[employee.name][system]);
+                    
+                    cell.addEventListener('click', () => {
+                        cyclePermission(employee.name, system, cell);
+                    });
+                    
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            });
+            
+            updateStatistics();
+        }
+
+        // Filter employees based on selected criteria
+        function filterEmployees() {
+            const deptFilter = document.getElementById('departmentFilter').value;
+            const facilityFilter = document.getElementById('facilityFilter').value;
+            
+            return employees.filter(employee => {
+                const deptMatch = deptFilter === 'all' || employee.department === deptFilter;
+                const facilityMatch = facilityFilter === 'all' || employee.facility === facilityFilter;
+                return deptMatch && facilityMatch;
+            });
+        }
+
+        // Update permission cell appearance
+        function updatePermissionCell(cell, permission) {
+            cell.className = `permission-cell permission-${permission}`;
+            
+            const displayText = {
+                none: "None",
+                read: "Read",
+                write: "Write",
+                control: "Control",
+                admin: "Admin"
+            };
+            
+            cell.textContent = displayText[permission];
+        }
+
+        // Cycle through permission levels
+        function cyclePermission(employeeName, system, cell) {
+            const currentPermission = accessMatrix[employeeName][system];
+            const currentIndex = permissionLevels.indexOf(currentPermission);
+            const nextIndex = (currentIndex + 1) % permissionLevels.length;
+            const nextPermission = permissionLevels[nextIndex];
+            
+            accessMatrix[employeeName][system] = nextPermission;
+            updatePermissionCell(cell, nextPermission);
+            updateStatistics();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const stats = calculateStatistics();
+            const container = document.getElementById('statsContainer');
+            
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.totalUsers}</div>
+                    <div>Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.totalSystems}</div>
+                    <div>Total Systems</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.adminAccess}</div>
+                    <div>Admin Access Grants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.noAccess}</div>
+                    <div>No Access Entries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.otSystemAccess}</div>
+                    <div>OT System Access</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.riskScore}</div>
+                    <div>Risk Score</div>
+                </div>
+            `;
+        }
+
+        // Calculate statistics
+        function calculateStatistics() {
+            const totalUsers = employees.length;
+            const totalSystems = systems.length;
+            let adminAccess = 0;
+            let noAccess = 0;
+            let otSystemAccess = 0;
+            
+            const otSystems = ["HMI Systems", "PLCs", "Edge Gateway", "SCADA System"];
+            
+            Object.keys(accessMatrix).forEach(employee => {
+                Object.keys(accessMatrix[employee]).forEach(system => {
+                    const permission = accessMatrix[employee][system];
+                    if (permission === "admin") adminAccess++;
+                    if (permission === "none") noAccess++;
+                    if (otSystems.includes(system) && permission !== "none") otSystemAccess++;
+                });
+            });
+            
+            // Simple risk score calculation
+            const riskScore = Math.max(0, 100 - Math.floor((noAccess / (totalUsers * totalSystems)) * 100));
+            
+            return {
+                totalUsers,
+                totalSystems,
+                adminAccess,
+                noAccess,
+                otSystemAccess,
+                riskScore
+            };
+        }
+
+        // Export matrix to CSV
+        function exportMatrix() {
+            let csv = "Employee,Role,Department,Facility," + systems.join(",") + "\n";
+            
+            employees.forEach(employee => {
+                const row = [
+                    employee.name,
+                    employee.role,
+                    employee.department,
+                    employee.facility
+                ];
+                
+                systems.forEach(system => {
+                    row.push(accessMatrix[employee.name][system]);
+                });
+                
+                csv += row.join(",") + "\n";
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'freshflow_access_matrix.csv';
+            a.click();
+        }
+
+        // Reset matrix to defaults
+        function resetMatrix() {
+            if (confirm('Are you sure you want to reset all permissions to defaults?')) {
+                initializeMatrix();
+                createMatrix();
+            }
+        }
+
+        // Generate security report
+        function generateReport() {
+            const stats = calculateStatistics();
+            const report = `
+FRESHFLOW SYSTEMS - ACCESS CONTROL MATRIX SECURITY REPORT
+Generated: ${new Date().toLocaleString()}
+
+EXECUTIVE SUMMARY:
+- Total Users: ${stats.totalUsers}
+- Total Systems: ${stats.totalSystems}
+- Risk Score: ${stats.riskScore}/100
+
+KEY METRICS:
+- Administrative Access Grants: ${stats.adminAccess}
+- OT System Access Points: ${stats.otSystemAccess}
+- Restricted Access Entries: ${stats.noAccess}
+
+COMPLIANCE STATUS:
+- NIST Cybersecurity Framework: Under Review
+- Segregation of Duties: Implemented
+- Least Privilege Principle: ${stats.riskScore > 80 ? 'Needs Attention' : 'Compliant'}
+
+RECOMMENDATIONS:
+1. Regular access reviews quarterly
+2. Multi-factor authentication for OT systems
+3. Enhanced monitoring for administrative accounts
+4. Cross-training for OT personnel access
+
+This report should be reviewed by the CISO and IT management team.
+            `;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'freshflow_security_report.txt';
+            a.click();
+        }
+
+        // Event listeners
+        document.getElementById('departmentFilter').addEventListener('change', createMatrix);
+        document.getElementById('facilityFilter').addEventListener('change', createMatrix);
+
+        // Initialize the application
+        initializeMatrix();
+        createMatrix();
+    </script>
+</body>
+</html>
