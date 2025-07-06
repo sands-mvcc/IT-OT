@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Actuators & IIoT Education Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: #1a1a1a;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar h1 {
+            padding: 0 2rem 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-bottom: 1px solid #333;
+            color: #22c55e;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .nav-menu li {
+            margin: 0.5rem 0;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background: #333;
+            border-left-color: #22c55e;
+            color: #22c55e;
+        }
+
+        /* Mobile menu button */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: #22c55e;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #22c55e;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        /* Simulation container */
+        .simulation {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .simulation h3 {
+            color: #22c55e;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* Control panels */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .control-group {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .control-group input,
+        .control-group select,
+        .control-group button {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .control-group button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .control-group button:hover {
+            background: #16a34a;
+        }
+
+        .control-group button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Output displays */
+        .output-panel {
+            background: #1a1a1a;
+            color: #22c55e;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            min-height: 150px;
+            overflow-y: auto;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-online { background: #22c55e; }
+        .status-offline { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+
+        /* Visual elements */
+        .device-visual {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .device-icon {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #22c55e;
+            transition: width 0.3s ease;
+        }
+
+        /* Map for RTLS */
+        .facility-map {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .asset-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #22c55e;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .asset-marker:hover {
+            transform: scale(1.2);
+        }
+
+        /* Dashboard grid for HMI */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .dashboard-widget {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .dashboard-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #22c55e;
+            margin: 0.5rem 0;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 4rem 1rem 1rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .rotate {
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        
+        <nav class="sidebar" id="sidebar">
+            <h1>IIoT Education</h1>
+            <ul class="nav-menu">
+                <li><a href="#overview" onclick="showSection('overview')" class="active">Overview</a></li>
+                <li><a href="#rfid" onclick="showSection('rfid')">RFID Trackers</a></li>
+                <li><a href="#edge" onclick="showSection('edge')">Edge Devices</a></li>
+                <li><a href="#gateway" onclick="showSection('gateway')">Industrial Gateways</a></li>
+                <li><a href="#plc" onclick="showSection('plc')">PLCs</a></li>
+                <li><a href="#hmi" onclick="showSection('hmi')">HMIs</a></li>
+                <li><a href="#monitoring" onclick="showSection('monitoring')">Condition Monitoring</a></li>
+                <li><a href="#rtls" onclick="showSection('rtls')">Asset Tracking & RTLS</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <div class="section-header">
+                    <h2>Industrial IoT & Actuators Overview</h2>
+                    <p>Interactive simulations of industrial automation devices that convert digital signals into physical actions</p>
+                </div>
+                
+                <div class="simulation">
+                    <h3>What are Actuators in Industrial IoT?</h3>
+                    <p>Actuators are devices that convert digital control signals into physical actions in automated environments. They work alongside sensors and controllers to create responsive industrial systems.</p>
+                    
+                    <div class="device-visual">
+                        <div class="device-icon">⚙️</div>
+                        <h4>Digital Signal → Physical Action</h4>
+                        <p>Click on any device type in the sidebar to explore interactive simulations</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RFID Trackers Section -->
+            <section id="rfid" class="section">
+                <div class="section-header">
+                    <h2>RFID Trackers</h2>
+                    <p>Used for asset tracking, inventory management, and quality control through radio frequency identification</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>RFID Scanner Simulation</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Tag ID to Scan:</label>
+                            <input type="text" id="rfidTagId" placeholder="Enter Tag ID (e.g., RF001234)">
+                        </div>
+                        <div class="control-group">
+                            <label>Scanner Action:</label>
+                            <button onclick="scanRFID()">Scan Tag</button>
+                        </div>
+                    </div>
+
+                    <div class="device-visual">
+                        <div class="device-icon" id="rfidIcon">📡</div>
+                        <div class="status-indicator" id="rfidStatus"></div>
+                        <span id="rfidStatusText">Ready to scan</span>
+                    </div>
+
+                    <div class="output-panel" id="rfidOutput">
+                        RFID Scanner Ready...
+                        Available Tags: RF001234, RF005678, RF009012
+                    </div>
+                </div>
+            </section>
+
+            <!-- Edge Devices Section -->
+            <section id="edge" class="section">
+                <div class="section-header">
+                    <h2>Edge Devices</h2>
+                    <p>Local computing units that process data near the source before sending it to the cloud</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>Edge Computing Simulation</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Data Source:</label>
+                            <select id="edgeDataSource">
+                                <option value="temperature">Temperature Sensor</option>
+                                <option value="pressure">Pressure Sensor</option>
+                                <option value="vibration">Vibration Sensor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Processing Mode:</label>
+                            <select id="edgeProcessingMode">
+                                <option value="local">Local Processing</option>
+                                <option value="cloud">Cloud Processing</option>
+                                <option value="hybrid">Hybrid Processing</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="processEdgeData()">Process Data</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <h4>Local Processing</h4>
+                            <div class="dashboard-value" id="localLatency">< 1ms</div>
+                            <p>Latency</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Cloud Processing</h4>
+                            <div class="dashboard-value" id="cloudLatency">~50ms</div>
+                            <p>Latency</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Data Processed</h4>
+                            <div class="dashboard-value" id="dataProcessed">0</div>
+                            <p>Packets</p>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="edgeOutput">
+                        Edge Device Ready...
+                        Benefits: Real-time processing, reduced bandwidth, improved reliability
+                    </div>
+                </div>
+            </section>
+
+            <!-- Industrial Gateways Section -->
+            <section id="gateway" class="section">
+                <div class="section-header">
+                    <h2>Industrial Gateways</h2>
+                    <p>Protocol translators and security buffers connecting legacy systems to modern IIoT networks</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>Gateway Protocol Translation</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Source Protocol:</label>
+                            <select id="sourceProtocol">
+                                <option value="modbus">Modbus RTU</option>
+                                <option value="profibus">Profibus</option>
+                                <option value="ethernet">Ethernet/IP</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Target Protocol:</label>
+                            <select id="targetProtocol">
+                                <option value="mqtt">MQTT</option>
+                                <option value="opcua">OPC UA</option>
+                                <option value="http">HTTP/REST</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Data Value:</label>
+                            <input type="number" id="gatewayData" placeholder="Enter sensor value">
+                        </div>
+                        <div class="control-group">
+                            <button onclick="translateProtocol()">Translate Data</button>
+                        </div>
+                    </div>
+
+                    <div class="device-visual">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div class="device-icon">🏭</div>
+                                <p>Legacy System</p>
+                            </div>
+                            <div class="device-icon rotate" id="gatewayIcon">🔄</div>
+                            <div>
+                                <div class="device-icon">☁️</div>
+                                <p>Cloud/Network</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="gatewayOutput">
+                        Gateway Ready...
+                        Supported Protocols: Modbus, Profibus, Ethernet/IP → MQTT, OPC UA, HTTP
+                    </div>
+                </div>
+            </section>
+
+            <!-- PLCs Section -->
+            <section id="plc" class="section">
+                <div class="section-header">
+                    <h2>Programmable Logic Controllers (PLCs)</h2>
+                    <p>Embedded control systems for automating machinery and industrial processes</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>PLC Control Logic Simulation</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Input 1 (Start Button):</label>
+                            <input type="checkbox" id="plcInput1" onchange="updatePLC()">
+                        </div>
+                        <div class="control-group">
+                            <label>Input 2 (Safety Switch):</label>
+                            <input type="checkbox" id="plcInput2" onchange="updatePLC()" checked>
+                        </div>
+                        <div class="control-group">
+                            <label>Input 3 (Temperature OK):</label>
+                            <input type="checkbox" id="plcInput3" onchange="updatePLC()" checked>
+                        </div>
+                        <div class="control-group">
+                            <label>Motor Speed (%):</label>
+                            <input type="range" id="motorSpeed" min="0" max="100" value="0" onchange="updatePLC()">
+                            <span id="speedValue">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <h4>Motor Status</h4>
+                            <div class="status-indicator" id="motorStatus"></div>
+                            <span id="motorStatusText">OFF</span>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Safety Status</h4>
+                            <div class="status-indicator" id="safetyStatus"></div>
+                            <span id="safetyStatusText">SAFE</span>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>System Ready</h4>
+                            <div class="status-indicator" id="systemStatus"></div>
+                            <span id="systemStatusText">READY</span>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="plcOutput">
+                        PLC Logic: Motor = Start AND Safety AND Temperature_OK
+                        System Status: Monitoring inputs...
+                    </div>
+                </div>
+            </section>
+
+            <!-- HMIs Section -->
+            <section id="hmi" class="section">
+                <div class="section-header">
+                    <h2>Human-Machine Interfaces (HMIs)</h2>
+                    <p>Visual dashboards for operators to monitor and control equipment with intuitive interfaces</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>Industrial Dashboard Simulation</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>System Mode:</label>
+                            <select id="systemMode" onchange="updateHMI()">
+                                <option value="manual">Manual</option>
+                                <option value="auto">Automatic</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="startProduction()">Start Production</button>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="stopProduction()" class="stop-btn">Stop Production</button>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="resetAlarms()">Reset Alarms</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <h4>Production Rate</h4>
+                            <div class="dashboard-value" id="productionRate">0</div>
+                            <p>units/hour</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Efficiency</h4>
+                            <div class="dashboard-value" id="efficiency">0%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="efficiencyBar"></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Temperature</h4>
+                            <div class="dashboard-value" id="hmiTemperature">22°C</div>
+                            <p>Normal</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Alarms</h4>
+                            <div class="dashboard-value" id="alarmCount">0</div>
+                            <p>Active</p>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="hmiOutput">
+                        HMI Dashboard Ready...
+                        System in Manual mode - Waiting for operator input
+                    </div>
+                </div>
+            </section>
+
+            <!-- Condition Monitoring Section -->
+            <section id="monitoring" class="section">
+                <div class="section-header">
+                    <h2>Condition Monitoring Systems</h2>
+                    <p>Integrated systems using sensors to track equipment health and predict maintenance needs</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>Equipment Health Monitoring</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Equipment Type:</label>
+                            <select id="equipmentType" onchange="updateMonitoring()">
+                                <option value="motor">Electric Motor</option>
+                                <option value="pump">Centrifugal Pump</option>
+                                <option value="compressor">Air Compressor</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Operating Hours:</label>
+                            <input type="range" id="operatingHours" min="0" max="8760" value="1000" onchange="updateMonitoring()">
+                            <span id="hoursValue">1000 hrs</span>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="runDiagnostics()">Run Diagnostics</button>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="scheduleMaintenace()">Schedule Maintenance</button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <h4>Overall Health</h4>
+                            <div class="dashboard-value" id="overallHealth">85%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="healthBar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Vibration</h4>
+                            <div class="dashboard-value" id="vibrationLevel">2.1</div>
+                            <p>mm/s RMS</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Temperature</h4>
+                            <div class="dashboard-value" id="equipmentTemp">68°C</div>
+                            <p>Normal</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Next Maintenance</h4>
+                            <div class="dashboard-value" id="nextMaintenance">45</div>
+                            <p>days</p>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="monitoringOutput">
+                        Condition Monitoring Active...
+                        Predictive analytics: Normal operation detected
+                    </div>
+                </div>
+            </section>
+
+            <!-- RTLS Section -->
+            <section id="rtls" class="section">
+                <div class="section-header">
+                    <h2>Asset Tracking & RTLS</h2>
+                    <p>Real-Time Location Systems for monitoring assets, tools, and vehicles within facilities</p>
+                </div>
+
+                <div class="simulation">
+                    <h3>Real-Time Asset Tracking</h3>
+                    
+                    <div class="control-panel">
+                        <div class="control-group">
+                            <label>Asset Type:</label>
+                            <select id="assetType">
+                                <option value="forklift">Forklift</option>
+                                <option value="tool">Tool Cart</option>
+                                <option value="material">Material Pallet</option>
+                                <option value="personnel">Personnel</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Asset ID:</label>
+                            <input type="text" id="assetId" placeholder="Enter Asset ID">
+                        </div>
+                        <div class="control-group">
+                            <button onclick="trackAsset()">Track Asset</button>
+                        </div>
+                        <div class="control-group">
+                            <button onclick="updateAssetLocation()">Update Location</button>
+                        </div>
+                    </div>
+
+                    <div class="facility-map" onclick="moveAsset(event)">
+                        <div class="asset-marker" id="asset1" style="top: 50px; left: 50px;" title="Forklift-001"></div>
+                        <div class="asset-marker" id="asset2" style="top: 150px; left: 200px;" title="Tool-Cart-A"></div>
+                        <div class="asset-marker" id="asset3" style="top: 100px; left: 350px;" title="Material-P001"></div>
+                        
+                        <!-- Facility zones -->
+                        <div style="position: absolute; top: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Production Floor</div>
+                        <div style="position: absolute; top: 10px; right: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Storage Area</div>
+                        <div style="position: absolute; bottom: 10px; left: 10px; padding: 5px; background: rgba(0,0,0,0.7); color: white; border-radius: 4px;">Shipping Dock</div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <h4>Tracked Assets</h4>
+                            <div class="dashboard-value" id="trackedAssets">12</div>
+                            <p>Active</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Zone Utilization</h4>
+                            <div class="dashboard-value" id="zoneUtil">73%</div>
+                            <p>Production Floor</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Avg. Dwell Time</h4>
+                            <div class="dashboard-value" id="dwellTime">4.2</div>
+                            <p>minutes</p>
+                        </div>
+                        <div class="dashboard-widget">
+                            <h4>Alerts</h4>
+                            <div class="dashboard-value" id="rtlsAlerts">0</div>
+                            <p>Active</p>
+                        </div>
+                    </div>
+
+                    <div class="output-panel" id="rtlsOutput">
+                        RTLS System Online...
+                        Click on the facility map to move assets or track new locations
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSection = 'overview';
+        let productionRunning = false;
+        let monitoringInterval;
+        let dataProcessedCount = 0;
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePLC();
+            updateHMI();
+            updateMonitoring();
+        });
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from nav links
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+            
+            currentSection = sectionId;
+            
+            // Close mobile menu
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // RFID Functions
+        function scanRFID() {
+            const tagId = document.getElementById('rfidTagId').value;
+            const output = document.getElementById('rfidOutput');
+            const icon = document.getElementById('rfidIcon');
+            const status = document.getElementById('rfidStatus');
+            const statusText = document.getElementById('rfidStatusText');
+            
+            if (!tagId) {
+                output.innerHTML += '\nError: Please enter a Tag ID';
+                return;
+            }
+            
+            // Simulate scanning
+            icon.classList.add('pulse');
+            status.className = 'status-indicator status-warning';
+            statusText.textContent = 'Scanning...';
+            
+            setTimeout(() => {
+                icon.classList.remove('pulse');
+                
+                // Simulate different responses based on tag ID
+                if (['RF001234', 'RF005678', 'RF009012'].includes(tagId)) {
+                    status.className = 'status-indicator status-online';
+                    statusText.textContent = 'Tag Found';
+                    
+                    const assetData = {
+                        'RF001234': { name: 'Laptop Computer', location: 'Office A-201', status: 'Checked Out' },
+                        'RF005678': { name: 'Tool Set #5', location: 'Workshop B', status: 'Available' },
+                        'RF009012': { name: 'Safety Equipment', location: 'Safety Station', status: 'Available' }
+                    };
+                    
+                    const asset = assetData[tagId];
+                    output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tag Scanned: ${tagId}`;
+                    output.innerHTML += `\nAsset: ${asset.name}`;
+                    output.innerHTML += `\nLocation: ${asset.location}`;
+                    output.innerHTML += `\nStatus: ${asset.status}`;
+                    output.innerHTML += '\n------------------------';
+                } else {
+                    status.className = 'status-indicator status-offline';
+                    statusText.textContent = 'Tag Not Found';
+                    output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tag ${tagId}: NOT FOUND`;
+                }
+                
+                output.scrollTop = output.scrollHeight;
+            }, 1500);
+        }
+
+        // Edge Device Functions
+        function processEdgeData() {
+            const dataSource = document.getElementById('edgeDataSource').value;
+            const processingMode = document.getElementById('edgeProcessingMode').value;
+            const output = document.getElementById('edgeOutput');
+            
+            dataProcessedCount++;
+            document.getElementById('dataProcessed').textContent = dataProcessedCount;
+            
+            const sourceData = {
+                'temperature': Math.random() * 50 + 20,
+                'pressure': Math.random() * 100 + 100,
+                'vibration': Math.random() * 5 + 1
+            };
+            
+            const value = sourceData[dataSource].toFixed(2);
+            
+            // Update latency based on processing mode
+            if (processingMode === 'local') {
+                document.getElementById('localLatency').textContent = '< 1ms';
+                document.getElementById('cloudLatency').textContent = 'N/A';
+            } else if (processingMode === 'cloud') {
+                document.getElementById('localLatency').textContent = 'N/A';
+                document.getElementById('cloudLatency').textContent = '~50ms';
+            } else {
+                document.getElementById('localLatency').textContent = '< 1ms';
+                document.getElementById('cloudLatency').textContent = '~25ms';
+            }
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] ${dataSource}: ${value}`;
+            output.innerHTML += `\nProcessing: ${processingMode.toUpperCase()} mode`;
+            output.innerHTML += `\nLatency: ${processingMode === 'local' ? '<1ms' : processingMode === 'cloud' ? '~50ms' : '~25ms'}`;
+            output.innerHTML += '\n------------------------';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Gateway Functions
+        function translateProtocol() {
+            const sourceProtocol = document.getElementById('sourceProtocol').value;
+            const targetProtocol = document.getElementById('targetProtocol').value;
+            const dataValue = document.getElementById('gatewayData').value;
+            const output = document.getElementById('gatewayOutput');
+            const icon = document.getElementById('gatewayIcon');
+            
+            if (!dataValue) {
+                output.innerHTML += '\nError: Please enter a data value';
+                return;
+            }
+            
+            // Animate translation
+            icon.classList.add('rotate');
+            
+            setTimeout(() => {
+                icon.classList.remove('rotate');
+                
+                const translations = {
+                    'modbus': `Modbus RTU Frame: [01][03][40][00][00][01][84][0A]`,
+                    'profibus': `Profibus DP: Station 2, Data Length 4, Value: ${dataValue}`,
+                    'ethernet': `Ethernet/IP: Class 0x04, Instance 0x01, Attribute 0x03`
+                };
+                
+                const outputs = {
+                    'mqtt': `{"topic": "sensor/data", "payload": {"value": ${dataValue}, "timestamp": "${new Date().toISOString()}"}}`,
+                    'opcua': `OPC UA Node: ns=2;s=SensorValue, Value: ${dataValue}, Quality: Good`,
+                    'http': `POST /api/sensors HTTP/1.1\nContent-Type: application/json\n{"sensorId": "001", "value": ${dataValue}}`
+                };
+                
+                output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Protocol Translation:`;
+                output.innerHTML += `\nSource (${sourceProtocol.toUpperCase()}): ${translations[sourceProtocol]}`;
+                output.innerHTML += `\nTarget (${targetProtocol.toUpperCase()}): ${outputs[targetProtocol]}`;
+                output.innerHTML += '\n------------------------';
+                output.scrollTop = output.scrollHeight;
+            }, 1000);
+        }
+
+        // PLC Functions
+        function updatePLC() {
+            const input1 = document.getElementById('plcInput1').checked;
+            const input2 = document.getElementById('plcInput2').checked;
+            const input3 = document.getElementById('plcInput3').checked;
+            const motorSpeed = document.getElementById('motorSpeed').value;
+            
+            document.getElementById('speedValue').textContent = motorSpeed + '%';
+            
+            // PLC Logic: Motor runs if all inputs are true
+            const motorRunning = input1 && input2 && input3;
+            
+            // Update motor status
+            const motorStatus = document.getElementById('motorStatus');
+            const motorStatusText = document.getElementById('motorStatusText');
+            if (motorRunning) {
+                motorStatus.className = 'status-indicator status-online';
+                motorStatusText.textContent = `ON (${motorSpeed}%)`;
+            } else {
+                motorStatus.className = 'status-indicator status-offline';
+                motorStatusText.textContent = 'OFF';
+            }
+            
+            // Update safety status
+            const safetyStatus = document.getElementById('safetyStatus');
+            const safetyStatusText = document.getElementById('safetyStatusText');
+            if (input2) {
+                safetyStatus.className = 'status-indicator status-online';
+                safetyStatusText.textContent = 'SAFE';
+            } else {
+                safetyStatus.className = 'status-indicator status-offline';
+                safetyStatusText.textContent = 'UNSAFE';
+            }
+            
+            // Update system status
+            const systemStatus = document.getElementById('systemStatus');
+            const systemStatusText = document.getElementById('systemStatusText');
+            if (input2 && input3) {
+                systemStatus.className = 'status-indicator status-online';
+                systemStatusText.textContent = 'READY';
+            } else {
+                systemStatus.className = 'status-indicator status-warning';
+                systemStatusText.textContent = 'NOT READY';
+            }
+            
+            // Update output
+            const output = document.getElementById('plcOutput');
+            output.innerHTML = `PLC Logic: Motor = Start(${input1}) AND Safety(${input2}) AND Temperature_OK(${input3})`;
+            output.innerHTML += `\nMotor Status: ${motorRunning ? 'RUNNING' : 'STOPPED'}`;
+            output.innerHTML += `\nSpeed Setting: ${motorSpeed}%`;
+            output.innerHTML += `\nSafety: ${input2 ? 'OK' : 'FAULT'}`;
+        }
+
+        // HMI Functions
+        function updateHMI() {
+            const mode = document.getElementById('systemMode').value;
+            const output = document.getElementById('hmiOutput');
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] System mode changed to: ${mode.toUpperCase()}`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function startProduction() {
+            if (productionRunning) return;
+            
+            productionRunning = true;
+            const output = document.getElementById('hmiOutput');
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Production STARTED`;
+            
+            // Simulate production metrics
+            let rate = 0;
+            let efficiency = 0;
+            let temperature = 22;
+            
+            monitoringInterval = setInterval(() => {
+                rate = Math.min(rate + Math.random() * 10, 85 + Math.random() * 15);
+                efficiency = Math.min(efficiency + Math.random() * 5, 95);
+                temperature = 22 + Math.random() * 20;
+                
+                document.getElementById('productionRate').textContent = Math.round(rate);
+                document.getElementById('efficiency').textContent = Math.round(efficiency) + '%';
+                document.getElementById('efficiencyBar').style.width = efficiency + '%';
+                document.getElementById('hmiTemperature').textContent = Math.round(temperature) + '°C';
+            }, 2000);
+            
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function stopProduction() {
+            if (!productionRunning) return;
+            
+            productionRunning = false;
+            clearInterval(monitoringInterval);
+            
+            const output = document.getElementById('hmiOutput');
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Production STOPPED`;
+            
+            // Reset values
+            setTimeout(() => {
+                document.getElementById('productionRate').textContent = '0';
+                document.getElementById('efficiency').textContent = '0%';
+                document.getElementById('efficiencyBar').style.width = '0%';
+            }, 1000);
+            
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function resetAlarms() {
+            document.getElementById('alarmCount').textContent = '0';
+            const output = document.getElementById('hmiOutput');
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] All alarms RESET`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Condition Monitoring Functions
+        function updateMonitoring() {
+            const equipmentType = document.getElementById('equipmentType').value;
+            const hours = document.getElementById('operatingHours').value;
+            
+            document.getElementById('hoursValue').textContent = hours + ' hrs';
+            
+            // Calculate health based on operating hours
+            let health = Math.max(10, 100 - (hours / 100));
+            let vibration = 1.5 + (hours / 5000);
+            let temperature = 50 + (hours / 200);
+            let maintenance = Math.max(1, 90 - Math.floor(hours / 100));
+            
+            document.getElementById('overallHealth').textContent = Math.round(health) + '%';
+            document.getElementById('healthBar').style.width = health + '%';
+            document.getElementById('vibrationLevel').textContent = vibration.toFixed(1);
+            document.getElementById('equipmentTemp').textContent = Math.round(temperature) + '°C';
+            document.getElementById('nextMaintenance').textContent = maintenance;
+            
+            // Update health bar color
+            const healthBar = document.getElementById('healthBar');
+            if (health > 70) {
+                healthBar.style.background = '#22c55e';
+            } else if (health > 40) {
+                healthBar.style.background = '#f59e0b';
+            } else {
+                healthBar.style.background = '#ef4444';
+            }
+        }
+
+        function runDiagnostics() {
+            const output = document.getElementById('monitoringOutput');
+            const equipmentType = document.getElementById('equipmentType').value;
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Running diagnostics on ${equipmentType}...`;
+            
+            setTimeout(() => {
+                output.innerHTML += `\nDiagnostics Complete:`;
+                output.innerHTML += `\n- Bearing condition: Good`;
+                output.innerHTML += `\n- Alignment: Within tolerance`;
+                output.innerHTML += `\n- Lubrication: Adequate`;
+                output.innerHTML += `\n- Electrical connections: Normal`;
+                output.innerHTML += '\n------------------------';
+                output.scrollTop = output.scrollHeight;
+            }, 2000);
+        }
+
+        function scheduleMaintenace() {
+            const output = document.getElementById('monitoringOutput');
+            const nextMaintenance = document.getElementById('nextMaintenance').textContent;
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Maintenance scheduled in ${nextMaintenance} days`;
+            output.innerHTML += `\nWork order created: WO-${Math.floor(Math.random() * 10000)}`;
+            output.innerHTML += `\nTechnician assigned: Auto-assigned`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // RTLS Functions
+        function trackAsset() {
+            const assetType = document.getElementById('assetType').value;
+            const assetId = document.getElementById('assetId').value;
+            const output = document.getElementById('rtlsOutput');
+            
+            if (!assetId) {
+                output.innerHTML += '\nError: Please enter an Asset ID';
+                return;
+            }
+            
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Tracking ${assetType}: ${assetId}`;
+            output.innerHTML += `\nLocation: Production Floor (Zone A)`;
+            output.innerHTML += `\nLast update: ${new Date().toLocaleTimeString()}`;
+            output.innerHTML += `\nStatus: Active`;
+            output.innerHTML += '\n------------------------';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateAssetLocation() {
+            const trackedAssets = document.getElementById('trackedAssets');
+            const currentCount = parseInt(trackedAssets.textContent);
+            trackedAssets.textContent = currentCount + 1;
+            
+            const output = document.getElementById('rtlsOutput');
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Asset location updated`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function moveAsset(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Move the first asset marker to clicked location
+            const asset = document.getElementById('asset1');
+            asset.style.left = (x - 10) + 'px';
+            asset.style.top = (y - 10) + 'px';
+            
+            const output = document.getElementById('rtlsOutput');
+            output.innerHTML += `\n[${new Date().toLocaleTimeString()}] Asset moved to coordinates (${x}, ${y})`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Responsive design handling
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('open') && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
