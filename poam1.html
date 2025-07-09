@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshFlow System Corporation - Cybersecurity Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .organization-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .org-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.2);
+        }
+
+        .dashboard-metrics {
+            background: #ffffff;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #2c3e50;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-card h3 {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .description {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .controls-section {
+            padding: 20px;
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 8px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            width: 250px;
+            font-size: 13px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .security-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .security-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .security-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .security-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+
+        .security-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-open {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-investigating {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-monitoring {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .severity-badge {
+            padding: 3px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background: #dc3545;
+            color: white;
+        }
+
+        .severity-high {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .severity-medium {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .severity-low {
+            background: #28a745;
+            color: white;
+        }
+
+        .category-indicator {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .category-malware { background: #dc3545; }
+        .category-phishing { background: #fd7e14; }
+        .category-vulnerability { background: #ffc107; color: #212529; }
+        .category-breach { background: #6f42c1; }
+        .category-policy { background: #20c997; }
+        .category-network { background: #17a2b8; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            transition: width 0.3s ease;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+
+        .charts-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .export-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .export-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        @media (max-width: 768px) {
+            .controls-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-filter-container {
+                justify-content: center;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .security-table-container {
+                overflow-x: auto;
+            }
+
+            .org-form {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FreshFlow System Corporation</h1>
+            <div class="subtitle">Cybersecurity Dashboard & Incident Management</div>
+        </div>
+
+        <div class="organization-info">
+            <div class="org-form">
+                <div class="form-group">
+                    <label class="form-label">Department/Division</label>
+                    <input type="text" class="form-control" id="department" value="IT Security Operations" placeholder="Enter department name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Security Manager</label>
+                    <input type="text" class="form-control" id="securityManager" value="Sarah Johnson" placeholder="Enter security manager name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Security Assessment</label>
+                    <input type="date" class="form-control" id="lastAssessment">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Next Review Date</label>
+                    <input type="date" class="form-control" id="nextReview">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Security Framework</label>
+                    <select class="form-control" id="framework">
+                        <option value="nist">NIST Cybersecurity Framework</option>
+                        <option value="iso27001">ISO 27001</option>
+                        <option value="cis">CIS Controls</option>
+                        <option value="custom">Custom Framework</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Email</label>
+                    <input type="email" class="form-control" id="contactEmail" value="security@freshflow.com" placeholder="Enter contact email">
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-metrics">
+            <div class="metric-card">
+                <h3>Total Security Items</h3>
+                <div class="number" id="totalItems" style="color: #2c3e50;">12</div>
+                <div class="description">Active Security Issues</div>
+            </div>
+            <div class="metric-card">
+                <h3>Open Items</h3>
+                <div class="number" id="openItems" style="color: #dc3545;">4</div>
+                <div class="description">Requiring Attention</div>
+            </div>
+            <div class="metric-card">
+                <h3>Under Investigation</h3>
+                <div class="number" id="investigatingItems" style="color: #ffc107;">5</div>
+                <div class="description">Being Analyzed</div>
+            </div>
+            <div class="metric-card">
+                <h3>Resolved</h3>
+                <div class="number" id="resolvedItems" style="color: #28a745;">3</div>
+                <div class="description">Successfully Mitigated</div>
+            </div>
+            <div class="metric-card">
+                <h3>Critical Severity</h3>
+                <div class="number" id="criticalItems" style="color: #dc3545;">2</div>
+                <div class="description">High Priority Issues</div>
+            </div>
+            <div class="metric-card">
+                <h3>Avg Resolution Time</h3>
+                <div class="number" id="avgResolutionTime" style="color: #17a2b8;">7</div>
+                <div class="description">Days to Resolution</div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="controls-header">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="openAddModal()">+ New Security Item</button>
+                    <button class="btn btn-secondary" onclick="showAlert('Import functionality')">Import Data</button>
+                    <button class="btn btn-success" onclick="showAlert('Bulk update functionality')">Bulk Update</button>
+                    <button class="btn btn-warning" onclick="generateReport()">Generate Report</button>
+                    <button class="btn btn-info" onclick="showAlert('Analytics view')">Analytics</button>
+                </div>
+                
+                <div class="search-filter-container">
+                    <input type="text" class="search-input" placeholder="Search security items..." onkeyup="searchItems(this.value)">
+                    <select class="filter-select" onchange="filterByStatus(this.value)">
+                        <option value="all">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="investigating">Investigating</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="monitoring">Monitoring</option>
+                    </select>
+                    <select class="filter-select" onchange="filterBySeverity(this.value)">
+                        <option value="all">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="security-table-container">
+                <table class="security-table" id="securityTable">
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Detection Date</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="securityTableBody">
+                        <!-- Security items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <h3>Security Analytics</h3>
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h4>Status Distribution</h4>
+                    <div id="statusChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Severity Breakdown</h4>
+                    <div id="severityChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Category Analysis</h4>
+                    <div id="categoryChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Monthly Trends</h4>
+                    <div id="trendsChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <div class="export-controls">
+                <button class="btn btn-info" onclick="exportData('csv')">Export CSV</button>
+                <button class="btn btn-info" onclick="exportData('excel')">Export Excel</button>
+                <button class="btn btn-info" onclick="exportData('pdf')">Export PDF Report</button>
+                <button class="btn btn-success" onclick="exportData('security')">Security Assessment Report</button>
+                <button class="btn btn-warning" onclick="showAlert('Schedule reports')">Schedule Reports</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Security Item Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Security Item</h2>
+                <span class="close" onclick="closeAddModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addItemForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Category *</label>
+                            <select class="form-control" id="newCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="malware">Malware Detection</option>
+                                <option value="phishing">Phishing Attempt</option>
+                                <option value="vulnerability">Vulnerability</option>
+                                <option value="breach">Data Breach</option>
+                                <option value="policy">Policy Violation</option>
+                                <option value="network">Network Security</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Severity *</label>
+                            <select class="form-control" id="newSeverity" required>
+                                <option value="">Select Severity</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row single">
+                        <div class="form-group">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" id="newDescription" placeholder="Describe the security issue..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Assigned To *</label>
+                            <input type="text" class="form-control" id="newAssignedTo" placeholder="Enter assignee name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="newStatus">
+                                <option value="open">Open</option>
+                                <option value="investigating">Investigating</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="monitoring">Monitoring</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Detection Date *</label>
+                            <input type="date" class="form-control" id="newDetectionDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Resolution Date</label>
+                            <input type="date" class="form-control" id="newTargetDate">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="addNewItem()">Add Security Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let securityItems = [];
+        let currentFilter = { status: 'all', severity: 'all' };
+        let nextItemId = 13;
+
+        // Sample data - 12 fictitious cybersecurity records
+        const sampleData = [
+            {
+                id: 'SEC-001',
+                category: 'malware',
+                severity: 'critical',
+                status: 'investigating',
+                assignedTo: 'Alex Rivera',
+                detectionDate: '2025-07-05',
+                targetDate: '2025-07-12',
+                progress: 65,
+                description: 'Advanced persistent threat detected in email gateway targeting financial data',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-002',
+                category: 'phishing',
+                severity: 'high',
+                status: 'resolved',
+                assignedTo: 'Maria Santos',
+                detectionDate: '2025-07-01',
+                targetDate: '2025-07-08',
+                progress: 100,
+                description: 'Sophisticated phishing campaign targeting employee credentials via fake login pages',
+                lastUpdated: '2025-07-07'
+            },
+            {
+                id: 'SEC-003',
+                category: 'vulnerability',
+                severity: 'high',
+                status: 'open',
+                assignedTo: 'James Chen',
+                detectionDate: '2025-07-06',
+                targetDate: '2025-07-20',
+                progress: 20,
+                description: 'Critical vulnerability in web application allowing SQL injection attacks',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-004',
+                category: 'breach',
+                severity: 'critical',
+                status: 'investigating',
+                assignedTo: 'Sarah Johnson',
+                detectionDate: '2025-07-04',
+                targetDate: '2025-07-11',
+                progress: 85,
+                description: 'Unauthorized access detected in customer database with potential data exfiltration',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-005',
+                category: 'policy',
+                severity: 'medium',
+                status: 'investigating',
+                assignedTo: 'David Kim',
+                detectionDate: '2025-07-03',
+                targetDate: '2025-07-17',
+                progress: 40,
+                description: 'Multiple instances of unauthorized software installation violating security policies',
+                lastUpdated: '2025-07-07'
+            },
+            {
+                id: 'SEC-006',
+                category: 'network',
+                severity: 'high',
+                status: 'investigating',
+                assignedTo: 'Emma Wilson',
+                detectionDate: '2025-07-02',
+                targetDate: '2025-07-16',
+                progress: 55,
+                description: 'Unusual network traffic patterns suggesting potential lateral movement by threat actor',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-007',
+                category: 'malware',
+                severity: 'medium',
+                status: 'resolved',
+                assignedTo: 'Roberto Martinez',
+                detectionDate: '2025-06-28',
+                targetDate: '2025-07-05',
+                progress: 100,
+                description: 'Ransomware attempt blocked by endpoint detection and response system',
+                lastUpdated: '2025-07-05'
+            },
+            {
+                id: 'SEC-008',
+                category: 'vulnerability',
+                severity: 'low',
+                status: 'monitoring',
+                assignedTo: 'Lisa Park',
+                detectionDate: '2025-07-01',
+                targetDate: '2025-07-30',
+                progress: 90,
+                description: 'Outdated SSL certificates on non-critical internal systems requiring renewal',
+                lastUpdated: '2025-07-06'
+            },
+            {
+                id: 'SEC-009',
+                category: 'phishing',
+                severity: 'medium',
+                status: 'investigating',
+                assignedTo: 'Michael Brown',
+                detectionDate: '2025-07-07',
+                targetDate: '2025-07-21',
+                progress: 30,
+                description: 'Targeted spear-phishing emails sent to executives containing malicious attachments',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-010',
+                category: 'network',
+                severity: 'low',
+                status: 'open',
+                assignedTo: 'Anna Foster',
+                detectionDate: '2025-07-05',
+                targetDate: '2025-07-25',
+                progress: 10,
+                description: 'Firewall rules optimization needed to improve network security posture',
+                lastUpdated: '2025-07-08'
+            },
+            {
+                id: 'SEC-011',
+                category: 'policy',
+                severity: 'low',
+                status: 'open',
+                assignedTo: 'Thomas Lee',
+                detectionDate: '2025-07-04',
+                targetDate: '2025-07-18',
+                progress: 15,
+                description: 'Security awareness training completion rates below organizational targets',
+                lastUpdated: '2025-07-07'
+            },
+            {
+                id: 'SEC-012',
+                category: 'vulnerability',
+                severity: 'medium',
+                status: 'resolved',
+                assignedTo: 'Jennifer Adams',
+                detectionDate: '2025-06-30',
+                targetDate: '2025-07-14',
+                progress: 100,
+                description: 'Missing security patches on workstations creating potential attack vectors',
+                lastUpdated: '2025-07-06'
+            }
+        ];
+
+        // Initialize application
+        function initializeApp() {
+            const today = new Date();
+            document.getElementById('lastAssessment').value = '2025-06-01';
+            
+            const nextReview = new Date();
+            nextReview.setMonth(nextReview.getMonth() + 3);
+            document.getElementById('nextReview').value = nextReview.toISOString().split('T')[0];
+
+            // Set default detection date to today in modal
+            document.getElementById('newDetectionDate').value = today.toISOString().split('T')[0];
+
+            securityItems = [...sampleData];
+            updateMetrics();
+            updateTable();
+            updateCharts();
+        }
+
+        // Calculate metrics
+        function calculateMetrics() {
+            const today = new Date();
+            const metrics = {
+                total: securityItems.length,
+                open: 0,
+                investigating: 0,
+                resolved: 0,
+                monitoring: 0,
+                critical: 0,
+                avgResolutionTime: 0
+            };
+
+            let totalDays = 0;
+            let resolvedCount = 0;
+
+            securityItems.forEach(item => {
+                switch (item.status) {
+                    case 'open': metrics.open++; break;
+                    case 'investigating': metrics.investigating++; break;
+                    case 'resolved': 
+                        metrics.resolved++; 
+                        const detectionDate = new Date(item.detectionDate);
+                        const lastUpdate = new Date(item.lastUpdated);
+                        const daysDiff = Math.ceil((lastUpdate - detectionDate) / (1000 * 60 * 60 * 24));
+                        totalDays += daysDiff;
+                        resolvedCount++;
+                        break;
+                    case 'monitoring': metrics.monitoring++; break;
+                }
+
+                if (item.severity === 'critical') {
+                    metrics.critical++;
+                }
+            });
+
+            metrics.avgResolutionTime = resolvedCount > 0 ? Math.round(totalDays / resolvedCount) : 0;
+            return metrics;
+        }
+
+        // Update metrics display
+        function updateMetrics() {
+            const metrics = calculateMetrics();
+            document.getElementById('totalItems').textContent = metrics.total;
+            document.getElementById('openItems').textContent = metrics.open;
+            document.getElementById('investigatingItems').textContent = metrics.investigating;
+            document.getElementById('resolvedItems').textContent = metrics.resolved;
+            document.getElementById('criticalItems').textContent = metrics.critical;
+            document.getElementById('avgResolutionTime').textContent = metrics.avgResolutionTime;
+        }
+
+        // Update table
+        function updateTable() {
+            const tbody = document.getElementById('securityTableBody');
+            tbody.innerHTML = '';
+
+            let filteredItems = securityItems;
+
+            // Apply filters
+            if (currentFilter.status !== 'all') {
+                filteredItems = filteredItems.filter(item => item.status === currentFilter.status);
+            }
+
+            if (currentFilter.severity !== 'all') {
+                filteredItems = filteredItems.filter(item => item.severity === currentFilter.severity);
+            }
+
+            filteredItems.forEach(item => {
+                const row = createTableRow(item);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Create table row
+        function createTableRow(item) {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td><strong>${item.id}</strong></td>
+                <td><span class="category-indicator category-${item.category}">${item.category.toUpperCase()}</span></td>
+                <td style="max-width: 250px;">${item.description}</td>
+                <td><span class="severity-badge severity-${item.severity}">${item.severity}</span></td>
+                <td><span class="status-badge status-${item.status}">${item.status.replace('-', ' ')}</span></td>
+                <td>${item.assignedTo}</td>
+                <td>${formatDate(item.detectionDate)}</td>
+                <td>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${item.progress}%"></div>
+                    </div>
+                    <div style="text-align: center; font-size: 11px; margin-top: 2px;">${item.progress}%</div>
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="viewItem('${item.id}')">View</button>
+                    <button class="btn btn-warning btn-sm" onclick="editItem('${item.id}')">Edit</button>
+                </td>
+            `;
+            return row;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Update charts
+        function updateCharts() {
+            const metrics = calculateMetrics();
+            
+            document.getElementById('statusChart').innerHTML = `
+                <div style="font-size: 12px; text-align: left;">
+                    <div style="margin: 5px 0;">Open: ${metrics.open}</div>
+                    <div style="margin: 5px 0;">Investigating: ${metrics.investigating}</div>
+                    <div style="margin: 5px 0;">Resolved: ${metrics.resolved}</div>
+                    <div style="margin: 5px 0;">Monitoring: ${metrics.monitoring}</div>
+                </div>
+            `;
+
+            const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+            securityItems.forEach(item => severityCounts[item.severity]++);
+            
+            document.getElementById('severityChart').innerHTML = `
+                <div style="font-size: 12px; text-align: left;">
+                    <div style="margin: 5px 0;">Critical: ${severityCounts.critical}</div>
+                    <div style="margin: 5px 0;">High: ${severityCounts.high}</div>
+                    <div style="margin: 5px 0;">Medium: ${severityCounts.medium}</div>
+                    <div style="margin: 5px 0;">Low: ${severityCounts.low}</div>
+                </div>
+            `;
+
+            const categoryCounts = { malware: 0, phishing: 0, vulnerability: 0, breach: 0, policy: 0, network: 0 };
+            securityItems.forEach(item => categoryCounts[item.category]++);
+            
+            document.getElementById('categoryChart').innerHTML = `
+                <div style="font-size: 12px; text-align: left;">
+                    <div style="margin: 5px 0;">Malware: ${categoryCounts.malware}</div>
+                    <div style="margin: 5px 0;">Phishing: ${categoryCounts.phishing}</div>
+                    <div style="margin: 5px 0;">Vulnerabilities: ${categoryCounts.vulnerability}</div>
+                    <div style="margin: 5px 0;">Breaches: ${categoryCounts.breach}</div>
+                    <div style="margin: 5px 0;">Policy: ${categoryCounts.policy}</div>
+                    <div style="margin: 5px 0;">Network: ${categoryCounts.network}</div>
+                </div>
+            `;
+
+            document.getElementById('trendsChart').innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">${securityItems.length}</div>
+                    <div style="font-size: 12px; color: #6c757d;">Total incidents this month</div>
+                    <div style="font-size: 12px; color: #28a745; margin-top: 5px;">↓ 15% from last month</div>
+                </div>
+            `;
+        }
+
+        // Modal functions
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+            document.getElementById('addItemForm').reset();
+            document.getElementById('newDetectionDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+
+        // Add new item
+        function addNewItem() {
+            const form = document.getElementById('addItemForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const newItem = {
+                id: `SEC-${String(nextItemId).padStart(3, '0')}`,
+                category: document.getElementById('newCategory').value,
+                severity: document.getElementById('newSeverity').value,
+                status: document.getElementById('newStatus').value,
+                assignedTo: document.getElementById('newAssignedTo').value,
+                detectionDate: document.getElementById('newDetectionDate').value,
+                targetDate: document.getElementById('newTargetDate').value || '',
+                progress: document.getElementById('newStatus').value === 'resolved' ? 100 : 0,
+                description: document.getElementById('newDescription').value,
+                lastUpdated: new Date().toISOString().split('T')[0]
+            };
+
+            securityItems.push(newItem);
+            nextItemId++;
+            
+            updateMetrics();
+            updateTable();
+            updateCharts();
+            closeAddModal();
+            
+            showNotification('Security item added successfully!', 'success');
+        }
+
+        // Filter functions
+        function filterByStatus(status) {
+            currentFilter.status = status;
+            updateTable();
+        }
+
+        function filterBySeverity(severity) {
+            currentFilter.severity = severity;
+            updateTable();
+        }
+
+        // Search function
+        function searchItems(query) {
+            const rows = document.querySelectorAll('#securityTableBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // View and edit functions
+        function viewItem(itemId) {
+            const item = securityItems.find(i => i.id === itemId);
+            if (item) {
+                alert(`Security Item Details:\n\nID: ${item.id}\nCategory: ${item.category}\nSeverity: ${item.severity}\nStatus: ${item.status}\nAssigned To: ${item.assignedTo}\nDescription: ${item.description}\nDetection Date: ${item.detectionDate}\nProgress: ${item.progress}%`);
+            }
+        }
+
+        function editItem(itemId) {
+            showAlert(`Edit functionality for ${itemId} would open a detailed edit form`);
+        }
+
+        // Export functions
+        function exportData(format) {
+            const department = document.getElementById('department').value || 'IT Security Operations';
+            
+            let content = `FreshFlow System Corporation - Security Dashboard Export\n`;
+            content += `Department: ${department}\n`;
+            content += `Export Date: ${new Date().toLocaleDateString()}\n\n`;
+            content += `Ticket ID,Category,Severity,Status,Assigned To,Detection Date,Progress,Description\n`;
+
+            securityItems.forEach(item => {
+                content += `${item.id},${item.category},${item.severity},${item.status},"${item.assignedTo}",${item.detectionDate},${item.progress}%,"${item.description}"\n`;
+            });
+
+            downloadFile(content, `FreshFlow_Security_Dashboard_${format.toUpperCase()}.csv`, 'text/csv');
+            showNotification(`Data exported as ${format.toUpperCase()} successfully`, 'success');
+        }
+
+        function generateReport() {
+            const department = document.getElementById('department').value || 'IT Security Operations';
+            const metrics = calculateMetrics();
+            
+            let report = `FreshFlow System Corporation - Security Status Report\n`;
+            report += `Department: ${department}\n`;
+            report += `Generated: ${new Date().toLocaleDateString()}\n\n`;
+            report += `Executive Summary:\n`;
+            report += `Total Security Items: ${metrics.total}\n`;
+            report += `Open Items: ${metrics.open}\n`;
+            report += `Under Investigation: ${metrics.investigating}\n`;
+            report += `Resolved Items: ${metrics.resolved}\n`;
+            report += `Critical Severity Items: ${metrics.critical}\n`;
+            report += `Average Resolution Time: ${metrics.avgResolutionTime} days\n\n`;
+            
+            report += `Detailed Security Items:\n`;
+            securityItems.forEach(item => {
+                report += `\n${item.id} - ${item.category.toUpperCase()}\n`;
+                report += `Severity: ${item.severity} | Status: ${item.status}\n`;
+                report += `Assigned To: ${item.assignedTo} | Detection: ${item.detectionDate}\n`;
+                report += `Progress: ${item.progress}%\n`;
+                report += `Description: ${item.description}\n`;
+                report += `---\n`;
+            });
+
+            downloadFile(report, `FreshFlow_Security_Report.txt`, 'text/plain');
+            showNotification('Security report generated successfully', 'success');
+        }
+
+        // Utility functions
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function showAlert(message) {
+            alert(message + ' - This functionality would be fully implemented in a production environment.');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('addModal');
+            if (event.target === modal) {
+                closeAddModal();
+            }
+        }
+
+        // Initialize when DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
