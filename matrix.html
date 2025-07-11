@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshFlow Systems - Access Control Matrix</title>
+    <title>FreshFlow Systems - Interactive Access Control Matrix Training</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -30,6 +30,206 @@
             color: black;
             margin: 10px 0;
             font-size: 1.1em;
+        }
+        
+        .mode-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: 2px solid green;
+            background-color: white;
+            color: green;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background-color: green;
+            color: white;
+        }
+        
+        .mode-btn:hover {
+            background-color: #006600;
+            color: white;
+        }
+        
+        .training-panel {
+            display: none;
+            background-color: #f9f9f9;
+            border: 2px solid green;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .training-panel.active {
+            display: block;
+        }
+        
+        .task-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .task-progress {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-dot.completed {
+            background-color: green;
+            color: white;
+        }
+        
+        .progress-dot.current {
+            background-color: #32CD32;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .task-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .task-title {
+            color: green;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .task-difficulty {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .difficulty-beginner {
+            background-color: #90EE90;
+            color: black;
+        }
+        
+        .difficulty-intermediate {
+            background-color: #FFA500;
+            color: white;
+        }
+        
+        .difficulty-advanced {
+            background-color: #FF4500;
+            color: white;
+        }
+        
+        .task-objectives {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-left: 4px solid green;
+            margin: 15px 0;
+        }
+        
+        .task-steps {
+            margin: 15px 0;
+        }
+        
+        .task-steps ol {
+            padding-left: 20px;
+        }
+        
+        .task-steps li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .validation-area {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+        
+        .validation-btn {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .validation-btn:hover {
+            background-color: #006600;
+        }
+        
+        .hint-btn {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .hint-content {
+            display: none;
+            background-color: #FFF8DC;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            border-left: 4px solid #FFA500;
+        }
+        
+        .result-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .result-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
         
         .controls {
@@ -144,6 +344,17 @@
             color: white;
         }
         
+        .highlighted-cell {
+            animation: pulse 1s infinite;
+            border: 3px solid #FF4500 !important;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         .legend {
             margin-top: 20px;
             display: flex;
@@ -214,107 +425,412 @@
         .dept-qc { background-color: #FF69B4; color: white; }
         .dept-maintenance { background-color: #8B4513; color: white; }
         .dept-support { background-color: #708090; color: white; }
+        
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: green;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .score-display.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <div class="score-display" id="scoreDisplay">
+        Training Score: <span id="currentScore">0</span>/10
+    </div>
+
     <div class="header">
         <h1>FreshFlow Systems</h1>
-        <p>Interactive Access Control Matrix</p>
-        <p>IT/OT Convergence Security Management</p>
+        <p>Interactive Access Control Matrix Training Platform</p>
+        <p>Master IT/OT Convergence Security Management</p>
     </div>
 
-    <div class="filter-section">
-        <div class="controls">
-            <div class="control-group">
-                <label for="departmentFilter">Filter by Department:</label>
-                <select id="departmentFilter">
-                    <option value="all">All Departments</option>
-                    <option value="Executive">Executive</option>
-                    <option value="IT">IT/Cybersecurity</option>
-                    <option value="R&D">R&D</option>
-                    <option value="Packaging">Packaging/Production</option>
-                    <option value="Warehouse">Warehouse</option>
-                    <option value="QC">Quality Control</option>
-                    <option value="Maintenance">Maintenance & OT</option>
-                    <option value="Support">General Support</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label for="facilityFilter">Filter by Facility:</label>
-                <select id="facilityFilter">
-                    <option value="all">All Facilities</option>
-                    <option value="headquarters">Headquarters</option>
-                    <option value="packaging">Packaging Facility</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <button onclick="exportMatrix()">Export Matrix</button>
-                <button onclick="resetMatrix()">Reset All</button>
-                <button onclick="generateReport()">Security Report</button>
+    <div class="mode-selector">
+        <button class="mode-btn active" onclick="switchMode('matrix')">Matrix Mode</button>
+        <button class="mode-btn" onclick="switchMode('training')">Training Mode</button>
+    </div>
+
+    <div id="trainingPanel" class="training-panel">
+        <div class="task-navigation">
+            <h2>Cybersecurity Training: Access Control Matrix Mastery</h2>
+            <div class="task-progress" id="taskProgress">
+                <!-- Progress dots will be populated by JavaScript -->
             </div>
         </div>
-    </div>
-
-    <div class="matrix-container">
-        <table class="matrix-table" id="accessMatrix">
-            <thead>
-                <tr>
-                    <th>Employee / Role</th>
-                    <th>ERP System</th>
-                    <th>CRM System</th>
-                    <th>Strategic Dashboard</th>
-                    <th>Active Directory</th>
-                    <th>Firewall</th>
-                    <th>GitLab</th>
-                    <th>R&D Server</th>
-                    <th>Email System</th>
-                    <th>HMI Systems</th>
-                    <th>Label Scanner</th>
-                    <th>PLCs</th>
-                    <th>Edge Gateway</th>
-                    <th>SCADA System</th>
-                    <th>WMS</th>
-                    <th>RFID System</th>
-                    <th>Shipping Dashboard</th>
-                    <th>Security Cameras</th>
-                    <th>Building Access</th>
-                    <th>Network Monitoring</th>
-                </tr>
-            </thead>
-            <tbody id="matrixBody">
-                <!-- Matrix rows will be populated by JavaScript -->
-            </tbody>
-        </table>
-    </div>
-
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-color permission-none"></div>
-            <span>None - No Access</span>
+        
+        <div id="taskContent" class="task-content">
+            <!-- Task content will be populated by JavaScript -->
         </div>
-        <div class="legend-item">
-            <div class="legend-color permission-read"></div>
-            <span>Read - View Only</span>
+        
+        <div class="validation-area">
+            <button class="validation-btn" onclick="validateCurrentTask()">Validate Task</button>
+            <button class="hint-btn" onclick="toggleHint()">Show Hint</button>
+            <div id="hintContent" class="hint-content"></div>
+            <div id="resultMessage" class="result-message" style="display: none;"></div>
         </div>
-        <div class="legend-item">
-            <div class="legend-color permission-write"></div>
-            <span>Write - Read/Write</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color permission-control"></div>
-            <span>Control - Operational Control</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color permission-admin"></div>
-            <span>Admin - Full Administrative</span>
+        
+        <div class="task-navigation">
+            <button onclick="previousTask()" id="prevBtn">← Previous Task</button>
+            <button onclick="nextTask()" id="nextBtn">Next Task →</button>
         </div>
     </div>
 
-    <div class="stats" id="statsContainer">
-        <!-- Statistics will be populated by JavaScript -->
+    <div id="matrixPanel">
+        <div class="filter-section">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="departmentFilter">Filter by Department:</label>
+                    <select id="departmentFilter">
+                        <option value="all">All Departments</option>
+                        <option value="Executive">Executive</option>
+                        <option value="IT">IT/Cybersecurity</option>
+                        <option value="R&D">R&D</option>
+                        <option value="Packaging">Packaging/Production</option>
+                        <option value="Warehouse">Warehouse</option>
+                        <option value="QC">Quality Control</option>
+                        <option value="Maintenance">Maintenance & OT</option>
+                        <option value="Support">General Support</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="facilityFilter">Filter by Facility:</label>
+                    <select id="facilityFilter">
+                        <option value="all">All Facilities</option>
+                        <option value="headquarters">Headquarters</option>
+                        <option value="packaging">Packaging Facility</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button onclick="exportMatrix()">Export Matrix</button>
+                    <button onclick="resetMatrix()">Reset All</button>
+                    <button onclick="generateReport()">Security Report</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <table class="matrix-table" id="accessMatrix">
+                <thead>
+                    <tr>
+                        <th>Employee / Role</th>
+                        <th>ERP System</th>
+                        <th>CRM System</th>
+                        <th>Strategic Dashboard</th>
+                        <th>Active Directory</th>
+                        <th>Firewall</th>
+                        <th>GitLab</th>
+                        <th>R&D Server</th>
+                        <th>Email System</th>
+                        <th>HMI Systems</th>
+                        <th>Label Scanner</th>
+                        <th>PLCs</th>
+                        <th>Edge Gateway</th>
+                        <th>SCADA System</th>
+                        <th>WMS</th>
+                        <th>RFID System</th>
+                        <th>Shipping Dashboard</th>
+                        <th>Security Cameras</th>
+                        <th>Building Access</th>
+                        <th>Network Monitoring</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody">
+                    <!-- Matrix rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color permission-none"></div>
+                <span>None - No Access</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-read"></div>
+                <span>Read - View Only</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-write"></div>
+                <span>Write - Read/Write</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-control"></div>
+                <span>Control - Operational Control</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-admin"></div>
+                <span>Admin - Full Administrative</span>
+            </div>
+        </div>
+
+        <div class="stats" id="statsContainer">
+            <!-- Statistics will be populated by JavaScript -->
+        </div>
     </div>
 
     <script>
+        // Training data and state
+        let currentMode = 'matrix';
+        let currentTask = 0;
+        let completedTasks = new Set();
+        let trainingScore = 0;
+
+        // Training tasks definition
+        const trainingTasks = [
+            {
+                title: "Understanding Access Control Fundamentals",
+                difficulty: "beginner",
+                objectives: [
+                    "Understand the purpose of an access control matrix",
+                    "Identify the five permission levels",
+                    "Navigate the matrix interface"
+                ],
+                description: "Welcome to the FreshFlow Systems Access Control Matrix! This task introduces you to the fundamental concepts of access control in an IT/OT converged environment.",
+                steps: [
+                    "Click on the Matrix Mode button to view the access control matrix",
+                    "Examine the matrix structure: employees (rows) vs. systems (columns)",
+                    "Click on any permission cell to cycle through the five permission levels",
+                    "Use the legend to understand what each color represents",
+                    "Check the statistics panel to see the current state of access permissions"
+                ],
+                validation: () => {
+                    // Check if user has interacted with at least 3 different cells
+                    const changedCells = document.querySelectorAll('.permission-cell').length;
+                    return changedCells > 0; // Simple validation for first task
+                },
+                hint: "Start by clicking on different cells in the matrix to see how permissions change. Notice how the colors and text update as you cycle through None → Read → Write → Control → Admin."
+            },
+            {
+                title: "Implementing Least Privilege Principle",
+                difficulty: "beginner",
+                objectives: [
+                    "Apply the principle of least privilege",
+                    "Minimize unnecessary access rights",
+                    "Understand role-based access control"
+                ],
+                description: "The principle of least privilege states that users should only have the minimum access necessary to perform their job functions. You'll apply this principle to reduce security risks.",
+                steps: [
+                    "Filter the matrix to show only 'General Support' department employees",
+                    "Review the current permissions for Paul Nguyen (Receptionist)",
+                    "Remove any unnecessary administrative or control permissions",
+                    "Ensure Paul only has 'Read' access to Email System and 'None' for critical systems",
+                    "Apply the same principle to other support staff"
+                ],
+                validation: () => {
+                    const paulEmail = accessMatrix["Paul Nguyen"] && accessMatrix["Paul Nguyen"]["Email System"];
+                    const paulPLC = accessMatrix["Paul Nguyen"] && accessMatrix["Paul Nguyen"]["PLCs"];
+                    const paulSCADA = accessMatrix["Paul Nguyen"] && accessMatrix["Paul Nguyen"]["SCADA System"];
+                    return paulEmail === "read" && (paulPLC === "none" || !paulPLC) && (paulSCADA === "none" || !paulSCADA);
+                },
+                hint: "Use the department filter to focus on General Support. A receptionist should have minimal system access - typically just email for communication. Remove any access to industrial control systems."
+            },
+            {
+                title: "OT Security: Protecting Industrial Control Systems",
+                difficulty: "intermediate",
+                objectives: [
+                    "Understand OT vs IT security requirements",
+                    "Properly configure PLC and SCADA access",
+                    "Implement operational safety controls"
+                ],
+                description: "Operational Technology (OT) systems like PLCs and SCADA require special security considerations due to their impact on physical processes and safety.",
+                steps: [
+                    "Filter to show 'Maintenance & OT' department employees",
+                    "Review Chen Liu (PLC Technician) - should have 'Admin' access to PLCs",
+                    "Review Kevin Patel (HMI Specialist) - should have 'Control' access to HMI Systems",
+                    "Ensure Regina Moore (OT Systems Engineer) has 'Admin' access to PLCs, SCADA, and Edge Gateway",
+                    "Verify that non-OT personnel have limited or no access to these critical systems"
+                ],
+                validation: () => {
+                    const chenPLC = accessMatrix["Chen Liu"] && accessMatrix["Chen Liu"]["PLCs"];
+                    const kevinHMI = accessMatrix["Kevin Patel"] && accessMatrix["Kevin Patel"]["HMI Systems"];
+                    const reginaSCADA = accessMatrix["Regina Moore"] && accessMatrix["Regina Moore"]["SCADA System"];
+                    return chenPLC === "admin" && kevinHMI === "control" && reginaSCADA === "admin";
+                },
+                hint: "OT systems control physical processes and require specialized access. Only qualified maintenance and engineering personnel should have administrative access to PLCs and SCADA systems."
+            },
+            {
+                title: "Segregation of Duties Implementation",
+                difficulty: "intermediate",
+                objectives: [
+                    "Understand segregation of duties principle",
+                    "Prevent single points of failure",
+                    "Implement checks and balances"
+                ],
+                description: "Segregation of duties prevents any single individual from having complete control over critical processes, reducing the risk of fraud and errors.",
+                steps: [
+                    "Review the CEO (Carla Jennings) current permissions",
+                    "Ensure the CEO has strategic visibility but not operational control of OT systems",
+                    "Set CEO's access to PLCs and SCADA as 'Read' only",
+                    "Verify Network Administrator (Jason Trujillo) has 'Admin' on IT systems but 'None' on OT systems",
+                    "Check that financial systems (ERP) have separation between users and administrators"
+                ],
+                validation: () => {
+                    const ceoPLC = accessMatrix["Carla Jennings"] && accessMatrix["Carla Jennings"]["PLCs"];
+                    const ceoSCADA = accessMatrix["Carla Jennings"] && accessMatrix["Carla Jennings"]["SCADA System"];
+                    const jasonPLC = accessMatrix["Jason Trujillo"] && accessMatrix["Jason Trujillo"]["PLCs"];
+                    return ceoPLC === "read" && ceoSCADA === "read" && jasonPLC === "none";
+                },
+                hint: "Even executives should not have direct control over operational systems. IT administrators should not have access to OT systems without proper training and authorization."
+            },
+            {
+                title: "Incident Response: Compromised Account Scenario",
+                difficulty: "intermediate",
+                objectives: [
+                    "Respond to a security incident",
+                    "Implement emergency access controls",
+                    "Minimize damage from compromised accounts"
+                ],
+                description: "SCENARIO: Derek Yoon's account in R&D has been compromised. As the incident response team, you need to immediately restrict access while maintaining operational continuity.",
+                steps: [
+                    "Locate Derek Yoon (Data Scientist) in the matrix",
+                    "Immediately revoke all of Derek's administrative permissions",
+                    "Set Derek's access to GitLab and R&D Server to 'None' (emergency lockout)",
+                    "Maintain 'Read' access to Email System for communication during investigation",
+                    "Document the changes by checking the updated statistics"
+                ],
+                validation: () => {
+                    const derekGitLab = accessMatrix["Derek Yoon"] && accessMatrix["Derek Yoon"]["GitLab"];
+                    const derekRD = accessMatrix["Derek Yoon"] && accessMatrix["Derek Yoon"]["R&D Server"];
+                    const derekEmail = accessMatrix["Derek Yoon"] && accessMatrix["Derek Yoon"]["Email System"];
+                    return derekGitLab === "none" && derekRD === "none" && derekEmail === "read";
+                },
+                hint: "In a compromise scenario, immediately revoke access to sensitive systems while maintaining minimal communication access for investigation purposes."
+            },
+            {
+                title: "Quality Control Access Management",
+                difficulty: "beginner",
+                objectives: [
+                    "Configure quality control permissions",
+                    "Ensure traceability and compliance",
+                    "Balance operational needs with security"
+                ],
+                description: "Quality control personnel need specific access to monitoring and inspection systems while maintaining data integrity for compliance purposes.",
+                steps: [
+                    "Filter to show 'QC' department employees",
+                    "Set Ronetta Bell (QC Manager) to have 'Write' access to Strategic Dashboard",
+                    "Configure Xavier Holmes (QC Analyst) to have 'Read' access to HMI Systems for monitoring",
+                    "Ensure Mia Alvarez (Documentation Specialist) has 'Write' access to Email System",
+                    "Verify all QC staff have 'Read' access to relevant production systems"
+                ],
+                validation: () => {
+                    const ronettaDash = accessMatrix["Ronetta Bell"] && accessMatrix["Ronetta Bell"]["Strategic Dashboard"];
+                    const xavierHMI = accessMatrix["Xavier Holmes"] && accessMatrix["Xavier Holmes"]["HMI Systems"];
+                    const miaEmail = accessMatrix["Mia Alvarez"] && accessMatrix["Mia Alvarez"]["Email System"];
+                    return ronettaDash === "write" && xavierHMI === "read" && miaEmail === "write";
+                },
+                hint: "QC personnel need to monitor production systems for quality assurance but should not have control over production processes."
+            },
+            {
+                title: "IT Administrator Security Review",
+                difficulty: "advanced",
+                objectives: [
+                    "Audit administrative access",
+                    "Implement security best practices",
+                    "Configure monitoring and oversight"
+                ],
+                description: "As CISO Victor Santos, you need to review and configure appropriate access for all IT personnel while ensuring proper oversight and monitoring.",
+                steps: [
+                    "Review Victor Santos (Cybersecurity Analyst) permissions - should have 'Read' access to ALL systems for audit purposes",
+                    "Configure Jason Trujillo (Network Admin) with 'Admin' access to Firewall and Active Directory",
+                    "Set Priya Nair (Systems Analyst) to 'Write' access on ERP System and 'Read' on others",
+                    "Ensure Michelle Donovan (Help Desk) has limited access appropriate for support role",
+                    "Verify all IT staff have 'Admin' access to Network Monitoring"
+                ],
+                validation: () => {
+                    const victorPLC = accessMatrix["Victor Santos"] && accessMatrix["Victor Santos"]["PLCs"];
+                    const jasonAD = accessMatrix["Jason Trujillo"] && accessMatrix["Jason Trujillo"]["Active Directory"];
+                    const priyaERP = accessMatrix["Priya Nair"] && accessMatrix["Priya Nair"]["ERP System"];
+                    return victorPLC === "read" && jasonAD === "admin" && priyaERP === "write";
+                },
+                hint: "The CISO needs audit access to all systems. Network administrators need full control of infrastructure systems but limited access to OT systems."
+            },
+            {
+                title: "Production Line Security Configuration",
+                difficulty: "intermediate",
+                objectives: [
+                    "Configure production personnel access",
+                    "Implement operational controls",
+                    "Ensure production continuity"
+                ],
+                description: "Production personnel need appropriate access to manufacturing systems while maintaining security and preventing unauthorized changes to critical processes.",
+                steps: [
+                    "Filter to show 'Packaging' department at the packaging facility",
+                    "Set Alan Gutierrez (Shift Supervisor) to 'Control' access on HMI Systems",
+                    "Configure Line Operators (Tonya Blake, Eric Schultz, Nathan Rhodes) with 'Read' access to HMI Systems",
+                    "Set Jamie Lin (Label Machine Operator) to 'Control' access on Label Scanner",
+                    "Ensure QA Technician (Andrea Lopez) has 'Control' access to HMI and Label Scanner"
+                ],
+                validation: () => {
+                    const alanHMI = accessMatrix["Alan Gutierrez"] && accessMatrix["Alan Gutierrez"]["HMI Systems"];
+                    const tonyaHMI = accessMatrix["Tonya Blake"] && accessMatrix["Tonya Blake"]["HMI Systems"];
+                    const jamieLabel = accessMatrix["Jamie Lin"] && accessMatrix["Jamie Lin"]["Label Scanner"];
+                    return alanHMI === "control" && tonyaHMI === "read" && jamieLabel === "control";
+                },
+                hint: "Supervisors need control access for adjustments, operators need read access for monitoring, and machine operators need control over their specific equipment."
+            },
+            {
+                title: "Executive Dashboard and Reporting Access",
+                difficulty: "beginner",
+                objectives: [
+                    "Configure executive visibility",
+                    "Implement business intelligence access",
+                    "Maintain strategic oversight"
+                ],
+                description: "Executive staff need appropriate access to strategic information and dashboards while maintaining separation from operational controls.",
+                steps: [
+                    "Filter to show 'Executive' department employees",
+                    "Ensure Carla Jennings (CEO) has 'Admin' access to Strategic Dashboard",
+                    "Set Marcus Lee (COO) to 'Write' access on Strategic Dashboard and 'Read' on SCADA for operational oversight",
+                    "Configure Elaine Harper (Finance Director) with 'Admin' access to ERP System",
+                    "Set James Olmstead (HR Manager) to 'Write' access on Email System and 'Read' on Building Access"
+                ],
+                validation: () => {
+                    const carlaDash = accessMatrix["Carla Jennings"] && accessMatrix["Carla Jennings"]["Strategic Dashboard"];
+                    const marcusOp = accessMatrix["Marcus Lee"] && accessMatrix["Marcus Lee"]["SCADA System"];
+                    const elaineERP = accessMatrix["Elaine Harper"] && accessMatrix["Elaine Harper"]["ERP System"];
+                    return carlaDash === "admin" && marcusOp === "read" && elaineERP === "admin";
+                },
+                hint: "Executives need strategic visibility and business system access but should have limited direct control over operational technology."
+            },
+            {
+                title: "Comprehensive Security Assessment",
+                difficulty: "advanced",
+                objectives: [
+                    "Conduct complete access review",
+                    "Identify security vulnerabilities",
+                    "Generate compliance report"
+                ],
+                description: "Perform a comprehensive security assessment of the entire access control matrix, identifying potential risks and ensuring compliance with cybersecurity best practices.",
+                steps: [
+                    "Review the current Risk Score in the statistics panel",
+                    "Identify any employees with excessive administrative privileges",
+                    "Ensure no non-IT personnel have 'Admin' access to IT infrastructure systems",
+                    "Verify OT systems are only accessible to qualified maintenance personnel",
+                    "Generate a security report to document your findings",
+                    "Aim for a Risk Score below 80 to demonstrate proper access control"
+                ],
+                validation: () => {
+                    const stats = calculateStatistics();
+                    // Check that risk score is reasonable and OT access is properly controlled
+                    const otSystemAccess = stats.otSystemAccess;
+                    const adminAccess = stats.adminAccess;
+                    return stats.riskScore <= 80 && otSystemAccess <= 15 && adminAccess <= 25;
+                },
+                hint: "Look for patterns of excessive access. Use the export and report functions to analyze the current state. Focus on reducing unnecessary administrative privileges and OT system exposure."
+            }
+        ];
+
+        // Employee and system data (same as before)
         const employees = [
             // Executive & Admin (6) - Headquarters
             { name: "Carla Jennings", role: "CEO", department: "Executive", facility: "headquarters" },
@@ -387,7 +903,149 @@
         const permissionLevels = ["none", "read", "write", "control", "admin"];
         let accessMatrix = {};
 
-        // Initialize access matrix with default permissions
+        // Training functions
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide panels
+            if (mode === 'training') {
+                document.getElementById('trainingPanel').classList.add('active');
+                document.getElementById('scoreDisplay').classList.add('show');
+                updateTaskDisplay();
+            } else {
+                document.getElementById('trainingPanel').classList.remove('active');
+                document.getElementById('scoreDisplay').classList.remove('show');
+                clearHighlights();
+            }
+        }
+
+        function updateTaskDisplay() {
+            const task = trainingTasks[currentTask];
+            const content = document.getElementById('taskContent');
+            
+            content.innerHTML = `
+                <div class="task-title">${task.title}</div>
+                <div class="task-difficulty difficulty-${task.difficulty}">
+                    ${task.difficulty.toUpperCase()}
+                </div>
+                <div class="task-objectives">
+                    <strong>Learning Objectives:</strong>
+                    <ul>
+                        ${task.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                    </ul>
+                </div>
+                <p><strong>Description:</strong> ${task.description}</p>
+                <div class="task-steps">
+                    <strong>Steps to Complete:</strong>
+                    <ol>
+                        ${task.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+            `;
+            
+            // Update progress dots
+            updateProgressDots();
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = currentTask > 0 ? 'inline-block' : 'none';
+            document.getElementById('nextBtn').style.display = currentTask < trainingTasks.length - 1 ? 'inline-block' : 'none';
+            
+            // Update hint content
+            document.getElementById('hintContent').innerHTML = `<strong>Hint:</strong> ${task.hint}`;
+            document.getElementById('hintContent').style.display = 'none';
+            
+            // Clear previous result
+            document.getElementById('resultMessage').style.display = 'none';
+        }
+
+        function updateProgressDots() {
+            const progressContainer = document.getElementById('taskProgress');
+            progressContainer.innerHTML = '';
+            
+            trainingTasks.forEach((task, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                dot.textContent = index + 1;
+                
+                if (completedTasks.has(index)) {
+                    dot.classList.add('completed');
+                }
+                if (index === currentTask) {
+                    dot.classList.add('current');
+                }
+                
+                dot.onclick = () => {
+                    currentTask = index;
+                    updateTaskDisplay();
+                };
+                
+                progressContainer.appendChild(dot);
+            });
+        }
+
+        function validateCurrentTask() {
+            const task = trainingTasks[currentTask];
+            const isValid = task.validation();
+            const resultElement = document.getElementById('resultMessage');
+            
+            if (isValid) {
+                completedTasks.add(currentTask);
+                trainingScore = completedTasks.size;
+                
+                resultElement.className = 'result-message result-success';
+                resultElement.textContent = '✓ Task completed successfully! Well done!';
+                resultElement.style.display = 'block';
+                
+                updateProgressDots();
+                document.getElementById('currentScore').textContent = trainingScore;
+                
+                // Auto-advance after a delay
+                setTimeout(() => {
+                    if (currentTask < trainingTasks.length - 1) {
+                        nextTask();
+                    }
+                }, 1500);
+            } else {
+                resultElement.className = 'result-message result-error';
+                resultElement.textContent = '✗ Task not yet complete. Please review the requirements and try again.';
+                resultElement.style.display = 'block';
+            }
+        }
+
+        function toggleHint() {
+            const hintElement = document.getElementById('hintContent');
+            hintElement.style.display = hintElement.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function nextTask() {
+            if (currentTask < trainingTasks.length - 1) {
+                currentTask++;
+                updateTaskDisplay();
+                clearHighlights();
+            }
+        }
+
+        function previousTask() {
+            if (currentTask > 0) {
+                currentTask--;
+                updateTaskDisplay();
+                clearHighlights();
+            }
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.highlighted-cell').forEach(cell => {
+                cell.classList.remove('highlighted-cell');
+            });
+        }
+
+        // Initialize access matrix with default permissions (same as before)
         function initializeMatrix() {
             employees.forEach(employee => {
                 accessMatrix[employee.name] = {};
@@ -397,7 +1055,7 @@
             });
         }
 
-        // Define default permissions based on roles
+        // Define default permissions based on roles (same as before)
         function getDefaultPermission(employee, system) {
             const role = employee.role;
             const dept = employee.department;
@@ -462,7 +1120,7 @@
             return "none";
         }
 
-        // Create matrix table
+        // Create matrix table (enhanced for training)
         function createMatrix() {
             const tbody = document.getElementById('matrixBody');
             tbody.innerHTML = '';
@@ -499,7 +1157,7 @@
             updateStatistics();
         }
 
-        // Filter employees based on selected criteria
+        // Filter employees based on selected criteria (same as before)
         function filterEmployees() {
             const deptFilter = document.getElementById('departmentFilter').value;
             const facilityFilter = document.getElementById('facilityFilter').value;
@@ -511,7 +1169,7 @@
             });
         }
 
-        // Update permission cell appearance
+        // Update permission cell appearance (same as before)
         function updatePermissionCell(cell, permission) {
             cell.className = `permission-cell permission-${permission}`;
             
@@ -526,7 +1184,7 @@
             cell.textContent = displayText[permission];
         }
 
-        // Cycle through permission levels
+        // Cycle through permission levels (same as before)
         function cyclePermission(employeeName, system, cell) {
             const currentPermission = accessMatrix[employeeName][system];
             const currentIndex = permissionLevels.indexOf(currentPermission);
@@ -538,7 +1196,7 @@
             updateStatistics();
         }
 
-        // Update statistics
+        // Update statistics (same as before)
         function updateStatistics() {
             const stats = calculateStatistics();
             const container = document.getElementById('statsContainer');
@@ -571,7 +1229,7 @@
             `;
         }
 
-        // Calculate statistics
+        // Calculate statistics (same as before)
         function calculateStatistics() {
             const totalUsers = employees.length;
             const totalSystems = systems.length;
@@ -603,7 +1261,7 @@
             };
         }
 
-        // Export matrix to CSV
+        // Export matrix to CSV (same as before)
         function exportMatrix() {
             let csv = "Employee,Role,Department,Facility," + systems.join(",") + "\n";
             
@@ -630,7 +1288,7 @@
             a.click();
         }
 
-        // Reset matrix to defaults
+        // Reset matrix to defaults (same as before)
         function resetMatrix() {
             if (confirm('Are you sure you want to reset all permissions to defaults?')) {
                 initializeMatrix();
@@ -638,9 +1296,11 @@
             }
         }
 
-        // Generate security report
+        // Generate security report (enhanced for training)
         function generateReport() {
             const stats = calculateStatistics();
+            const completionRate = Math.round((completedTasks.size / trainingTasks.length) * 100);
+            
             const report = `
 FRESHFLOW SYSTEMS - ACCESS CONTROL MATRIX SECURITY REPORT
 Generated: ${new Date().toLocaleString()}
@@ -649,6 +1309,7 @@ EXECUTIVE SUMMARY:
 - Total Users: ${stats.totalUsers}
 - Total Systems: ${stats.totalSystems}
 - Risk Score: ${stats.riskScore}/100
+- Training Completion: ${completionRate}% (${completedTasks.size}/${trainingTasks.length} tasks)
 
 KEY METRICS:
 - Administrative Access Grants: ${stats.adminAccess}
@@ -656,34 +1317,40 @@ KEY METRICS:
 - Restricted Access Entries: ${stats.noAccess}
 
 COMPLIANCE STATUS:
-- NIST Cybersecurity Framework: Under Review
-- Segregation of Duties: Implemented
-- Least Privilege Principle: ${stats.riskScore > 80 ? 'Needs Attention' : 'Compliant'}
+- NIST Cybersecurity Framework: ${stats.riskScore <= 80 ? 'Compliant' : 'Needs Review'}
+- Segregation of Duties: ${stats.adminAccess <= 25 ? 'Implemented' : 'Requires Attention'}
+- Least Privilege Principle: ${stats.riskScore <= 70 ? 'Compliant' : 'Needs Improvement'}
+
+TRAINING ASSESSMENT:
+- Completed Tasks: ${Array.from(completedTasks).map(i => trainingTasks[i].title).join(', ')}
+- Proficiency Level: ${completionRate >= 80 ? 'Expert' : completionRate >= 60 ? 'Proficient' : 'Developing'}
 
 RECOMMENDATIONS:
 1. Regular access reviews quarterly
 2. Multi-factor authentication for OT systems
 3. Enhanced monitoring for administrative accounts
 4. Cross-training for OT personnel access
+5. ${completionRate < 100 ? 'Complete remaining training modules' : 'Advanced training in incident response'}
 
-This report should be reviewed by the CISO and IT management team.
+This report demonstrates understanding of access control principles in IT/OT converged environments.
             `;
             
             const blob = new Blob([report], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'freshflow_security_report.txt';
+            a.download = 'freshflow_training_report.txt';
             a.click();
         }
 
-        // Event listeners
+        // Event listeners (same as before)
         document.getElementById('departmentFilter').addEventListener('change', createMatrix);
         document.getElementById('facilityFilter').addEventListener('change', createMatrix);
 
         // Initialize the application
         initializeMatrix();
         createMatrix();
+        updateTaskDisplay();
     </script>
 </body>
 </html>
