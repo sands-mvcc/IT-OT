@@ -681,11 +681,279 @@ def threshold_servo_control():
                     <div class="explanation">
                         <h3>Enhanced Python Features:</h3>
                         <ul>
-                            <li><strong>Signal Smoothing:</strong> Implements moving average filter to reduce sensor noise</li>
-                            <li><strong>Visual Feedback:</strong> ASCII bar graph shows force level in real-time</li>
-                            <li><strong>Threshold Control:</strong> Alternative implementation with discrete force levels</li>
-                            <li><strong>Calibration:</strong> Configurable force thresholds for different sensors</li>
-                            <li><strong>Error Handling:</strong> Robust constrain function prevents servo damage</li>
+                            <li><strong>Data Logging:</strong> Automatic temperature logging with timestamps</li>
+                            <li><strong>Multiple Sensors:</strong> Support for both analog (LM35) and digital (DS18B20) sensors</li>
+                            <li><strong>Session Summary:</strong> Statistics display when program ends</li>
+                            <li><strong>Visual Status:</strong> Real-time status indicators and formatted output</li>
+                            <li><strong>Configurable Alerts:</strong> Easy threshold adjustment for different applications</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Servo Actuator Lab -->
+            <section id="servo-actuator" class="lab-section">
+                <div class="lab-header">
+                    <h1>⚙️ Servo Actuator Lab</h1>
+                    <p>Micro:bit Servo Control with Button and Gesture Input</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="servo.png" alt="Servo Actuator Circuit Diagram" />
+                        <p><em>Micro:bit with Servo Motor Control</em></p>
+                    </div>
+
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original MicroPython Code (Micro:bit)</div>
+                            <div class="code-block arduino-code">
+def on_button_pressed_a():
+    pins.servo_write_pin(AnalogPin.P2, 45)
+    basic.show_leds("""
+        . . . . #
+        . . . # .
+        . . # . .
+        . # . . .
+        # . . . .
+        """)
+
+input.on_button_pressed(Button.A, on_button_pressed_a)
+
+def on_button_pressed_b():
+    pins.servo_write_pin(AnalogPin.P2, 90)
+    basic.show_leds("""
+        . . # . .
+        . . # . .
+        . . # . .
+        . . # . .
+        . . # . .
+        """)
+
+input.on_button_pressed(Button.B, on_button_pressed_b)
+
+def on_gesture_shake():
+    basic.pause(2000)
+    pins.servo_write_pin(AnalogPin.P2, 0)
+    basic.show_leds("""
+        . . . . .
+        . . . . .
+        # # # # #
+        . . . . .
+        . . . . .
+        """)
+
+input.on_gesture(Gesture.Shake, on_gesture_shake)
+                            </div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">
+import time
+import RPi.GPIO as GPIO
+from gpiozero import Servo, Button
+import threading
+import sys
+
+# Pin Configuration
+SERVO_PIN = 18
+BUTTON_A_PIN = 2
+BUTTON_B_PIN = 3
+SHAKE_BUTTON_PIN = 4  # Simulate shake with button
+
+# LED Matrix simulation (8x8 or use actual LED matrix)
+LED_PINS = [5, 6, 12, 13, 16, 19, 20, 21]  # Example pins for LED matrix
+
+# Setup components
+servo = Servo(SERVO_PIN)
+button_a = Button(BUTTON_A_PIN)
+button_b = Button(BUTTON_B_PIN)
+shake_button = Button(SHAKE_BUTTON_PIN)
+
+# LED matrix setup
+GPIO.setmode(GPIO.BCM)
+for pin in LED_PINS:
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
+
+# Current servo position
+current_position = 0
+
+def display_pattern(pattern):
+    """Display LED pattern (simplified for 8 LEDs)"""
+    for i, led_pin in enumerate(LED_PINS):
+        if i < len(pattern):
+            GPIO.output(led_pin, GPIO.HIGH if pattern[i] == 1 else GPIO.LOW)
+
+def clear_display():
+    """Clear all LEDs"""
+    for pin in LED_PINS:
+        GPIO.output(pin, GPIO.LOW)
+
+def servo_to_angle(angle):
+    """Convert angle to servo value (-1 to 1)"""
+    return (angle - 90) / 90.0
+
+def on_button_a_pressed():
+    """Handle button A press - 45 degrees"""
+    global current_position
+    print("Button A pressed - Moving to 45°")
+    current_position = 45
+    servo.value = servo_to_angle(45)
+    
+    # Display arrow pattern
+    arrow_pattern = [0, 0, 0, 1, 1, 1, 0, 0]  # Simplified arrow
+    display_pattern(arrow_pattern)
+    
+    time.sleep(0.5)
+    clear_display()
+
+def on_button_b_pressed():
+    """Handle button B press - 90 degrees"""
+    global current_position
+    print("Button B pressed - Moving to 90°")
+    current_position = 90
+    servo.value = servo_to_angle(90)
+    
+    # Display vertical line pattern
+    vertical_pattern = [0, 1, 0, 1, 0, 1, 0, 1]  # Simplified vertical line
+    display_pattern(vertical_pattern)
+    
+    time.sleep(0.5)
+    clear_display()
+
+def on_shake_detected():
+    """Handle shake gesture - 0 degrees"""
+    global current_position
+    print("Shake detected - Moving to 0°")
+    time.sleep(2)  # Pause like in original code
+    current_position = 0
+    servo.value = servo_to_angle(0)
+    
+    # Display horizontal line pattern
+    horizontal_pattern = [0, 0, 1, 1, 1, 1, 0, 0]  # Simplified horizontal line
+    display_pattern(horizontal_pattern)
+    
+    time.sleep(0.5)
+    clear_display()
+
+def display_status():
+    """Continuously display current status"""
+    while True:
+        print(f"Current servo position: {current_position}°")
+        time.sleep(2)
+
+# Assign button callbacks
+button_a.when_pressed = on_button_a_pressed
+button_b.when_pressed = on_button_b_pressed
+shake_button.when_pressed = on_shake_detected
+
+try:
+    print("Servo Control System")
+    print("Button A: 45°, Button B: 90°, Shake Button: 0°")
+    print("-" * 50)
+    
+    # Start status display thread
+    status_thread = threading.Thread(target=display_status, daemon=True)
+    status_thread.start()
+    
+    # Keep program running
+    while True:
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("\nProgram stopped")
+finally:
+    clear_display()
+    servo.close()
+    GPIO.cleanup()
+
+# Alternative with accelerometer for real shake detection
+"""
+import adafruit_adxl34x
+import board
+import busio
+
+# I2C setup for accelerometer
+i2c = busio.I2C(board.SCL, board.SDA)
+accelerometer = adafruit_adxl34x.ADXL345(i2c)
+
+def detect_shake():
+    threshold = 15.0  # Shake threshold
+    readings = []
+    
+    while True:
+        x, y, z = accelerometer.acceleration
+        magnitude = (x**2 + y**2 + z**2)**0.5
+        readings.append(magnitude)
+        
+        if len(readings) > 10:
+            readings.pop(0)
+            
+        if len(readings) == 10:
+            avg = sum(readings) / len(readings)
+            current = readings[-1]
+            
+            if abs(current - avg) > threshold:
+                on_shake_detected()
+                time.sleep(1)  # Prevent multiple detections
+                
+        time.sleep(0.1)
+
+# Start shake detection in separate thread
+shake_thread = threading.Thread(target=detect_shake, daemon=True)
+shake_thread.start()
+"""
+
+# Advanced servo control with smooth movement
+class SmoothServo:
+    def __init__(self, pin):
+        self.servo = Servo(pin)
+        self.current_angle = 90
+        self.target_angle = 90
+        
+    def move_to(self, angle, speed=2):
+        """Move to target angle with specified speed"""
+        self.target_angle = max(0, min(180, angle))
+        
+        while abs(self.current_angle - self.target_angle) > 1:
+            if self.current_angle < self.target_angle:
+                self.current_angle += speed
+            else:
+                self.current_angle -= speed
+                
+            self.servo.value = servo_to_angle(self.current_angle)
+            time.sleep(0.05)
+            
+        self.current_angle = self.target_angle
+
+# Usage with smooth servo
+"""
+smooth_servo = SmoothServo(SERVO_PIN)
+
+def smooth_button_a():
+    smooth_servo.move_to(45, speed=3)
+    
+def smooth_button_b():
+    smooth_servo.move_to(90, speed=2)
+    
+def smooth_shake():
+    time.sleep(2)
+    smooth_servo.move_to(0, speed=5)
+"""
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <h3>Advanced Python Implementation:</h3>
+                        <ul>
+                            <li><strong>Multi-threading:</strong> Separate threads for status display and sensor monitoring</li>
+                            <li><strong>LED Matrix Control:</strong> GPIO control for visual feedback display</li>
+                            <li><strong>Smooth Movement:</strong> Custom SmoothServo class for gradual position changes</li>
+                            <li><strong>Real Accelerometer:</strong> Optional ADXL345 integration for actual shake detection</li>
+                            <li><strong>Event-Driven Design:</strong> Callback functions for responsive button handling</li>
+                            <li><strong>Error Prevention:</strong> Angle constraints and proper resource cleanup</li>
                         </ul>
                     </div>
                 </div>
@@ -862,4 +1130,33 @@ finally:
     GPIO.cleanup()
     pygame.mixer.quit()
 
-# Alternative using DS18B20 digital temperature
+# Alternative using DS18B20 digital temperature sensor
+"""
+import os
+import glob
+
+# Enable 1-wire interface
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
+def read_ds18b20():
+    base_dir = '/sys/bus/w1/devices/'
+    device_folder = glob.glob(base_dir + '28*')[0]
+    device_file = device_folder + '/w1_slave'
+    
+    def read_temp_raw():
+        with open(device_file, 'r') as f:
+            lines = f.readlines()
+        return lines
+    
+    lines = read_temp_raw()
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.2)
+        lines = read_temp_raw()
+    
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = float(temp_string) / 1000.0
+        return temp_c
+"""
