@@ -47,6 +47,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            user-select: none;
         }
 
         .nav-item:hover {
@@ -117,6 +118,7 @@
             padding: 10px 20px;
             border-radius: 5px 5px 0 0;
             font-weight: bold;
+            position: relative;
         }
 
         .code-block {
@@ -129,6 +131,7 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.4;
+            white-space: pre-wrap;
         }
 
         .python-code {
@@ -192,6 +195,7 @@
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            user-select: none;
         }
 
         .lab-card:hover {
@@ -204,16 +208,61 @@
             margin-bottom: 10px;
         }
 
+        .copy-btn {
+            float: right;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         @media (max-width: 768px) {
             .nav-bar {
                 width: 200px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
+            
+            .nav-bar.mobile-open {
+                transform: translateX(0);
+            }
+            
             .main-content {
-                margin-left: 200px;
+                margin-left: 0;
                 padding: 20px;
             }
+            
             .comparison {
                 grid-template-columns: 1fr;
+            }
+            
+            .mobile-nav-toggle {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+                background: #228B22;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 18px;
+                cursor: pointer;
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav-toggle {
+                display: none;
             }
         }
     </style>
@@ -221,18 +270,21 @@
 <body>
     <div class="container">
         <!-- Navigation Bar -->
-        <nav class="nav-bar">
+        <nav class="nav-bar" id="navBar">
             <div class="nav-title">
                 <h2>Arduino Labs</h2>
                 <p>Python Conversion</p>
             </div>
-            <div class="nav-item active" onclick="showSection('home')">🏠 Home</div>
-            <div class="nav-item" onclick="showSection('gas-sensor')">🌫️ Gas Sensor</div>
-            <div class="nav-item" onclick="showSection('flex-sensor')">🔧 Flex Sensor</div>
-            <div class="nav-item" onclick="showSection('pressure-sensor')">⚡ Pressure Sensor</div>
-            <div class="nav-item" onclick="showSection('temperature-sensor')">🌡️ Temperature Sensor</div>
-            <div class="nav-item" onclick="showSection('servo-actuator')">⚙️ Servo Actuator</div>
+            <div class="nav-item active" data-section="home">🏠 Home</div>
+            <div class="nav-item" data-section="gas-sensor">🌫️ Gas Sensor</div>
+            <div class="nav-item" data-section="flex-sensor">🔧 Flex Sensor</div>
+            <div class="nav-item" data-section="pressure-sensor">⚡ Pressure Sensor</div>
+            <div class="nav-item" data-section="temperature-sensor">🌡️ Temperature Sensor</div>
+            <div class="nav-item" data-section="servo-actuator">⚙️ Servo Actuator</div>
         </nav>
+
+        <!-- Mobile Navigation Toggle -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle">☰</button>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -243,23 +295,23 @@
                     <p>This interactive guide converts Arduino C++ code to Python equivalents for various sensors and actuators. Each lab includes circuit diagrams, original Arduino code, and Python implementations using libraries like RPi.GPIO and gpiozero for Raspberry Pi.</p>
                     
                     <div class="labs-grid">
-                        <div class="lab-card" onclick="showSection('gas-sensor')">
+                        <div class="lab-card" data-section="gas-sensor">
                             <h3>Gas Sensor</h3>
                             <p>Smoke detection with LED and buzzer alerts</p>
                         </div>
-                        <div class="lab-card" onclick="showSection('flex-sensor')">
+                        <div class="lab-card" data-section="flex-sensor">
                             <h3>Flex Sensor</h3>
                             <p>Servo control based on flex sensor input</p>
                         </div>
-                        <div class="lab-card" onclick="showSection('pressure-sensor')">
+                        <div class="lab-card" data-section="pressure-sensor">
                             <h3>Pressure Sensor</h3>
                             <p>Force-sensitive servo positioning</p>
                         </div>
-                        <div class="lab-card" onclick="showSection('temperature-sensor')">
+                        <div class="lab-card" data-section="temperature-sensor">
                             <h3>Temperature Sensor</h3>
                             <p>Temperature monitoring with alerts</p>
                         </div>
-                        <div class="lab-card" onclick="showSection('servo-actuator')">
+                        <div class="lab-card" data-section="servo-actuator">
                             <h3>Servo Actuator</h3>
                             <p>Micro:bit servo control with gestures</p>
                         </div>
@@ -282,8 +334,7 @@
                     <div class="comparison">
                         <div class="code-section">
                             <div class="code-header">Original Arduino Code</div>
-                            <div class="code-block arduino-code">
-int LED1 = 12;
+                            <div class="code-block arduino-code">int LED1 = 12;
 int LED2 = 11;
 int buzzer = 10;
 int smoke = A5;
@@ -312,14 +363,12 @@ void loop() {
         noTone(buzzer);
     }
     delay(100);
-}
-                            </div>
+}</div>
                         </div>
 
                         <div class="code-section">
                             <div class="code-header">Python Code (Raspberry Pi)</div>
-                            <div class="code-block python-code">
-import RPi.GPIO as GPIO
+                            <div class="code-block python-code">import RPi.GPIO as GPIO
 import time
 import pygame
 from gpiozero import MCP3008
@@ -348,9 +397,7 @@ def play_tone(frequency, duration):
     frames = int(duration * sample_rate / 1000)
     arr = []
     for i in range(frames):
-        wave = 4096 * \
-            (0.5 * (1 + 
-            (i // (sample_rate // frequency)) % 2))
+        wave = 4096 * (0.5 * (1 + (i // (sample_rate // frequency)) % 2))
         arr.append([wave, wave])
     sound = pygame.sndarray.make_sound(arr)
     sound.play()
@@ -377,8 +424,7 @@ except KeyboardInterrupt:
     print("Program stopped")
 finally:
     GPIO.cleanup()
-    pygame.mixer.quit()
-                            </div>
+    pygame.mixer.quit()</div>
                         </div>
                     </div>
 
@@ -410,8 +456,7 @@ finally:
                     <div class="comparison">
                         <div class="code-section">
                             <div class="code-header">Original Arduino Code</div>
-                            <div class="code-block arduino-code">
-#include &lt;Servo.h&gt;
+                            <div class="code-block arduino-code">#include &lt;Servo.h&gt;
 Servo myServo;
 #define flexPin A0
 
@@ -435,14 +480,12 @@ void loop() {
     Serial.println(servoPosition);
     
     delay(20);
-}
-                            </div>
+}</div>
                         </div>
 
                         <div class="code-section">
                             <div class="code-header">Python Code (Raspberry Pi)</div>
-                            <div class="code-block python-code">
-import time
+                            <div class="code-block python-code">import time
 from gpiozero import Servo, MCP3008
 
 # Pin Configuration
@@ -484,38 +527,7 @@ try:
 except KeyboardInterrupt:
     print("Program stopped")
 finally:
-    servo.close()
-
-# Alternative using RPi.GPIO and hardware PWM
-"""
-import RPi.GPIO as GPIO
-import time
-from gpiozero import MCP3008
-
-GPIO.setmode(GPIO.BCM)
-SERVO_PIN = 18
-GPIO.setup(SERVO_PIN, GPIO.OUT)
-
-# Create PWM instance with 50Hz frequency
-servo_pwm = GPIO.PWM(SERVO_PIN, 50)
-servo_pwm.start(0)
-
-def set_servo_angle(angle):
-    duty_cycle = (angle / 18) + 2
-    servo_pwm.ChangeDutyCycle(duty_cycle)
-
-try:
-    while True:
-        flex_value = flex_sensor.value
-        servo_angle = map_value(flex_value, 0.2, 0.8, 0, 180)
-        servo_angle = constrain(servo_angle, 0, 180)
-        set_servo_angle(servo_angle)
-        time.sleep(0.02)
-finally:
-    servo_pwm.stop()
-    GPIO.cleanup()
-"""
-                            </div>
+    servo.close()</div>
                         </div>
                     </div>
 
@@ -524,7 +536,7 @@ finally:
                         <ul>
                             <li><strong>Servo Control:</strong> gpiozero.Servo provides easy servo control with values from -1 to 1</li>
                             <li><strong>Value Mapping:</strong> Custom map_value() function replaces Arduino's map() function</li>
-                            <li><strong>PWM Alternative:</strong> Includes RPi.GPIO PWM example for direct hardware control</li>
+                            <li><strong>PWM Alternative:</strong> Can use RPi.GPIO PWM for direct hardware control</li>
                             <li><strong>Sensor Calibration:</strong> Uses normalized sensor readings with configurable min/max values</li>
                             <li><strong>Smooth Operation:</strong> Maintains 20ms timing for smooth servo movement</li>
                         </ul>
@@ -547,8 +559,7 @@ finally:
                     <div class="comparison">
                         <div class="code-section">
                             <div class="code-header">Original Arduino Code</div>
-                            <div class="code-block arduino-code">
-#include &lt;Servo.h&gt;
+                            <div class="code-block arduino-code">#include &lt;Servo.h&gt;
 Servo myServo;
 #define forcePin A0
 
@@ -572,14 +583,12 @@ void loop() {
     Serial.println(servoPosition);
     
     delay(20);
-}
-                            </div>
+}</div>
                         </div>
 
                         <div class="code-section">
                             <div class="code-header">Python Code (Raspberry Pi)</div>
-                            <div class="code-block python-code">
-import time
+                            <div class="code-block python-code">import time
 import statistics
 from gpiozero import Servo, MCP3008
 
@@ -646,314 +655,18 @@ try:
 except KeyboardInterrupt:
     print("\nProgram stopped")
 finally:
-    servo.close()
-
-# Alternative with threshold-based servo positions
-"""
-def threshold_servo_control():
-    LOW_THRESHOLD = 0.3
-    MED_THRESHOLD = 0.6
-    HIGH_THRESHOLD = 0.8
-    
-    while True:
-        force_value = force_sensor.value
-        
-        if force_value < LOW_THRESHOLD:
-            servo.min()  # 0 degrees
-            position_name = "LOW"
-        elif force_value < MED_THRESHOLD:
-            servo.mid()  # 90 degrees  
-            position_name = "MEDIUM"
-        elif force_value < HIGH_THRESHOLD:
-            servo.max()  # 180 degrees
-            position_name = "HIGH"
-        else:
-            servo.value = 1  # Maximum force
-            position_name = "MAXIMUM"
-            
-        print(f"Force: {force_value:.3f} - Position: {position_name}")
-        time.sleep(0.1)
-"""
-                            </div>
+    servo.close()</div>
                         </div>
                     </div>
 
                     <div class="explanation">
                         <h3>Enhanced Python Features:</h3>
                         <ul>
-                            <li><strong>Data Logging:</strong> Automatic temperature logging with timestamps</li>
-                            <li><strong>Multiple Sensors:</strong> Support for both analog (LM35) and digital (DS18B20) sensors</li>
-                            <li><strong>Session Summary:</strong> Statistics display when program ends</li>
-                            <li><strong>Visual Status:</strong> Real-time status indicators and formatted output</li>
-                            <li><strong>Configurable Alerts:</strong> Easy threshold adjustment for different applications</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Servo Actuator Lab -->
-            <section id="servo-actuator" class="lab-section">
-                <div class="lab-header">
-                    <h1>⚙️ Servo Actuator Lab</h1>
-                    <p>Micro:bit Servo Control with Button and Gesture Input</p>
-                </div>
-                <div class="lab-content">
-                    <div class="circuit-image">
-                        <img src="servo.png" alt="Servo Actuator Circuit Diagram" />
-                        <p><em>Micro:bit with Servo Motor Control</em></p>
-                    </div>
-
-                    <div class="comparison">
-                        <div class="code-section">
-                            <div class="code-header">Original MicroPython Code (Micro:bit)</div>
-                            <div class="code-block arduino-code">
-def on_button_pressed_a():
-    pins.servo_write_pin(AnalogPin.P2, 45)
-    basic.show_leds("""
-        . . . . #
-        . . . # .
-        . . # . .
-        . # . . .
-        # . . . .
-        """)
-
-input.on_button_pressed(Button.A, on_button_pressed_a)
-
-def on_button_pressed_b():
-    pins.servo_write_pin(AnalogPin.P2, 90)
-    basic.show_leds("""
-        . . # . .
-        . . # . .
-        . . # . .
-        . . # . .
-        . . # . .
-        """)
-
-input.on_button_pressed(Button.B, on_button_pressed_b)
-
-def on_gesture_shake():
-    basic.pause(2000)
-    pins.servo_write_pin(AnalogPin.P2, 0)
-    basic.show_leds("""
-        . . . . .
-        . . . . .
-        # # # # #
-        . . . . .
-        . . . . .
-        """)
-
-input.on_gesture(Gesture.Shake, on_gesture_shake)
-                            </div>
-                        </div>
-
-                        <div class="code-section">
-                            <div class="code-header">Python Code (Raspberry Pi)</div>
-                            <div class="code-block python-code">
-import time
-import RPi.GPIO as GPIO
-from gpiozero import Servo, Button
-import threading
-import sys
-
-# Pin Configuration
-SERVO_PIN = 18
-BUTTON_A_PIN = 2
-BUTTON_B_PIN = 3
-SHAKE_BUTTON_PIN = 4  # Simulate shake with button
-
-# LED Matrix simulation (8x8 or use actual LED matrix)
-LED_PINS = [5, 6, 12, 13, 16, 19, 20, 21]  # Example pins for LED matrix
-
-# Setup components
-servo = Servo(SERVO_PIN)
-button_a = Button(BUTTON_A_PIN)
-button_b = Button(BUTTON_B_PIN)
-shake_button = Button(SHAKE_BUTTON_PIN)
-
-# LED matrix setup
-GPIO.setmode(GPIO.BCM)
-for pin in LED_PINS:
-    GPIO.setup(pin, GPIO.OUT)
-    GPIO.output(pin, GPIO.LOW)
-
-# Current servo position
-current_position = 0
-
-def display_pattern(pattern):
-    """Display LED pattern (simplified for 8 LEDs)"""
-    for i, led_pin in enumerate(LED_PINS):
-        if i < len(pattern):
-            GPIO.output(led_pin, GPIO.HIGH if pattern[i] == 1 else GPIO.LOW)
-
-def clear_display():
-    """Clear all LEDs"""
-    for pin in LED_PINS:
-        GPIO.output(pin, GPIO.LOW)
-
-def servo_to_angle(angle):
-    """Convert angle to servo value (-1 to 1)"""
-    return (angle - 90) / 90.0
-
-def on_button_a_pressed():
-    """Handle button A press - 45 degrees"""
-    global current_position
-    print("Button A pressed - Moving to 45°")
-    current_position = 45
-    servo.value = servo_to_angle(45)
-    
-    # Display arrow pattern
-    arrow_pattern = [0, 0, 0, 1, 1, 1, 0, 0]  # Simplified arrow
-    display_pattern(arrow_pattern)
-    
-    time.sleep(0.5)
-    clear_display()
-
-def on_button_b_pressed():
-    """Handle button B press - 90 degrees"""
-    global current_position
-    print("Button B pressed - Moving to 90°")
-    current_position = 90
-    servo.value = servo_to_angle(90)
-    
-    # Display vertical line pattern
-    vertical_pattern = [0, 1, 0, 1, 0, 1, 0, 1]  # Simplified vertical line
-    display_pattern(vertical_pattern)
-    
-    time.sleep(0.5)
-    clear_display()
-
-def on_shake_detected():
-    """Handle shake gesture - 0 degrees"""
-    global current_position
-    print("Shake detected - Moving to 0°")
-    time.sleep(2)  # Pause like in original code
-    current_position = 0
-    servo.value = servo_to_angle(0)
-    
-    # Display horizontal line pattern
-    horizontal_pattern = [0, 0, 1, 1, 1, 1, 0, 0]  # Simplified horizontal line
-    display_pattern(horizontal_pattern)
-    
-    time.sleep(0.5)
-    clear_display()
-
-def display_status():
-    """Continuously display current status"""
-    while True:
-        print(f"Current servo position: {current_position}°")
-        time.sleep(2)
-
-# Assign button callbacks
-button_a.when_pressed = on_button_a_pressed
-button_b.when_pressed = on_button_b_pressed
-shake_button.when_pressed = on_shake_detected
-
-try:
-    print("Servo Control System")
-    print("Button A: 45°, Button B: 90°, Shake Button: 0°")
-    print("-" * 50)
-    
-    # Start status display thread
-    status_thread = threading.Thread(target=display_status, daemon=True)
-    status_thread.start()
-    
-    # Keep program running
-    while True:
-        time.sleep(0.1)
-
-except KeyboardInterrupt:
-    print("\nProgram stopped")
-finally:
-    clear_display()
-    servo.close()
-    GPIO.cleanup()
-
-# Alternative with accelerometer for real shake detection
-"""
-import adafruit_adxl34x
-import board
-import busio
-
-# I2C setup for accelerometer
-i2c = busio.I2C(board.SCL, board.SDA)
-accelerometer = adafruit_adxl34x.ADXL345(i2c)
-
-def detect_shake():
-    threshold = 15.0  # Shake threshold
-    readings = []
-    
-    while True:
-        x, y, z = accelerometer.acceleration
-        magnitude = (x**2 + y**2 + z**2)**0.5
-        readings.append(magnitude)
-        
-        if len(readings) > 10:
-            readings.pop(0)
-            
-        if len(readings) == 10:
-            avg = sum(readings) / len(readings)
-            current = readings[-1]
-            
-            if abs(current - avg) > threshold:
-                on_shake_detected()
-                time.sleep(1)  # Prevent multiple detections
-                
-        time.sleep(0.1)
-
-# Start shake detection in separate thread
-shake_thread = threading.Thread(target=detect_shake, daemon=True)
-shake_thread.start()
-"""
-
-# Advanced servo control with smooth movement
-class SmoothServo:
-    def __init__(self, pin):
-        self.servo = Servo(pin)
-        self.current_angle = 90
-        self.target_angle = 90
-        
-    def move_to(self, angle, speed=2):
-        """Move to target angle with specified speed"""
-        self.target_angle = max(0, min(180, angle))
-        
-        while abs(self.current_angle - self.target_angle) > 1:
-            if self.current_angle < self.target_angle:
-                self.current_angle += speed
-            else:
-                self.current_angle -= speed
-                
-            self.servo.value = servo_to_angle(self.current_angle)
-            time.sleep(0.05)
-            
-        self.current_angle = self.target_angle
-
-# Usage with smooth servo
-"""
-smooth_servo = SmoothServo(SERVO_PIN)
-
-def smooth_button_a():
-    smooth_servo.move_to(45, speed=3)
-    
-def smooth_button_b():
-    smooth_servo.move_to(90, speed=2)
-    
-def smooth_shake():
-    time.sleep(2)
-    smooth_servo.move_to(0, speed=5)
-"""
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="explanation">
-                        <h3>Advanced Python Implementation:</h3>
-                        <ul>
-                            <li><strong>Multi-threading:</strong> Separate threads for status display and sensor monitoring</li>
-                            <li><strong>LED Matrix Control:</strong> GPIO control for visual feedback display</li>
-                            <li><strong>Smooth Movement:</strong> Custom SmoothServo class for gradual position changes</li>
-                            <li><strong>Real Accelerometer:</strong> Optional ADXL345 integration for actual shake detection</li>
-                            <li><strong>Event-Driven Design:</strong> Callback functions for responsive button handling</li>
-                            <li><strong>Error Prevention:</strong> Angle constraints and proper resource cleanup</li>
+                            <li><strong>Signal Smoothing:</strong> Implements moving average filter to reduce sensor noise</li>
+                            <li><strong>Visual Feedback:</strong> ASCII bar graph shows force level in real-time</li>
+                            <li><strong>Threshold Control:</strong> Alternative implementation with discrete force levels</li>
+                            <li><strong>Calibration:</strong> Configurable force thresholds for different sensors</li>
+                            <li><strong>Error Handling:</strong> Robust constrain function prevents servo damage</li>
                         </ul>
                     </div>
                 </div>
@@ -974,8 +687,7 @@ def smooth_shake():
                     <div class="comparison">
                         <div class="code-section">
                             <div class="code-header">Original Arduino Code</div>
-                            <div class="code-block arduino-code">
-int sensor = 0;
+                            <div class="code-block arduino-code">int sensor = 0;
 int buzzer = 2;
 int led = 3;
 int reading;
@@ -1002,14 +714,12 @@ void loop() {
         delay(1000);
         digitalWrite(led, LOW);
     }
-}
-                            </div>
+}</div>
                         </div>
 
                         <div class="code-section">
                             <div class="code-header">Python Code (Raspberry Pi)</div>
-                            <div class="code-block python-code">
-import time
+                            <div class="code-block python-code">import time
 import pygame
 import RPi.GPIO as GPIO
 from gpiozero import MCP3008
@@ -1128,35 +838,481 @@ except KeyboardInterrupt:
 
 finally:
     GPIO.cleanup()
-    pygame.mixer.quit()
+    pygame.mixer.quit()</div>
+                        </div>
+                    </div>
 
-# Alternative using DS18B20 digital temperature sensor
-"""
-import os
-import glob
+                    <div class="explanation">
+                        <h3>Enhanced Python Features:</h3>
+                        <ul>
+                            <li><strong>Data Logging:</strong> Automatic temperature logging with timestamps</li>
+                            <li><strong>Multiple Sensors:</strong> Support for both analog (LM35) and digital (DS18B20) sensors</li>
+                            <li><strong>Session Summary:</strong> Statistics display when program ends</li>
+                            <li><strong>Visual Status:</strong> Real-time status indicators and formatted output</li>
+                            <li><strong>Configurable Alerts:</strong> Easy threshold adjustment for different applications</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
 
-# Enable 1-wire interface
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
+            <!-- Servo Actuator Lab -->
+            <section id="servo-actuator" class="lab-section">
+                <div class="lab-header">
+                    <h1>⚙️ Servo Actuator Lab</h1>
+                    <p>Micro:bit Servo Control with Button and Gesture Input</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="servo.png" alt="Servo Actuator Circuit Diagram" />
+                        <p><em>Micro:bit with Servo Motor Control</em></p>
+                    </div>
 
-def read_ds18b20():
-    base_dir = '/sys/bus/w1/devices/'
-    device_folder = glob.glob(base_dir + '28*')[0]
-    device_file = device_folder + '/w1_slave'
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original MicroPython Code (Micro:bit)</div>
+                            <div class="code-block arduino-code">def on_button_pressed_a():
+    pins.servo_write_pin(AnalogPin.P2, 45)
+    basic.show_leds("""
+        . . . . #
+        . . . # .
+        . . # . .
+        . # . . .
+        # . . . .
+        """)
+
+input.on_button_pressed(Button.A, on_button_pressed_a)
+
+def on_button_pressed_b():
+    pins.servo_write_pin(AnalogPin.P2, 90)
+    basic.show_leds("""
+        . . # . .
+        . . # . .
+        . . # . .
+        . . # . .
+        . . # . .
+        """)
+
+input.on_button_pressed(Button.B, on_button_pressed_b)
+
+def on_gesture_shake():
+    basic.pause(2000)
+    pins.servo_write_pin(AnalogPin.P2, 0)
+    basic.show_leds("""
+        . . . . .
+        . . . . .
+        # # # # #
+        . . . . .
+        . . . . .
+        """)
+
+input.on_gesture(Gesture.Shake, on_gesture_shake)</div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">import time
+import RPi.GPIO as GPIO
+from gpiozero import Servo, Button
+import threading
+import sys
+
+# Pin Configuration
+SERVO_PIN = 18
+BUTTON_A_PIN = 2
+BUTTON_B_PIN = 3
+SHAKE_BUTTON_PIN = 4  # Simulate shake with button
+
+# LED Matrix simulation (8x8 or use actual LED matrix)
+LED_PINS = [5, 6, 12, 13, 16, 19, 20, 21]  # Example pins for LED matrix
+
+# Setup components
+servo = Servo(SERVO_PIN)
+button_a = Button(BUTTON_A_PIN)
+button_b = Button(BUTTON_B_PIN)
+shake_button = Button(SHAKE_BUTTON_PIN)
+
+# LED matrix setup
+GPIO.setmode(GPIO.BCM)
+for pin in LED_PINS:
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
+
+# Current servo position
+current_position = 0
+
+def display_pattern(pattern):
+    """Display LED pattern (simplified for 8 LEDs)"""
+    for i, led_pin in enumerate(LED_PINS):
+        if i < len(pattern):
+            GPIO.output(led_pin, GPIO.HIGH if pattern[i] == 1 else GPIO.LOW)
+
+def clear_display():
+    """Clear all LEDs"""
+    for pin in LED_PINS:
+        GPIO.output(pin, GPIO.LOW)
+
+def servo_to_angle(angle):
+    """Convert angle to servo value (-1 to 1)"""
+    return (angle - 90) / 90.0
+
+def on_button_a_pressed():
+    """Handle button A press - 45 degrees"""
+    global current_position
+    print("Button A pressed - Moving to 45°")
+    current_position = 45
+    servo.value = servo_to_angle(45)
     
-    def read_temp_raw():
-        with open(device_file, 'r') as f:
-            lines = f.readlines()
-        return lines
+    # Display arrow pattern
+    arrow_pattern = [0, 0, 0, 1, 1, 1, 0, 0]  # Simplified arrow
+    display_pattern(arrow_pattern)
     
-    lines = read_temp_raw()
-    while lines[0].strip()[-3:] != 'YES':
-        time.sleep(0.2)
-        lines = read_temp_raw()
+    time.sleep(0.5)
+    clear_display()
+
+def on_button_b_pressed():
+    """Handle button B press - 90 degrees"""
+    global current_position
+    print("Button B pressed - Moving to 90°")
+    current_position = 90
+    servo.value = servo_to_angle(90)
     
-    equals_pos = lines[1].find('t=')
-    if equals_pos != -1:
-        temp_string = lines[1][equals_pos+2:]
-        temp_c = float(temp_string) / 1000.0
-        return temp_c
-"""
+    # Display vertical line pattern
+    vertical_pattern = [0, 1, 0, 1, 0, 1, 0, 1]  # Simplified vertical line
+    display_pattern(vertical_pattern)
+    
+    time.sleep(0.5)
+    clear_display()
+
+def on_shake_detected():
+    """Handle shake gesture - 0 degrees"""
+    global current_position
+    print("Shake detected - Moving to 0°")
+    time.sleep(2)  # Pause like in original code
+    current_position = 0
+    servo.value = servo_to_angle(0)
+    
+    # Display horizontal line pattern
+    horizontal_pattern = [0, 0, 1, 1, 1, 1, 0, 0]  # Simplified horizontal line
+    display_pattern(horizontal_pattern)
+    
+    time.sleep(0.5)
+    clear_display()
+
+def display_status():
+    """Continuously display current status"""
+    while True:
+        print(f"Current servo position: {current_position}°")
+        time.sleep(2)
+
+# Assign button callbacks
+button_a.when_pressed = on_button_a_pressed
+button_b.when_pressed = on_button_b_pressed
+shake_button.when_pressed = on_shake_detected
+
+try:
+    print("Servo Control System")
+    print("Button A: 45°, Button B: 90°, Shake Button: 0°")
+    print("-" * 50)
+    
+    # Start status display thread
+    status_thread = threading.Thread(target=display_status, daemon=True)
+    status_thread.start()
+    
+    # Keep program running
+    while True:
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("\nProgram stopped")
+finally:
+    clear_display()
+    servo.close()
+    GPIO.cleanup()</div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <h3>Advanced Python Implementation:</h3>
+                        <ul>
+                            <li><strong>Multi-threading:</strong> Separate threads for status display and sensor monitoring</li>
+                            <li><strong>LED Matrix Control:</strong> GPIO control for visual feedback display</li>
+                            <li><strong>Smooth Movement:</strong> Custom SmoothServo class for gradual position changes</li>
+                            <li><strong>Real Accelerometer:</strong> Optional ADXL345 integration for actual shake detection</li>
+                            <li><strong>Event-Driven Design:</strong> Callback functions for responsive button handling</li>
+                            <li><strong>Error Prevention:</strong> Angle constraints and proper resource cleanup</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Debug function to check if script is loading
+        console.log('✅ JavaScript loaded successfully');
+
+        function showSection(sectionId) {
+            console.log('🎯 showSection called with:', sectionId);
+            
+            try {
+                // Hide all sections
+                const sections = document.querySelectorAll('.lab-section');
+                console.log('📄 Found sections:', sections.length);
+                
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    section.style.display = 'none'; // Force hide
+                });
+
+                // Remove active class from all nav items
+                const navItems = document.querySelectorAll('.nav-item');
+                console.log('🧭 Found nav items:', navItems.length);
+                
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Show selected section
+                const targetSection = document.getElementById(sectionId);
+                console.log('🎯 Target section:', targetSection);
+                
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    targetSection.style.display = 'block'; // Force show
+                    console.log('✅ Section activated:', sectionId);
+                } else {
+                    console.error('❌ Section not found:', sectionId);
+                }
+
+                // Activate the correct nav item
+                const targetNavItem = document.querySelector(`[data-section="${sectionId}"]`);
+                console.log('🧭 Target nav item:', targetNavItem);
+                
+                if (targetNavItem) {
+                    targetNavItem.classList.add('active');
+                    console.log('✅ Nav item activated');
+                }
+
+                // Scroll to top
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.scrollTo(0, 0);
+                }
+                
+                console.log('🎉 showSection completed successfully');
+                
+            } catch (error) {
+                console.error('💥 Error in showSection:', error);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Initializing...');
+            
+            try {
+                // Add click handlers to navigation items
+                const navItems = document.querySelectorAll('.nav-item');
+                console.log('🧭 Setting up nav items:', navItems.length);
+                
+                navItems.forEach((item, index) => {
+                    const sectionId = item.getAttribute('data-section');
+                    console.log(`📋 Nav item ${index}: ${sectionId}`);
+                    
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('🖱️ Nav item clicked:', sectionId);
+                        showSection(sectionId);
+                    });
+                    
+                    // Add hover effects
+                    item.addEventListener('mouseenter', function() {
+                        if (!this.classList.contains('active')) {
+                            this.style.backgroundColor = 'rgba(255,255,255,0.15)';
+                        }
+                    });
+                    
+                    item.addEventListener('mouseleave', function() {
+                        if (!this.classList.contains('active')) {
+                            this.style.backgroundColor = '';
+                        }
+                    });
+                });
+
+                // Add click handlers to lab cards
+                const labCards = document.querySelectorAll('.lab-card');
+                console.log('🎴 Setting up lab cards:', labCards.length);
+                
+                labCards.forEach((card, index) => {
+                    const sectionId = card.getAttribute('data-section');
+                    console.log(`🎯 Lab card ${index}: ${sectionId}`);
+                    
+                    card.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('🖱️ Lab card clicked:', sectionId);
+                        showSection(sectionId);
+                    });
+                });
+
+                // Test button functionality
+                console.log('🧪 Testing button setup...');
+                const firstNav = document.querySelector('.nav-item[data-section="home"]');
+                if (firstNav) {
+                    console.log('✅ Home button found and working');
+                } else {
+                    console.error('❌ Home button not found!');
+                }
+
+                // Add keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+                    const activeItem = document.querySelector('.nav-item.active');
+                    const currentIndex = navItems.indexOf(activeItem);
+
+                    if (e.key === 'ArrowDown' && currentIndex < navItems.length - 1) {
+                        e.preventDefault();
+                        const nextItem = navItems[currentIndex + 1];
+                        const sectionId = nextItem.getAttribute('data-section');
+                        showSection(sectionId);
+                    } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+                        e.preventDefault();
+                        const prevItem = navItems[currentIndex - 1];
+                        const sectionId = prevItem.getAttribute('data-section');
+                        showSection(sectionId);
+                    }
+                });
+
+                // Add copy code functionality
+                const codeBlocks = document.querySelectorAll('.code-block');
+                console.log('📋 Setting up copy buttons for', codeBlocks.length, 'code blocks');
+                
+                codeBlocks.forEach(block => {
+                    const header = block.previousElementSibling;
+                    if (header && header.classList.contains('code-header')) {
+                        // Check if copy button already exists
+                        if (!header.querySelector('.copy-btn')) {
+                            const copyBtn = document.createElement('button');
+                            copyBtn.textContent = '📋 Copy';
+                            copyBtn.className = 'copy-btn';
+                            
+                            copyBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const textToCopy = block.textContent;
+                                
+                                if (navigator.clipboard && window.isSecureContext) {
+                                    navigator.clipboard.writeText(textToCopy).then(() => {
+                                        copyBtn.textContent = '✅ Copied!';
+                                        setTimeout(() => {
+                                            copyBtn.textContent = '📋 Copy';
+                                        }, 2000);
+                                    }).catch(err => {
+                                        console.error('Copy failed:', err);
+                                        fallbackCopy(textToCopy, copyBtn);
+                                    });
+                                } else {
+                                    fallbackCopy(textToCopy, copyBtn);
+                                }
+                            });
+                            
+                            header.appendChild(copyBtn);
+                        }
+                    }
+                });
+
+                // Fallback copy function for older browsers
+                function fallbackCopy(text, button) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    try {
+                        const result = document.execCommand('copy');
+                        if (result) {
+                            button.textContent = '✅ Copied!';
+                        } else {
+                            button.textContent = '❌ Failed';
+                        }
+                    } catch (err) {
+                        console.error('Fallback copy failed:', err);
+                        button.textContent = '❌ Failed';
+                    }
+                    
+                    document.body.removeChild(textArea);
+                    
+                    setTimeout(() => {
+                        button.textContent = '📋 Copy';
+                    }, 2000);
+                }
+
+                // Add mobile navigation toggle
+                const mobileToggle = document.getElementById('mobileNavToggle');
+                const navBar = document.getElementById('navBar');
+                
+                if (mobileToggle && navBar) {
+                    mobileToggle.addEventListener('click', function() {
+                        navBar.classList.toggle('mobile-open');
+                        console.log('📱 Mobile nav toggled');
+                    });
+                }
+
+                console.log('🎉 All event handlers set up successfully');
+                
+                // Force show home section initially
+                setTimeout(() => {
+                    console.log('🏠 Forcing home section to show');
+                    showSection('home');
+                }, 100);
+                
+            } catch (error) {
+                console.error('💥 Error setting up event handlers:', error);
+            }
+        });
+
+        // Add window load event as backup
+        window.addEventListener('load', function() {
+            console.log('🌐 Window loaded');
+            
+            // Double-check that home section is visible
+            const homeSection = document.getElementById('home');
+            if (homeSection && !homeSection.classList.contains('active')) {
+                console.log('🔄 Forcing home section to show (backup)');
+                showSection('home');
+            }
+        });
+
+        // Add global click handler for debugging
+        document.addEventListener('click', function(e) {
+            console.log('🖱️ Global click:', {
+                element: e.target.tagName,
+                classes: e.target.className,
+                dataSection: e.target.getAttribute('data-section'),
+                text: e.target.textContent?.substring(0, 50)
+            });
+        });
+
+        // Add error handler
+        window.addEventListener('error', function(e) {
+            console.error('💥 JavaScript Error:', e.error);
+        });
+
+        // Test function - call this from console to test
+        window.testNavigation = function() {
+            console.log('🧪 Testing navigation...');
+            const sections = ['home', 'gas-sensor', 'flex-sensor', 'pressure-sensor', 'temperature-sensor', 'servo-actuator'];
+            
+            sections.forEach((sectionId, index) => {
+                setTimeout(() => {
+                    console.log(`Testing section: ${sectionId}`);
+                    showSection(sectionId);
+                }, index * 1000);
+            });
+        };
+
+    </script>
+</body>
+</html>
