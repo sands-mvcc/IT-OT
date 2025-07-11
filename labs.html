@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Labs - Python Conversion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            width: 250px;
+            background-color: #228B22;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-title {
+            text-align: center;
+            padding: 0 20px 30px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255,255,255,0.2);
+            border-left: 4px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            flex: 1;
+        }
+
+        .lab-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .lab-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lab-header {
+            background-color: #228B22;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+        }
+
+        .lab-content {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .circuit-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .circuit-image img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #228B22;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .code-section {
+            margin: 30px 0;
+        }
+
+        .code-header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .python-code {
+            color: #2d5016;
+        }
+
+        .arduino-code {
+            color: #0066cc;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .explanation {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-left: 4px solid #228B22;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .explanation h3 {
+            color: #228B22;
+            margin-bottom: 10px;
+        }
+
+        .home-section {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .home-section h1 {
+            color: #228B22;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .home-section p {
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #555;
+        }
+
+        .labs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .lab-card {
+            background-color: #f8f9fa;
+            border: 2px solid #228B22;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(34, 139, 34, 0.2);
+        }
+
+        .lab-card h3 {
+            color: #228B22;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="nav-bar">
+            <div class="nav-title">
+                <h2>Arduino Labs</h2>
+                <p>Python Conversion</p>
+            </div>
+            <div class="nav-item active" onclick="showSection('home')">🏠 Home</div>
+            <div class="nav-item" onclick="showSection('gas-sensor')">🌫️ Gas Sensor</div>
+            <div class="nav-item" onclick="showSection('flex-sensor')">🔧 Flex Sensor</div>
+            <div class="nav-item" onclick="showSection('pressure-sensor')">⚡ Pressure Sensor</div>
+            <div class="nav-item" onclick="showSection('temperature-sensor')">🌡️ Temperature Sensor</div>
+            <div class="nav-item" onclick="showSection('servo-actuator')">⚙️ Servo Actuator</div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Section -->
+            <section id="home" class="lab-section active">
+                <div class="home-section">
+                    <h1>Arduino to Python Lab Conversion</h1>
+                    <p>This interactive guide converts Arduino C++ code to Python equivalents for various sensors and actuators. Each lab includes circuit diagrams, original Arduino code, and Python implementations using libraries like RPi.GPIO and gpiozero for Raspberry Pi.</p>
+                    
+                    <div class="labs-grid">
+                        <div class="lab-card" onclick="showSection('gas-sensor')">
+                            <h3>Gas Sensor</h3>
+                            <p>Smoke detection with LED and buzzer alerts</p>
+                        </div>
+                        <div class="lab-card" onclick="showSection('flex-sensor')">
+                            <h3>Flex Sensor</h3>
+                            <p>Servo control based on flex sensor input</p>
+                        </div>
+                        <div class="lab-card" onclick="showSection('pressure-sensor')">
+                            <h3>Pressure Sensor</h3>
+                            <p>Force-sensitive servo positioning</p>
+                        </div>
+                        <div class="lab-card" onclick="showSection('temperature-sensor')">
+                            <h3>Temperature Sensor</h3>
+                            <p>Temperature monitoring with alerts</p>
+                        </div>
+                        <div class="lab-card" onclick="showSection('servo-actuator')">
+                            <h3>Servo Actuator</h3>
+                            <p>Micro:bit servo control with gestures</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gas Sensor Lab -->
+            <section id="gas-sensor" class="lab-section">
+                <div class="lab-header">
+                    <h1>🌫️ Gas Sensor Lab</h1>
+                    <p>Smoke/Gas Detection System with Visual and Audio Alerts</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="gas.png" alt="Gas Sensor Circuit Diagram" />
+                        <p><em>Gas Sensor Circuit Configuration</em></p>
+                    </div>
+
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original Arduino Code</div>
+                            <div class="code-block arduino-code">
+int LED1 = 12;
+int LED2 = 11;
+int buzzer = 10;
+int smoke = A5;
+int sensorThreshold = 500;
+
+void setup() {
+    pinMode(LED1, OUTPUT);
+    pinMode(LED2, OUTPUT);
+    pinMode(buzzer, OUTPUT);
+    pinMode(smoke, INPUT);
+    Serial.begin(9600);
+}
+
+void loop() {
+    int analogSensor = analogRead(smoke);
+    Serial.print("SENSOR: ");
+    Serial.println(analogSensor);
+    
+    if (analogSensor > sensorThreshold) {
+        digitalWrite(LED1, HIGH);
+        digitalWrite(LED2, LOW);
+        tone(buzzer, 1000, 350);
+    } else {
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        noTone(buzzer);
+    }
+    delay(100);
+}
+                            </div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">
+import RPi.GPIO as GPIO
+import time
+import pygame
+from gpiozero import MCP3008
+
+# Pin Configuration
+LED1 = 18
+LED2 = 19
+BUZZER = 20
+SENSOR_THRESHOLD = 0.5  # Normalized value (0-1)
+
+# Setup
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED1, GPIO.OUT)
+GPIO.setup(LED2, GPIO.OUT)
+GPIO.setup(BUZZER, GPIO.OUT)
+
+# Initialize ADC for analog sensor
+smoke_sensor = MCP3008(channel=0)
+
+# Initialize pygame for buzzer sound
+pygame.mixer.init()
+
+def play_tone(frequency, duration):
+    """Generate a tone using pygame"""
+    sample_rate = 22050
+    frames = int(duration * sample_rate / 1000)
+    arr = []
+    for i in range(frames):
+        wave = 4096 * \
+            (0.5 * (1 + 
+            (i // (sample_rate // frequency)) % 2))
+        arr.append([wave, wave])
+    sound = pygame.sndarray.make_sound(arr)
+    sound.play()
+
+try:
+    while True:
+        # Read analog sensor value (0.0 to 1.0)
+        sensor_value = smoke_sensor.value
+        print(f"SENSOR: {sensor_value:.3f}")
+        
+        if sensor_value > SENSOR_THRESHOLD:
+            # Gas detected - Alert mode
+            GPIO.output(LED1, GPIO.HIGH)
+            GPIO.output(LED2, GPIO.LOW)
+            play_tone(1000, 350)
+        else:
+            # Normal mode
+            GPIO.output(LED1, GPIO.LOW)
+            GPIO.output(LED2, GPIO.HIGH)
+            
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("Program stopped")
+finally:
+    GPIO.cleanup()
+    pygame.mixer.quit()
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <h3>Key Differences in Python Implementation:</h3>
+                        <ul>
+                            <li><strong>GPIO Library:</strong> Uses RPi.GPIO for pin control instead of Arduino's digitalWrite</li>
+                            <li><strong>Analog Input:</strong> Requires MCP3008 ADC chip since Raspberry Pi lacks built-in ADC</li>
+                            <li><strong>Sound Generation:</strong> Uses pygame library to generate tones instead of Arduino's tone() function</li>
+                            <li><strong>Normalized Values:</strong> Sensor readings are normalized (0.0-1.0) rather than raw ADC values</li>
+                            <li><strong>Exception Handling:</strong> Includes proper cleanup for GPIO pins and resources</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Flex Sensor Lab -->
+            <section id="flex-sensor" class="lab-section">
+                <div class="lab-header">
+                    <h1>🔧 Flex Sensor Lab</h1>
+                    <p>Servo Motor Control Based on Flex Sensor Input</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="flex.png" alt="Flex Sensor Circuit Diagram" />
+                        <p><em>Flex Sensor with Servo Motor Configuration</em></p>
+                    </div>
+
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original Arduino Code</div>
+                            <div class="code-block arduino-code">
+#include &lt;Servo.h&gt;
+Servo myServo;
+#define flexPin A0
+
+void setup() {
+    myServo.attach(3);
+    Serial.begin(9600);
+}
+
+void loop() {
+    int flexValue;
+    int servoPosition;
+    
+    flexValue = analogRead(flexPin);
+    servoPosition = map(flexValue, 770, 950, 0, 180);
+    servoPosition = constrain(servoPosition, 0, 180);
+    myServo.write(servoPosition);
+    
+    Serial.print("sensor =");
+    Serial.println(flexValue);
+    Serial.print("servo =");
+    Serial.println(servoPosition);
+    
+    delay(20);
+}
+                            </div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">
+import time
+from gpiozero import Servo, MCP3008
+
+# Pin Configuration
+SERVO_PIN = 18
+FLEX_MIN = 0.2  # Minimum flex sensor reading
+FLEX_MAX = 0.8  # Maximum flex sensor reading
+
+# Setup components
+servo = Servo(SERVO_PIN)
+flex_sensor = MCP3008(channel=0)
+
+def map_value(value, in_min, in_max, out_min, out_max):
+    """Map a value from one range to another"""
+    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+def constrain(value, min_val, max_val):
+    """Constrain value within specified range"""
+    return max(min_val, min(max_val, value))
+
+try:
+    while True:
+        # Read flex sensor value (0.0 to 1.0)
+        flex_value = flex_sensor.value
+        
+        # Map sensor value to servo position (-1 to 1 for gpiozero)
+        servo_position = map_value(flex_value, FLEX_MIN, FLEX_MAX, -1, 1)
+        servo_position = constrain(servo_position, -1, 1)
+        
+        # Set servo position
+        servo.value = servo_position
+        
+        # Convert to degrees for display (0-180)
+        servo_degrees = map_value(servo_position, -1, 1, 0, 180)
+        
+        print(f"Sensor: {flex_value:.3f}, Servo: {servo_degrees:.1f}°")
+        
+        time.sleep(0.02)  # 20ms delay
+
+except KeyboardInterrupt:
+    print("Program stopped")
+finally:
+    servo.close()
+
+# Alternative using RPi.GPIO and hardware PWM
+"""
+import RPi.GPIO as GPIO
+import time
+from gpiozero import MCP3008
+
+GPIO.setmode(GPIO.BCM)
+SERVO_PIN = 18
+GPIO.setup(SERVO_PIN, GPIO.OUT)
+
+# Create PWM instance with 50Hz frequency
+servo_pwm = GPIO.PWM(SERVO_PIN, 50)
+servo_pwm.start(0)
+
+def set_servo_angle(angle):
+    duty_cycle = (angle / 18) + 2
+    servo_pwm.ChangeDutyCycle(duty_cycle)
+
+try:
+    while True:
+        flex_value = flex_sensor.value
+        servo_angle = map_value(flex_value, 0.2, 0.8, 0, 180)
+        servo_angle = constrain(servo_angle, 0, 180)
+        set_servo_angle(servo_angle)
+        time.sleep(0.02)
+finally:
+    servo_pwm.stop()
+    GPIO.cleanup()
+"""
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <h3>Python Implementation Notes:</h3>
+                        <ul>
+                            <li><strong>Servo Control:</strong> gpiozero.Servo provides easy servo control with values from -1 to 1</li>
+                            <li><strong>Value Mapping:</strong> Custom map_value() function replaces Arduino's map() function</li>
+                            <li><strong>PWM Alternative:</strong> Includes RPi.GPIO PWM example for direct hardware control</li>
+                            <li><strong>Sensor Calibration:</strong> Uses normalized sensor readings with configurable min/max values</li>
+                            <li><strong>Smooth Operation:</strong> Maintains 20ms timing for smooth servo movement</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pressure Sensor Lab -->
+            <section id="pressure-sensor" class="lab-section">
+                <div class="lab-header">
+                    <h1>⚡ Pressure Force Sensor Lab</h1>
+                    <p>Force-Sensitive Servo Motor Positioning System</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="pressure.png" alt="Pressure Sensor Circuit Diagram" />
+                        <p><em>Pressure Force Sensor with Servo Motor</em></p>
+                    </div>
+
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original Arduino Code</div>
+                            <div class="code-block arduino-code">
+#include &lt;Servo.h&gt;
+Servo myServo;
+#define forcePin A0
+
+void setup() {
+    myServo.attach(3);
+    Serial.begin(9600);
+}
+
+void loop() {
+    int forceValue;
+    int servoPosition;
+    
+    forceValue = analogRead(forcePin);
+    servoPosition = map(forceValue, 770, 950, 0, 180);
+    servoPosition = constrain(servoPosition, 0, 180);
+    myServo.write(servoPosition);
+    
+    Serial.print("sensor =");
+    Serial.println(forceValue);
+    Serial.print("servo =");
+    Serial.println(servoPosition);
+    
+    delay(20);
+}
+                            </div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">
+import time
+import statistics
+from gpiozero import Servo, MCP3008
+
+# Pin Configuration
+SERVO_PIN = 18
+FORCE_MIN = 0.1  # Minimum force reading
+FORCE_MAX = 0.9  # Maximum force reading
+
+# Setup components
+servo = Servo(SERVO_PIN)
+force_sensor = MCP3008(channel=0)
+
+# Smoothing variables
+readings_buffer = []
+BUFFER_SIZE = 5
+
+def map_value(value, in_min, in_max, out_min, out_max):
+    """Map a value from one range to another"""
+    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+def constrain(value, min_val, max_val):
+    """Constrain value within specified range"""
+    return max(min_val, min(max_val, value))
+
+def smooth_reading(new_reading):
+    """Apply moving average smoothing to sensor readings"""
+    global readings_buffer
+    readings_buffer.append(new_reading)
+    if len(readings_buffer) > BUFFER_SIZE:
+        readings_buffer.pop(0)
+    return statistics.mean(readings_buffer)
+
+try:
+    print("Force Sensor to Servo Control")
+    print("Apply pressure to control servo position")
+    print("-" * 40)
+    
+    while True:
+        # Read force sensor value
+        raw_force = force_sensor.value
+        
+        # Apply smoothing
+        smooth_force = smooth_reading(raw_force)
+        
+        # Map force to servo position (-1 to 1)
+        servo_position = map_value(smooth_force, FORCE_MIN, FORCE_MAX, -1, 1)
+        servo_position = constrain(servo_position, -1, 1)
+        
+        # Set servo position
+        servo.value = servo_position
+        
+        # Convert to degrees for display
+        servo_degrees = map_value(servo_position, -1, 1, 0, 180)
+        
+        # Display force level as bar graph
+        force_percentage = constrain(smooth_force / FORCE_MAX * 100, 0, 100)
+        bar_length = int(force_percentage / 5)
+        force_bar = "█" * bar_length + "░" * (20 - bar_length)
+        
+        print(f"Force: {smooth_force:.3f} [{force_bar}] Servo: {servo_degrees:.1f}°")
+        
+        time.sleep(0.02)
+
+except KeyboardInterrupt:
+    print("\nProgram stopped")
+finally:
+    servo.close()
+
+# Alternative with threshold-based servo positions
+"""
+def threshold_servo_control():
+    LOW_THRESHOLD = 0.3
+    MED_THRESHOLD = 0.6
+    HIGH_THRESHOLD = 0.8
+    
+    while True:
+        force_value = force_sensor.value
+        
+        if force_value < LOW_THRESHOLD:
+            servo.min()  # 0 degrees
+            position_name = "LOW"
+        elif force_value < MED_THRESHOLD:
+            servo.mid()  # 90 degrees  
+            position_name = "MEDIUM"
+        elif force_value < HIGH_THRESHOLD:
+            servo.max()  # 180 degrees
+            position_name = "HIGH"
+        else:
+            servo.value = 1  # Maximum force
+            position_name = "MAXIMUM"
+            
+        print(f"Force: {force_value:.3f} - Position: {position_name}")
+        time.sleep(0.1)
+"""
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="explanation">
+                        <h3>Enhanced Python Features:</h3>
+                        <ul>
+                            <li><strong>Signal Smoothing:</strong> Implements moving average filter to reduce sensor noise</li>
+                            <li><strong>Visual Feedback:</strong> ASCII bar graph shows force level in real-time</li>
+                            <li><strong>Threshold Control:</strong> Alternative implementation with discrete force levels</li>
+                            <li><strong>Calibration:</strong> Configurable force thresholds for different sensors</li>
+                            <li><strong>Error Handling:</strong> Robust constrain function prevents servo damage</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Temperature Sensor Lab -->
+            <section id="temperature-sensor" class="lab-section">
+                <div class="lab-header">
+                    <h1>🌡️ Temperature Sensor Lab</h1>
+                    <p>Temperature Monitoring with LED and Buzzer Alerts</p>
+                </div>
+                <div class="lab-content">
+                    <div class="circuit-image">
+                        <img src="temp.png" alt="Temperature Sensor Circuit Diagram" />
+                        <p><em>Temperature Sensor with Alert System</em></p>
+                    </div>
+
+                    <div class="comparison">
+                        <div class="code-section">
+                            <div class="code-header">Original Arduino Code</div>
+                            <div class="code-block arduino-code">
+int sensor = 0;
+int buzzer = 2;
+int led = 3;
+int reading;
+float voltage, tempc, tempf;
+
+void setup() {
+    pinMode(sensor, INPUT);
+    Serial.begin(9600);
+    pinMode(buzzer, OUTPUT);
+    pinMode(led, OUTPUT);
+}
+
+void loop() {
+    reading = analogRead(sensor);
+    voltage = (reading * 5.0) / 1024.0;
+    tempc = (voltage - 0.5) * 100.0;
+    tempf = (tempc * 1.8) + 32.0;
+    
+    if (reading > 153) {
+        digitalWrite(led, HIGH);
+        tone(buzzer, 1000);
+        delay(1000);
+        noTone(buzzer);
+        delay(1000);
+        digitalWrite(led, LOW);
+    }
+}
+                            </div>
+                        </div>
+
+                        <div class="code-section">
+                            <div class="code-header">Python Code (Raspberry Pi)</div>
+                            <div class="code-block python-code">
+import time
+import pygame
+import RPi.GPIO as GPIO
+from gpiozero import MCP3008
+from datetime import datetime
+
+# Pin Configuration
+LED_PIN = 18
+BUZZER_PIN = 19
+TEMP_THRESHOLD_C = 25.0  # Temperature threshold in Celsius
+
+# Setup
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN, GPIO.OUT)
+GPIO.setup(BUZZER_PIN, GPIO.OUT)
+
+# Temperature sensor (LM35 or similar)
+temp_sensor = MCP3008(channel=0)
+
+# Initialize pygame for buzzer
+pygame.mixer.init()
+
+# Temperature logging
+temp_log = []
+
+def voltage_to_celsius(voltage):
+    """Convert voltage to Celsius for LM35 sensor"""
+    # LM35: 10mV per degree Celsius
+    return voltage * 100.0
+
+def celsius_to_fahrenheit(celsius):
+    """Convert Celsius to Fahrenheit"""
+    return (celsius * 1.8) + 32.0
+
+def play_alarm_tone():
+    """Generate alarm tone"""
+    sample_rate = 22050
+    duration = 500  # milliseconds
+    frequency = 1000
+    
+    frames = int(duration * sample_rate / 1000)
+    arr = []
+    for i in range(frames):
+        wave = 4096 * (0.5 * (1 + (i // (sample_rate // frequency)) % 2))
+        arr.append([wave, wave])
+    
+    sound = pygame.sndarray.make_sound(arr)
+    sound.play()
+    time.sleep(0.5)
+
+def log_temperature(temp_c, temp_f, is_alert):
+    """Log temperature readings with timestamp"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    temp_log.append({
+        'time': timestamp,
+        'celsius': temp_c,
+        'fahrenheit': temp_f,
+        'alert': is_alert
+    })
+    
+    # Keep only last 100 readings
+    if len(temp_log) > 100:
+        temp_log.pop(0)
+
+def display_status(temp_c, temp_f, is_alert):
+    """Display current temperature and status"""
+    status = "🚨 ALERT" if is_alert else "✅ Normal"
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] "
+          f"{temp_c:.1f}°C / {temp_f:.1f}°F - {status}")
+
+try:
+    print("Temperature Monitoring System")
+    print(f"Alert threshold: {TEMP_THRESHOLD_C}°C")
+    print("-" * 50)
+    
+    while True:
+        # Read sensor (0.0 to 1.0)
+        sensor_value = temp_sensor.value
+        
+        # Convert to voltage (assuming 3.3V reference)
+        voltage = sensor_value * 3.3
+        
+        # Convert to temperature
+        temp_celsius = voltage_to_celsius(voltage)
+        temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
+        
+        # Check for temperature alert
+        is_alert = temp_celsius > TEMP_THRESHOLD_C
+        
+        if is_alert:
+            # Temperature too high - activate alert
+            GPIO.output(LED_PIN, GPIO.HIGH)
+            play_alarm_tone()
+            GPIO.output(LED_PIN, GPIO.LOW)
+            time.sleep(1)
+        else:
+            # Normal temperature
+            GPIO.output(LED_PIN, GPIO.LOW)
+        
+        # Log and display temperature
+        log_temperature(temp_celsius, temp_fahrenheit, is_alert)
+        display_status(temp_celsius, temp_fahrenheit, is_alert)
+        
+        time.sleep(2)  # Check every 2 seconds
+
+except KeyboardInterrupt:
+    print("\nShutting down temperature monitor...")
+    
+    # Display summary
+    if temp_log:
+        avg_temp = sum(entry['celsius'] for entry in temp_log) / len(temp_log)
+        alert_count = sum(1 for entry in temp_log if entry['alert'])
+        print(f"\nSession Summary:")
+        print(f"Average temperature: {avg_temp:.1f}°C")
+        print(f"Alert events: {alert_count}")
+        print(f"Total readings: {len(temp_log)}")
+
+finally:
+    GPIO.cleanup()
+    pygame.mixer.quit()
+
+# Alternative using DS18B20 digital temperature
