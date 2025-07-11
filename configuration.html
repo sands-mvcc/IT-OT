@@ -396,6 +396,7 @@
                 <div class="nav-item" onclick="scrollToSection('tools')">Tools & Technology</div>
                 <div class="nav-item" onclick="scrollToSection('training')">Training</div>
                 <div class="nav-item" onclick="scrollToSection('metrics')">Metrics & KPIs</div>
+                <div class="nav-item" onclick="scrollToSection('student-activities')" style="background: #90EE90; color: #2d5016; font-weight: bold;">🎓 Learning Activities</div>
             </div>
         </div>
 
@@ -1016,8 +1017,400 @@
             </div>
         </div>
 
+        <!-- Student Learning Activities Section -->
+        <div class="section" id="student-activities">
+            <div class="section-header" onclick="toggleSection('student-activities')">
+                <h2>🎓 Student Learning Activities</h2>
+                <span class="section-toggle">+</span>
+            </div>
+            <div class="section-content">
+                <div class="alert alert-success">
+                    <strong>Learning Objective:</strong> Master configuration management principles through hands-on interaction with enterprise-level CM tools and processes.
+                </div>
+
+                <!-- Task 1: Change Management Simulation -->
+                <div class="subsection" id="task1">
+                    <h3>Task 1: Change Management Process Simulation 🔄</h3>
+                    <p><strong>Objective:</strong> Demonstrate understanding of change categories, approval workflows, and emergency procedures.</p>
+                    
+                    <div class="form-group">
+                        <label>Scenario: A critical security vulnerability has been discovered in the production SCADA system. Complete the emergency change process:</label>
+                        
+                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                            <h4>Step 1: Classify the Change</h4>
+                            <select class="form-control" id="changeCategory" onchange="updateChangeDetails()">
+                                <option value="">Select Change Category</option>
+                                <option value="emergency">Emergency Change</option>
+                                <option value="standard">Standard Change</option>
+                                <option value="normal">Normal Change</option>
+                                <option value="major">Major Change</option>
+                            </select>
+                            
+                            <div id="changeDetails" style="margin-top: 15px; display: none;">
+                                <p><strong>Selected:</strong> <span id="selectedCategory"></span></p>
+                                <p><strong>Processing Time:</strong> <span id="processingTime"></span></p>
+                                <p><strong>Approval Required:</strong> <span id="approvalRequired"></span></p>
+                            </div>
+                        </div>
+
+                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                            <h4>Step 2: Identify Emergency Contacts</h4>
+                            <p>Who should be contacted first for this SCADA emergency? (Refer to Section 3 Emergency Contacts)</p>
+                            <input type="text" class="form-control" id="primaryContact" placeholder="Enter primary contact name">
+                            <textarea class="form-control" style="margin-top: 10px;" id="justification" placeholder="Justify your contact selection and explain the urgency level"></textarea>
+                        </div>
+
+                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                            <h4>Step 3: Document Implementation Plan</h4>
+                            <textarea class="form-control" id="implementationPlan" placeholder="Describe your implementation approach, including rollback procedures"></textarea>
+                        </div>
+
+                        <button class="btn" onclick="submitTask1()">Submit Task 1</button>
+                        <div id="task1Result" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 2: Compliance Gap Analysis -->
+                <div class="subsection" id="task2">
+                    <h3>Task 2: Compliance Assessment & Gap Analysis 📊</h3>
+                    <p><strong>Objective:</strong> Analyze current compliance status and develop improvement strategies.</p>
+                    
+                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                        <h4>Current Compliance Scores (from Section 5):</h4>
+                        <ul>
+                            <li>FDA 21 CFR Part 11: 95%</li>
+                            <li>NIST Framework: 88%</li>
+                            <li>IEC 62443: 92%</li>
+                            <li>SOX Controls: 85%</li>
+                        </ul>
+                        
+                        <div class="form-group">
+                            <label>Which compliance area needs the most urgent attention?</label>
+                            <select class="form-control" id="priorityCompliance">
+                                <option value="">Select Priority Area</option>
+                                <option value="fda">FDA 21 CFR Part 11</option>
+                                <option value="nist">NIST Framework</option>
+                                <option value="iec">IEC 62443</option>
+                                <option value="sox">SOX Controls</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Propose 3 specific improvement actions for your selected priority area:</label>
+                            <textarea class="form-control" id="improvementActions" rows="6" placeholder="1. Action 1&#10;2. Action 2&#10;3. Action 3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Calculate the overall compliance score and set a target for next quarter:</label>
+                            <input type="text" class="form-control" id="currentScore" placeholder="Current Overall Score (%)" readonly>
+                            <input type="text" class="form-control" id="targetScore" placeholder="Target Score for Q4 2025 (%)" style="margin-top: 10px;">
+                        </div>
+
+                        <button class="btn" onclick="calculateCompliance()">Calculate Current Score</button>
+                        <button class="btn" onclick="submitTask2()">Submit Task 2</button>
+                        <div id="task2Result" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 3: Resource Planning & Tool Management -->
+                <div class="subsection" id="task3">
+                    <h3>Task 3: Resource Planning & Tool Management 🛠️</h3>
+                    <p><strong>Objective:</strong> Evaluate current tool coverage and plan automation improvements.</p>
+                    
+                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                        <h4>Current Tool Coverage Analysis (from Section 6):</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>System Type</th>
+                                        <th>Current Coverage</th>
+                                        <th>Your Proposed Target</th>
+                                        <th>Implementation Priority</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Windows Systems (SCCM)</td>
+                                        <td>90%</td>
+                                        <td><input type="number" class="form-control" id="windowsTarget" max="100" style="width: 80px;"></td>
+                                        <td>
+                                            <select class="form-control" id="windowsPriority">
+                                                <option value="">Select</option>
+                                                <option value="high">High</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Linux Systems (Ansible)</td>
+                                        <td>85%</td>
+                                        <td><input type="number" class="form-control" id="linuxTarget" max="100" style="width: 80px;"></td>
+                                        <td>
+                                            <select class="form-control" id="linuxPriority">
+                                                <option value="">Select</option>
+                                                <option value="high">High</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Network Equipment</td>
+                                        <td>70%</td>
+                                        <td><input type="number" class="form-control" id="networkTarget" max="100" style="width: 80px;"></td>
+                                        <td>
+                                            <select class="form-control" id="networkPriority">
+                                                <option value="">Select</option>
+                                                <option value="high">High</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>PLC Configuration</td>
+                                        <td>60%</td>
+                                        <td><input type="number" class="form-control" id="plcTarget" max="100" style="width: 80px;"></td>
+                                        <td>
+                                            <select class="form-control" id="plcPriority">
+                                                <option value="">Select</option>
+                                                <option value="high">High</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Justify your highest priority selection with a business case:</label>
+                            <textarea class="form-control" id="businessCase" rows="4" placeholder="Explain why this system should receive priority investment, including ROI considerations"></textarea>
+                        </div>
+
+                        <button class="btn" onclick="submitTask3()">Submit Task 3</button>
+                        <div id="task3Result" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 4: Training Program Development -->
+                <div class="subsection" id="task4">
+                    <h3>Task 4: Training Program Development 📚</h3>
+                    <p><strong>Objective:</strong> Assess training effectiveness and design improvement programs.</p>
+                    
+                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                        <h4>Current Training Completion Rates (from Section 7):</h4>
+                        <ul>
+                            <li>System Administrators: 85% Complete</li>
+                            <li>OT Engineers: 70% Complete</li>
+                            <li>Change Coordinators: 90% Complete</li>
+                            <li>Business Users: 45% Complete</li>
+                        </ul>
+
+                        <div class="form-group">
+                            <label>Which role group requires immediate training intervention?</label>
+                            <select class="form-control" id="trainingPriority">
+                                <option value="">Select Role Group</option>
+                                <option value="sysadmin">System Administrators</option>
+                                <option value="ot">OT Engineers</option>
+                                <option value="coordinators">Change Coordinators</option>
+                                <option value="business">Business Users</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Design a remedial training program for your selected group:</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label>Training Method:</label>
+                                    <select class="form-control" id="trainingMethod">
+                                        <option value="">Select Method</option>
+                                        <option value="online">Online Self-Paced</option>
+                                        <option value="classroom">Classroom Instruction</option>
+                                        <option value="hands-on">Hands-On Workshop</option>
+                                        <option value="mentoring">Peer Mentoring</option>
+                                        <option value="blended">Blended Learning</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Duration (hours):</label>
+                                    <input type="number" class="form-control" id="trainingDuration" min="1" max="40">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Define learning objectives for your training program:</label>
+                            <textarea class="form-control" id="learningObjectives" rows="4" placeholder="List 3-5 specific, measurable learning objectives"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>How will you measure training effectiveness?</label>
+                            <textarea class="form-control" id="assessmentMethod" rows="3" placeholder="Describe your assessment and evaluation approach"></textarea>
+                        </div>
+
+                        <button class="btn" onclick="submitTask4()">Submit Task 4</button>
+                        <div id="task4Result" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 5: Metrics Analysis & Continuous Improvement -->
+                <div class="subsection" id="task5">
+                    <h3>Task 5: Metrics Analysis & Continuous Improvement 📈</h3>
+                    <p><strong>Objective:</strong> Analyze KPI performance and develop data-driven improvement strategies.</p>
+                    
+                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
+                        <h4>Current KPI Performance vs. Targets (from Section 8):</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>KPI</th>
+                                        <th>Current</th>
+                                        <th>Target</th>
+                                        <th>Gap</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>System Availability</td>
+                                        <td>99.2%</td>
+                                        <td>99.9%</td>
+                                        <td style="color: red;">-0.7%</td>
+                                        <td><span class="status-indicator status-yellow"></span>Below Target</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Change Success Rate</td>
+                                        <td>87%</td>
+                                        <td>95%</td>
+                                        <td style="color: red;">-8%</td>
+                                        <td><span class="status-indicator status-red"></span>Needs Improvement</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MTTR</td>
+                                        <td>1.8 hrs</td>
+                                        <td>&lt;2 hrs</td>
+                                        <td style="color: green;">+0.2 hrs</td>
+                                        <td><span class="status-indicator status-green"></span>Meeting Target</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Configuration Accuracy</td>
+                                        <td>92%</td>
+                                        <td>95%</td>
+                                        <td style="color: red;">-3%</td>
+                                        <td><span class="status-indicator status-yellow"></span>Below Target</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Select the KPI that requires most urgent attention:</label>
+                            <select class="form-control" id="priorityKPI">
+                                <option value="">Select KPI</option>
+                                <option value="availability">System Availability</option>
+                                <option value="change-success">Change Success Rate</option>
+                                <option value="mttr">Mean Time to Recovery</option>
+                                <option value="config-accuracy">Configuration Accuracy</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Root Cause Analysis - Why is this KPI underperforming?</label>
+                            <textarea class="form-control" id="rootCauseAnalysis" rows="4" placeholder="Identify and analyze the primary factors contributing to poor performance"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Improvement Action Plan (SMART Goals):</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label>Specific Action:</label>
+                                    <input type="text" class="form-control" id="specificAction" placeholder="What will you do?">
+                                </div>
+                                <div>
+                                    <label>Target Improvement:</label>
+                                    <input type="text" class="form-control" id="targetImprovement" placeholder="By how much?">
+                                </div>
+                                <div>
+                                    <label>Timeline:</label>
+                                    <input type="text" class="form-control" id="timeline" placeholder="When will this be achieved?">
+                                </div>
+                                <div>
+                                    <label>Success Metric:</label>
+                                    <input type="text" class="form-control" id="successMetric" placeholder="How will you measure success?">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="submitTask5()">Submit Task 5</button>
+                        <div id="task5Result" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Final Assessment -->
+                <div class="subsection" id="final-assessment">
+                    <h3>📋 Final Assessment & Reflection</h3>
+                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #2d5016; border-radius: 8px; background: #f8f9fa;">
+                        <div class="form-group">
+                            <label>Reflection: What did you learn about configuration management through these activities?</label>
+                            <textarea class="form-control" id="finalReflection" rows="5" placeholder="Reflect on your learning experience and key insights gained"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Professional Application: How would you apply these concepts in a real enterprise environment?</label>
+                            <textarea class="form-control" id="professionalApplication" rows="4" placeholder="Describe how you would implement these practices in your future career"></textarea>
+                        </div>
+
+                        <button class="btn" onclick="submitFinalAssessment()">Complete Final Assessment</button>
+                        <div id="finalResult" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Progress Tracking -->
+                <div class="subsection">
+                    <h3>🎯 Progress Tracking</h3>
+                    <div id="progressTracker">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div class="metric-card" id="task1Progress">
+                                <div class="metric-value" id="task1Status">Not Started</div>
+                                <div class="metric-label">Task 1: Change Management</div>
+                            </div>
+                            <div class="metric-card" id="task2Progress">
+                                <div class="metric-value" id="task2Status">Not Started</div>
+                                <div class="metric-label">Task 2: Compliance Analysis</div>
+                            </div>
+                            <div class="metric-card" id="task3Progress">
+                                <div class="metric-value" id="task3Status">Not Started</div>
+                                <div class="metric-label">Task 3: Resource Planning</div>
+                            </div>
+                            <div class="metric-card" id="task4Progress">
+                                <div class="metric-value" id="task4Status">Not Started</div>
+                                <div class="metric-label">Task 4: Training Development</div>
+                            </div>
+                            <div class="metric-card" id="task5Progress">
+                                <div class="metric-value" id="task5Status">Not Started</div>
+                                <div class="metric-label">Task 5: Metrics Analysis</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; text-align: center;">
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                <div id="overallProgress" style="background: linear-gradient(90deg, #4a7c59, #2d5016); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <p style="margin-top: 10px;"><strong>Overall Completion: <span id="completionPercentage">0%</span></strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="scrollToSection('student-activities')">🎓 Start Learning Activities</button>
             <button class="btn" onclick="exportPlan()">Export Plan</button>
             <button class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
             <button class="btn" onclick="saveDraft()">Save Draft</button>
@@ -1167,6 +1560,423 @@
         
         // Update timestamp every minute
         setInterval(updateTimestamp, 60000);
+
+        // Student Activity Functions
+        let studentProgress = {
+            task1: false,
+            task2: false,
+            task3: false,
+            task4: false,
+            task5: false,
+            final: false
+        };
+
+        function updateChangeDetails() {
+            const category = document.getElementById('changeCategory').value;
+            const details = document.getElementById('changeDetails');
+            const selectedCategory = document.getElementById('selectedCategory');
+            const processingTime = document.getElementById('processingTime');
+            const approvalRequired = document.getElementById('approvalRequired');
+
+            if (category) {
+                details.style.display = 'block';
+                selectedCategory.textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' Change';
+                
+                switch(category) {
+                    case 'emergency':
+                        processingTime.textContent = '<4 hours';
+                        approvalRequired.textContent = 'CISO or designated deputy';
+                        break;
+                    case 'standard':
+                        processingTime.textContent = '<24 hours';
+                        approvalRequired.textContent = 'Automated approval';
+                        break;
+                    case 'normal':
+                        processingTime.textContent = '5-14 business days';
+                        approvalRequired.textContent = 'Full CCB review';
+                        break;
+                    case 'major':
+                        processingTime.textContent = '30+ business days';
+                        approvalRequired.textContent = 'Executive leadership';
+                        break;
+                }
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function submitTask1() {
+            const category = document.getElementById('changeCategory').value;
+            const contact = document.getElementById('primaryContact').value;
+            const justification = document.getElementById('justification').value;
+            const plan = document.getElementById('implementationPlan').value;
+            const result = document.getElementById('task1Result');
+
+            if (!category || !contact || !justification || !plan) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
+                return;
+            }
+
+            let score = 0;
+            let feedback = [];
+
+            if (category === 'emergency') {
+                score += 25;
+                feedback.push('✅ Correct change category identified');
+            } else {
+                feedback.push('❌ This should be classified as an Emergency Change due to security vulnerability');
+            }
+
+            if (contact.toLowerCase().includes('regina') || contact.toLowerCase().includes('moore')) {
+                score += 25;
+                feedback.push('✅ Correct primary contact for OT/SCADA systems');
+            } else {
+                feedback.push('❌ Regina Moore (OT Systems Engineer) should be the primary contact for SCADA issues');
+            }
+
+            if (justification.length > 50) {
+                score += 25;
+                feedback.push('✅ Adequate justification provided');
+            } else {
+                feedback.push('❌ Justification needs more detail about urgency and impact');
+            }
+
+            if (plan.toLowerCase().includes('rollback') || plan.toLowerCase().includes('backup')) {
+                score += 25;
+                feedback.push('✅ Implementation plan includes rollback considerations');
+            } else {
+                feedback.push('❌ Implementation plan should include rollback procedures');
+            }
+
+            studentProgress.task1 = score >= 75;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
+                    <h4>Task 1 Score: ${score}/100</h4>
+                    <ul style="margin-left: 20px;">
+                        ${feedback.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    ${score >= 75 ? '<p><strong>Excellent work! You demonstrate strong understanding of change management processes.</strong></p>' : '<p><strong>Review the emergency change procedures and try again.</strong></p>'}
+                </div>
+            `;
+        }
+
+        function calculateCompliance() {
+            const scores = [95, 88, 92, 85]; // FDA, NIST, IEC, SOX
+            const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+            document.getElementById('currentScore').value = average.toFixed(1) + '%';
+        }
+
+        function submitTask2() {
+            const priority = document.getElementById('priorityCompliance').value;
+            const actions = document.getElementById('improvementActions').value;
+            const target = document.getElementById('targetScore').value;
+            const result = document.getElementById('task2Result');
+
+            if (!priority || !actions || !target) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
+                return;
+            }
+
+            let score = 0;
+            let feedback = [];
+
+            if (priority === 'sox') {
+                score += 30;
+                feedback.push('✅ Correct priority - SOX has the lowest compliance score at 85%');
+            } else {
+                feedback.push('❌ SOX Controls (85%) should be the priority as it has the lowest score');
+            }
+
+            const actionCount = actions.split('\n').filter(line => line.trim().length > 0).length;
+            if (actionCount >= 3) {
+                score += 35;
+                feedback.push('✅ Provided adequate number of improvement actions');
+            } else {
+                feedback.push('❌ Need at least 3 specific improvement actions');
+            }
+
+            const targetNum = parseFloat(target);
+            if (targetNum > 90 && targetNum <= 98) {
+                score += 35;
+                feedback.push('✅ Realistic target score set');
+            } else {
+                feedback.push('❌ Target should be ambitious but realistic (90-98%)');
+            }
+
+            studentProgress.task2 = score >= 75;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
+                    <h4>Task 2 Score: ${score}/100</h4>
+                    <ul style="margin-left: 20px;">
+                        ${feedback.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    ${score >= 75 ? '<p><strong>Great analysis! You understand compliance prioritization.</strong></p>' : '<p><strong>Review the compliance scores and focus on the lowest performing area.</strong></p>'}
+                </div>
+            `;
+        }
+
+        function submitTask3() {
+            const windowsTarget = document.getElementById('windowsTarget').value;
+            const linuxTarget = document.getElementById('linuxTarget').value;
+            const networkTarget = document.getElementById('networkTarget').value;
+            const plcTarget = document.getElementById('plcTarget').value;
+            const businessCase = document.getElementById('businessCase').value;
+            const result = document.getElementById('task3Result');
+
+            if (!windowsTarget || !linuxTarget || !networkTarget || !plcTarget || !businessCase) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
+                return;
+            }
+
+            let score = 0;
+            let feedback = [];
+
+            // Check if targets are realistic improvements
+            const targets = [
+                { current: 90, target: parseInt(windowsTarget), name: 'Windows' },
+                { current: 85, target: parseInt(linuxTarget), name: 'Linux' },
+                { current: 70, target: parseInt(networkTarget), name: 'Network' },
+                { current: 60, target: parseInt(plcTarget), name: 'PLC' }
+            ];
+
+            let realisticTargets = 0;
+            targets.forEach(item => {
+                if (item.target > item.current && item.target <= 100) {
+                    realisticTargets++;
+                }
+            });
+
+            if (realisticTargets >= 3) {
+                score += 30;
+                feedback.push('✅ Realistic improvement targets set');
+            } else {
+                feedback.push('❌ Targets should improve current coverage but remain achievable');
+            }
+
+            // Check if PLC is prioritized (lowest current coverage)
+            const plcPriority = document.getElementById('plcPriority').value;
+            if (plcPriority === 'high') {
+                score += 35;
+                feedback.push('✅ Correctly prioritized PLC systems (lowest coverage)');
+            } else {
+                feedback.push('❌ PLC systems should be high priority due to lowest coverage (60%)');
+            }
+
+            if (businessCase.length > 100) {
+                score += 35;
+                feedback.push('✅ Comprehensive business case provided');
+            } else {
+                feedback.push('❌ Business case needs more detail about ROI and justification');
+            }
+
+            studentProgress.task3 = score >= 75;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
+                    <h4>Task 3 Score: ${score}/100</h4>
+                    <ul style="margin-left: 20px;">
+                        ${feedback.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    ${score >= 75 ? '<p><strong>Excellent resource planning! You understand prioritization principles.</strong></p>' : '<p><strong>Focus on the systems with lowest coverage and provide stronger business justification.</strong></p>'}
+                </div>
+            `;
+        }
+
+        function submitTask4() {
+            const priority = document.getElementById('trainingPriority').value;
+            const method = document.getElementById('trainingMethod').value;
+            const duration = document.getElementById('trainingDuration').value;
+            const objectives = document.getElementById('learningObjectives').value;
+            const assessment = document.getElementById('assessmentMethod').value;
+            const result = document.getElementById('task4Result');
+
+            if (!priority || !method || !duration || !objectives || !assessment) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
+                return;
+            }
+
+            let score = 0;
+            let feedback = [];
+
+            if (priority === 'business') {
+                score += 25;
+                feedback.push('✅ Correct priority - Business Users have lowest completion (45%)');
+            } else {
+                feedback.push('❌ Business Users should be priority with only 45% completion');
+            }
+
+            if (method === 'blended' || method === 'hands-on') {
+                score += 20;
+                feedback.push('✅ Appropriate training method selected');
+            } else {
+                feedback.push('❌ Consider blended or hands-on approaches for better engagement');
+            }
+
+            if (parseInt(duration) >= 4 && parseInt(duration) <= 16) {
+                score += 20;
+                feedback.push('✅ Reasonable training duration');
+            } else {
+                feedback.push('❌ Duration should be 4-16 hours for effective learning');
+            }
+
+            const objectiveCount = objectives.split('\n').filter(line => line.trim().length > 0).length;
+            if (objectiveCount >= 3) {
+                score += 20;
+                feedback.push('✅ Adequate learning objectives defined');
+            } else {
+                feedback.push('❌ Need at least 3 specific learning objectives');
+            }
+
+            if (assessment.length > 50) {
+                score += 15;
+                feedback.push('✅ Assessment method described');
+            } else {
+                feedback.push('❌ Need more detailed assessment approach');
+            }
+
+            studentProgress.task4 = score >= 75;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
+                    <h4>Task 4 Score: ${score}/100</h4>
+                    <ul style="margin-left: 20px;">
+                        ${feedback.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    ${score >= 75 ? '<p><strong>Well-designed training program! You understand adult learning principles.</strong></p>' : '<p><strong>Focus on the group with lowest completion and design comprehensive programs.</strong></p>'}
+                </div>
+            `;
+        }
+
+        function submitTask5() {
+            const priorityKPI = document.getElementById('priorityKPI').value;
+            const rootCause = document.getElementById('rootCauseAnalysis').value;
+            const action = document.getElementById('specificAction').value;
+            const improvement = document.getElementById('targetImprovement').value;
+            const timeline = document.getElementById('timeline').value;
+            const metric = document.getElementById('successMetric').value;
+            const result = document.getElementById('task5Result');
+
+            if (!priorityKPI || !rootCause || !action || !improvement || !timeline || !metric) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
+                return;
+            }
+
+            let score = 0;
+            let feedback = [];
+
+            if (priorityKPI === 'change-success') {
+                score += 20;
+                feedback.push('✅ Correct priority - Change Success Rate has largest gap (-8%)');
+            } else {
+                feedback.push('❌ Change Success Rate should be priority with 8% gap from target');
+            }
+
+            if (rootCause.length > 100) {
+                score += 20;
+                feedback.push('✅ Thorough root cause analysis provided');
+            } else {
+                feedback.push('❌ Root cause analysis needs more depth and detail');
+            }
+
+            if (action.length > 30) {
+                score += 20;
+                feedback.push('✅ Specific action defined');
+            } else {
+                feedback.push('❌ Action needs to be more specific and detailed');
+            }
+
+            if (improvement.includes('%') || improvement.includes('hour') || improvement.includes('day')) {
+                score += 20;
+                feedback.push('✅ Measurable improvement target set');
+            } else {
+                feedback.push('❌ Improvement target should be quantifiable');
+            }
+
+            if (timeline.length > 10) {
+                score += 20;
+                feedback.push('✅ Timeline provided');
+            } else {
+                feedback.push('❌ Timeline needs more specificity');
+            }
+
+            studentProgress.task5 = score >= 75;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
+                    <h4>Task 5 Score: ${score}/100</h4>
+                    <ul style="margin-left: 20px;">
+                        ${feedback.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                    ${score >= 75 ? '<p><strong>Excellent analytical skills! You understand performance improvement methodology.</strong></p>' : '<p><strong>Focus on the KPI with the largest performance gap and develop SMART goals.</strong></p>'}
+                </div>
+            `;
+        }
+
+        function submitFinalAssessment() {
+            const reflection = document.getElementById('finalReflection').value;
+            const application = document.getElementById('professionalApplication').value;
+            const result = document.getElementById('finalResult');
+
+            if (!reflection || !application) {
+                result.innerHTML = '<div class="alert alert-warning">Please complete both reflection fields.</div>';
+                return;
+            }
+
+            const completedTasks = Object.values(studentProgress).filter(Boolean).length;
+            let grade = '';
+            let message = '';
+
+            if (completedTasks >= 4) {
+                grade = 'Excellent';
+                message = 'Outstanding performance! You have demonstrated mastery of configuration management principles.';
+            } else if (completedTasks >= 3) {
+                grade = 'Good';
+                message = 'Good work! You understand most configuration management concepts with room for improvement.';
+            } else {
+                grade = 'Needs Improvement';
+                message = 'Additional study required. Please review the material and retry incomplete tasks.';
+            }
+
+            studentProgress.final = true;
+            updateProgressTracker();
+
+            result.innerHTML = `
+                <div class="alert alert-success">
+                    <h4>Final Assessment Complete</h4>
+                    <p><strong>Overall Performance:</strong> ${grade}</p>
+                    <p><strong>Tasks Completed Successfully:</strong> ${completedTasks}/5</p>
+                    <p>${message}</p>
+                    <p><strong>Reflection Quality:</strong> ${reflection.length > 100 ? 'Comprehensive' : 'Adequate'}</p>
+                    <p><strong>Professional Application:</strong> ${application.length > 100 ? 'Well-developed' : 'Basic'}</p>
+                </div>
+            `;
+        }
+
+        function updateProgressTracker() {
+            const completedTasks = Object.values(studentProgress).filter(Boolean).length;
+            const totalTasks = Object.keys(studentProgress).length;
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+
+            // Update individual task status
+            Object.keys(studentProgress).forEach(task => {
+                const statusElement = document.getElementById(`${task}Status`);
+                if (statusElement) {
+                    statusElement.textContent = studentProgress[task] ? 'Completed' : 'Not Started';
+                    statusElement.style.color = studentProgress[task] ? '#28a745' : '#6c757d';
+                }
+            });
+
+            // Update overall progress
+            document.getElementById('overallProgress').style.width = `${percentage}%`;
+            document.getElementById('completionPercentage').textContent = `${percentage}%`;
+        }
     </script>
 </body>
 </html>
