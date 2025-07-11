@@ -778,4 +778,204 @@
         <!-- NEW: Student Activity Section -->
         <div id="student-activity" class="content-section">
             <div class="activity-container">
-                <h2 class="activity-
+                <h2 class="activity-title">🎯 IEC 62443 Deep Dive Student Activity</h2>
+                
+                <div class="activity-instructions">
+                    <h3 style="color: #e65100; margin-bottom: 1rem;">📋 Activity Instructions</h3>
+                    <p><strong>Objective:</strong> Complete 10 comprehensive tasks to gain deep understanding of the IEC 62443 framework and its practical application in securing Industrial Automation and Control Systems (IACS).</p>
+                    <p><strong>Learning Outcomes:</strong> By completing this activity, you will be able to analyze OT/IT security requirements, design secure industrial network architectures, implement risk-based security controls, and apply IEC 62443 principles to real-world scenarios.</p>
+                    <p><strong>Instructions:</strong> Work through each task systematically. Use the interactive elements on this webpage and click "Complete Task" when finished. Document your findings and be prepared to discuss your solutions.</p>
+                </div>
+
+                <div class="activity-progress">
+                    <h3 style="color: #e65100;">📊 Your Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p id="progress-text">0% Complete (0/10 tasks completed)</p>
+                </div>
+
+                <div class="task-grid">
+                    <!-- Task 1: Framework Analysis -->
+                    <div class="task-card" id="task-1">
+                        <div class="task-number">1</div>
+                        <div class="task-title">Framework Structure Analysis</div>
+                        <div class="task-description">
+                            Navigate through all four framework categories (General, Policies & Procedures, System, Component). Compare and contrast how each category addresses different stakeholder responsibilities in the shared security model.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Create a stakeholder responsibility matrix showing which IEC 62443 parts apply to asset owners, suppliers, integrators, and service providers.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(1)">Complete Task 1</button>
+                    </div>
+
+                    <!-- Task 2: Security Levels Mapping -->
+                    <div class="task-card" id="task-2">
+                        <div class="task-number">2</div>
+                        <div class="task-title">Security Level Vector Design</div>
+                        <div class="task-description">
+                            Study the Security Levels (SL-0 through SL-4) and create security level vectors for three different industrial scenarios: a water treatment plant control room, a manufacturing line HMI, and a remote pump station.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Scenario Analysis:</div>
+                            Consider threat landscape, criticality, and operational requirements for each system when determining appropriate security levels for each foundational requirement.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Document three 7-element security level vectors with justification for each FR assignment.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(2)">Complete Task 2</button>
+                    </div>
+
+                    <!-- Task 3: Zone Architecture Design -->
+                    <div class="task-card" id="task-3">
+                        <div class="task-number">3</div>
+                        <div class="task-title">Zones & Conduits Architecture</div>
+                        <div class="task-description">
+                            Using the interactive diagram, design a comprehensive network architecture for a chemical processing facility. Define zones based on criticality and operational requirements, then specify conduit security controls.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Facility Requirements:</div>
+                            Include corporate office, engineering workstations, supervisory control systems, safety instrumented systems (SIS), and field devices across multiple process units.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Network architecture diagram with zone definitions, boundaries, and conduit security specifications.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(3)">Complete Task 3</button>
+                    </div>
+
+                    <!-- Task 4: Foundational Requirements Deep Dive -->
+                    <div class="task-card" id="task-4">
+                        <div class="task-number">4</div>
+                        <div class="task-title">FR Implementation Strategy</div>
+                        <div class="task-description">
+                            Click through each Foundational Requirement modal and develop specific implementation strategies for FR1 (IAC), FR5 (RDF), and FR6 (TRE) in an oil refinery environment.
+                        </div>
+                        <div class="reflection-area">
+                            <div class="reflection-title">Critical Thinking:</div>
+                            How do operational technology constraints (real-time requirements, legacy systems, safety considerations) impact the implementation of these foundational requirements?
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Implementation roadmap for three FRs including technical controls, procedures, and timeline considerations.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(4)">Complete Task 4</button>
+                    </div>
+
+                    <!-- Task 5: Risk Assessment Application -->
+                    <div class="task-card" id="task-5">
+                        <div class="task-number">5</div>
+                        <div class="task-title">IEC 62443-3-2 Risk Assessment</div>
+                        <div class="task-description">
+                            Apply the IEC 62443-3-2 risk assessment methodology to evaluate a power generation facility. Identify critical assets, assess threat scenarios, and determine target security levels.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Assessment Scope:</div>
+                            Focus on turbine control systems, electrical protection systems, and the connection between operational technology and business networks.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Risk assessment report with asset inventory, threat analysis, vulnerability assessment, and security level recommendations.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(5)">Complete Task 5</button>
+                    </div>
+
+                    <!-- Task 6: Component Security Requirements -->
+                    <div class="task-card" id="task-6">
+                        <div class="task-number">6</div>
+                        <div class="task-title">IEC 62443-4-2 Component Analysis</div>
+                        <div class="task-description">
+                            Explore the Component Requirements section and analyze how IEC 62443-4-2 technical requirements apply to different component types: embedded devices, network components, host devices, and software applications.
+                        </div>
+                        <div class="reflection-area">
+                            <div class="reflection-title">Vendor Evaluation:</div>
+                            How would you use IEC 62443-4-2 requirements to evaluate and select industrial cybersecurity products for your organization?
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Component security requirements checklist for procurement and vendor assessment processes.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(6)">Complete Task 6</button>
+                    </div>
+
+                    <!-- Task 7: Secure Development Lifecycle -->
+                    <div class="task-card" id="task-7">
+                        <div class="task-number">7</div>
+                        <div class="task-title">SDL Implementation Planning</div>
+                        <div class="task-description">
+                            Navigate through the 6-stage Secure Development Lifecycle and create an implementation plan for a company developing industrial IoT sensors that will be deployed in critical infrastructure.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Product Context:</div>
+                            Wireless temperature and pressure sensors for pipeline monitoring with edge computing capabilities and cloud connectivity.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> SDL implementation plan with specific activities, deliverables, and success criteria for each lifecycle stage.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(7)">Complete Task 7</button>
+                    </div>
+
+                    <!-- Task 8: Integration Challenge -->
+                    <div class="task-card" id="task-8">
+                        <div class="task-number">8</div>
+                        <div class="task-title">IT/OT Integration Security</div>
+                        <div class="task-description">
+                            Design a secure integration strategy for connecting a legacy SCADA system to modern business analytics platforms while maintaining operational integrity and meeting IEC 62443 requirements.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Integration Challenge:</div>
+                            The legacy system uses proprietary protocols, has no native security features, and must maintain 99.9% availability for critical operations.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Integration architecture with security controls, data flow diagrams, and implementation strategy addressing legacy system constraints.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(8)">Complete Task 8</button>
+                    </div>
+
+                    <!-- Task 9: Incident Response Planning -->
+                    <div class="task-card" id="task-9">
+                        <div class="task-number">9</div>
+                        <div class="task-title">ICS Incident Response Framework</div>
+                        <div class="task-description">
+                            Develop an incident response plan specifically tailored for industrial control systems that incorporates IEC 62443 principles, particularly FR6 (Timely Response to Events) and operational continuity requirements.
+                        </div>
+                        <div class="reflection-area">
+                            <div class="reflection-title">Operational Impact:</div>
+                            How do you balance cybersecurity incident response with the need to maintain continuous operations in critical infrastructure?
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> ICS-specific incident response playbook with escalation procedures, containment strategies, and recovery protocols.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(9)">Complete Task 9</button>
+                    </div>
+
+                    <!-- Task 10: Compliance and Certification -->
+                    <div class="task-card" id="task-10">
+                        <div class="task-number">10</div>
+                        <div class="task-title">IEC 62443 Compliance Strategy</div>
+                        <div class="task-description">
+                            Create a comprehensive compliance strategy for an organization seeking to implement IEC 62443 across their industrial operations. Address organizational readiness, certification pathways, and ongoing compliance management.
+                        </div>
+                        <div class="scenario-box">
+                            <div class="scenario-title">Organizational Context:</div>
+                            Multi-site manufacturing company with 15 facilities, mixed legacy and modern systems, and regulatory requirements across multiple jurisdictions.
+                        </div>
+                        <div class="task-deliverable">
+                            <strong>Deliverable:</strong> Compliance roadmap with gap analysis, certification strategy, resource requirements, and success metrics for IEC 62443 implementation.
+                        </div>
+                        <button class="complete-task-btn" onclick="completeTask(10)">Complete Task 10</button>
+                    </div>
+                </div>
+
+                <div class="reflection-area" style="margin-top: 2rem;">
+                    <div class="reflection-title">🤔 Final Reflection Questions:</div>
+                    <p>After completing all tasks, consider these questions:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>How does IEC 62443 address the unique challenges of securing operational technology compared to traditional IT security frameworks?</li>
+                        <li>What are the most significant implementation challenges organizations face when adopting IEC 62443, and how can they be addressed?</li>
+                        <li>How does the shared responsibility model in IEC 62443 change the cybersecurity landscape for industrial organizations?</li>
+                        <li>What role does risk assessment play in the practical application of IEC 62443 security levels and controls?</li>
+                    </ul>
+                </div>
+
+                <div class="highlight" style="margin-top: 2rem; text-align: center;">
+                    <strong>🏆 Completion Certificate:</strong> Once all 10 tasks are completed, you'll have demonstrated comprehensive understanding of IEC 62443 framework principles and practical application in industrial cybersecurity contexts.
+                </div>
+            </div>
+        </div>
