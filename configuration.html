@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshFlow Systems - Configuration Management Plan</title>
+    <title>FreshFlow Systems - Interactive Configuration Management Plan (Training Edition)</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -31,11 +31,37 @@
             border-radius: 10px;
             margin-bottom: 30px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+        }
+
+        .training-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .training-mode-toggle:hover {
+            background: white;
+            color: #2d5016;
+        }
+
+        .training-mode-toggle.active {
+            background: #90EE90;
+            color: #2d5016;
+            border-color: #90EE90;
         }
 
         .document-info {
@@ -49,6 +75,7 @@
             background: rgba(255,255,255,0.1);
             padding: 10px;
             border-radius: 5px;
+            position: relative;
         }
 
         .info-item strong {
@@ -62,11 +89,24 @@
             padding: 5px;
             color: white;
             border-radius: 3px;
+            min-height: 20px;
+            display: inline-block;
+            min-width: 100px;
         }
 
         .editable:focus {
             background: rgba(255,255,255,0.2);
             outline: none;
+            border-style: solid;
+        }
+
+        .training-mode .editable {
+            border: 2px dashed #90EE90;
+            background: rgba(144, 238, 144, 0.1);
+        }
+
+        .training-mode .editable:hover {
+            background: rgba(144, 238, 144, 0.2);
             border-style: solid;
         }
 
@@ -107,6 +147,11 @@
             margin-bottom: 30px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .training-mode .section {
+            border-color: #4a7c59;
         }
 
         .section-header {
@@ -121,16 +166,29 @@
 
         .section-header h2 {
             font-size: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .section-controls {
+            display: none;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        .training-mode .section-controls {
+            display: flex;
         }
 
         .section-toggle {
             font-size: 1.5rem;
             transition: transform 0.3s ease;
+            margin-left: 10px;
         }
 
         .section-content {
             padding: 30px;
             display: none;
+            position: relative;
         }
 
         .section-content.active {
@@ -143,6 +201,23 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             background: #fafafa;
+            position: relative;
+        }
+
+        .training-mode .subsection {
+            border: 2px dashed #4a7c59;
+        }
+
+        .subsection-controls {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            gap: 5px;
+        }
+
+        .training-mode .subsection-controls {
+            display: flex;
         }
 
         .subsection h3 {
@@ -151,9 +226,81 @@
             font-size: 1.3rem;
         }
 
+        .editable-title {
+            background: transparent;
+            border: none;
+            color: #2d5016;
+            font-size: 1.3rem;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .training-mode .editable-title {
+            border: 1px dashed #4a7c59;
+            padding: 5px;
+            background: rgba(74, 124, 89, 0.05);
+        }
+
+        .editable-content {
+            background: transparent;
+            border: none;
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .training-mode .editable-content {
+            border: 1px dashed #4a7c59;
+            padding: 10px;
+            background: rgba(74, 124, 89, 0.05);
+        }
+
+        .editable-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .editable-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .training-mode .editable-list li {
+            background: rgba(74, 124, 89, 0.05);
+            border: 1px dashed #4a7c59;
+        }
+
+        .list-item-content {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .list-item-controls {
+            display: none;
+            gap: 5px;
+        }
+
+        .training-mode .list-item-controls {
+            display: flex;
+        }
+
         .table-container {
             overflow-x: auto;
             margin: 20px 0;
+            position: relative;
         }
 
         table {
@@ -165,31 +312,89 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        .training-mode table {
+            border: 2px solid #4a7c59;
+        }
+
         th {
             background: #4a7c59;
             color: white;
             padding: 15px;
             text-align: left;
             font-weight: bold;
+            position: relative;
+        }
+
+        .training-mode th {
+            cursor: pointer;
+        }
+
+        .training-mode th:hover {
+            background: #2d5016;
+        }
+
+        .column-controls {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            gap: 5px;
+        }
+
+        .training-mode .column-controls {
+            display: flex;
         }
 
         td {
             padding: 12px 15px;
             border-bottom: 1px solid #e0e0e0;
+            position: relative;
         }
 
         .editable-cell {
-            background: #f8f9fa;
-            border: 1px dashed #4a7c59;
+            background: transparent;
+            border: none;
+            width: 100%;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
             min-height: 30px;
+        }
+
+        .training-mode .editable-cell {
+            background: rgba(74, 124, 89, 0.05);
+            border: 1px dashed #4a7c59;
             padding: 8px;
             border-radius: 4px;
         }
 
-        .editable-cell:focus {
+        .training-mode .editable-cell:focus {
             background: white;
             outline: none;
             border-style: solid;
+        }
+
+        .row-controls {
+            display: none;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            gap: 5px;
+        }
+
+        .training-mode tr:hover .row-controls {
+            display: flex;
+        }
+
+        .table-controls {
+            display: none;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .training-mode .table-controls {
+            display: flex;
         }
 
         .metric-card {
@@ -200,6 +405,23 @@
             margin: 15px;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .training-mode .metric-card {
+            border-style: dashed;
+        }
+
+        .metric-controls {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            gap: 5px;
+        }
+
+        .training-mode .metric-controls {
+            display: flex;
         }
 
         .metric-value {
@@ -209,9 +431,40 @@
             margin-bottom: 10px;
         }
 
+        .editable-metric-value {
+            background: transparent;
+            border: none;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d5016;
+            text-align: center;
+            width: 100%;
+        }
+
+        .training-mode .editable-metric-value {
+            border: 1px dashed #4a7c59;
+            background: rgba(74, 124, 89, 0.05);
+            padding: 5px;
+        }
+
         .metric-label {
             color: #666;
             font-size: 0.9rem;
+        }
+
+        .editable-metric-label {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .training-mode .editable-metric-label {
+            border: 1px dashed #4a7c59;
+            background: rgba(74, 124, 89, 0.05);
+            padding: 5px;
         }
 
         .process-flow {
@@ -219,6 +472,7 @@
             flex-wrap: wrap;
             gap: 20px;
             margin: 20px 0;
+            position: relative;
         }
 
         .process-step {
@@ -230,6 +484,22 @@
             padding: 20px;
             text-align: center;
             position: relative;
+        }
+
+        .training-mode .process-step {
+            border-style: dashed;
+        }
+
+        .process-step-controls {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            gap: 5px;
+        }
+
+        .training-mode .process-step-controls {
+            display: flex;
         }
 
         .process-step::after {
@@ -262,12 +532,43 @@
             background: #2d5016;
         }
 
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+
         .btn-secondary {
             background: #6c757d;
         }
 
         .btn-secondary:hover {
             background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
         }
 
         .form-group {
@@ -312,6 +613,12 @@
             color: #856404;
         }
 
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
         .status-indicator {
             display: inline-block;
             width: 12px;
@@ -329,6 +636,100 @@
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin: 20px 0;
+            position: relative;
+        }
+
+        .dashboard-controls {
+            display: none;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .training-mode .dashboard-controls {
+            display: flex;
+        }
+
+        .add-section-controls {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #4a7c59;
+            border-radius: 10px;
+            background: rgba(74, 124, 89, 0.05);
+        }
+
+        .training-mode .add-section-controls {
+            display: block;
+        }
+
+        .template-selector {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .training-mode .template-selector {
+            display: block;
+        }
+
+        .floating-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        .training-mode .floating-save {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 6px 12px rgba(74, 124, 89, 0.4); }
+            100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #4a7c59;
+            margin-right: 10px;
+            display: none;
+        }
+
+        .training-mode .drag-handle {
+            display: inline-block;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .drop-zone {
+            border: 2px dashed #4a7c59;
+            background: rgba(74, 124, 89, 0.1);
+            min-height: 50px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .drop-zone.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -351,6 +752,14 @@
             .process-step::after {
                 display: none;
             }
+
+            .section-controls,
+            .subsection-controls,
+            .metric-controls {
+                position: static;
+                justify-content: center;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -358,36 +767,52 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
+            <button class="training-mode-toggle" onclick="toggleTrainingMode()">
+                🎓 Training Mode: OFF
+            </button>
             <h1>Configuration Management Plan</h1>
             <p>FreshFlow Systems - Comprehensive IT/OT Configuration Management</p>
             <div class="document-info">
                 <div class="info-item">
                     <strong>Date:</strong>
-                    <span class="editable" contenteditable="true">July 5, 2025</span>
+                    <span class="editable" contenteditable="true" data-field="date">July 5, 2025</span>
                 </div>
                 <div class="info-item">
                     <strong>Version:</strong>
-                    <span class="editable" contenteditable="true">1.3</span>
+                    <span class="editable" contenteditable="true" data-field="version">1.3</span>
                 </div>
                 <div class="info-item">
                     <strong>Classification:</strong>
-                    <span class="editable" contenteditable="true">Confidential</span>
+                    <span class="editable" contenteditable="true" data-field="classification">Confidential</span>
                 </div>
                 <div class="info-item">
                     <strong>Document Owner:</strong>
-                    <span class="editable" contenteditable="true">Jason Trujillo, Network Administrator</span>
+                    <span class="editable" contenteditable="true" data-field="owner">Jason Trujillo, Network Administrator</span>
                 </div>
                 <div class="info-item">
                     <strong>Approved by:</strong>
-                    <span class="editable" contenteditable="true">Dr. Nia Clarke, CISO</span>
+                    <span class="editable" contenteditable="true" data-field="approver">Dr. Nia Clarke, CISO</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Template Selector -->
+        <div class="template-selector">
+            <h3>📋 Training Templates & Scenarios</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="loadTemplate('baseline')">Load Baseline Plan</button>
+                <button class="btn btn-secondary" onclick="loadTemplate('emergency')">Emergency Scenario</button>
+                <button class="btn btn-secondary" onclick="loadTemplate('compliance')">Compliance Focused</button>
+                <button class="btn btn-secondary" onclick="loadTemplate('minimal')">Minimal Template</button>
+                <button class="btn btn-warning" onclick="resetPlan()">Reset to Default</button>
+                <button class="btn btn-success" onclick="saveAsTemplate()">Save as Template</button>
             </div>
         </div>
 
         <!-- Navigation Menu -->
         <div class="nav-menu">
             <h3 style="text-align: center; margin-bottom: 20px; color: #2d5016;">Quick Navigation</h3>
-            <div class="nav-grid">
+            <div class="nav-grid" id="navigation-grid">
                 <div class="nav-item" onclick="scrollToSection('executive-summary')">Executive Summary</div>
                 <div class="nav-item" onclick="scrollToSection('framework')">CM Framework</div>
                 <div class="nav-item" onclick="scrollToSection('change-management')">Change Management</div>
@@ -400,1583 +825,1407 @@
             </div>
         </div>
 
-        <!-- Executive Summary Section -->
-        <div class="section" id="executive-summary">
-            <div class="section-header" onclick="toggleSection('executive-summary')">
-                <h2>1. Executive Summary</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Purpose and Scope</h3>
-                    <p>This Configuration Management Plan establishes standardized processes for maintaining secure, compliant configurations across FreshFlow Systems' hybrid IT/OT environment. The plan addresses configuration baselines, change control procedures, and compliance monitoring for all systems supporting the organization's food packaging operations across three facilities in Lima, Ohio.</p>
-                </div>
-
-                <div class="subsection">
-                    <h3>Strategic Objectives</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Operational Stability:</strong> Maintain &lt;2-hour recovery time for production systems through consistent configurations</li>
-                        <li><strong>Security Compliance:</strong> Ensure all systems meet industry security standards and regulatory requirements</li>
-                        <li><strong>Change Control:</strong> Implement formal change management reducing configuration-related incidents by 90%</li>
-                        <li><strong>Scalability:</strong> Support 125% annual growth through automated configuration management processes</li>
-                        <li><strong>IT/OT Integration:</strong> Establish unified configuration standards across information and operational technology environments</li>
-                    </ul>
-                </div>
-
-                <div class="subsection">
-                    <h3>Current State Assessment</h3>
-                    <div class="dashboard-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">Level 2</div>
-                            <div class="metric-label">CM Maturity (Moving to Level 3)</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">75%</div>
-                            <div class="metric-label">IT Systems Automated</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">25%</div>
-                            <div class="metric-label">OT Systems Automated</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">85%</div>
-                            <div class="metric-label">Change Success Rate</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Add Section Controls -->
+        <div class="add-section-controls">
+            <h3>➕ Add New Section</h3>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+                <button class="btn" onclick="addSection('text', 'Text Section')">📝 Text Section</button>
+                <button class="btn" onclick="addSection('table', 'Data Table')">📊 Data Table</button>
+                <button class="btn" onclick="addSection('metrics', 'Metrics Dashboard')">📈 Metrics Dashboard</button>
+                <button class="btn" onclick="addSection('process', 'Process Flow')">🔄 Process Flow</button>
+                <button class="btn" onclick="addSection('list', 'List Section')">📋 List Section</button>
             </div>
         </div>
 
-        <!-- Framework Section -->
-        <div class="section" id="framework">
-            <div class="section-header" onclick="toggleSection('framework')">
-                <h2>2. Configuration Management Framework</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Configuration Control Board (CCB)</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Name</th>
-                                    <th>Primary Responsibilities</th>
-                                    <th>Authority Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Chair</td>
-                                    <td class="editable-cell" contenteditable="true">Dr. Nia Clarke (CISO)</td>
-                                    <td class="editable-cell" contenteditable="true">Overall CM process oversight, baseline approval</td>
-                                    <td>Level 4 (Strategic)</td>
-                                </tr>
-                                <tr>
-                                    <td>Technical Lead</td>
-                                    <td class="editable-cell" contenteditable="true">Jason Trujillo (Network Administrator)</td>
-                                    <td class="editable-cell" contenteditable="true">Daily configuration maintenance, change implementation</td>
-                                    <td>Level 3 (Tactical)</td>
-                                </tr>
-                                <tr>
-                                    <td>OT Representative</td>
-                                    <td class="editable-cell" contenteditable="true">Regina Moore (OT Systems Engineer)</td>
-                                    <td class="editable-cell" contenteditable="true">Industrial system configuration management</td>
-                                    <td>Level 3 (Tactical)</td>
-                                </tr>
-                                <tr>
-                                    <td>Business Representative</td>
-                                    <td class="editable-cell" contenteditable="true">Marcus Lee (COO)</td>
-                                    <td class="editable-cell" contenteditable="true">Configuration requirements definition, business approval</td>
-                                    <td>Level 3 (Tactical)</td>
-                                </tr>
-                                <tr>
-                                    <td>Quality Assurance</td>
-                                    <td class="editable-cell" contenteditable="true">Ronetta Bell (QC Manager)</td>
-                                    <td class="editable-cell" contenteditable="true">Quality validation and compliance verification</td>
-                                    <td>Level 2 (Operational)</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>CMDB Structure</h3>
-                    <p><strong>Primary Tool:</strong> ServiceNow IT Asset Management with OT extension modules</p>
-                    <div class="alert alert-success">
-                        <strong>Status:</strong> <span class="status-indicator status-green"></span>Active and Operational
-                    </div>
-                    <ul style="margin-left: 20px;">
-                        <li>Integration: Active Directory, VMware vCenter, SIEM, monitoring tools</li>
-                        <li>Data Sources: Automated discovery, manual entry, third-party feeds</li>
-                        <li>Update Frequency: Real-time for critical attributes, daily for standard attributes</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Change Management Section -->
-        <div class="section" id="change-management">
-            <div class="section-header" onclick="toggleSection('change-management')">
-                <h2>3. Change Management Process</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Change Categories</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Processing Time</th>
-                                    <th>Approval Required</th>
-                                    <th>Risk Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Emergency</td>
-                                    <td>&lt;4 hours</td>
-                                    <td>CISO or Deputy</td>
-                                    <td><span class="status-indicator status-red"></span>Critical</td>
-                                </tr>
-                                <tr>
-                                    <td>Standard</td>
-                                    <td>&lt;24 hours</td>
-                                    <td>Automated</td>
-                                    <td><span class="status-indicator status-green"></span>Low</td>
-                                </tr>
-                                <tr>
-                                    <td>Normal</td>
-                                    <td>5-14 business days</td>
-                                    <td>Full CCB Review</td>
-                                    <td><span class="status-indicator status-yellow"></span>Medium</td>
-                                </tr>
-                                <tr>
-                                    <td>Major</td>
-                                    <td>30+ business days</td>
-                                    <td>Executive Leadership</td>
-                                    <td><span class="status-indicator status-red"></span>High</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Change Request Process Flow</h3>
-                    <div class="process-flow">
-                        <div class="process-step">
-                            <h4>1. Request Initiation</h4>
-                            <p>ServiceNow form submission with required documentation</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>2. Impact Assessment</h4>
-                            <p>Technical review, risk analysis, business impact evaluation</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>3. CCB Review</h4>
-                            <p>Board review, approval decision, scheduling coordination</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>4. Implementation</h4>
-                            <p>Execution with monitoring, validation, documentation</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>5. Post-Review</h4>
-                            <p>Success validation, lessons learned, closure</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Emergency Change Contact Information</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Contact</th>
-                                    <th>Responsibility</th>
-                                    <th>Availability</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Primary Contact</td>
-                                    <td class="editable-cell" contenteditable="true">Jason Trujillo</td>
-                                    <td>Network Administration</td>
-                                    <td>24/7</td>
-                                </tr>
-                                <tr>
-                                    <td>Secondary Contact</td>
-                                    <td class="editable-cell" contenteditable="true">Regina Moore</td>
-                                    <td>OT Systems Engineering</td>
-                                    <td>Production Hours</td>
-                                </tr>
-                                <tr>
-                                    <td>Executive Authority</td>
-                                    <td class="editable-cell" contenteditable="true">Dr. Nia Clarke</td>
-                                    <td>Final Decision Authority</td>
-                                    <td>On-call</td>
-                                </tr>
-                                <tr>
-                                    <td>Business Liaison</td>
-                                    <td class="editable-cell" contenteditable="true">Marcus Lee</td>
-                                    <td>Business Impact Decisions</td>
-                                    <td>Business Hours</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Baseline Management Section -->
-        <div class="section" id="baseline-management">
-            <div class="section-header" onclick="toggleSection('baseline-management')">
-                <h2>4. Configuration Baseline Management</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>IT System Baselines</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Windows Workstations:</strong> NIST SP 800-171 security configuration guide</li>
-                        <li><strong>Windows Servers:</strong> CIS Benchmark Level 1 with organizational customizations</li>
-                        <li><strong>Linux Systems:</strong> CIS Benchmark Level 1 with hardening supplements</li>
-                        <li><strong>Network Infrastructure:</strong> Vendor security guides with zero-trust principles</li>
-                        <li><strong>Cloud Services:</strong> Azure Security Benchmark, AWS Well-Architected Framework</li>
-                    </ul>
-                </div>
-
-                <div class="subsection">
-                    <h3>OT System Baselines</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Rockwell PLCs:</strong> IEC 62443 security levels with vendor recommendations</li>
-                        <li><strong>HMI Systems:</strong> NIST SP 800-82 industrial control system guidelines</li>
-                        <li><strong>SCADA Gateway:</strong> Multi-layered security configuration with protocol filtering</li>
-                        <li><strong>IoT Devices:</strong> Manufacturer security baselines with network isolation</li>
-                        <li><strong>Industrial Networks:</strong> Segmented VLAN configuration with monitoring</li>
-                    </ul>
-                </div>
-
-                <div class="subsection">
-                    <h3>Automated Configuration Management Tools</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>System Type</th>
-                                    <th>Tool</th>
-                                    <th>Coverage</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Windows Systems</td>
-                                    <td>Microsoft SCCM</td>
-                                    <td class="editable-cell" contenteditable="true">90%</td>
-                                    <td><span class="status-indicator status-green"></span>Active</td>
-                                </tr>
-                                <tr>
-                                    <td>Linux Systems</td>
-                                    <td>Ansible</td>
-                                    <td class="editable-cell" contenteditable="true">85%</td>
-                                    <td><span class="status-indicator status-green"></span>Active</td>
-                                </tr>
-                                <tr>
-                                    <td>Network Equipment</td>
-                                    <td>Cisco DNA Center</td>
-                                    <td class="editable-cell" contenteditable="true">70%</td>
-                                    <td><span class="status-indicator status-yellow"></span>Expanding</td>
-                                </tr>
-                                <tr>
-                                    <td>PLC Configuration</td>
-                                    <td>FactoryTalk Asset Centre</td>
-                                    <td class="editable-cell" contenteditable="true">60%</td>
-                                    <td><span class="status-indicator status-yellow"></span>Implementing</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Compliance Section -->
-        <div class="section" id="compliance">
-            <div class="section-header" onclick="toggleSection('compliance')">
-                <h2>5. Compliance and Audit Management</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Regulatory Compliance Framework</h3>
-                    <div class="dashboard-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">95%</div>
-                            <div class="metric-label">FDA 21 CFR Part 11 Compliance</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">88%</div>
-                            <div class="metric-label">NIST Framework Alignment</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">92%</div>
-                            <div class="metric-label">IEC 62443 Compliance</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">85%</div>
-                            <div class="metric-label">SOX Controls</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Key Compliance Requirements</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Food Safety:</strong> FDA 21 CFR Part 11, FSMA Traceability, HACCP Compliance</li>
-                        <li><strong>Cybersecurity:</strong> NIST Cybersecurity Framework, IEC 62443, ISO 27001</li>
-                        <li><strong>Financial:</strong> SOX Section 404, PCI DSS</li>
-                    </ul>
-                </div>
-
-                <div class="subsection">
-                    <h3>Audit Schedule</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Audit Type</th>
-                                    <th>Frequency</th>
-                                    <th>Next Due</th>
-                                    <th>Responsible Party</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Internal CM Audit</td>
-                                    <td>Quarterly</td>
-                                    <td class="editable-cell" contenteditable="true">October 15, 2025</td>
-                                    <td>Internal Audit Team</td>
-                                </tr>
-                                <tr>
-                                    <td>FDA Inspection</td>
-                                    <td>Bi-annual</td>
-                                    <td class="editable-cell" contenteditable="true">March 2026</td>
-                                    <td>Quality Assurance</td>
-                                </tr>
-                                <tr>
-                                    <td>SOX Compliance</td>
-                                    <td>Annual</td>
-                                    <td class="editable-cell" contenteditable="true">December 2025</td>
-                                    <td>External Auditor</td>
-                                </tr>
-                                <tr>
-                                    <td>Security Assessment</td>
-                                    <td>Semi-annual</td>
-                                    <td class="editable-cell" contenteditable="true">January 2026</td>
-                                    <td>Security Team</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tools Section -->
-        <div class="section" id="tools">
-            <div class="section-header" onclick="toggleSection('tools')">
-                <h2>6. Tools and Technology</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Configuration Management Tools</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tool Category</th>
-                                    <th>Primary Tool</th>
-                                    <th>Secondary Tool</th>
-                                    <th>Integration Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>CMDB Platform</td>
-                                    <td>ServiceNow ITAM</td>
-                                    <td>-</td>
-                                    <td><span class="status-indicator status-green"></span>Fully Integrated</td>
-                                </tr>
-                                <tr>
-                                    <td>IT Automation</td>
-                                    <td>Ansible Tower</td>
-                                    <td>SCCM</td>
-                                    <td><span class="status-indicator status-green"></span>Operational</td>
-                                </tr>
-                                <tr>
-                                    <td>Network Automation</td>
-                                    <td>Cisco DNA Center</td>
-                                    <td>Juniper Space</td>
-                                    <td><span class="status-indicator status-yellow"></span>Expanding</td>
-                                </tr>
-                                <tr>
-                                    <td>Vulnerability Scanning</td>
-                                    <td>Tenable Nessus</td>
-                                    <td>-</td>
-                                    <td><span class="status-indicator status-green"></span>Active</td>
-                                </tr>
-                                <tr>
-                                    <td>File Integrity</td>
-                                    <td>Tripwire Enterprise</td>
-                                    <td>-</td>
-                                    <td><span class="status-indicator status-green"></span>Monitoring</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Tool Roadmap</h3>
-                    <div class="process-flow">
-                        <div class="process-step">
-                            <h4>Q3 2025</h4>
-                            <p>Complete ServiceNow CMDB implementation and population</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>Q4 2025</h4>
-                            <p>Deploy automated configuration baselines for all IT systems</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>Q1 2026</h4>
-                            <p>Integrate OT systems into unified configuration management</p>
-                        </div>
-                        <div class="process-step">
-                            <h4>Q2 2026</h4>
-                            <p>Implement predictive analytics for configuration management</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Training Section -->
-        <div class="section" id="training">
-            <div class="section-header" onclick="toggleSection('training')">
-                <h2>7. Training and Competency Management</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Role-Based Training Matrix</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Required Training</th>
-                                    <th>Frequency</th>
-                                    <th>Next Due</th>
-                                    <th>Completion Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>System Administrators</td>
-                                    <td>CM procedures, tool training</td>
-                                    <td>Annual</td>
-                                    <td class="editable-cell" contenteditable="true">January 2026</td>
-                                    <td><span class="status-indicator status-green"></span>85% Complete</td>
-                                </tr>
-                                <tr>
-                                    <td>OT Engineers</td>
-                                    <td>Industrial cybersecurity, change control</td>
-                                    <td>Annual</td>
-                                    <td class="editable-cell" contenteditable="true">February 2026</td>
-                                    <td><span class="status-indicator status-yellow"></span>70% Complete</td>
-                                </tr>
-                                <tr>
-                                    <td>Change Coordinators</td>
-                                    <td>Change management process, ServiceNow</td>
-                                    <td>Semi-annual</td>
-                                    <td class="editable-cell" contenteditable="true">December 2025</td>
-                                    <td><span class="status-indicator status-green"></span>90% Complete</td>
-                                </tr>
-                                <tr>
-                                    <td>Business Users</td>
-                                    <td>Change request procedures</td>
-                                    <td>Annual</td>
-                                    <td class="editable-cell" contenteditable="true">March 2026</td>
-                                    <td><span class="status-indicator status-red"></span>45% Complete</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Training Programs</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>ITIL Foundation:</strong> Change and configuration management best practices</li>
-                        <li><strong>Industrial Cybersecurity:</strong> IEC 62443 and NIST SP 800-82 training</li>
-                        <li><strong>Tool-Specific Training:</strong> Vendor certification programs for key platforms</li>
-                        <li><strong>Security Awareness:</strong> Configuration security and insider threat prevention</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Metrics Section -->
-        <div class="section" id="metrics">
-            <div class="section-header" onclick="toggleSection('metrics')">
-                <h2>8. Metrics and Continuous Improvement</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="subsection">
-                    <h3>Key Performance Indicators</h3>
-                    <div class="dashboard-grid">
-                        <div class="metric-card">
-                            <div class="metric-value">99.2%</div>
-                            <div class="metric-label">System Availability (Target: 99.9%)</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">87%</div>
-                            <div class="metric-label">Change Success Rate (Target: 95%)</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">1.8hrs</div>
-                            <div class="metric-label">Mean Time to Recovery (Target: <2hrs)</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">92%</div>
-                            <div class="metric-label">Configuration Accuracy (Target: 95%)</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">6.2 days</div>
-                            <div class="metric-label">Avg Change Processing Time</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">15 min</div>
-                            <div class="metric-label">Configuration Drift Detection Time</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="subsection">
-                    <h3>Improvement Initiatives</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Initiative</th>
-                                    <th>Target Completion</th>
-                                    <th>Expected Impact</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Automated Baseline Verification</td>
-                                    <td class="editable-cell" contenteditable="true">Q4 2025</td>
-                                    <td>Real-time validation</td>
-                                    <td><span class="status-indicator status-green"></span>On Track</td>
-                                </tr>
-                                <tr>
-                                    <td>Self-Service Change Portal</td>
-                                    <td class="editable-cell" contenteditable="true">Q1 2026</td>
-                                    <td>Reduce processing time by 50%</td>
-                                    <td><span class="status-indicator status-yellow"></span>Planning</td>
-                                </tr>
-                                <tr>
-                                    <td>Predictive Analytics</td>
-                                    <td class="editable-cell" contenteditable="true">Q2 2026</td>
-                                    <td>Early warning system</td>
-                                    <td><span class="status-indicator status-yellow"></span>Research</td>
-                                </tr>
-                                <tr>
-                                    <td>AI-Powered CM</td>
-                                    <td class="editable-cell" contenteditable="true">Q4 2026</td>
-                                    <td>Optimal configuration recommendations</td>
-                                    <td><span class="status-indicator status-red"></span>Future</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Student Learning Activities Section -->
-        <div class="section" id="student-activities">
-            <div class="section-header" onclick="toggleSection('student-activities')">
-                <h2>🎓 Student Learning Activities</h2>
-                <span class="section-toggle">+</span>
-            </div>
-            <div class="section-content">
-                <div class="alert alert-success">
-                    <strong>Learning Objective:</strong> Master configuration management principles through hands-on interaction with enterprise-level CM tools and processes.
-                </div>
-
-                <!-- Task 1: Change Management Simulation -->
-                <div class="subsection" id="task1">
-                    <h3>Task 1: Change Management Process Simulation 🔄</h3>
-                    <p><strong>Objective:</strong> Demonstrate understanding of change categories, approval workflows, and emergency procedures.</p>
-                    
-                    <div class="form-group">
-                        <label>Scenario: A critical security vulnerability has been discovered in the production SCADA system. Complete the emergency change process:</label>
-                        
-                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                            <h4>Step 1: Classify the Change</h4>
-                            <select class="form-control" id="changeCategory" onchange="updateChangeDetails()">
-                                <option value="">Select Change Category</option>
-                                <option value="emergency">Emergency Change</option>
-                                <option value="standard">Standard Change</option>
-                                <option value="normal">Normal Change</option>
-                                <option value="major">Major Change</option>
-                            </select>
-                            
-                            <div id="changeDetails" style="margin-top: 15px; display: none;">
-                                <p><strong>Selected:</strong> <span id="selectedCategory"></span></p>
-                                <p><strong>Processing Time:</strong> <span id="processingTime"></span></p>
-                                <p><strong>Approval Required:</strong> <span id="approvalRequired"></span></p>
-                            </div>
-                        </div>
-
-                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                            <h4>Step 2: Identify Emergency Contacts</h4>
-                            <p>Who should be contacted first for this SCADA emergency? (Refer to Section 3 Emergency Contacts)</p>
-                            <input type="text" class="form-control" id="primaryContact" placeholder="Enter primary contact name">
-                            <textarea class="form-control" style="margin-top: 10px;" id="justification" placeholder="Justify your contact selection and explain the urgency level"></textarea>
-                        </div>
-
-                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                            <h4>Step 3: Document Implementation Plan</h4>
-                            <textarea class="form-control" id="implementationPlan" placeholder="Describe your implementation approach, including rollback procedures"></textarea>
-                        </div>
-
-                        <button class="btn" onclick="submitTask1()">Submit Task 1</button>
-                        <div id="task1Result" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Task 2: Compliance Gap Analysis -->
-                <div class="subsection" id="task2">
-                    <h3>Task 2: Compliance Assessment & Gap Analysis 📊</h3>
-                    <p><strong>Objective:</strong> Analyze current compliance status and develop improvement strategies.</p>
-                    
-                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                        <h4>Current Compliance Scores (from Section 5):</h4>
-                        <ul>
-                            <li>FDA 21 CFR Part 11: 95%</li>
-                            <li>NIST Framework: 88%</li>
-                            <li>IEC 62443: 92%</li>
-                            <li>SOX Controls: 85%</li>
-                        </ul>
-                        
-                        <div class="form-group">
-                            <label>Which compliance area needs the most urgent attention?</label>
-                            <select class="form-control" id="priorityCompliance">
-                                <option value="">Select Priority Area</option>
-                                <option value="fda">FDA 21 CFR Part 11</option>
-                                <option value="nist">NIST Framework</option>
-                                <option value="iec">IEC 62443</option>
-                                <option value="sox">SOX Controls</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Propose 3 specific improvement actions for your selected priority area:</label>
-                            <textarea class="form-control" id="improvementActions" rows="6" placeholder="1. Action 1&#10;2. Action 2&#10;3. Action 3"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Calculate the overall compliance score and set a target for next quarter:</label>
-                            <input type="text" class="form-control" id="currentScore" placeholder="Current Overall Score (%)" readonly>
-                            <input type="text" class="form-control" id="targetScore" placeholder="Target Score for Q4 2025 (%)" style="margin-top: 10px;">
-                        </div>
-
-                        <button class="btn" onclick="calculateCompliance()">Calculate Current Score</button>
-                        <button class="btn" onclick="submitTask2()">Submit Task 2</button>
-                        <div id="task2Result" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Task 3: Resource Planning & Tool Management -->
-                <div class="subsection" id="task3">
-                    <h3>Task 3: Resource Planning & Tool Management 🛠️</h3>
-                    <p><strong>Objective:</strong> Evaluate current tool coverage and plan automation improvements.</p>
-                    
-                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                        <h4>Current Tool Coverage Analysis (from Section 6):</h4>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>System Type</th>
-                                        <th>Current Coverage</th>
-                                        <th>Your Proposed Target</th>
-                                        <th>Implementation Priority</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Windows Systems (SCCM)</td>
-                                        <td>90%</td>
-                                        <td><input type="number" class="form-control" id="windowsTarget" max="100" style="width: 80px;"></td>
-                                        <td>
-                                            <select class="form-control" id="windowsPriority">
-                                                <option value="">Select</option>
-                                                <option value="high">High</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="low">Low</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Linux Systems (Ansible)</td>
-                                        <td>85%</td>
-                                        <td><input type="number" class="form-control" id="linuxTarget" max="100" style="width: 80px;"></td>
-                                        <td>
-                                            <select class="form-control" id="linuxPriority">
-                                                <option value="">Select</option>
-                                                <option value="high">High</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="low">Low</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Network Equipment</td>
-                                        <td>70%</td>
-                                        <td><input type="number" class="form-control" id="networkTarget" max="100" style="width: 80px;"></td>
-                                        <td>
-                                            <select class="form-control" id="networkPriority">
-                                                <option value="">Select</option>
-                                                <option value="high">High</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="low">Low</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>PLC Configuration</td>
-                                        <td>60%</td>
-                                        <td><input type="number" class="form-control" id="plcTarget" max="100" style="width: 80px;"></td>
-                                        <td>
-                                            <select class="form-control" id="plcPriority">
-                                                <option value="">Select</option>
-                                                <option value="high">High</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="low">Low</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Justify your highest priority selection with a business case:</label>
-                            <textarea class="form-control" id="businessCase" rows="4" placeholder="Explain why this system should receive priority investment, including ROI considerations"></textarea>
-                        </div>
-
-                        <button class="btn" onclick="submitTask3()">Submit Task 3</button>
-                        <div id="task3Result" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Task 4: Training Program Development -->
-                <div class="subsection" id="task4">
-                    <h3>Task 4: Training Program Development 📚</h3>
-                    <p><strong>Objective:</strong> Assess training effectiveness and design improvement programs.</p>
-                    
-                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                        <h4>Current Training Completion Rates (from Section 7):</h4>
-                        <ul>
-                            <li>System Administrators: 85% Complete</li>
-                            <li>OT Engineers: 70% Complete</li>
-                            <li>Change Coordinators: 90% Complete</li>
-                            <li>Business Users: 45% Complete</li>
-                        </ul>
-
-                        <div class="form-group">
-                            <label>Which role group requires immediate training intervention?</label>
-                            <select class="form-control" id="trainingPriority">
-                                <option value="">Select Role Group</option>
-                                <option value="sysadmin">System Administrators</option>
-                                <option value="ot">OT Engineers</option>
-                                <option value="coordinators">Change Coordinators</option>
-                                <option value="business">Business Users</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Design a remedial training program for your selected group:</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div>
-                                    <label>Training Method:</label>
-                                    <select class="form-control" id="trainingMethod">
-                                        <option value="">Select Method</option>
-                                        <option value="online">Online Self-Paced</option>
-                                        <option value="classroom">Classroom Instruction</option>
-                                        <option value="hands-on">Hands-On Workshop</option>
-                                        <option value="mentoring">Peer Mentoring</option>
-                                        <option value="blended">Blended Learning</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label>Duration (hours):</label>
-                                    <input type="number" class="form-control" id="trainingDuration" min="1" max="40">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Define learning objectives for your training program:</label>
-                            <textarea class="form-control" id="learningObjectives" rows="4" placeholder="List 3-5 specific, measurable learning objectives"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>How will you measure training effectiveness?</label>
-                            <textarea class="form-control" id="assessmentMethod" rows="3" placeholder="Describe your assessment and evaluation approach"></textarea>
-                        </div>
-
-                        <button class="btn" onclick="submitTask4()">Submit Task 4</button>
-                        <div id="task4Result" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Task 5: Metrics Analysis & Continuous Improvement -->
-                <div class="subsection" id="task5">
-                    <h3>Task 5: Metrics Analysis & Continuous Improvement 📈</h3>
-                    <p><strong>Objective:</strong> Analyze KPI performance and develop data-driven improvement strategies.</p>
-                    
-                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #4a7c59; border-radius: 8px;">
-                        <h4>Current KPI Performance vs. Targets (from Section 8):</h4>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>KPI</th>
-                                        <th>Current</th>
-                                        <th>Target</th>
-                                        <th>Gap</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>System Availability</td>
-                                        <td>99.2%</td>
-                                        <td>99.9%</td>
-                                        <td style="color: red;">-0.7%</td>
-                                        <td><span class="status-indicator status-yellow"></span>Below Target</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Change Success Rate</td>
-                                        <td>87%</td>
-                                        <td>95%</td>
-                                        <td style="color: red;">-8%</td>
-                                        <td><span class="status-indicator status-red"></span>Needs Improvement</td>
-                                    </tr>
-                                    <tr>
-                                        <td>MTTR</td>
-                                        <td>1.8 hrs</td>
-                                        <td>&lt;2 hrs</td>
-                                        <td style="color: green;">+0.2 hrs</td>
-                                        <td><span class="status-indicator status-green"></span>Meeting Target</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Configuration Accuracy</td>
-                                        <td>92%</td>
-                                        <td>95%</td>
-                                        <td style="color: red;">-3%</td>
-                                        <td><span class="status-indicator status-yellow"></span>Below Target</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Select the KPI that requires most urgent attention:</label>
-                            <select class="form-control" id="priorityKPI">
-                                <option value="">Select KPI</option>
-                                <option value="availability">System Availability</option>
-                                <option value="change-success">Change Success Rate</option>
-                                <option value="mttr">Mean Time to Recovery</option>
-                                <option value="config-accuracy">Configuration Accuracy</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Root Cause Analysis - Why is this KPI underperforming?</label>
-                            <textarea class="form-control" id="rootCauseAnalysis" rows="4" placeholder="Identify and analyze the primary factors contributing to poor performance"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Improvement Action Plan (SMART Goals):</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div>
-                                    <label>Specific Action:</label>
-                                    <input type="text" class="form-control" id="specificAction" placeholder="What will you do?">
-                                </div>
-                                <div>
-                                    <label>Target Improvement:</label>
-                                    <input type="text" class="form-control" id="targetImprovement" placeholder="By how much?">
-                                </div>
-                                <div>
-                                    <label>Timeline:</label>
-                                    <input type="text" class="form-control" id="timeline" placeholder="When will this be achieved?">
-                                </div>
-                                <div>
-                                    <label>Success Metric:</label>
-                                    <input type="text" class="form-control" id="successMetric" placeholder="How will you measure success?">
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="btn" onclick="submitTask5()">Submit Task 5</button>
-                        <div id="task5Result" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Final Assessment -->
-                <div class="subsection" id="final-assessment">
-                    <h3>📋 Final Assessment & Reflection</h3>
-                    <div style="margin: 15px 0; padding: 15px; border: 2px solid #2d5016; border-radius: 8px; background: #f8f9fa;">
-                        <div class="form-group">
-                            <label>Reflection: What did you learn about configuration management through these activities?</label>
-                            <textarea class="form-control" id="finalReflection" rows="5" placeholder="Reflect on your learning experience and key insights gained"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Professional Application: How would you apply these concepts in a real enterprise environment?</label>
-                            <textarea class="form-control" id="professionalApplication" rows="4" placeholder="Describe how you would implement these practices in your future career"></textarea>
-                        </div>
-
-                        <button class="btn" onclick="submitFinalAssessment()">Complete Final Assessment</button>
-                        <div id="finalResult" style="margin-top: 15px;"></div>
-                    </div>
-                </div>
-
-                <!-- Progress Tracking -->
-                <div class="subsection">
-                    <h3>🎯 Progress Tracking</h3>
-                    <div id="progressTracker">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div class="metric-card" id="task1Progress">
-                                <div class="metric-value" id="task1Status">Not Started</div>
-                                <div class="metric-label">Task 1: Change Management</div>
-                            </div>
-                            <div class="metric-card" id="task2Progress">
-                                <div class="metric-value" id="task2Status">Not Started</div>
-                                <div class="metric-label">Task 2: Compliance Analysis</div>
-                            </div>
-                            <div class="metric-card" id="task3Progress">
-                                <div class="metric-value" id="task3Status">Not Started</div>
-                                <div class="metric-label">Task 3: Resource Planning</div>
-                            </div>
-                            <div class="metric-card" id="task4Progress">
-                                <div class="metric-value" id="task4Status">Not Started</div>
-                                <div class="metric-label">Task 4: Training Development</div>
-                            </div>
-                            <div class="metric-card" id="task5Progress">
-                                <div class="metric-value" id="task5Status">Not Started</div>
-                                <div class="metric-label">Task 5: Metrics Analysis</div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 20px; text-align: center;">
-                            <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
-                                <div id="overallProgress" style="background: linear-gradient(90deg, #4a7c59, #2d5016); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
-                            </div>
-                            <p style="margin-top: 10px;"><strong>Overall Completion: <span id="completionPercentage">0%</span></strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Dynamic Sections Container -->
+        <div id="sections-container">
+            <!-- Sections will be dynamically loaded here -->
         </div>
 
         <!-- Action Buttons -->
         <div style="text-align: center; margin: 30px 0;">
             <button class="btn" onclick="scrollToSection('student-activities')">🎓 Start Learning Activities</button>
-            <button class="btn" onclick="exportPlan()">Export Plan</button>
-            <button class="btn btn-secondary" onclick="generateReport()">Generate Report</button>
-            <button class="btn" onclick="saveDraft()">Save Draft</button>
-            <button class="btn btn-secondary" onclick="printPlan()">Print Plan</button>
+            <button class="btn" onclick="exportPlan()">📤 Export Plan</button>
+            <button class="btn btn-secondary" onclick="generateReport()">📊 Generate Report</button>
+            <button class="btn" onclick="importPlan()">📥 Import Plan</button>
+            <button class="btn btn-secondary" onclick="printPlan()">🖨️ Print Plan</button>
+            <button class="btn btn-warning" onclick="validatePlan()">✅ Validate Plan</button>
         </div>
 
         <!-- Footer -->
         <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; margin-top: 30px;">
             <p><strong>Document Status:</strong> <span style="color: #2d5016;">Active and Current</span></p>
-            <p><strong>Next Review:</strong> October 5, 2025 | <strong>Update Schedule:</strong> Quarterly review, annual revision</p>
+            <p><strong>Next Review:</strong> <span class="editable" contenteditable="true">October 5, 2025</span> | <strong>Update Schedule:</strong> <span class="editable" contenteditable="true">Quarterly review, annual revision</span></p>
             <p><strong>Change Control:</strong> All updates subject to CCB approval</p>
+            <p><strong>Training Mode:</strong> <span id="training-status">Disabled</span> | <strong>Last Saved:</strong> <span id="last-saved">Never</span></p>
         </div>
     </div>
 
+    <!-- Floating Save Button -->
+    <button class="floating-save" onclick="quickSave()">
+        💾 Save Progress
+    </button>
+
+    <!-- Hidden File Input for Import -->
+    <input type="file" id="fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+
     <script>
+        // Global Configuration Management System
+        class ConfigurationManagementPlan {
+            constructor() {
+                this.trainingMode = false;
+                this.sections = new Map();
+                this.templates = new Map();
+                this.changeLog = [];
+                this.autoSaveInterval = null;
+                this.lastSaved = null;
+                this.validationRules = new Map();
+                this.initializeDefaultPlan();
+                this.setupEventListeners();
+            }
+
+            initializeDefaultPlan() {
+                // Initialize with default sections
+                this.addDefaultSections();
+                this.setupTemplates();
+                this.setupValidationRules();
+                this.renderAllSections();
+            }
+
+            addDefaultSections() {
+                // Executive Summary Section
+                this.sections.set('executive-summary', {
+                    id: 'executive-summary',
+                    title: '1. Executive Summary',
+                    type: 'text',
+                    subsections: [
+                        {
+                            id: 'purpose-scope',
+                            title: 'Purpose and Scope',
+                            content: 'This Configuration Management Plan establishes standardized processes for maintaining secure, compliant configurations across FreshFlow Systems\' hybrid IT/OT environment. The plan addresses configuration baselines, change control procedures, and compliance monitoring for all systems supporting the organization\'s food packaging operations across three facilities in Lima, Ohio.',
+                            type: 'text'
+                        },
+                        {
+                            id: 'strategic-objectives',
+                            title: 'Strategic Objectives',
+                            content: [
+                                'Operational Stability: Maintain <2-hour recovery time for production systems through consistent configurations',
+                                'Security Compliance: Ensure all systems meet industry security standards and regulatory requirements',
+                                'Change Control: Implement formal change management reducing configuration-related incidents by 90%',
+                                'Scalability: Support 125% annual growth through automated configuration management processes',
+                                'IT/OT Integration: Establish unified configuration standards across information and operational technology environments'
+                            ],
+                            type: 'list'
+                        },
+                        {
+                            id: 'current-state',
+                            title: 'Current State Assessment',
+                            content: [
+                                { label: 'CM Maturity', value: 'Level 2', target: 'Level 3', status: 'yellow' },
+                                { label: 'IT Systems Automated', value: '75%', target: '90%', status: 'yellow' },
+                                { label: 'OT Systems Automated', value: '25%', target: '70%', status: 'red' },
+                                { label: 'Change Success Rate', value: '85%', target: '95%', status: 'yellow' }
+                            ],
+                            type: 'metrics'
+                        }
+                    ]
+                });
+
+                // Framework Section
+                this.sections.set('framework', {
+                    id: 'framework',
+                    title: '2. Configuration Management Framework',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'ccb-structure',
+                            title: 'Configuration Control Board (CCB)',
+                            content: {
+                                headers: ['Role', 'Name', 'Primary Responsibilities', 'Authority Level'],
+                                rows: [
+                                    ['Chair', 'Dr. Nia Clarke (CISO)', 'Overall CM process oversight, baseline approval', 'Level 4 (Strategic)'],
+                                    ['Technical Lead', 'Jason Trujillo (Network Administrator)', 'Daily configuration maintenance, change implementation', 'Level 3 (Tactical)'],
+                                    ['OT Representative', 'Regina Moore (OT Systems Engineer)', 'Industrial system configuration management', 'Level 3 (Tactical)'],
+                                    ['Business Representative', 'Marcus Lee (COO)', 'Configuration requirements definition, business approval', 'Level 3 (Tactical)'],
+                                    ['Quality Assurance', 'Ronetta Bell (QC Manager)', 'Quality validation and compliance verification', 'Level 2 (Operational)']
+                                ]
+                            },
+                            type: 'table'
+                        },
+                        {
+                            id: 'cmdb-structure',
+                            title: 'CMDB Structure',
+                            content: 'Primary Tool: ServiceNow IT Asset Management with OT extension modules\n\nIntegration: Active Directory, VMware vCenter, SIEM, monitoring tools\nData Sources: Automated discovery, manual entry, third-party feeds\nUpdate Frequency: Real-time for critical attributes, daily for standard attributes',
+                            type: 'text'
+                        }
+                    ]
+                });
+
+                // Add more default sections...
+                this.addChangeManagementSection();
+                this.addBaselineManagementSection();
+                this.addComplianceSection();
+                this.addToolsSection();
+                this.addTrainingSection();
+                this.addMetricsSection();
+                this.addStudentActivitiesSection();
+            }
+
+            addChangeManagementSection() {
+                this.sections.set('change-management', {
+                    id: 'change-management',
+                    title: '3. Change Management Process',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'change-categories',
+                            title: 'Change Categories',
+                            content: {
+                                headers: ['Category', 'Processing Time', 'Approval Required', 'Risk Level'],
+                                rows: [
+                                    ['Emergency', '<4 hours', 'CISO or Deputy', 'Critical'],
+                                    ['Standard', '<24 hours', 'Automated', 'Low'],
+                                    ['Normal', '5-14 business days', 'Full CCB Review', 'Medium'],
+                                    ['Major', '30+ business days', 'Executive Leadership', 'High']
+                                ]
+                            },
+                            type: 'table'
+                        },
+                        {
+                            id: 'change-process',
+                            title: 'Change Request Process Flow',
+                            content: [
+                                { title: '1. Request Initiation', description: 'ServiceNow form submission with required documentation' },
+                                { title: '2. Impact Assessment', description: 'Technical review, risk analysis, business impact evaluation' },
+                                { title: '3. CCB Review', description: 'Board review, approval decision, scheduling coordination' },
+                                { title: '4. Implementation', description: 'Execution with monitoring, validation, documentation' },
+                                { title: '5. Post-Review', description: 'Success validation, lessons learned, closure' }
+                            ],
+                            type: 'process'
+                        }
+                    ]
+                });
+            }
+
+            addBaselineManagementSection() {
+                this.sections.set('baseline-management', {
+                    id: 'baseline-management',
+                    title: '4. Configuration Baseline Management',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'it-baselines',
+                            title: 'IT System Baselines',
+                            content: [
+                                'Windows Workstations: NIST SP 800-171 security configuration guide',
+                                'Windows Servers: CIS Benchmark Level 1 with organizational customizations',
+                                'Linux Systems: CIS Benchmark Level 1 with hardening supplements',
+                                'Network Infrastructure: Vendor security guides with zero-trust principles',
+                                'Cloud Services: Azure Security Benchmark, AWS Well-Architected Framework'
+                            ],
+                            type: 'list'
+                        },
+                        {
+                            id: 'ot-baselines',
+                            title: 'OT System Baselines',
+                            content: [
+                                'Rockwell PLCs: IEC 62443 security levels with vendor recommendations',
+                                'HMI Systems: NIST SP 800-82 industrial control system guidelines',
+                                'SCADA Gateway: Multi-layered security configuration with protocol filtering',
+                                'IoT Devices: Manufacturer security baselines with network isolation',
+                                'Industrial Networks: Segmented VLAN configuration with monitoring'
+                            ],
+                            type: 'list'
+                        }
+                    ]
+                });
+            }
+
+            addComplianceSection() {
+                this.sections.set('compliance', {
+                    id: 'compliance',
+                    title: '5. Compliance and Audit Management',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'compliance-metrics',
+                            title: 'Regulatory Compliance Framework',
+                            content: [
+                                { label: 'FDA 21 CFR Part 11 Compliance', value: '95%', target: '98%', status: 'green' },
+                                { label: 'NIST Framework Alignment', value: '88%', target: '95%', status: 'yellow' },
+                                { label: 'IEC 62443 Compliance', value: '92%', target: '95%', status: 'yellow' },
+                                { label: 'SOX Controls', value: '85%', target: '95%', status: 'red' }
+                            ],
+                            type: 'metrics'
+                        }
+                    ]
+                });
+            }
+
+            addToolsSection() {
+                this.sections.set('tools', {
+                    id: 'tools',
+                    title: '6. Tools and Technology',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'tool-coverage',
+                            title: 'Configuration Management Tools',
+                            content: {
+                                headers: ['System Type', 'Tool', 'Coverage', 'Status'],
+                                rows: [
+                                    ['Windows Systems', 'Microsoft SCCM', '90%', 'Active'],
+                                    ['Linux Systems', 'Ansible', '85%', 'Active'],
+                                    ['Network Equipment', 'Cisco DNA Center', '70%', 'Expanding'],
+                                    ['PLC Configuration', 'FactoryTalk Asset Centre', '60%', 'Implementing']
+                                ]
+                            },
+                            type: 'table'
+                        }
+                    ]
+                });
+            }
+
+            addTrainingSection() {
+                this.sections.set('training', {
+                    id: 'training',
+                    title: '7. Training and Competency Management',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'training-matrix',
+                            title: 'Role-Based Training Matrix',
+                            content: {
+                                headers: ['Role', 'Required Training', 'Frequency', 'Next Due', 'Completion Status'],
+                                rows: [
+                                    ['System Administrators', 'CM procedures, tool training', 'Annual', 'January 2026', '85% Complete'],
+                                    ['OT Engineers', 'Industrial cybersecurity, change control', 'Annual', 'February 2026', '70% Complete'],
+                                    ['Change Coordinators', 'Change management process, ServiceNow', 'Semi-annual', 'December 2025', '90% Complete'],
+                                    ['Business Users', 'Change request procedures', 'Annual', 'March 2026', '45% Complete']
+                                ]
+                            },
+                            type: 'table'
+                        }
+                    ]
+                });
+            }
+
+            addMetricsSection() {
+                this.sections.set('metrics', {
+                    id: 'metrics',
+                    title: '8. Metrics and Continuous Improvement',
+                    type: 'mixed',
+                    subsections: [
+                        {
+                            id: 'kpi-dashboard',
+                            title: 'Key Performance Indicators',
+                            content: [
+                                { label: 'System Availability', value: '99.2%', target: '99.9%', status: 'yellow' },
+                                { label: 'Change Success Rate', value: '87%', target: '95%', status: 'red' },
+                                { label: 'Mean Time to Recovery', value: '1.8hrs', target: '<2hrs', status: 'green' },
+                                { label: 'Configuration Accuracy', value: '92%', target: '95%', status: 'yellow' },
+                                { label: 'Avg Change Processing Time', value: '6.2 days', target: '5 days', status: 'yellow' },
+                                { label: 'Configuration Drift Detection', value: '15 min', target: '10 min', status: 'yellow' }
+                            ],
+                            type: 'metrics'
+                        }
+                    ]
+                });
+            }
+
+            addStudentActivitiesSection() {
+                this.sections.set('student-activities', {
+                    id: 'student-activities',
+                    title: '🎓 Student Learning Activities',
+                    type: 'interactive',
+                    subsections: [
+                        {
+                            id: 'learning-intro',
+                            title: 'Learning Objectives',
+                            content: 'Master configuration management principles through hands-on interaction with enterprise-level CM tools and processes. Complete 5 practical tasks to demonstrate understanding.',
+                            type: 'text'
+                        }
+                    ]
+                });
+            }
+
+            setupTemplates() {
+                this.templates.set('baseline', {
+                    name: 'Baseline Configuration Plan',
+                    description: 'Standard enterprise configuration management plan',
+                    sections: Array.from(this.sections.keys())
+                });
+
+                this.templates.set('emergency', {
+                    name: 'Emergency Response Plan',
+                    description: 'Focused on emergency change procedures',
+                    sections: ['executive-summary', 'change-management', 'tools']
+                });
+
+                this.templates.set('compliance', {
+                    name: 'Compliance-Focused Plan',
+                    description: 'Emphasis on regulatory compliance and audit',
+                    sections: ['executive-summary', 'compliance', 'training', 'metrics']
+                });
+
+                this.templates.set('minimal', {
+                    name: 'Minimal Template',
+                    description: 'Basic structure for small organizations',
+                    sections: ['executive-summary', 'change-management']
+                });
+            }
+
+            setupValidationRules() {
+                this.validationRules.set('percentage', (value) => {
+                    const num = parseFloat(value);
+                    return !isNaN(num) && num >= 0 && num <= 100;
+                });
+
+                this.validationRules.set('date', (value) => {
+                    return !isNaN(Date.parse(value));
+                });
+
+                this.validationRules.set('required', (value) => {
+                    return value && value.trim().length > 0;
+                });
+            }
+
+            setupEventListeners() {
+                // Auto-save when content changes
+                document.addEventListener('input', (e) => {
+                    if (this.trainingMode && (e.target.classList.contains('editable') || 
+                        e.target.classList.contains('editable-cell') || 
+                        e.target.classList.contains('editable-content'))) {
+                        this.markAsChanged();
+                        this.debounceAutoSave();
+                    }
+                });
+
+                // Setup drag and drop
+                this.setupDragAndDrop();
+            }
+
+            setupDragAndDrop() {
+                let draggedElement = null;
+
+                document.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('drag-handle')) {
+                        draggedElement = e.target.closest('.subsection, .section, tr');
+                        e.target.closest('.subsection, .section, tr').classList.add('dragging');
+                    }
+                });
+
+                document.addEventListener('dragend', (e) => {
+                    if (draggedElement) {
+                        draggedElement.classList.remove('dragging');
+                        draggedElement = null;
+                    }
+                });
+
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                document.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (draggedElement && e.target.classList.contains('drop-zone')) {
+                        this.handleDrop(draggedElement, e.target);
+                    }
+                });
+            }
+
+            toggleTrainingMode() {
+                this.trainingMode = !this.trainingMode;
+                const toggle = document.querySelector('.training-mode-toggle');
+                const body = document.body;
+                
+                if (this.trainingMode) {
+                    body.classList.add('training-mode');
+                    toggle.textContent = '🎓 Training Mode: ON';
+                    toggle.classList.add('active');
+                    this.enableAutoSave();
+                    document.getElementById('training-status').textContent = 'Enabled';
+                    this.showTrainingHelp();
+                } else {
+                    body.classList.remove('training-mode');
+                    toggle.textContent = '🎓 Training Mode: OFF';
+                    toggle.classList.remove('active');
+                    this.disableAutoSave();
+                    document.getElementById('training-status').textContent = 'Disabled';
+                }
+                
+                this.renderAllSections();
+            }
+
+            showTrainingHelp() {
+                setTimeout(() => {
+                    alert('🎓 Training Mode Activated!\n\n✅ All content is now editable\n✅ Add/delete items using the action buttons\n✅ Drag and drop to reorder content\n✅ Changes are auto-saved\n✅ Use templates to load different scenarios\n\nStart by exploring the different sections and making modifications!');
+                }, 500);
+            }
+
+            enableAutoSave() {
+                this.autoSaveInterval = setInterval(() => {
+                    this.autoSave();
+                }, 30000); // Auto-save every 30 seconds
+            }
+
+            disableAutoSave() {
+                if (this.autoSaveInterval) {
+                    clearInterval(this.autoSaveInterval);
+                    this.autoSaveInterval = null;
+                }
+            }
+
+            markAsChanged() {
+                const saveButton = document.querySelector('.floating-save');
+                if (saveButton) {
+                    saveButton.style.background = '#ffc107';
+                    saveButton.textContent = '💾 Unsaved Changes';
+                }
+            }
+
+            debounceAutoSave() {
+                clearTimeout(this.autoSaveTimeout);
+                this.autoSaveTimeout = setTimeout(() => {
+                    this.autoSave();
+                }, 2000);
+            }
+
+            autoSave() {
+                this.saveCurrentState();
+                const saveButton = document.querySelector('.floating-save');
+                if (saveButton) {
+                    saveButton.style.background = '#28a745';
+                    saveButton.textContent = '✅ Saved';
+                    setTimeout(() => {
+                        saveButton.style.background = '#4a7c59';
+                        saveButton.textContent = '💾 Save Progress';
+                    }, 2000);
+                }
+            }
+
+            quickSave() {
+                this.saveCurrentState();
+                this.showNotification('Progress saved successfully!', 'success');
+            }
+
+            saveCurrentState() {
+                try {
+                    // Collect all current data
+                    const currentState = {
+                        sections: Array.from(this.sections.entries()),
+                        metadata: this.collectMetadata(),
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Store in memory (localStorage not available)
+                    this.lastSavedState = currentState;
+                    this.lastSaved = new Date();
+                    document.getElementById('last-saved').textContent = this.lastSaved.toLocaleTimeString();
+                    
+                    this.changeLog.push({
+                        action: 'save',
+                        timestamp: new Date(),
+                        state: JSON.parse(JSON.stringify(currentState))
+                    });
+                    
+                } catch (error) {
+                    console.error('Save failed:', error);
+                    this.showNotification('Save failed: ' + error.message, 'error');
+                }
+            }
+
+            collectMetadata() {
+                const editableElements = document.querySelectorAll('[data-field]');
+                const metadata = {};
+                editableElements.forEach(element => {
+                    metadata[element.dataset.field] = element.textContent;
+                });
+                return metadata;
+            }
+
+            renderAllSections() {
+                const container = document.getElementById('sections-container');
+                container.innerHTML = '';
+                
+                this.sections.forEach((section, sectionId) => {
+                    const sectionElement = this.createSectionElement(section);
+                    container.appendChild(sectionElement);
+                });
+
+                this.updateNavigation();
+            }
+
+            createSectionElement(section) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section';
+                sectionDiv.id = section.id;
+                
+                sectionDiv.innerHTML = `
+                    <div class="section-header" onclick="toggleSection('${section.id}')">
+                        <span class="drag-handle" draggable="true">≡</span>
+                        <h2 class="editable-title" contenteditable="${this.trainingMode}" data-section="${section.id}">${section.title}</h2>
+                        <div class="section-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addSubsection('${section.id}')">+ Add</button>
+                            <button class="btn btn-small btn-warning" onclick="cmPlan.editSectionProperties('${section.id}')">⚙️</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteSection('${section.id}')">🗑️</button>
+                        </div>
+                        <span class="section-toggle">+</span>
+                    </div>
+                    <div class="section-content">
+                        ${this.renderSubsections(section.subsections, section.id)}
+                    </div>
+                `;
+                
+                return sectionDiv;
+            }
+
+            renderSubsections(subsections, sectionId) {
+                if (!subsections || subsections.length === 0) {
+                    return '<div class="subsection"><h3>Empty Section</h3><p>Add content using the training mode controls.</p></div>';
+                }
+                
+                return subsections.map((subsection, index) => {
+                    return this.renderSubsection(subsection, sectionId, index);
+                }).join('');
+            }
+
+            renderSubsection(subsection, sectionId, index) {
+                const content = this.renderSubsectionContent(subsection);
+                
+                return `
+                    <div class="subsection" data-section="${sectionId}" data-index="${index}">
+                        <div class="subsection-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.duplicateSubsection('${sectionId}', ${index})">📋</button>
+                            <button class="btn btn-small btn-warning" onclick="cmPlan.editSubsection('${sectionId}', ${index})">✏️</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteSubsection('${sectionId}', ${index})">🗑️</button>
+                        </div>
+                        <span class="drag-handle" draggable="true">≡</span>
+                        <h3 class="editable-title" contenteditable="${this.trainingMode}">${subsection.title}</h3>
+                        ${content}
+                    </div>
+                `;
+            }
+
+            renderSubsectionContent(subsection) {
+                switch (subsection.type) {
+                    case 'text':
+                        return `<textarea class="editable-content" ${this.trainingMode ? '' : 'readonly'}>${subsection.content}</textarea>`;
+                    
+                    case 'list':
+                        return this.renderEditableList(subsection.content);
+                    
+                    case 'table':
+                        return this.renderEditableTable(subsection.content);
+                    
+                    case 'metrics':
+                        return this.renderEditableMetrics(subsection.content);
+                    
+                    case 'process':
+                        return this.renderEditableProcess(subsection.content);
+                    
+                    default:
+                        return `<div class="editable-content">${subsection.content}</div>`;
+                }
+            }
+
+            renderEditableList(items) {
+                const listItems = items.map((item, index) => `
+                    <li>
+                        <span class="drag-handle" draggable="true">≡</span>
+                        <input type="text" class="list-item-content" value="${item}" ${this.trainingMode ? '' : 'readonly'}>
+                        <div class="list-item-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this)">+</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteListItem(this)">-</button>
+                        </div>
+                    </li>
+                `).join('');
+                
+                return `
+                    <ul class="editable-list">${listItems}</ul>
+                    ${this.trainingMode ? '<button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this, true)">+ Add Item</button>' : ''}
+                `;
+            }
+
+            renderEditableTable(tableData) {
+                const headers = tableData.headers.map((header, index) => `
+                    <th>
+                        <span class="editable-cell" contenteditable="${this.trainingMode}">${header}</span>
+                        <div class="column-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, ${index})">+</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableColumn(this, ${index})">-</button>
+                        </div>
+                    </th>
+                `).join('');
+                
+                const rows = tableData.rows.map((row, rowIndex) => `
+                    <tr>
+                        ${row.map((cell, cellIndex) => `
+                            <td>
+                                <span class="editable-cell" contenteditable="${this.trainingMode}">${cell}</span>
+                            </td>
+                        `).join('')}
+                        <td class="row-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, ${rowIndex})">+</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableRow(this, ${rowIndex})">-</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                return `
+                    <div class="table-controls">
+                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, -1)">+ Add Row</button>
+                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, -1)">+ Add Column</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr>${headers}</tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            renderEditableMetrics(metrics) {
+                const metricCards = metrics.map((metric, index) => `
+                    <div class="metric-card">
+                        <div class="metric-controls">
+                            <button class="btn btn-small btn-warning" onclick="cmPlan.editMetric(this, ${index})">✏️</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteMetric(this, ${index})">🗑️</button>
+                        </div>
+                        <div class="metric-value">
+                            <input type="text" class="editable-metric-value" value="${metric.value}" ${this.trainingMode ? '' : 'readonly'}>
+                        </div>
+                        <div class="metric-label">
+                            <input type="text" class="editable-metric-label" value="${metric.label}" ${this.trainingMode ? '' : 'readonly'}>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                            Target: ${metric.target} | Status: <span class="status-indicator status-${metric.status}"></span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="dashboard-controls">
+                        <button class="btn btn-small btn-success" onclick="cmPlan.addMetric(this)">+ Add Metric</button>
+                    </div>
+                    <div class="dashboard-grid">${metricCards}</div>
+                `;
+            }
+
+            renderEditableProcess(steps) {
+                const processSteps = steps.map((step, index) => `
+                    <div class="process-step">
+                        <div class="process-step-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, ${index})">+</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteProcessStep(this, ${index})">-</button>
+                        </div>
+                        <h4 class="editable-title" contenteditable="${this.trainingMode}">${step.title}</h4>
+                        <p class="editable-content" contenteditable="${this.trainingMode}">${step.description}</p>
+                    </div>
+                `).join('');
+                
+                return `
+                    <div class="process-flow">${processSteps}</div>
+                    ${this.trainingMode ? '<button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, -1)">+ Add Step</button>' : ''}
+                `;
+            }
+
+            // CRUD Operations
+            addSection(type, title) {
+                const sectionId = 'section-' + Date.now();
+                const newSection = {
+                    id: sectionId,
+                    title: title || 'New Section',
+                    type: type,
+                    subsections: [
+                        {
+                            id: 'subsection-' + Date.now(),
+                            title: 'New Subsection',
+                            content: type === 'table' ? { headers: ['Column 1'], rows: [['Data 1']] } : 
+                                    type === 'list' ? ['Item 1'] :
+                                    type === 'metrics' ? [{ label: 'New Metric', value: '0%', target: '100%', status: 'yellow' }] :
+                                    type === 'process' ? [{ title: 'Step 1', description: 'Description' }] :
+                                    'New content',
+                            type: type
+                        }
+                    ]
+                };
+                
+                this.sections.set(sectionId, newSection);
+                this.renderAllSections();
+                this.markAsChanged();
+                this.scrollToSection(sectionId);
+            }
+
+            deleteSection(sectionId) {
+                if (confirm('Are you sure you want to delete this section?')) {
+                    this.sections.delete(sectionId);
+                    this.renderAllSections();
+                    this.markAsChanged();
+                }
+            }
+
+            addSubsection(sectionId) {
+                const section = this.sections.get(sectionId);
+                if (section) {
+                    const newSubsection = {
+                        id: 'subsection-' + Date.now(),
+                        title: 'New Subsection',
+                        content: 'New content',
+                        type: 'text'
+                    };
+                    section.subsections.push(newSubsection);
+                    this.sections.set(sectionId, section);
+                    this.renderAllSections();
+                    this.markAsChanged();
+                }
+            }
+
+            deleteSubsection(sectionId, index) {
+                const section = this.sections.get(sectionId);
+                if (section && confirm('Delete this subsection?')) {
+                    section.subsections.splice(index, 1);
+                    this.sections.set(sectionId, section);
+                    this.renderAllSections();
+                    this.markAsChanged();
+                }
+            }
+
+            duplicateSubsection(sectionId, index) {
+                const section = this.sections.get(sectionId);
+                if (section) {
+                    const original = section.subsections[index];
+                    const duplicate = JSON.parse(JSON.stringify(original));
+                    duplicate.id = 'subsection-' + Date.now();
+                    duplicate.title += ' (Copy)';
+                    section.subsections.splice(index + 1, 0, duplicate);
+                    this.sections.set(sectionId, section);
+                    this.renderAllSections();
+                    this.markAsChanged();
+                }
+            }
+
+            // List Operations
+            addListItem(button, isNewList = false) {
+                if (isNewList) {
+                    const list = button.previousElementSibling;
+                    const newItem = document.createElement('li');
+                    newItem.innerHTML = `
+                        <span class="drag-handle" draggable="true">≡</span>
+                        <input type="text" class="list-item-content" value="New item" placeholder="Enter item">
+                        <div class="list-item-controls">
+                            <button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this)">+</button>
+                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteListItem(this)">-</button>
+                        </div>
+                    `;
+                    list.appendChild(newItem);
+                } else {
+                    const listItem = button.closest('li');
+                    const newItem = listItem.cloneNode(true);
+                    newItem.querySelector('.list-item-content').value = 'New item';
+                    listItem.parentNode.insertBefore(newItem, listItem.nextSibling);
+                }
+                this.markAsChanged();
+            }
+
+            deleteListItem(button) {
+                const listItem = button.closest('li');
+                const list = listItem.closest('ul');
+                if (list.children.length > 1) {
+                    listItem.remove();
+                    this.markAsChanged();
+                } else {
+                    alert('Cannot delete the last item in the list.');
+                }
+            }
+
+            // Table Operations
+            addTableRow(button, rowIndex) {
+                const table = button.closest('.table-container').querySelector('table tbody');
+                const newRow = table.insertRow(rowIndex + 1);
+                const columnCount = table.closest('table').querySelector('thead tr').cells.length;
+                
+                for (let i = 0; i < columnCount; i++) {
+                    const cell = newRow.insertCell();
+                    cell.innerHTML = `<span class="editable-cell" contenteditable="${this.trainingMode}">New data</span>`;
+                }
+                
+                const controlCell = newRow.insertCell();
+                controlCell.className = 'row-controls';
+                controlCell.innerHTML = `
+                    <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, ${rowIndex + 1})">+</button>
+                    <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableRow(this, ${rowIndex + 1})">-</button>
+                `;
+                
+                this.markAsChanged();
+            }
+
+            deleteTableRow(button, rowIndex) {
+                const table = button.closest('.table-container').querySelector('table tbody');
+                if (table.rows.length > 1) {
+                    table.deleteRow(rowIndex);
+                    this.markAsChanged();
+                } else {
+                    alert('Cannot delete the last row.');
+                }
+            }
+
+            addTableColumn(button, columnIndex) {
+                const table = button.closest('.table-container').querySelector('table');
+                const headerRow = table.querySelector('thead tr');
+                const newHeader = headerRow.insertCell(columnIndex + 1);
+                newHeader.innerHTML = `
+                    <span class="editable-cell" contenteditable="${this.trainingMode}">New Column</span>
+                    <div class="column-controls">
+                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, ${columnIndex + 1})">+</button>
+                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableColumn(this, ${columnIndex + 1})">-</button>
+                    </div>
+                `;
+                
+                const bodyRows = table.querySelectorAll('tbody tr');
+                bodyRows.forEach(row => {
+                    const newCell = row.insertCell(columnIndex + 1);
+                    newCell.innerHTML = `<span class="editable-cell" contenteditable="${this.trainingMode}">New data</span>`;
+                });
+                
+                this.markAsChanged();
+            }
+
+            deleteTableColumn(button, columnIndex) {
+                const table = button.closest('.table-container').querySelector('table');
+                const headerRow = table.querySelector('thead tr');
+                
+                if (headerRow.cells.length > 2) { // Keep at least one data column plus controls
+                    headerRow.deleteCell(columnIndex);
+                    const bodyRows = table.querySelectorAll('tbody tr');
+                    bodyRows.forEach(row => {
+                        row.deleteCell(columnIndex);
+                    });
+                    this.markAsChanged();
+                } else {
+                    alert('Cannot delete the last column.');
+                }
+            }
+
+            // Metric Operations
+            addMetric(button) {
+                const dashboard = button.nextElementSibling;
+                const newMetric = document.createElement('div');
+                newMetric.className = 'metric-card';
+                newMetric.innerHTML = `
+                    <div class="metric-controls">
+                        <button class="btn btn-small btn-warning" onclick="cmPlan.editMetric(this, 0)">✏️</button>
+                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteMetric(this, 0)">🗑️</button>
+                    </div>
+                    <div class="metric-value">
+                        <input type="text" class="editable-metric-value" value="0%" ${this.trainingMode ? '' : 'readonly'}>
+                    </div>
+                    <div class="metric-label">
+                        <input type="text" class="editable-metric-label" value="New Metric" ${this.trainingMode ? '' : 'readonly'}>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                        Target: 100% | Status: <span class="status-indicator status-yellow"></span>
+                    </div>
+                `;
+                dashboard.appendChild(newMetric);
+                this.markAsChanged();
+            }
+
+            deleteMetric(button, index) {
+                const metricCard = button.closest('.metric-card');
+                const dashboard = metricCard.parentNode;
+                if (dashboard.children.length > 1) {
+                    metricCard.remove();
+                    this.markAsChanged();
+                } else {
+                    alert('Cannot delete the last metric.');
+                }
+            }
+
+            // Process Operations
+            addProcessStep(button, index) {
+                const processFlow = button.closest('.process-flow') || button.previousElementSibling;
+                const newStep = document.createElement('div');
+                newStep.className = 'process-step';
+                newStep.innerHTML = `
+                    <div class="process-step-controls">
+                        <button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, ${index + 1})">+</button>
+                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteProcessStep(this, ${index + 1})">-</button>
+                    </div>
+                    <h4 class="editable-title" contenteditable="${this.trainingMode}">New Step</h4>
+                    <p class="editable-content" contenteditable="${this.trainingMode}">Step description</p>
+                `;
+                
+                if (index >= 0) {
+                    const steps = processFlow.querySelectorAll('.process-step');
+                    processFlow.insertBefore(newStep, steps[index + 1]);
+                } else {
+                    processFlow.appendChild(newStep);
+                }
+                this.markAsChanged();
+            }
+
+            deleteProcessStep(button, index) {
+                const processStep = button.closest('.process-step');
+                const processFlow = processStep.parentNode;
+                if (processFlow.children.length > 1) {
+                    processStep.remove();
+                    this.markAsChanged();
+                } else {
+                    alert('Cannot delete the last process step.');
+                }
+            }
+
+            // Template Operations
+            loadTemplate(templateName) {
+                if (confirm(`Load ${templateName} template? This will replace current content.`)) {
+                    const template = this.templates.get(templateName);
+                    if (template) {
+                        // Clear current sections
+                        this.sections.clear();
+                        
+                        // Load template sections
+                        this.addDefaultSections(); // Reset to default
+                        
+                        // Filter sections based on template
+                        const filteredSections = new Map();
+                        template.sections.forEach(sectionId => {
+                            if (this.sections.has(sectionId)) {
+                                filteredSections.set(sectionId, this.sections.get(sectionId));
+                            }
+                        });
+                        
+                        this.sections = filteredSections;
+                        this.renderAllSections();
+                        this.markAsChanged();
+                        this.showNotification(`${template.name} loaded successfully!`, 'success');
+                    }
+                }
+            }
+
+            saveAsTemplate() {
+                const templateName = prompt('Enter template name:');
+                if (templateName) {
+                    this.templates.set(templateName.toLowerCase().replace(/\s+/g, '-'), {
+                        name: templateName,
+                        description: 'Custom template',
+                        sections: Array.from(this.sections.keys()),
+                        data: Array.from(this.sections.entries())
+                    });
+                    this.showNotification(`Template "${templateName}" saved!`, 'success');
+                }
+            }
+
+            resetPlan() {
+                if (confirm('Reset to default plan? All changes will be lost.')) {
+                    this.sections.clear();
+                    this.addDefaultSections();
+                    this.renderAllSections();
+                    this.markAsChanged();
+                    this.showNotification('Plan reset to default', 'success');
+                }
+            }
+
+            // Import/Export Functions
+            exportPlan() {
+                try {
+                    const exportData = {
+                        metadata: this.collectMetadata(),
+                        sections: Array.from(this.sections.entries()),
+                        timestamp: new Date().toISOString(),
+                        version: '1.0'
+                    };
+                    
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(dataBlob);
+                    
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `freshflow-cm-plan-${new Date().toISOString().split('T')[0]}.json`;
+                    link.click();
+                    
+                    URL.revokeObjectURL(url);
+                    this.showNotification('Plan exported successfully!', 'success');
+                } catch (error) {
+                    this.showNotification('Export failed: ' + error.message, 'error');
+                }
+            }
+
+            importPlan() {
+                document.getElementById('fileInput').click();
+            }
+
+            handleFileImport(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const importData = JSON.parse(e.target.result);
+                            this.loadImportedData(importData);
+                        } catch (error) {
+                            this.showNotification('Import failed: Invalid file format', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            }
+
+            loadImportedData(data) {
+                if (confirm('Import new plan? Current changes will be lost.')) {
+                    try {
+                        // Load metadata
+                        if (data.metadata) {
+                            Object.keys(data.metadata).forEach(key => {
+                                const element = document.querySelector(`[data-field="${key}"]`);
+                                if (element) {
+                                    element.textContent = data.metadata[key];
+                                }
+                            });
+                        }
+                        
+                        // Load sections
+                        if (data.sections) {
+                            this.sections = new Map(data.sections);
+                            this.renderAllSections();
+                            this.markAsChanged();
+                            this.showNotification('Plan imported successfully!', 'success');
+                        }
+                    } catch (error) {
+                        this.showNotification('Import failed: ' + error.message, 'error');
+                    }
+                }
+            }
+
+            // Validation Functions
+            validatePlan() {
+                const errors = [];
+                const warnings = [];
+                
+                // Validate metadata
+                const requiredFields = ['date', 'version', 'owner', 'approver'];
+                requiredFields.forEach(field => {
+                    const element = document.querySelector(`[data-field="${field}"]`);
+                    if (!element || !element.textContent.trim()) {
+                        errors.push(`Missing required field: ${field}`);
+                    }
+                });
+                
+                // Validate sections
+                if (this.sections.size === 0) {
+                    errors.push('No sections found');
+                } else {
+                    this.sections.forEach((section, sectionId) => {
+                        if (!section.title || section.title.trim() === '') {
+                            errors.push(`Section ${sectionId} has no title`);
+                        }
+                        
+                        if (!section.subsections || section.subsections.length === 0) {
+                            warnings.push(`Section ${sectionId} has no content`);
+                        }
+                    });
+                }
+                
+                // Show validation results
+                this.showValidationResults(errors, warnings);
+            }
+
+            showValidationResults(errors, warnings) {
+                let message = '📋 Plan Validation Results\n\n';
+                
+                if (errors.length === 0 && warnings.length === 0) {
+                    message += '✅ Plan validation passed!\nNo errors or warnings found.';
+                    this.showNotification(message, 'success');
+                } else {
+                    if (errors.length > 0) {
+                        message += `❌ Errors (${errors.length}):\n`;
+                        errors.forEach(error => message += `• ${error}\n`);
+                        message += '\n';
+                    }
+                    
+                    if (warnings.length > 0) {
+                        message += `⚠️ Warnings (${warnings.length}):\n`;
+                        warnings.forEach(warning => message += `• ${warning}\n`);
+                    }
+                    
+                    alert(message);
+                }
+            }
+
+            // Utility Functions
+            updateNavigation() {
+                const navGrid = document.getElementById('navigation-grid');
+                const existingNavItems = navGrid.querySelectorAll('.nav-item:not([onclick*="student-activities"])');
+                
+                // Remove dynamically created nav items
+                existingNavItems.forEach(item => {
+                    if (!item.onclick.toString().includes('executive-summary') &&
+                        !item.onclick.toString().includes('framework') &&
+                        !item.onclick.toString().includes('change-management') &&
+                        !item.onclick.toString().includes('baseline-management') &&
+                        !item.onclick.toString().includes('compliance') &&
+                        !item.onclick.toString().includes('tools') &&
+                        !item.onclick.toString().includes('training') &&
+                        !item.onclick.toString().includes('metrics')) {
+                        item.remove();
+                    }
+                });
+                
+                // Add nav items for custom sections
+                this.sections.forEach((section, sectionId) => {
+                    if (!document.querySelector(`[onclick*="${sectionId}"]`)) {
+                        const navItem = document.createElement('div');
+                        navItem.className = 'nav-item';
+                        navItem.onclick = () => this.scrollToSection(sectionId);
+                        navItem.textContent = section.title.replace(/^\d+\.\s*/, '');
+                        navGrid.appendChild(navItem);
+                    }
+                });
+            }
+
+            scrollToSection(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Auto-expand the section
+                    const content = section.querySelector('.section-content');
+                    const toggle = section.querySelector('.section-toggle');
+                    if (content && toggle) {
+                        content.classList.add('active');
+                        toggle.textContent = '−';
+                    }
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'warning'}`;
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '10000';
+                notification.style.minWidth = '300px';
+                notification.style.animation = 'fadeIn 0.3s ease';
+                notification.innerHTML = `
+                    <strong>${type === 'error' ? '❌' : type === 'success' ? '✅' : '⚠️'}</strong> ${message}
+                    <button style="float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer;" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+
+            generateReport() {
+                const reportData = {
+                    title: 'Configuration Management Plan Executive Report',
+                    timestamp: new Date().toLocaleString(),
+                    metadata: this.collectMetadata(),
+                    sectionCount: this.sections.size,
+                    subsectionCount: Array.from(this.sections.values()).reduce((total, section) => total + (section.subsections?.length || 0), 0),
+                    lastModified: this.lastSaved ? this.lastSaved.toLocaleString() : 'Never',
+                    sections: Array.from(this.sections.entries()).map(([id, section]) => ({
+                        id,
+                        title: section.title,
+                        type: section.type,
+                        subsectionCount: section.subsections?.length || 0
+                    }))
+                };
+                
+                const reportWindow = window.open('', '_blank');
+                reportWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${reportData.title}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                            .header { background: #4a7c59; color: white; padding: 20px; border-radius: 8px; }
+                            .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+                            .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+                            .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+                            .stat-value { font-size: 2rem; font-weight: bold; color: #4a7c59; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>${reportData.title}</h1>
+                            <p>Generated: ${reportData.timestamp}</p>
+                        </div>
+                        
+                        <div class="section">
+                            <h2>Document Overview</h2>
+                            <div class="stats">
+                                <div class="stat-card">
+                                    <div class="stat-value">${reportData.sectionCount}</div>
+                                    <div>Total Sections</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${reportData.subsectionCount}</div>
+                                    <div>Total Subsections</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${reportData.metadata.version || 'N/A'}</div>
+                                    <div>Version</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${reportData.lastModified}</div>
+                                    <div>Last Modified</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h2>Section Summary</h2>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="background: #4a7c59; color: white;">
+                                    <tr>
+                                        <th style="padding: 10px; border: 1px solid #ddd;">Section</th>
+                                        <th style="padding: 10px; border: 1px solid #ddd;">Type</th>
+                                        <th style="padding: 10px; border: 1px solid #ddd;">Subsections</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${reportData.sections.map(section => `
+                                        <tr>
+                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.title}</td>
+                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.type}</td>
+                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.subsectionCount}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="section">
+                            <h2>Metadata</h2>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tbody>
+                                    ${Object.entries(reportData.metadata).map(([key, value]) => `
+                                        <tr>
+                                            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${key}</td>
+                                            <td style="padding: 8px; border: 1px solid #ddd;">${value}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                
+                this.showNotification('Executive report generated successfully!', 'success');
+            }
+
+            printPlan() {
+                window.print();
+            }
+        }
+
+        // Initialize the Configuration Management Plan
+        let cmPlan;
+        
         // Section Toggle Functionality
         function toggleSection(sectionId) {
             const section = document.getElementById(sectionId);
-            const content = section.querySelector('.section-content');
-            const toggle = section.querySelector('.section-toggle');
-            
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                toggle.textContent = '+';
-            } else {
-                content.classList.add('active');
-                toggle.textContent = '−';
+            if (section) {
+                const content = section.querySelector('.section-content');
+                const toggle = section.querySelector('.section-toggle');
+                
+                if (content.classList.contains('active')) {
+                    content.classList.remove('active');
+                    toggle.textContent = '+';
+                } else {
+                    content.classList.add('active');
+                    toggle.textContent = '−';
+                }
             }
         }
 
-        // Scroll to Section
+        // Training Mode Toggle
+        function toggleTrainingMode() {
+            cmPlan.toggleTrainingMode();
+        }
+
+        // Template Functions
+        function loadTemplate(templateName) {
+            cmPlan.loadTemplate(templateName);
+        }
+
+        function saveAsTemplate() {
+            cmPlan.saveAsTemplate();
+        }
+
+        function resetPlan() {
+            cmPlan.resetPlan();
+        }
+
+        // Section Management
+        function addSection(type, title) {
+            cmPlan.addSection(type, title);
+        }
+
         function scrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            section.scrollIntoView({ behavior: 'smooth' });
-            
-            // Auto-expand the section
-            const content = section.querySelector('.section-content');
-            const toggle = section.querySelector('.section-toggle');
-            content.classList.add('active');
-            toggle.textContent = '−';
+            cmPlan.scrollToSection(sectionId);
         }
 
-        // Save data to memory (since localStorage is not available)
-        let planData = {};
-
-        function saveDraft() {
-            // Collect all editable content
-            const editableElements = document.querySelectorAll('.editable, .editable-cell');
-            editableElements.forEach((element, index) => {
-                planData[`element_${index}`] = element.textContent;
-            });
-            
-            alert('Draft saved successfully! (Data stored in memory for this session)');
-        }
-
+        // File Operations
         function exportPlan() {
-            // Create a simplified version for export
-            const planContent = document.querySelector('.container').innerHTML;
-            const exportWindow = window.open('', '_blank');
-            exportWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>FreshFlow Systems Configuration Management Plan - Export</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        .header { background: #4a7c59; color: white; padding: 20px; }
-                        .section { margin: 20px 0; border: 1px solid #ccc; }
-                        .section-header { background: #f8f9fa; padding: 15px; font-weight: bold; }
-                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #4a7c59; color: white; }
-                    </style>
-                </head>
-                <body>${planContent}</body>
-                </html>
-            `);
+            cmPlan.exportPlan();
+        }
+
+        function importPlan() {
+            cmPlan.importPlan();
+        }
+
+        function handleFileImport(event) {
+            cmPlan.handleFileImport(event);
         }
 
         function generateReport() {
-            const reportData = {
-                executiveSummary: "Configuration Management Plan for FreshFlow Systems",
-                currentMaturity: "Level 2 (Moving to Level 3)",
-                keyMetrics: {
-                    changeSuccessRate: "87%",
-                    systemAvailability: "99.2%",
-                    configurationAccuracy: "92%",
-                    mttr: "1.8 hours"
-                },
-                complianceStatus: {
-                    fda: "95%",
-                    nist: "88%",
-                    iec62443: "92%",
-                    sox: "85%"
-                },
-                upcomingMilestones: [
-                    "Q3 2025: ServiceNow CMDB completion",
-                    "Q4 2025: Automated baseline deployment",
-                    "Q1 2026: OT systems integration",
-                    "Q2 2026: Predictive analytics implementation"
-                ]
-            };
-            
-            alert('Executive Report Generated!\n\n' + 
-                  'Current Status: ' + reportData.currentMaturity + '\n' +
-                  'Change Success Rate: ' + reportData.keyMetrics.changeSuccessRate + '\n' +
-                  'System Availability: ' + reportData.keyMetrics.systemAvailability + '\n' +
-                  'Next Milestone: ' + reportData.upcomingMilestones[0]);
+            cmPlan.generateReport();
+        }
+
+        function validatePlan() {
+            cmPlan.validatePlan();
         }
 
         function printPlan() {
-            window.print();
+            cmPlan.printPlan();
         }
 
-        // Auto-save functionality
-        let autoSaveTimer;
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('editable') || e.target.classList.contains('editable-cell')) {
-                clearTimeout(autoSaveTimer);
-                autoSaveTimer = setTimeout(saveDraft, 5000); // Auto-save after 5 seconds of inactivity
-            }
-        });
+        function quickSave() {
+            cmPlan.quickSave();
+        }
 
-        // Initialize the page
+        // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            cmPlan = new ConfigurationManagementPlan();
+            
             // Show the executive summary by default
-            toggleSection('executive-summary');
+            setTimeout(() => {
+                toggleSection('executive-summary');
+            }, 500);
             
-            // Add click handlers for metric cards
-            const metricCards = document.querySelectorAll('.metric-card');
-            metricCards.forEach(card => {
-                card.style.cursor = 'pointer';
-                card.addEventListener('click', function() {
-                    alert('Detailed metrics and trends would be displayed here in a production system.');
-                });
-            });
-            
-            console.log('FreshFlow Systems Configuration Management Plan loaded successfully!');
+            console.log('🎓 FreshFlow Systems Configuration Management Plan (Training Edition) loaded successfully!');
+            console.log('Features: Full CRUD operations, drag & drop, templates, validation, import/export');
         });
 
-        // Update timestamps
-        function updateTimestamp() {
-            const now = new Date();
-            const timestamp = now.toLocaleString();
-            document.title = `FreshFlow Systems CM Plan - Last Updated: ${timestamp}`;
-        }
-        
-        // Update timestamp every minute
-        setInterval(updateTimestamp, 60000);
-
-        // Student Activity Functions
-        let studentProgress = {
-            task1: false,
-            task2: false,
-            task3: false,
-            task4: false,
-            task5: false,
-            final: false
-        };
-
-        function updateChangeDetails() {
-            const category = document.getElementById('changeCategory').value;
-            const details = document.getElementById('changeDetails');
-            const selectedCategory = document.getElementById('selectedCategory');
-            const processingTime = document.getElementById('processingTime');
-            const approvalRequired = document.getElementById('approvalRequired');
-
-            if (category) {
-                details.style.display = 'block';
-                selectedCategory.textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' Change';
-                
-                switch(category) {
-                    case 'emergency':
-                        processingTime.textContent = '<4 hours';
-                        approvalRequired.textContent = 'CISO or designated deputy';
-                        break;
-                    case 'standard':
-                        processingTime.textContent = '<24 hours';
-                        approvalRequired.textContent = 'Automated approval';
-                        break;
-                    case 'normal':
-                        processingTime.textContent = '5-14 business days';
-                        approvalRequired.textContent = 'Full CCB review';
-                        break;
-                    case 'major':
-                        processingTime.textContent = '30+ business days';
-                        approvalRequired.textContent = 'Executive leadership';
-                        break;
-                }
-            } else {
-                details.style.display = 'none';
+        // Add CSS animation for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
             }
-        }
-
-        function submitTask1() {
-            const category = document.getElementById('changeCategory').value;
-            const contact = document.getElementById('primaryContact').value;
-            const justification = document.getElementById('justification').value;
-            const plan = document.getElementById('implementationPlan').value;
-            const result = document.getElementById('task1Result');
-
-            if (!category || !contact || !justification || !plan) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
-                return;
-            }
-
-            let score = 0;
-            let feedback = [];
-
-            if (category === 'emergency') {
-                score += 25;
-                feedback.push('✅ Correct change category identified');
-            } else {
-                feedback.push('❌ This should be classified as an Emergency Change due to security vulnerability');
-            }
-
-            if (contact.toLowerCase().includes('regina') || contact.toLowerCase().includes('moore')) {
-                score += 25;
-                feedback.push('✅ Correct primary contact for OT/SCADA systems');
-            } else {
-                feedback.push('❌ Regina Moore (OT Systems Engineer) should be the primary contact for SCADA issues');
-            }
-
-            if (justification.length > 50) {
-                score += 25;
-                feedback.push('✅ Adequate justification provided');
-            } else {
-                feedback.push('❌ Justification needs more detail about urgency and impact');
-            }
-
-            if (plan.toLowerCase().includes('rollback') || plan.toLowerCase().includes('backup')) {
-                score += 25;
-                feedback.push('✅ Implementation plan includes rollback considerations');
-            } else {
-                feedback.push('❌ Implementation plan should include rollback procedures');
-            }
-
-            studentProgress.task1 = score >= 75;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
-                    <h4>Task 1 Score: ${score}/100</h4>
-                    <ul style="margin-left: 20px;">
-                        ${feedback.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                    ${score >= 75 ? '<p><strong>Excellent work! You demonstrate strong understanding of change management processes.</strong></p>' : '<p><strong>Review the emergency change procedures and try again.</strong></p>'}
-                </div>
-            `;
-        }
-
-        function calculateCompliance() {
-            const scores = [95, 88, 92, 85]; // FDA, NIST, IEC, SOX
-            const average = scores.reduce((a, b) => a + b, 0) / scores.length;
-            document.getElementById('currentScore').value = average.toFixed(1) + '%';
-        }
-
-        function submitTask2() {
-            const priority = document.getElementById('priorityCompliance').value;
-            const actions = document.getElementById('improvementActions').value;
-            const target = document.getElementById('targetScore').value;
-            const result = document.getElementById('task2Result');
-
-            if (!priority || !actions || !target) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
-                return;
-            }
-
-            let score = 0;
-            let feedback = [];
-
-            if (priority === 'sox') {
-                score += 30;
-                feedback.push('✅ Correct priority - SOX has the lowest compliance score at 85%');
-            } else {
-                feedback.push('❌ SOX Controls (85%) should be the priority as it has the lowest score');
-            }
-
-            const actionCount = actions.split('\n').filter(line => line.trim().length > 0).length;
-            if (actionCount >= 3) {
-                score += 35;
-                feedback.push('✅ Provided adequate number of improvement actions');
-            } else {
-                feedback.push('❌ Need at least 3 specific improvement actions');
-            }
-
-            const targetNum = parseFloat(target);
-            if (targetNum > 90 && targetNum <= 98) {
-                score += 35;
-                feedback.push('✅ Realistic target score set');
-            } else {
-                feedback.push('❌ Target should be ambitious but realistic (90-98%)');
-            }
-
-            studentProgress.task2 = score >= 75;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
-                    <h4>Task 2 Score: ${score}/100</h4>
-                    <ul style="margin-left: 20px;">
-                        ${feedback.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                    ${score >= 75 ? '<p><strong>Great analysis! You understand compliance prioritization.</strong></p>' : '<p><strong>Review the compliance scores and focus on the lowest performing area.</strong></p>'}
-                </div>
-            `;
-        }
-
-        function submitTask3() {
-            const windowsTarget = document.getElementById('windowsTarget').value;
-            const linuxTarget = document.getElementById('linuxTarget').value;
-            const networkTarget = document.getElementById('networkTarget').value;
-            const plcTarget = document.getElementById('plcTarget').value;
-            const businessCase = document.getElementById('businessCase').value;
-            const result = document.getElementById('task3Result');
-
-            if (!windowsTarget || !linuxTarget || !networkTarget || !plcTarget || !businessCase) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
-                return;
-            }
-
-            let score = 0;
-            let feedback = [];
-
-            // Check if targets are realistic improvements
-            const targets = [
-                { current: 90, target: parseInt(windowsTarget), name: 'Windows' },
-                { current: 85, target: parseInt(linuxTarget), name: 'Linux' },
-                { current: 70, target: parseInt(networkTarget), name: 'Network' },
-                { current: 60, target: parseInt(plcTarget), name: 'PLC' }
-            ];
-
-            let realisticTargets = 0;
-            targets.forEach(item => {
-                if (item.target > item.current && item.target <= 100) {
-                    realisticTargets++;
-                }
-            });
-
-            if (realisticTargets >= 3) {
-                score += 30;
-                feedback.push('✅ Realistic improvement targets set');
-            } else {
-                feedback.push('❌ Targets should improve current coverage but remain achievable');
-            }
-
-            // Check if PLC is prioritized (lowest current coverage)
-            const plcPriority = document.getElementById('plcPriority').value;
-            if (plcPriority === 'high') {
-                score += 35;
-                feedback.push('✅ Correctly prioritized PLC systems (lowest coverage)');
-            } else {
-                feedback.push('❌ PLC systems should be high priority due to lowest coverage (60%)');
-            }
-
-            if (businessCase.length > 100) {
-                score += 35;
-                feedback.push('✅ Comprehensive business case provided');
-            } else {
-                feedback.push('❌ Business case needs more detail about ROI and justification');
-            }
-
-            studentProgress.task3 = score >= 75;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
-                    <h4>Task 3 Score: ${score}/100</h4>
-                    <ul style="margin-left: 20px;">
-                        ${feedback.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                    ${score >= 75 ? '<p><strong>Excellent resource planning! You understand prioritization principles.</strong></p>' : '<p><strong>Focus on the systems with lowest coverage and provide stronger business justification.</strong></p>'}
-                </div>
-            `;
-        }
-
-        function submitTask4() {
-            const priority = document.getElementById('trainingPriority').value;
-            const method = document.getElementById('trainingMethod').value;
-            const duration = document.getElementById('trainingDuration').value;
-            const objectives = document.getElementById('learningObjectives').value;
-            const assessment = document.getElementById('assessmentMethod').value;
-            const result = document.getElementById('task4Result');
-
-            if (!priority || !method || !duration || !objectives || !assessment) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
-                return;
-            }
-
-            let score = 0;
-            let feedback = [];
-
-            if (priority === 'business') {
-                score += 25;
-                feedback.push('✅ Correct priority - Business Users have lowest completion (45%)');
-            } else {
-                feedback.push('❌ Business Users should be priority with only 45% completion');
-            }
-
-            if (method === 'blended' || method === 'hands-on') {
-                score += 20;
-                feedback.push('✅ Appropriate training method selected');
-            } else {
-                feedback.push('❌ Consider blended or hands-on approaches for better engagement');
-            }
-
-            if (parseInt(duration) >= 4 && parseInt(duration) <= 16) {
-                score += 20;
-                feedback.push('✅ Reasonable training duration');
-            } else {
-                feedback.push('❌ Duration should be 4-16 hours for effective learning');
-            }
-
-            const objectiveCount = objectives.split('\n').filter(line => line.trim().length > 0).length;
-            if (objectiveCount >= 3) {
-                score += 20;
-                feedback.push('✅ Adequate learning objectives defined');
-            } else {
-                feedback.push('❌ Need at least 3 specific learning objectives');
-            }
-
-            if (assessment.length > 50) {
-                score += 15;
-                feedback.push('✅ Assessment method described');
-            } else {
-                feedback.push('❌ Need more detailed assessment approach');
-            }
-
-            studentProgress.task4 = score >= 75;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
-                    <h4>Task 4 Score: ${score}/100</h4>
-                    <ul style="margin-left: 20px;">
-                        ${feedback.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                    ${score >= 75 ? '<p><strong>Well-designed training program! You understand adult learning principles.</strong></p>' : '<p><strong>Focus on the group with lowest completion and design comprehensive programs.</strong></p>'}
-                </div>
-            `;
-        }
-
-        function submitTask5() {
-            const priorityKPI = document.getElementById('priorityKPI').value;
-            const rootCause = document.getElementById('rootCauseAnalysis').value;
-            const action = document.getElementById('specificAction').value;
-            const improvement = document.getElementById('targetImprovement').value;
-            const timeline = document.getElementById('timeline').value;
-            const metric = document.getElementById('successMetric').value;
-            const result = document.getElementById('task5Result');
-
-            if (!priorityKPI || !rootCause || !action || !improvement || !timeline || !metric) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete all fields before submitting.</div>';
-                return;
-            }
-
-            let score = 0;
-            let feedback = [];
-
-            if (priorityKPI === 'change-success') {
-                score += 20;
-                feedback.push('✅ Correct priority - Change Success Rate has largest gap (-8%)');
-            } else {
-                feedback.push('❌ Change Success Rate should be priority with 8% gap from target');
-            }
-
-            if (rootCause.length > 100) {
-                score += 20;
-                feedback.push('✅ Thorough root cause analysis provided');
-            } else {
-                feedback.push('❌ Root cause analysis needs more depth and detail');
-            }
-
-            if (action.length > 30) {
-                score += 20;
-                feedback.push('✅ Specific action defined');
-            } else {
-                feedback.push('❌ Action needs to be more specific and detailed');
-            }
-
-            if (improvement.includes('%') || improvement.includes('hour') || improvement.includes('day')) {
-                score += 20;
-                feedback.push('✅ Measurable improvement target set');
-            } else {
-                feedback.push('❌ Improvement target should be quantifiable');
-            }
-
-            if (timeline.length > 10) {
-                score += 20;
-                feedback.push('✅ Timeline provided');
-            } else {
-                feedback.push('❌ Timeline needs more specificity');
-            }
-
-            studentProgress.task5 = score >= 75;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert ${score >= 75 ? 'alert-success' : 'alert-warning'}">
-                    <h4>Task 5 Score: ${score}/100</h4>
-                    <ul style="margin-left: 20px;">
-                        ${feedback.map(item => `<li>${item}</li>`).join('')}
-                    </ul>
-                    ${score >= 75 ? '<p><strong>Excellent analytical skills! You understand performance improvement methodology.</strong></p>' : '<p><strong>Focus on the KPI with the largest performance gap and develop SMART goals.</strong></p>'}
-                </div>
-            `;
-        }
-
-        function submitFinalAssessment() {
-            const reflection = document.getElementById('finalReflection').value;
-            const application = document.getElementById('professionalApplication').value;
-            const result = document.getElementById('finalResult');
-
-            if (!reflection || !application) {
-                result.innerHTML = '<div class="alert alert-warning">Please complete both reflection fields.</div>';
-                return;
-            }
-
-            const completedTasks = Object.values(studentProgress).filter(Boolean).length;
-            let grade = '';
-            let message = '';
-
-            if (completedTasks >= 4) {
-                grade = 'Excellent';
-                message = 'Outstanding performance! You have demonstrated mastery of configuration management principles.';
-            } else if (completedTasks >= 3) {
-                grade = 'Good';
-                message = 'Good work! You understand most configuration management concepts with room for improvement.';
-            } else {
-                grade = 'Needs Improvement';
-                message = 'Additional study required. Please review the material and retry incomplete tasks.';
-            }
-
-            studentProgress.final = true;
-            updateProgressTracker();
-
-            result.innerHTML = `
-                <div class="alert alert-success">
-                    <h4>Final Assessment Complete</h4>
-                    <p><strong>Overall Performance:</strong> ${grade}</p>
-                    <p><strong>Tasks Completed Successfully:</strong> ${completedTasks}/5</p>
-                    <p>${message}</p>
-                    <p><strong>Reflection Quality:</strong> ${reflection.length > 100 ? 'Comprehensive' : 'Adequate'}</p>
-                    <p><strong>Professional Application:</strong> ${application.length > 100 ? 'Well-developed' : 'Basic'}</p>
-                </div>
-            `;
-        }
-
-        function updateProgressTracker() {
-            const completedTasks = Object.values(studentProgress).filter(Boolean).length;
-            const totalTasks = Object.keys(studentProgress).length;
-            const percentage = Math.round((completedTasks / totalTasks) * 100);
-
-            // Update individual task status
-            Object.keys(studentProgress).forEach(task => {
-                const statusElement = document.getElementById(`${task}Status`);
-                if (statusElement) {
-                    statusElement.textContent = studentProgress[task] ? 'Completed' : 'Not Started';
-                    statusElement.style.color = studentProgress[task] ? '#28a745' : '#6c757d';
-                }
-            });
-
-            // Update overall progress
-            document.getElementById('overallProgress').style.width = `${percentage}%`;
-            document.getElementById('completionPercentage').textContent = `${percentage}%`;
-        }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
