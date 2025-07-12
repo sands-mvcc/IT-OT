@@ -126,90 +126,6 @@
             padding: 40px;
         }
 
-        /* Mind Map Grid Layout */
-        .mind-map-container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e9ecef;
-        }
-
-        .mind-map-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #1a5f2e;
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-
-        .mind-map-grid {
-            display: flex;
-            flex-direction: row;
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .central-hub {
-            background: linear-gradient(135deg, #8B0000, #DC143C);
-            color: white;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 24px rgba(139, 0, 0, 0.3);
-            padding: 12px 20px;
-            height: 60px;
-            min-width: 180px;
-            order: 0;
-        }
-
-        .central-hub:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 32px rgba(139, 0, 0, 0.4);
-        }
-
-        .hub-branch {
-            background: linear-gradient(135deg, #1a5f2e, #2d8f3f);
-            color: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(26, 95, 46, 0.2);
-            padding: 10px 16px;
-            height: 60px;
-            min-width: 140px;
-        }
-
-        .hub-branch:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(26, 95, 46, 0.3);
-            background: linear-gradient(135deg, #2d8f3f, #1a5f2e);
-        }
-
-        /* Order branches horizontally */
-        .branch-1 { order: 1; }
-        .branch-2 { order: 2; }
-        .branch-3 { order: 3; }
-        .branch-4 { order: 4; }
-        .branch-5 { order: 5; }
-
         /* Content Sections */
         .content-section {
             display: none;
@@ -774,33 +690,6 @@
                 padding: 20px;
             }
             
-            .mind-map-grid {
-                flex-direction: column;
-                gap: 12px;
-                align-items: stretch;
-            }
-            
-            .central-hub {
-                order: 0;
-                min-width: auto;
-                width: 100%;
-                height: 50px;
-                font-size: 0.8em;
-            }
-            
-            .hub-branch {
-                min-width: auto;
-                width: 100%;
-                height: 50px;
-                font-size: 0.75em;
-            }
-            
-            .branch-1 { order: 1; }
-            .branch-2 { order: 2; }
-            .branch-3 { order: 3; }
-            .branch-4 { order: 4; }
-            .branch-5 { order: 5; }
-            
             .topic-grid {
                 grid-template-columns: 1fr;
             }
@@ -915,32 +804,6 @@
             </div>
 
             <div class="content-body">
-                <!-- Interactive Mind Map -->
-                <div class="mind-map-container" id="mindMapContainer">
-                    <h2 class="mind-map-title">Framework Components</h2>
-                    <div class="mind-map-grid">
-                        <div class="hub-branch branch-1" onclick="showSection('basic-principles')">
-                            Basic Principles
-                        </div>
-                        <div class="hub-branch branch-5" onclick="showSection('compliance')">
-                            Compliance & Standards
-                        </div>
-                        <div class="hub-branch branch-4" onclick="showSection('ics-architecture')">
-                            ICS Architecture
-                        </div>
-                        <div class="central-hub" onclick="showSection('overview')">
-                            NIST SP 800-82 Rev 2<br>
-                            <small>Click to explore</small>
-                        </div>
-                        <div class="hub-branch branch-2" onclick="showSection('applications')">
-                            Applications
-                        </div>
-                        <div class="hub-branch branch-3" onclick="showSection('emerging-challenges')">
-                            Emerging Challenges
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Content Sections -->
                 <div id="overview" class="content-section">
                     <div class="section-header">
@@ -1462,11 +1325,9 @@
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
             
-            // Hide quiz
+            // Hide quiz and lab
             document.getElementById('quiz').style.display = 'none';
-            
-            // Show mind map
-            document.getElementById('mindMapContainer').style.display = 'block';
+            document.getElementById('lab').style.display = 'none';
             
             // Show selected section
             document.getElementById(sectionId).classList.add('active');
@@ -1482,10 +1343,12 @@
         }
 
         function showQuiz() {
-            // Hide all sections and mind map
+            // Hide all sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('mindMapContainer').style.display = 'none';
+            
+            // Hide lab
+            document.getElementById('lab').style.display = 'none';
             
             // Show quiz
             document.getElementById('quiz').style.display = 'block';
@@ -1505,9 +1368,9 @@
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
             
-            // Hide quiz and show mind map
+            // Hide quiz and lab
             document.getElementById('quiz').style.display = 'none';
-            document.getElementById('mindMapContainer').style.display = 'block';
+            document.getElementById('lab').style.display = 'none';
             
             // Reset quiz
             resetQuiz();
@@ -1522,10 +1385,11 @@
         }
 
         function showLab() {
-            // Hide all sections and mind map
+            // Hide all sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('mindMapContainer').style.display = 'none';
+            
+            // Hide quiz
             document.getElementById('quiz').style.display = 'none';
             
             // Show lab
@@ -1895,6 +1759,15 @@ This assessment addresses FDA food safety regulations and HACCP requirements by:
             }
             
             alert(message);
+        }
+
+        function updateNavigation(sectionId) {
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to current section (simplified approach)
+            // In a more complex implementation, you'd match the onclick handlers
         }
 
         // Initialize the application
