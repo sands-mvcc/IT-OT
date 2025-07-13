@@ -3,8 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshFlow Systems - Interactive Configuration Management Plan (Training Edition)</title>
+    <title>FreshFlow Systems - Configuration Management Platform (White/Green Theme)</title>
     <style>
+        /* OT Industrial Design System - White/Dark Green/Black Theme */
+        :root {
+            --ot-primary: #1b4332;
+            --ot-secondary: #2d5a3d;
+            --ot-accent: #0f3023;
+            --ot-warning: #ca8a04;
+            --ot-danger: #dc2626;
+            --ot-success: #16a34a;
+            --ot-info: #22c55e;
+            --ot-dark: #ffffff;
+            --ot-darker: #f8f9fa;
+            --ot-light: #1a1a1a;
+            --ot-border: #2d5a3d;
+            --ot-grid: #f1f5f9;
+            --ot-panel: #ffffff;
+            --ot-surface: #e2e8f0;
+            --ot-text: #1a1a1a;
+            --ot-text-muted: #4a4a4a;
+            --ot-glow: #22c55e;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,866 +33,1132 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: white;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+            background: linear-gradient(135deg, var(--ot-darker) 0%, var(--ot-dark) 100%);
+            color: var(--ot-text);
+            line-height: 1.4;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1400px;
+        .ot-container {
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .training-mode-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .training-mode-toggle:hover {
-            background: white;
-            color: #2d5016;
-        }
-
-        .training-mode-toggle.active {
-            background: #90EE90;
-            color: #2d5016;
-            border-color: #90EE90;
-        }
-
-        .document-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .info-item {
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            border-radius: 5px;
-            position: relative;
-        }
-
-        .info-item strong {
-            display: block;
-            color: #90EE90;
-        }
-
-        .editable {
-            background: transparent;
-            border: 1px dashed rgba(255,255,255,0.3);
-            padding: 5px;
-            color: white;
-            border-radius: 3px;
-            min-height: 20px;
-            display: inline-block;
-            min-width: 100px;
-        }
-
-        .editable:focus {
-            background: rgba(255,255,255,0.2);
-            outline: none;
-            border-style: solid;
-        }
-
-        .training-mode .editable {
-            border: 2px dashed #90EE90;
-            background: rgba(144, 238, 144, 0.1);
-        }
-
-        .training-mode .editable:hover {
-            background: rgba(144, 238, 144, 0.2);
-            border-style: solid;
-        }
-
-        .nav-menu {
-            background: #f8f9fa;
-            border: 2px solid #4a7c59;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .nav-item {
-            background: white;
-            border: 2px solid #4a7c59;
-            border-radius: 8px;
             padding: 15px;
+        }
+
+        /* OT Header Panel */
+        .ot-header {
+            background: linear-gradient(135deg, var(--ot-primary) 0%, var(--ot-secondary) 100%);
+            border: 2px solid var(--ot-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(99, 179, 237, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ot-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ot-success), var(--ot-warning), var(--ot-danger));
+            animation: statusSweep 3s ease-in-out infinite;
+        }
+
+        @keyframes statusSweep {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .ot-header-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .ot-title-section h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--ot-text);
+            text-shadow: 0 0 10px var(--ot-glow);
+            margin-bottom: 5px;
+        }
+
+        .ot-subtitle {
+            color: var(--ot-text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ot-system-status {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .ot-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid var(--ot-border);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .ot-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            position: relative;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .ot-led.active { background: var(--ot-success); box-shadow: 0 0 10px var(--ot-success); }
+        .ot-led.warning { background: var(--ot-warning); box-shadow: 0 0 10px var(--ot-warning); }
+        .ot-led.alarm { background: var(--ot-danger); box-shadow: 0 0 10px var(--ot-danger); animation: blink 1s infinite; }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .ot-training-toggle {
+            background: linear-gradient(135deg, var(--ot-grid), var(--ot-surface));
+            border: 2px solid var(--ot-border);
+            color: var(--ot-text);
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ot-training-toggle:hover {
+            border-color: var(--ot-glow);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .ot-training-toggle.active {
+            background: linear-gradient(135deg, var(--ot-success), var(--ot-info));
+            border-color: var(--ot-success);
+            box-shadow: 0 0 20px rgba(22, 163, 74, 0.5);
+        }
+
+        /* OT Control Panel */
+        .ot-control-panel {
+            background: var(--ot-panel);
+            border: 2px solid var(--ot-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .ot-panel-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--ot-border);
+        }
+
+        .ot-panel-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--ot-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ot-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .ot-nav-button {
+            background: linear-gradient(135deg, var(--ot-grid), var(--ot-surface));
+            border: 2px solid var(--ot-border);
+            color: var(--ot-text);
+            padding: 15px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            font-family: inherit;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-item:hover {
-            background: #4a7c59;
-            color: white;
+        .ot-nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .ot-nav-button:hover {
+            border-color: var(--ot-glow);
+            color: var(--ot-glow);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
             transform: translateY(-2px);
         }
 
-        .section {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 30px;
+        .ot-nav-button:hover::before {
+            left: 100%;
+        }
+
+        .ot-nav-button.active {
+            background: linear-gradient(135deg, var(--ot-accent), var(--ot-info));
+            border-color: var(--ot-glow);
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 179, 237, 0.5);
+        }
+
+        /* OT Section Panel */
+        .ot-section {
+            background: var(--ot-panel);
+            border: 2px solid var(--ot-border);
+            border-radius: 8px;
+            margin-bottom: 20px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             position: relative;
         }
 
-        .training-mode .section {
-            border-color: #4a7c59;
+        .training-mode .ot-section {
+            border-color: var(--ot-success);
+            box-shadow: 0 0 15px rgba(56, 161, 105, 0.2);
         }
 
-        .section-header {
-            background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
-            color: white;
-            padding: 20px;
+        .ot-section-header {
+            background: linear-gradient(135deg, var(--ot-primary), var(--ot-secondary));
+            color: var(--ot-text);
+            padding: 15px 20px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid var(--ot-border);
+            position: relative;
         }
 
-        .section-header h2 {
-            font-size: 1.5rem;
+        .ot-section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--ot-glow);
+            box-shadow: 0 0 8px var(--ot-glow);
+        }
+
+        .ot-section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             flex-grow: 1;
         }
 
-        .section-controls {
+        .ot-section-controls {
             display: none;
-            gap: 10px;
-            margin-left: 20px;
+            gap: 8px;
         }
 
-        .training-mode .section-controls {
+        .training-mode .ot-section-controls {
             display: flex;
         }
 
-        .section-toggle {
-            font-size: 1.5rem;
+        .ot-section-toggle {
+            font-size: 1.2rem;
             transition: transform 0.3s ease;
-            margin-left: 10px;
+            color: var(--ot-glow);
         }
 
-        .section-content {
-            padding: 30px;
+        .ot-section-content {
+            padding: 20px;
             display: none;
-            position: relative;
+            background: var(--ot-dark);
         }
 
-        .section-content.active {
+        .ot-section-content.active {
             display: block;
         }
 
-        .subsection {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background: #fafafa;
+        /* OT Subsection */
+        .ot-subsection {
+            background: var(--ot-grid);
+            border: 1px solid var(--ot-border);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            padding: 15px;
             position: relative;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
         }
 
-        .training-mode .subsection {
-            border: 2px dashed #4a7c59;
+        .training-mode .ot-subsection {
+            border: 2px dashed var(--ot-success);
+            background: rgba(22, 163, 74, 0.05);
         }
 
-        .subsection-controls {
+        .ot-subsection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ot-border);
+        }
+
+        .ot-subsection-title {
+            color: var(--ot-glow);
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ot-subsection-controls {
             display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
             gap: 5px;
         }
 
-        .training-mode .subsection-controls {
+        .training-mode .ot-subsection-controls {
             display: flex;
         }
 
-        .subsection h3 {
-            color: #2d5016;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+        /* OT Button System */
+        .ot-btn {
+            background: linear-gradient(135deg, var(--ot-grid), var(--ot-surface));
+            border: 2px solid var(--ot-border);
+            color: var(--ot-text);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .editable-title {
-            background: transparent;
-            border: none;
-            color: #2d5016;
-            font-size: 1.3rem;
+        .ot-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(34, 197, 94, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .ot-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .ot-btn:hover {
+            border-color: var(--ot-glow);
+            color: var(--ot-glow);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
+        .ot-btn-small {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+
+        .ot-btn-success {
+            background: linear-gradient(135deg, var(--ot-success), #2f855a);
+            border-color: var(--ot-success);
+        }
+
+        .ot-btn-success:hover {
+            box-shadow: 0 0 15px rgba(22, 163, 74, 0.5);
+        }
+
+        .ot-btn-warning {
+            background: linear-gradient(135deg, var(--ot-warning), #dd6b20);
+            border-color: var(--ot-warning);
+        }
+
+        .ot-btn-warning:hover {
+            box-shadow: 0 0 15px rgba(202, 138, 4, 0.5);
+        }
+
+        .ot-btn-danger {
+            background: linear-gradient(135deg, var(--ot-danger), #c53030);
+            border-color: var(--ot-danger);
+        }
+
+        .ot-btn-danger:hover {
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        }
+
+        /* OT Data Table */
+        .ot-table-container {
+            background: var(--ot-dark);
+            border: 2px solid var(--ot-border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .ot-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .ot-table th {
+            background: linear-gradient(135deg, var(--ot-primary), var(--ot-secondary));
+            color: var(--ot-text);
+            padding: 12px 15px;
+            text-align: left;
             font-weight: bold;
-            width: 100%;
-            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid var(--ot-border);
+            position: relative;
         }
 
-        .training-mode .editable-title {
-            border: 1px dashed #4a7c59;
-            padding: 5px;
-            background: rgba(74, 124, 89, 0.05);
+        .ot-table th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--ot-glow);
+            box-shadow: 0 0 5px var(--ot-glow);
         }
 
-        .editable-content {
+        .ot-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--ot-border);
+            border-right: 1px solid var(--ot-border);
+            background: var(--ot-grid);
+        }
+
+        .ot-table tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .ot-table tr:hover td {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .ot-editable-cell {
             background: transparent;
             border: none;
+            color: var(--ot-text);
             width: 100%;
-            min-height: 60px;
-            resize: vertical;
             font-family: inherit;
             font-size: inherit;
-            line-height: inherit;
+            padding: 4px;
         }
 
-        .training-mode .editable-content {
-            border: 1px dashed #4a7c59;
-            padding: 10px;
-            background: rgba(74, 124, 89, 0.05);
+        .training-mode .ot-editable-cell {
+            background: rgba(22, 163, 74, 0.1);
+            border: 1px dashed var(--ot-success);
+            border-radius: 2px;
         }
 
-        .editable-list {
-            list-style: none;
-            padding: 0;
+        .ot-editable-cell:focus {
+            outline: none;
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--ot-glow);
+            box-shadow: 0 0 5px rgba(34, 197, 94, 0.3);
         }
 
-        .editable-list li {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
+        /* OT Metrics Dashboard */
+        .ot-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .ot-metric-card {
+            background: linear-gradient(135deg, var(--ot-grid), var(--ot-surface));
+            border: 2px solid var(--ot-border);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
             position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .training-mode .ot-metric-card {
+            border-color: var(--ot-success);
+            border-style: dashed;
+        }
+
+        .ot-metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--ot-glow);
+            box-shadow: 0 0 8px var(--ot-glow);
+        }
+
+        .ot-metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--ot-glow);
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px var(--ot-glow);
+            font-family: 'Courier New', monospace;
+        }
+
+        .ot-metric-label {
+            color: var(--ot-text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ot-metric-status {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* OT Process Flow */
+        .ot-process-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            align-items: center;
+        }
+
+        .ot-process-step {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, var(--ot-grid), var(--ot-surface));
+            border: 2px solid var(--ot-border);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .training-mode .ot-process-step {
+            border-color: var(--ot-success);
+            border-style: dashed;
+        }
+
+        .ot-process-step::after {
+            content: '▶';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--ot-glow);
+            text-shadow: 0 0 5px var(--ot-glow);
+        }
+
+        .ot-process-step:last-child::after {
+            display: none;
+        }
+
+        .ot-process-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--ot-glow);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .ot-process-desc {
+            color: var(--ot-text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* OT Lists */
+        .ot-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .ot-list-item {
+            background: var(--ot-grid);
+            border: 1px solid var(--ot-border);
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: all 0.3s ease;
         }
 
-        .training-mode .editable-list li {
-            background: rgba(74, 124, 89, 0.05);
-            border: 1px dashed #4a7c59;
+        .training-mode .ot-list-item {
+            border-color: var(--ot-success);
+            border-style: dashed;
+            background: rgba(22, 163, 74, 0.05);
         }
 
-        .list-item-content {
+        .ot-list-item:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--ot-glow);
+        }
+
+        .ot-list-item::before {
+            content: '●';
+            color: var(--ot-glow);
+            font-size: 1.2rem;
+        }
+
+        .ot-list-content {
             flex-grow: 1;
             background: transparent;
             border: none;
+            color: var(--ot-text);
             font-family: inherit;
             font-size: inherit;
-            line-height: inherit;
         }
 
-        .list-item-controls {
-            display: none;
-            gap: 5px;
+        .training-mode .ot-list-content {
+            border: 1px dashed var(--ot-success);
+            padding: 4px;
+            border-radius: 2px;
         }
 
-        .training-mode .list-item-controls {
-            display: flex;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .training-mode table {
-            border: 2px solid #4a7c59;
-        }
-
-        th {
-            background: #4a7c59;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-            position: relative;
-        }
-
-        .training-mode th {
-            cursor: pointer;
-        }
-
-        .training-mode th:hover {
-            background: #2d5016;
-        }
-
-        .column-controls {
-            display: none;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            gap: 5px;
-        }
-
-        .training-mode .column-controls {
-            display: flex;
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
-            position: relative;
-        }
-
-        .editable-cell {
-            background: transparent;
-            border: none;
-            width: 100%;
-            font-family: inherit;
-            font-size: inherit;
-            line-height: inherit;
-            min-height: 30px;
-        }
-
-        .training-mode .editable-cell {
-            background: rgba(74, 124, 89, 0.05);
-            border: 1px dashed #4a7c59;
-            padding: 8px;
+        /* OT Text Areas */
+        .ot-editable-content {
+            background: var(--ot-dark);
+            border: 2px solid var(--ot-border);
             border-radius: 4px;
-        }
-
-        .training-mode .editable-cell:focus {
-            background: white;
-            outline: none;
-            border-style: solid;
-        }
-
-        .row-controls {
-            display: none;
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            gap: 5px;
-        }
-
-        .training-mode tr:hover .row-controls {
-            display: flex;
-        }
-
-        .table-controls {
-            display: none;
-            margin-bottom: 10px;
-            gap: 10px;
-        }
-
-        .training-mode .table-controls {
-            display: flex;
-        }
-
-        .metric-card {
-            background: white;
-            border: 2px solid #4a7c59;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .training-mode .metric-card {
-            border-style: dashed;
-        }
-
-        .metric-controls {
-            display: none;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            gap: 5px;
-        }
-
-        .training-mode .metric-controls {
-            display: flex;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2d5016;
-            margin-bottom: 10px;
-        }
-
-        .editable-metric-value {
-            background: transparent;
-            border: none;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2d5016;
-            text-align: center;
+            color: var(--ot-text);
             width: 100%;
-        }
-
-        .training-mode .editable-metric-value {
-            border: 1px dashed #4a7c59;
-            background: rgba(74, 124, 89, 0.05);
-            padding: 5px;
-        }
-
-        .metric-label {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .editable-metric-label {
-            background: transparent;
-            border: none;
-            color: #666;
-            font-size: 0.9rem;
-            text-align: center;
-            width: 100%;
-        }
-
-        .training-mode .editable-metric-label {
-            border: 1px dashed #4a7c59;
-            background: rgba(74, 124, 89, 0.05);
-            padding: 5px;
-        }
-
-        .process-flow {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .process-step {
-            flex: 1;
-            min-width: 200px;
-            background: white;
-            border: 2px solid #4a7c59;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .training-mode .process-step {
-            border-style: dashed;
-        }
-
-        .process-step-controls {
-            display: none;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            gap: 5px;
-        }
-
-        .training-mode .process-step-controls {
-            display: flex;
-        }
-
-        .process-step::after {
-            content: '→';
-            position: absolute;
-            right: -25px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
-            color: #4a7c59;
-        }
-
-        .process-step:last-child::after {
-            display: none;
-        }
-
-        .btn {
-            background: #4a7c59;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            background: #2d5016;
-        }
-
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            margin: 2px;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn-success {
-            background: #28a745;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #2d5016;
-        }
-
-        .form-control {
-            width: 100%;
+            min-height: 80px;
             padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            line-height: 1.4;
         }
 
-        .form-control:focus {
-            border-color: #4a7c59;
+        .training-mode .ot-editable-content {
+            border-color: var(--ot-success);
+            border-style: dashed;
+            background: rgba(22, 163, 74, 0.05);
+        }
+
+        .ot-editable-content:focus {
             outline: none;
+            border-color: var(--ot-glow);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
         }
 
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        /* OT Status Indicators */
+        .ot-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid;
         }
 
-        .alert-success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+        .ot-status-active {
+            background: rgba(56, 161, 105, 0.2);
+            border-color: var(--ot-success);
+            color: var(--ot-success);
         }
 
-        .alert-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
+        .ot-status-warning {
+            background: rgba(237, 137, 54, 0.2);
+            border-color: var(--ot-warning);
+            color: var(--ot-warning);
         }
 
-        .alert-danger {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
+        .ot-status-alarm {
+            background: rgba(229, 62, 62, 0.2);
+            border-color: var(--ot-danger);
+            color: var(--ot-danger);
         }
 
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-green { background: #28a745; }
-        .status-yellow { background: #ffc107; }
-        .status-red { background: #dc3545; }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .dashboard-controls {
-            display: none;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .training-mode .dashboard-controls {
-            display: flex;
-        }
-
-        .add-section-controls {
-            display: none;
+        /* OT Footer */
+        .ot-footer {
+            background: var(--ot-panel);
+            border: 2px solid var(--ot-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
             text-align: center;
-            padding: 20px;
-            margin: 20px 0;
-            border: 2px dashed #4a7c59;
-            border-radius: 10px;
-            background: rgba(74, 124, 89, 0.05);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
         }
 
-        .training-mode .add-section-controls {
-            display: block;
+        .ot-footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
-        .template-selector {
-            margin: 20px 0;
-            padding: 20px;
-            border: 2px solid #4a7c59;
-            border-radius: 10px;
-            background: #f8f9fa;
-            display: none;
+        .ot-footer-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border: 1px solid var(--ot-border);
         }
 
-        .training-mode .template-selector {
-            display: block;
+        .ot-footer-label {
+            font-size: 0.7rem;
+            color: var(--ot-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .floating-save {
+        .ot-footer-value {
+            font-size: 0.9rem;
+            color: var(--ot-glow);
+            font-weight: bold;
+        }
+
+        /* OT Floating Controls */
+        .ot-floating-save {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4a7c59;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--ot-success), #2f855a);
+            border: 2px solid var(--ot-success);
             color: white;
-            border: none;
             padding: 15px 20px;
-            border-radius: 50px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             z-index: 1000;
             display: none;
+            transition: all 0.3s ease;
+        }
+
+        .training-mode .ot-floating-save {
+            display: block;
             animation: pulse 2s infinite;
         }
 
-        .training-mode .floating-save {
-            display: block;
+        .ot-floating-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 20px rgba(22, 163, 74, 0.5);
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-            50% { box-shadow: 0 6px 12px rgba(74, 124, 89, 0.4); }
-            100% { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+            0% { box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 8px 16px rgba(0,0,0,0.3), 0 0 25px rgba(22, 163, 74, 0.6); }
+            100% { box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
         }
 
-        .drag-handle {
-            cursor: move;
-            color: #4a7c59;
-            margin-right: 10px;
+        /* OT Templates Panel */
+        .ot-templates {
+            background: var(--ot-panel);
+            border: 2px solid var(--ot-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
             display: none;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
         }
 
-        .training-mode .drag-handle {
-            display: inline-block;
-        }
-
-        .dragging {
-            opacity: 0.5;
-            transform: rotate(5deg);
-        }
-
-        .drop-zone {
-            border: 2px dashed #4a7c59;
-            background: rgba(74, 124, 89, 0.1);
-            min-height: 50px;
-            margin: 10px 0;
-            border-radius: 5px;
-            display: none;
-        }
-
-        .drop-zone.active {
+        .training-mode .ot-templates {
             display: block;
         }
 
+        .ot-templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        /* OT Notifications */
+        .ot-notification {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            min-width: 350px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            border: 2px solid;
+            z-index: 10000;
+            font-family: inherit;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            animation: slideInRight 0.3s ease;
+        }
+
+        .ot-notification-success {
+            background: rgba(22, 163, 74, 0.1);
+            border-color: var(--ot-success);
+            color: var(--ot-success);
+        }
+
+        .ot-notification-warning {
+            background: rgba(202, 138, 4, 0.1);
+            border-color: var(--ot-warning);
+            color: var(--ot-warning);
+        }
+
+        .ot-notification-error {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: var(--ot-danger);
+            color: var(--ot-danger);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* OT Drag & Drop */
+        .ot-drag-handle {
+            cursor: move;
+            color: var(--ot-glow);
+            margin-right: 10px;
+            display: none;
+            font-size: 1.2rem;
+        }
+
+        .training-mode .ot-drag-handle {
+            display: inline-block;
+        }
+
+        .ot-dragging {
+            opacity: 0.6;
+            transform: rotate(2deg) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .ot-drop-zone {
+            border: 2px dashed var(--ot-glow);
+            background: rgba(34, 197, 94, 0.1);
+            min-height: 40px;
+            margin: 8px 0;
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--ot-glow);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .ot-drop-zone.active {
+            display: flex;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .ot-header-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .ot-system-status {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .ot-nav-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
+            .ot-container {
+                padding: 10px;
             }
             
-            .document-info {
+            .ot-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .ot-system-status {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .ot-nav-grid {
                 grid-template-columns: 1fr;
             }
             
-            .nav-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .process-flow {
+            .ot-process-flow {
                 flex-direction: column;
             }
             
-            .process-step::after {
+            .ot-process-step::after {
                 display: none;
             }
-
-            .section-controls,
-            .subsection-controls,
-            .metric-controls {
-                position: static;
-                justify-content: center;
-                margin-top: 10px;
+            
+            .ot-metrics-grid {
+                grid-template-columns: 1fr;
             }
+            
+            .ot-floating-save {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 16px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* OT Loading Animations */
+        .ot-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--ot-border);
+            border-radius: 50%;
+            border-top: 2px solid var(--ot-glow);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* OT Progress Bars */
+        .ot-progress {
+            width: 100%;
+            height: 8px;
+            background: var(--ot-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--ot-border);
+        }
+
+        .ot-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ot-success), var(--ot-glow));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--ot-glow);
+        }
+
+        /* Hide default elements not needed in OT style */
+        .default-hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <div class="header">
-            <button class="training-mode-toggle" onclick="toggleTrainingMode()">
-                🎓 Training Mode: OFF
-            </button>
-            <h1>Configuration Management Plan</h1>
-            <p>FreshFlow Systems - Comprehensive IT/OT Configuration Management</p>
-            <div class="document-info">
-                <div class="info-item">
+    <div class="ot-container">
+        <!-- OT Header Control Panel -->
+        <div class="ot-header">
+            <div class="ot-header-grid">
+                <div class="ot-title-section">
+                    <h1>FRESHFLOW SYSTEMS</h1>
+                    <div class="ot-subtitle">Configuration Management Platform v2.1</div>
+                </div>
+                
+                <div class="ot-system-status">
+                    <div class="ot-status-indicator">
+                        <div class="ot-led active"></div>
+                        <span>System Online</span>
+                    </div>
+                    <div class="ot-status-indicator">
+                        <div class="ot-led warning"></div>
+                        <span>Training Mode</span>
+                    </div>
+                    <div class="ot-status-indicator">
+                        <div class="ot-led active"></div>
+                        <span>Database</span>
+                    </div>
+                    <div class="ot-status-indicator">
+                        <div class="ot-led active"></div>
+                        <span>Network</span>
+                    </div>
+                </div>
+                
+                <button class="ot-training-toggle" onclick="toggleTrainingMode()">
+                    🎓 Training Mode: OFF
+                </button>
+            </div>
+            
+            <!-- Document Metadata Panel -->
+            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                <div class="ot-status-indicator">
                     <strong>Date:</strong>
-                    <span class="editable" contenteditable="true" data-field="date">July 5, 2025</span>
+                    <span class="ot-editable-cell" contenteditable="true" data-field="date">July 5, 2025</span>
                 </div>
-                <div class="info-item">
+                <div class="ot-status-indicator">
                     <strong>Version:</strong>
-                    <span class="editable" contenteditable="true" data-field="version">1.3</span>
+                    <span class="ot-editable-cell" contenteditable="true" data-field="version">1.3</span>
                 </div>
-                <div class="info-item">
+                <div class="ot-status-indicator">
                     <strong>Classification:</strong>
-                    <span class="editable" contenteditable="true" data-field="classification">Confidential</span>
+                    <span class="ot-editable-cell" contenteditable="true" data-field="classification">Confidential</span>
                 </div>
-                <div class="info-item">
-                    <strong>Document Owner:</strong>
-                    <span class="editable" contenteditable="true" data-field="owner">Jason Trujillo, Network Administrator</span>
+                <div class="ot-status-indicator">
+                    <strong>Owner:</strong>
+                    <span class="ot-editable-cell" contenteditable="true" data-field="owner">Jason Trujillo</span>
                 </div>
-                <div class="info-item">
-                    <strong>Approved by:</strong>
-                    <span class="editable" contenteditable="true" data-field="approver">Dr. Nia Clarke, CISO</span>
+                <div class="ot-status-indicator">
+                    <strong>Approved:</strong>
+                    <span class="ot-editable-cell" contenteditable="true" data-field="approver">Dr. Nia Clarke</span>
                 </div>
             </div>
         </div>
 
-        <!-- Template Selector -->
-        <div class="template-selector">
-            <h3>📋 Training Templates & Scenarios</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                <button class="btn btn-secondary" onclick="loadTemplate('baseline')">Load Baseline Plan</button>
-                <button class="btn btn-secondary" onclick="loadTemplate('emergency')">Emergency Scenario</button>
-                <button class="btn btn-secondary" onclick="loadTemplate('compliance')">Compliance Focused</button>
-                <button class="btn btn-secondary" onclick="loadTemplate('minimal')">Minimal Template</button>
-                <button class="btn btn-warning" onclick="resetPlan()">Reset to Default</button>
-                <button class="btn btn-success" onclick="saveAsTemplate()">Save as Template</button>
+        <!-- OT Template Control Panel -->
+        <div class="ot-templates">
+            <div class="ot-panel-header">
+                <h3 class="ot-panel-title">🔧 Training Scenarios & Templates</h3>
+            </div>
+            <div class="ot-templates-grid">
+                <button class="ot-btn" onclick="loadTemplate('baseline')">📋 Baseline Plan</button>
+                <button class="ot-btn" onclick="loadTemplate('emergency')">🚨 Emergency Scenario</button>
+                <button class="ot-btn" onclick="loadTemplate('compliance')">✅ Compliance Focus</button>
+                <button class="ot-btn" onclick="loadTemplate('minimal')">📝 Minimal Template</button>
+                <button class="ot-btn ot-btn-warning" onclick="resetPlan()">🔄 Reset Default</button>
+                <button class="ot-btn ot-btn-success" onclick="saveAsTemplate()">💾 Save Template</button>
             </div>
         </div>
 
-        <!-- Navigation Menu -->
-        <div class="nav-menu">
-            <h3 style="text-align: center; margin-bottom: 20px; color: #2d5016;">Quick Navigation</h3>
-            <div class="nav-grid" id="navigation-grid">
-                <div class="nav-item" onclick="scrollToSection('executive-summary')">Executive Summary</div>
-                <div class="nav-item" onclick="scrollToSection('framework')">CM Framework</div>
-                <div class="nav-item" onclick="scrollToSection('change-management')">Change Management</div>
-                <div class="nav-item" onclick="scrollToSection('baseline-management')">Baseline Management</div>
-                <div class="nav-item" onclick="scrollToSection('compliance')">Compliance & Audit</div>
-                <div class="nav-item" onclick="scrollToSection('tools')">Tools & Technology</div>
-                <div class="nav-item" onclick="scrollToSection('training')">Training</div>
-                <div class="nav-item" onclick="scrollToSection('metrics')">Metrics & KPIs</div>
-                <div class="nav-item" onclick="scrollToSection('student-activities')" style="background: #90EE90; color: #2d5016; font-weight: bold;">🎓 Learning Activities</div>
+        <!-- OT Navigation Control Panel -->
+        <div class="ot-control-panel">
+            <div class="ot-panel-header">
+                <h3 class="ot-panel-title">🗺️ System Navigation</h3>
+            </div>
+            <div class="ot-nav-grid" id="ot-navigation-grid">
+                <button class="ot-nav-button" onclick="scrollToSection('executive-summary')">📊 Executive Summary</button>
+                <button class="ot-nav-button" onclick="scrollToSection('framework')">🏗️ CM Framework</button>
+                <button class="ot-nav-button" onclick="scrollToSection('change-management')">🔄 Change Management</button>
+                <button class="ot-nav-button" onclick="scrollToSection('baseline-management')">⚙️ Baseline Management</button>
+                <button class="ot-nav-button" onclick="scrollToSection('compliance')">✅ Compliance & Audit</button>
+                <button class="ot-nav-button" onclick="scrollToSection('tools')">🛠️ Tools & Technology</button>
+                <button class="ot-nav-button" onclick="scrollToSection('training')">🎓 Training Program</button>
+                <button class="ot-nav-button" onclick="scrollToSection('metrics')">📈 Metrics & KPIs</button>
+                <button class="ot-nav-button ot-nav-button active" onclick="scrollToSection('student-activities')">🎯 Learning Activities</button>
             </div>
         </div>
 
         <!-- Add Section Controls -->
-        <div class="add-section-controls">
-            <h3>➕ Add New Section</h3>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
-                <button class="btn" onclick="addSection('text', 'Text Section')">📝 Text Section</button>
-                <button class="btn" onclick="addSection('table', 'Data Table')">📊 Data Table</button>
-                <button class="btn" onclick="addSection('metrics', 'Metrics Dashboard')">📈 Metrics Dashboard</button>
-                <button class="btn" onclick="addSection('process', 'Process Flow')">🔄 Process Flow</button>
-                <button class="btn" onclick="addSection('list', 'List Section')">📋 List Section</button>
+        <div class="ot-control-panel" style="display: none;">
+            <div class="ot-panel-header">
+                <h3 class="ot-panel-title">➕ Add New Content</h3>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="ot-btn ot-btn-success" onclick="addSection('text', '📝 Text Section')">📝 Text Section</button>
+                <button class="ot-btn ot-btn-success" onclick="addSection('table', '📊 Data Table')">📊 Data Table</button>
+                <button class="ot-btn ot-btn-success" onclick="addSection('metrics', '📈 Metrics Dashboard')">📈 Metrics</button>
+                <button class="ot-btn ot-btn-success" onclick="addSection('process', '🔄 Process Flow')">🔄 Process Flow</button>
+                <button class="ot-btn ot-btn-success" onclick="addSection('list', '📋 List Section')">📋 List</button>
             </div>
         </div>
 
         <!-- Dynamic Sections Container -->
-        <div id="sections-container">
+        <div id="ot-sections-container">
             <!-- Sections will be dynamically loaded here -->
         </div>
 
-        <!-- Action Buttons -->
-        <div style="text-align: center; margin: 30px 0;">
-            <button class="btn" onclick="scrollToSection('student-activities')">🎓 Start Learning Activities</button>
-            <button class="btn" onclick="exportPlan()">📤 Export Plan</button>
-            <button class="btn btn-secondary" onclick="generateReport()">📊 Generate Report</button>
-            <button class="btn" onclick="importPlan()">📥 Import Plan</button>
-            <button class="btn btn-secondary" onclick="printPlan()">🖨️ Print Plan</button>
-            <button class="btn btn-warning" onclick="validatePlan()">✅ Validate Plan</button>
+        <!-- OT Action Control Panel -->
+        <div class="ot-control-panel">
+            <div class="ot-panel-header">
+                <h3 class="ot-panel-title">🎮 System Operations</h3>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="ot-btn ot-btn-success" onclick="scrollToSection('student-activities')">🎓 Learning Activities</button>
+                <button class="ot-btn" onclick="exportPlan()">📤 Export Data</button>
+                <button class="ot-btn" onclick="importPlan()">📥 Import Data</button>
+                <button class="ot-btn" onclick="generateReport()">📊 Generate Report</button>
+                <button class="ot-btn" onclick="validatePlan()">✅ Validate System</button>
+                <button class="ot-btn" onclick="printPlan()">🖨️ Print Output</button>
+            </div>
         </div>
 
-        <!-- Footer -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; margin-top: 30px;">
-            <p><strong>Document Status:</strong> <span style="color: #2d5016;">Active and Current</span></p>
-            <p><strong>Next Review:</strong> <span class="editable" contenteditable="true">October 5, 2025</span> | <strong>Update Schedule:</strong> <span class="editable" contenteditable="true">Quarterly review, annual revision</span></p>
-            <p><strong>Change Control:</strong> All updates subject to CCB approval</p>
-            <p><strong>Training Mode:</strong> <span id="training-status">Disabled</span> | <strong>Last Saved:</strong> <span id="last-saved">Never</span></p>
+        <!-- OT Footer Status Panel -->
+        <div class="ot-footer">
+            <div class="ot-footer-grid">
+                <div class="ot-footer-item">
+                    <div class="ot-footer-label">System Status</div>
+                    <div class="ot-footer-value">OPERATIONAL</div>
+                </div>
+                <div class="ot-footer-item">
+                    <div class="ot-footer-label">Next Review</div>
+                    <div class="ot-footer-value ot-editable-cell" contenteditable="true">Oct 5, 2025</div>
+                </div>
+                <div class="ot-footer-item">
+                    <div class="ot-footer-label">Update Schedule</div>
+                    <div class="ot-footer-value ot-editable-cell" contenteditable="true">Quarterly</div>
+                </div>
+                <div class="ot-footer-item">
+                    <div class="ot-footer-label">Training Mode</div>
+                    <div class="ot-footer-value" id="ot-training-status">DISABLED</div>
+                </div>
+                <div class="ot-footer-item">
+                    <div class="ot-footer-label">Last Saved</div>
+                    <div class="ot-footer-value" id="ot-last-saved">Never</div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; color: var(--ot-text-muted); font-size: 0.8rem;">
+                <strong>Change Control:</strong> All updates subject to CCB approval | 
+                <strong>Facility:</strong> Lima, Ohio Operations
+            </div>
         </div>
     </div>
 
-    <!-- Floating Save Button -->
-    <button class="floating-save" onclick="quickSave()">
-        💾 Save Progress
+    <!-- OT Floating Save Control -->
+    <button class="ot-floating-save" onclick="quickSave()">
+        💾 SAVE DATA
     </button>
 
     <!-- Hidden File Input for Import -->
-    <input type="file" id="fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+    <input type="file" id="ot-fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
 
     <script>
-        // Global Configuration Management System
-        class ConfigurationManagementPlan {
+        // OT Configuration Management System - Industrial Design
+        class OTConfigurationSystem {
             constructor() {
                 this.trainingMode = false;
                 this.sections = new Map();
@@ -880,302 +1167,429 @@
                 this.autoSaveInterval = null;
                 this.lastSaved = null;
                 this.validationRules = new Map();
-                this.initializeDefaultPlan();
-                this.setupEventListeners();
+                this.systemStatus = {
+                    online: true,
+                    training: false,
+                    database: true,
+                    network: true
+                };
+                this.initializeOTSystem();
+                this.setupOTEventListeners();
             }
 
-            initializeDefaultPlan() {
-                // Initialize with default sections
-                this.addDefaultSections();
-                this.setupTemplates();
-                this.setupValidationRules();
-                this.renderAllSections();
+            initializeOTSystem() {
+                this.addOTDefaultSections();
+                this.setupOTTemplates();
+                this.setupOTValidationRules();
+                this.renderOTSections();
+                this.updateOTSystemStatus();
             }
 
-            addDefaultSections() {
-                // Executive Summary Section
+            addOTDefaultSections() {
+                // Executive Summary Section - OT Style
                 this.sections.set('executive-summary', {
                     id: 'executive-summary',
-                    title: '1. Executive Summary',
-                    type: 'text',
+                    title: '📊 Executive Summary & System Overview',
+                    type: 'mixed',
+                    priority: 'high',
                     subsections: [
                         {
                             id: 'purpose-scope',
-                            title: 'Purpose and Scope',
-                            content: 'This Configuration Management Plan establishes standardized processes for maintaining secure, compliant configurations across FreshFlow Systems\' hybrid IT/OT environment. The plan addresses configuration baselines, change control procedures, and compliance monitoring for all systems supporting the organization\'s food packaging operations across three facilities in Lima, Ohio.',
-                            type: 'text'
+                            title: 'System Purpose & Operational Scope',
+                            content: 'This Configuration Management Platform establishes standardized processes for maintaining secure, compliant configurations across FreshFlow Systems\' hybrid IT/OT environment. The system addresses configuration baselines, change control procedures, and compliance monitoring for all systems supporting food packaging operations across three manufacturing facilities in Lima, Ohio.',
+                            type: 'text',
+                            status: 'active'
                         },
                         {
                             id: 'strategic-objectives',
-                            title: 'Strategic Objectives',
+                            title: 'Strategic Operating Objectives',
                             content: [
-                                'Operational Stability: Maintain <2-hour recovery time for production systems through consistent configurations',
-                                'Security Compliance: Ensure all systems meet industry security standards and regulatory requirements',
-                                'Change Control: Implement formal change management reducing configuration-related incidents by 90%',
-                                'Scalability: Support 125% annual growth through automated configuration management processes',
-                                'IT/OT Integration: Establish unified configuration standards across information and operational technology environments'
+                                'OPERATIONAL STABILITY: Maintain <2-hour MTTR for production systems through consistent configurations',
+                                'SECURITY COMPLIANCE: Ensure all systems meet IEC 62443 and industry security standards',
+                                'CHANGE CONTROL: Implement formal change management reducing incidents by 90%',
+                                'SCALABILITY: Support 125% annual growth through automated configuration processes',
+                                'IT/OT INTEGRATION: Establish unified configuration standards across all technology environments'
                             ],
-                            type: 'list'
+                            type: 'list',
+                            status: 'active'
                         },
                         {
                             id: 'current-state',
-                            title: 'Current State Assessment',
+                            title: 'Current System State Assessment',
                             content: [
-                                { label: 'CM Maturity', value: 'Level 2', target: 'Level 3', status: 'yellow' },
-                                { label: 'IT Systems Automated', value: '75%', target: '90%', status: 'yellow' },
-                                { label: 'OT Systems Automated', value: '25%', target: '70%', status: 'red' },
-                                { label: 'Change Success Rate', value: '85%', target: '95%', status: 'yellow' }
+                                { label: 'CM MATURITY LEVEL', value: 'LEVEL 2', target: 'LEVEL 3', status: 'warning' },
+                                { label: 'IT SYSTEMS AUTOMATED', value: '75%', target: '90%', status: 'warning' },
+                                { label: 'OT SYSTEMS AUTOMATED', value: '25%', target: '70%', status: 'alarm' },
+                                { label: 'CHANGE SUCCESS RATE', value: '85%', target: '95%', status: 'warning' },
+                                { label: 'SYSTEM AVAILABILITY', value: '99.2%', target: '99.9%', status: 'active' },
+                                { label: 'SECURITY COMPLIANCE', value: '88%', target: '95%', status: 'warning' }
                             ],
-                            type: 'metrics'
+                            type: 'metrics',
+                            status: 'active'
                         }
                     ]
                 });
 
-                // Framework Section
+                // Framework Section - OT Style
                 this.sections.set('framework', {
                     id: 'framework',
-                    title: '2. Configuration Management Framework',
+                    title: '🏗️ Configuration Management Framework',
                     type: 'mixed',
+                    priority: 'high',
                     subsections: [
                         {
                             id: 'ccb-structure',
-                            title: 'Configuration Control Board (CCB)',
+                            title: 'Configuration Control Board (CCB) Structure',
                             content: {
-                                headers: ['Role', 'Name', 'Primary Responsibilities', 'Authority Level'],
+                                headers: ['ROLE', 'OPERATOR', 'PRIMARY RESPONSIBILITIES', 'AUTHORITY LEVEL', 'STATUS'],
                                 rows: [
-                                    ['Chair', 'Dr. Nia Clarke (CISO)', 'Overall CM process oversight, baseline approval', 'Level 4 (Strategic)'],
-                                    ['Technical Lead', 'Jason Trujillo (Network Administrator)', 'Daily configuration maintenance, change implementation', 'Level 3 (Tactical)'],
-                                    ['OT Representative', 'Regina Moore (OT Systems Engineer)', 'Industrial system configuration management', 'Level 3 (Tactical)'],
-                                    ['Business Representative', 'Marcus Lee (COO)', 'Configuration requirements definition, business approval', 'Level 3 (Tactical)'],
-                                    ['Quality Assurance', 'Ronetta Bell (QC Manager)', 'Quality validation and compliance verification', 'Level 2 (Operational)']
+                                    ['CHAIR', 'Dr. Nia Clarke (CISO)', 'Overall CM process oversight, baseline approval', 'LEVEL 4 (Strategic)', 'ACTIVE'],
+                                    ['TECH LEAD', 'Jason Trujillo (Network Admin)', 'Daily configuration maintenance, change implementation', 'LEVEL 3 (Tactical)', 'ACTIVE'],
+                                    ['OT REP', 'Regina Moore (OT Systems Engineer)', 'Industrial system configuration management', 'LEVEL 3 (Tactical)', 'ACTIVE'],
+                                    ['BIZ REP', 'Marcus Lee (COO)', 'Configuration requirements, business approval', 'LEVEL 3 (Tactical)', 'ACTIVE'],
+                                    ['QA', 'Ronetta Bell (QC Manager)', 'Quality validation and compliance verification', 'LEVEL 2 (Operational)', 'ACTIVE']
                                 ]
                             },
-                            type: 'table'
+                            type: 'table',
+                            status: 'active'
                         },
                         {
-                            id: 'cmdb-structure',
-                            title: 'CMDB Structure',
-                            content: 'Primary Tool: ServiceNow IT Asset Management with OT extension modules\n\nIntegration: Active Directory, VMware vCenter, SIEM, monitoring tools\nData Sources: Automated discovery, manual entry, third-party feeds\nUpdate Frequency: Real-time for critical attributes, daily for standard attributes',
-                            type: 'text'
+                            id: 'cmdb-architecture',
+                            title: 'CMDB System Architecture',
+                            content: 'PRIMARY PLATFORM: ServiceNow IT Asset Management with OT extension modules\n\nSYSTEM INTEGRATION:\n• Active Directory Authentication\n• VMware vCenter Virtualization\n• SIEM Security Information Management\n• Industrial Monitoring Tools\n\nDATA SOURCES:\n• Automated Discovery Agents\n• Manual Entry Interfaces\n• Third-party System Feeds\n• Real-time Sensor Data\n\nUPDATE FREQUENCY:\n• Critical Attributes: Real-time\n• Standard Attributes: Daily\n• Historical Data: Continuous Archive',
+                            type: 'text',
+                            status: 'active'
                         }
                     ]
                 });
 
-                // Add more default sections...
-                this.addChangeManagementSection();
-                this.addBaselineManagementSection();
-                this.addComplianceSection();
-                this.addToolsSection();
-                this.addTrainingSection();
-                this.addMetricsSection();
-                this.addStudentActivitiesSection();
+                // Add more OT-styled sections...
+                this.addOTChangeManagementSection();
+                this.addOTBaselineManagementSection();
+                this.addOTComplianceSection();
+                this.addOTToolsSection();
+                this.addOTTrainingSection();
+                this.addOTMetricsSection();
+                this.addOTStudentActivitiesSection();
             }
 
-            addChangeManagementSection() {
+            addOTChangeManagementSection() {
                 this.sections.set('change-management', {
                     id: 'change-management',
-                    title: '3. Change Management Process',
+                    title: '🔄 Change Management Process Control',
                     type: 'mixed',
+                    priority: 'critical',
                     subsections: [
                         {
                             id: 'change-categories',
-                            title: 'Change Categories',
+                            title: 'Change Classification Matrix',
                             content: {
-                                headers: ['Category', 'Processing Time', 'Approval Required', 'Risk Level'],
+                                headers: ['CATEGORY', 'PROCESSING TIME', 'APPROVAL REQUIRED', 'RISK LEVEL', 'STATUS'],
                                 rows: [
-                                    ['Emergency', '<4 hours', 'CISO or Deputy', 'Critical'],
-                                    ['Standard', '<24 hours', 'Automated', 'Low'],
-                                    ['Normal', '5-14 business days', 'Full CCB Review', 'Medium'],
-                                    ['Major', '30+ business days', 'Executive Leadership', 'High']
+                                    ['EMERGENCY', '<4 hours', 'CISO or Deputy', 'CRITICAL', 'ALARM'],
+                                    ['STANDARD', '<24 hours', 'Automated', 'LOW', 'ACTIVE'],
+                                    ['NORMAL', '5-14 business days', 'Full CCB Review', 'MEDIUM', 'WARNING'],
+                                    ['MAJOR', '30+ business days', 'Executive Leadership', 'HIGH', 'WARNING']
                                 ]
                             },
-                            type: 'table'
+                            type: 'table',
+                            status: 'active'
                         },
                         {
-                            id: 'change-process',
+                            id: 'change-process-flow',
                             title: 'Change Request Process Flow',
                             content: [
-                                { title: '1. Request Initiation', description: 'ServiceNow form submission with required documentation' },
-                                { title: '2. Impact Assessment', description: 'Technical review, risk analysis, business impact evaluation' },
-                                { title: '3. CCB Review', description: 'Board review, approval decision, scheduling coordination' },
-                                { title: '4. Implementation', description: 'Execution with monitoring, validation, documentation' },
-                                { title: '5. Post-Review', description: 'Success validation, lessons learned, closure' }
+                                { title: 'STEP 1: INITIATION', description: 'ServiceNow form submission with required documentation and impact assessment' },
+                                { title: 'STEP 2: ASSESSMENT', description: 'Technical review, risk analysis, business impact evaluation, and resource validation' },
+                                { title: 'STEP 3: CCB REVIEW', description: 'Board review, approval decision, scheduling coordination, and stakeholder notification' },
+                                { title: 'STEP 4: IMPLEMENTATION', description: 'Execution with real-time monitoring, validation testing, and complete documentation' },
+                                { title: 'STEP 5: POST-REVIEW', description: 'Success validation, lessons learned capture, metrics collection, and formal closure' }
                             ],
-                            type: 'process'
+                            type: 'process',
+                            status: 'active'
+                        },
+                        {
+                            id: 'emergency-contacts',
+                            title: 'Emergency Response Team Contacts',
+                            content: {
+                                headers: ['ROLE', 'CONTACT', 'RESPONSIBILITY', 'AVAILABILITY', 'STATUS'],
+                                rows: [
+                                    ['PRIMARY', 'Jason Trujillo', 'Network Administration', '24/7', 'ACTIVE'],
+                                    ['SECONDARY', 'Regina Moore', 'OT Systems Engineering', 'Production Hours', 'ACTIVE'],
+                                    ['EXECUTIVE', 'Dr. Nia Clarke', 'Final Decision Authority', 'On-call', 'ACTIVE'],
+                                    ['BUSINESS', 'Marcus Lee', 'Business Impact Decisions', 'Business Hours', 'ACTIVE']
+                                ]
+                            },
+                            type: 'table',
+                            status: 'active'
                         }
                     ]
                 });
             }
 
-            addBaselineManagementSection() {
+            addOTBaselineManagementSection() {
                 this.sections.set('baseline-management', {
                     id: 'baseline-management',
-                    title: '4. Configuration Baseline Management',
+                    title: '⚙️ Configuration Baseline Management',
                     type: 'mixed',
+                    priority: 'high',
                     subsections: [
                         {
                             id: 'it-baselines',
-                            title: 'IT System Baselines',
+                            title: 'IT System Baseline Standards',
                             content: [
-                                'Windows Workstations: NIST SP 800-171 security configuration guide',
-                                'Windows Servers: CIS Benchmark Level 1 with organizational customizations',
-                                'Linux Systems: CIS Benchmark Level 1 with hardening supplements',
-                                'Network Infrastructure: Vendor security guides with zero-trust principles',
-                                'Cloud Services: Azure Security Benchmark, AWS Well-Architected Framework'
+                                'WINDOWS WORKSTATIONS: NIST SP 800-171 security configuration guide with corporate hardening',
+                                'WINDOWS SERVERS: CIS Benchmark Level 1 with organizational customizations and monitoring',
+                                'LINUX SYSTEMS: CIS Benchmark Level 1 with hardening supplements and security patches',
+                                'NETWORK INFRASTRUCTURE: Vendor security guides with zero-trust principles implementation',
+                                'CLOUD SERVICES: Azure Security Benchmark, AWS Well-Architected Framework compliance'
                             ],
-                            type: 'list'
+                            type: 'list',
+                            status: 'active'
                         },
                         {
                             id: 'ot-baselines',
-                            title: 'OT System Baselines',
+                            title: 'OT System Baseline Standards',
                             content: [
-                                'Rockwell PLCs: IEC 62443 security levels with vendor recommendations',
-                                'HMI Systems: NIST SP 800-82 industrial control system guidelines',
-                                'SCADA Gateway: Multi-layered security configuration with protocol filtering',
-                                'IoT Devices: Manufacturer security baselines with network isolation',
-                                'Industrial Networks: Segmented VLAN configuration with monitoring'
+                                'ROCKWELL PLCS: IEC 62443 security levels with vendor recommendations and zone segmentation',
+                                'HMI SYSTEMS: NIST SP 800-82 industrial control system guidelines with access controls',
+                                'SCADA GATEWAY: Multi-layered security configuration with protocol filtering and monitoring',
+                                'IOT DEVICES: Manufacturer security baselines with network isolation and encrypted communications',
+                                'INDUSTRIAL NETWORKS: Segmented VLAN configuration with continuous monitoring and threat detection'
                             ],
-                            type: 'list'
-                        }
-                    ]
-                });
-            }
-
-            addComplianceSection() {
-                this.sections.set('compliance', {
-                    id: 'compliance',
-                    title: '5. Compliance and Audit Management',
-                    type: 'mixed',
-                    subsections: [
+                            type: 'list',
+                            status: 'active'
+                        },
                         {
-                            id: 'compliance-metrics',
-                            title: 'Regulatory Compliance Framework',
-                            content: [
-                                { label: 'FDA 21 CFR Part 11 Compliance', value: '95%', target: '98%', status: 'green' },
-                                { label: 'NIST Framework Alignment', value: '88%', target: '95%', status: 'yellow' },
-                                { label: 'IEC 62443 Compliance', value: '92%', target: '95%', status: 'yellow' },
-                                { label: 'SOX Controls', value: '85%', target: '95%', status: 'red' }
-                            ],
-                            type: 'metrics'
-                        }
-                    ]
-                });
-            }
-
-            addToolsSection() {
-                this.sections.set('tools', {
-                    id: 'tools',
-                    title: '6. Tools and Technology',
-                    type: 'mixed',
-                    subsections: [
-                        {
-                            id: 'tool-coverage',
-                            title: 'Configuration Management Tools',
+                            id: 'automation-tools',
+                            title: 'Automated Configuration Management Tools',
                             content: {
-                                headers: ['System Type', 'Tool', 'Coverage', 'Status'],
+                                headers: ['SYSTEM TYPE', 'AUTOMATION TOOL', 'COVERAGE %', 'STATUS', 'NEXT UPDATE'],
                                 rows: [
-                                    ['Windows Systems', 'Microsoft SCCM', '90%', 'Active'],
-                                    ['Linux Systems', 'Ansible', '85%', 'Active'],
-                                    ['Network Equipment', 'Cisco DNA Center', '70%', 'Expanding'],
-                                    ['PLC Configuration', 'FactoryTalk Asset Centre', '60%', 'Implementing']
+                                    ['Windows Systems', 'Microsoft SCCM', '90%', 'ACTIVE', '2025-08-01'],
+                                    ['Linux Systems', 'Ansible Tower', '85%', 'ACTIVE', '2025-07-15'],
+                                    ['Network Equipment', 'Cisco DNA Center', '70%', 'WARNING', '2025-09-01'],
+                                    ['PLC Configuration', 'FactoryTalk Asset Centre', '60%', 'WARNING', '2025-10-01'],
+                                    ['HMI Systems', 'Wonderware InTouch', '45%', 'ALARM', '2025-08-15']
                                 ]
                             },
-                            type: 'table'
+                            type: 'table',
+                            status: 'active'
                         }
                     ]
                 });
             }
 
-            addTrainingSection() {
+            addOTComplianceSection() {
+                this.sections.set('compliance', {
+                    id: 'compliance',
+                    title: '✅ Compliance & Regulatory Management',
+                    type: 'mixed',
+                    priority: 'critical',
+                    subsections: [
+                        {
+                            id: 'compliance-dashboard',
+                            title: 'Regulatory Compliance Dashboard',
+                            content: [
+                                { label: 'FDA 21 CFR PART 11', value: '95%', target: '98%', status: 'active' },
+                                { label: 'NIST FRAMEWORK', value: '88%', target: '95%', status: 'warning' },
+                                { label: 'IEC 62443 COMPLIANCE', value: '92%', target: '95%', status: 'warning' },
+                                { label: 'SOX CONTROLS', value: '85%', target: '95%', status: 'alarm' },
+                                { label: 'FSMA TRACEABILITY', value: '93%', target: '98%', status: 'active' },
+                                { label: 'ISO 27001', value: '89%', target: '95%', status: 'warning' }
+                            ],
+                            type: 'metrics',
+                            status: 'active'
+                        },
+                        {
+                            id: 'audit-schedule',
+                            title: 'Audit & Assessment Schedule',
+                            content: {
+                                headers: ['AUDIT TYPE', 'FREQUENCY', 'NEXT DUE', 'RESPONSIBLE PARTY', 'STATUS'],
+                                rows: [
+                                    ['Internal CM Audit', 'Quarterly', 'October 15, 2025', 'Internal Audit Team', 'ACTIVE'],
+                                    ['FDA Inspection', 'Bi-annual', 'March 2026', 'Quality Assurance', 'WARNING'],
+                                    ['SOX Compliance', 'Annual', 'December 2025', 'External Auditor', 'WARNING'],
+                                    ['Security Assessment', 'Semi-annual', 'January 2026', 'Security Team', 'ACTIVE'],
+                                    ['IEC 62443 Review', 'Annual', 'November 2025', 'OT Security Team', 'ACTIVE']
+                                ]
+                            },
+                            type: 'table',
+                            status: 'active'
+                        }
+                    ]
+                });
+            }
+
+            addOTToolsSection() {
+                this.sections.set('tools', {
+                    id: 'tools',
+                    title: '🛠️ Tools & Technology Infrastructure',
+                    type: 'mixed',
+                    priority: 'high',
+                    subsections: [
+                        {
+                            id: 'tool-inventory',
+                            title: 'Configuration Management Tool Inventory',
+                            content: {
+                                headers: ['TOOL CATEGORY', 'PRIMARY TOOL', 'SECONDARY TOOL', 'INTEGRATION STATUS', 'UPTIME'],
+                                rows: [
+                                    ['CMDB Platform', 'ServiceNow ITAM', 'Asset Manager', 'FULLY INTEGRATED', '99.9%'],
+                                    ['IT Automation', 'Ansible Tower', 'SCCM', 'OPERATIONAL', '99.5%'],
+                                    ['Network Automation', 'Cisco DNA Center', 'Juniper Space', 'EXPANDING', '98.2%'],
+                                    ['Vulnerability Scanning', 'Tenable Nessus', 'Qualys VMDR', 'ACTIVE', '99.8%'],
+                                    ['File Integrity', 'Tripwire Enterprise', 'AIDE', 'MONITORING', '99.9%'],
+                                    ['OT Monitoring', 'Claroty Platform', 'Dragos', 'IMPLEMENTING', '97.5%']
+                                ]
+                            },
+                            type: 'table',
+                            status: 'active'
+                        },
+                        {
+                            id: 'implementation-roadmap',
+                            title: 'Technology Implementation Roadmap',
+                            content: [
+                                { title: 'Q3 2025: CMDB COMPLETION', description: 'Complete ServiceNow CMDB implementation and data population across all facilities' },
+                                { title: 'Q4 2025: BASELINE AUTOMATION', description: 'Deploy automated configuration baselines for all IT and critical OT systems' },
+                                { title: 'Q1 2026: OT INTEGRATION', description: 'Integrate operational technology systems into unified configuration management platform' },
+                                { title: 'Q2 2026: PREDICTIVE ANALYTICS', description: 'Implement AI-powered predictive analytics for configuration drift and failure prediction' },
+                                { title: 'Q3 2026: FULL AUTOMATION', description: 'Achieve 95% automation across all systems with zero-touch deployment capabilities' }
+                            ],
+                            type: 'process',
+                            status: 'active'
+                        }
+                    ]
+                });
+            }
+
+            addOTTrainingSection() {
                 this.sections.set('training', {
                     id: 'training',
-                    title: '7. Training and Competency Management',
+                    title: '🎓 Training & Competency Management',
                     type: 'mixed',
+                    priority: 'medium',
                     subsections: [
                         {
                             id: 'training-matrix',
-                            title: 'Role-Based Training Matrix',
+                            title: 'Role-Based Training Competency Matrix',
                             content: {
-                                headers: ['Role', 'Required Training', 'Frequency', 'Next Due', 'Completion Status'],
+                                headers: ['ROLE', 'REQUIRED TRAINING', 'FREQUENCY', 'NEXT DUE', 'COMPLETION %', 'STATUS'],
                                 rows: [
-                                    ['System Administrators', 'CM procedures, tool training', 'Annual', 'January 2026', '85% Complete'],
-                                    ['OT Engineers', 'Industrial cybersecurity, change control', 'Annual', 'February 2026', '70% Complete'],
-                                    ['Change Coordinators', 'Change management process, ServiceNow', 'Semi-annual', 'December 2025', '90% Complete'],
-                                    ['Business Users', 'Change request procedures', 'Annual', 'March 2026', '45% Complete']
+                                    ['System Administrators', 'CM procedures, tool training, security', 'Annual', 'January 2026', '85%', 'ACTIVE'],
+                                    ['OT Engineers', 'Industrial cybersecurity, IEC 62443', 'Annual', 'February 2026', '70%', 'WARNING'],
+                                    ['Change Coordinators', 'Change management, ServiceNow, ITIL', 'Semi-annual', 'December 2025', '90%', 'ACTIVE'],
+                                    ['Business Users', 'Change request procedures, awareness', 'Annual', 'March 2026', '45%', 'ALARM'],
+                                    ['Security Team', 'OT security, incident response', 'Quarterly', 'October 2025', '95%', 'ACTIVE']
                                 ]
                             },
-                            type: 'table'
+                            type: 'table',
+                            status: 'active'
+                        },
+                        {
+                            id: 'training-programs',
+                            title: 'Specialized Training Programs',
+                            content: [
+                                'ITIL FOUNDATION: Change and configuration management best practices with certification',
+                                'INDUSTRIAL CYBERSECURITY: IEC 62443 and NIST SP 800-82 comprehensive training program',
+                                'TOOL-SPECIFIC TRAINING: Vendor certification programs for ServiceNow, Ansible, and SCADA systems',
+                                'SECURITY AWARENESS: Configuration security, insider threat prevention, and incident response',
+                                'OT/IT CONVERGENCE: Integrated training on IT/OT security and configuration management'
+                            ],
+                            type: 'list',
+                            status: 'active'
                         }
                     ]
                 });
             }
 
-            addMetricsSection() {
+            addOTMetricsSection() {
                 this.sections.set('metrics', {
                     id: 'metrics',
-                    title: '8. Metrics and Continuous Improvement',
+                    title: '📈 Metrics & Performance Dashboard',
                     type: 'mixed',
+                    priority: 'high',
                     subsections: [
                         {
                             id: 'kpi-dashboard',
-                            title: 'Key Performance Indicators',
+                            title: 'Key Performance Indicators Dashboard',
                             content: [
-                                { label: 'System Availability', value: '99.2%', target: '99.9%', status: 'yellow' },
-                                { label: 'Change Success Rate', value: '87%', target: '95%', status: 'red' },
-                                { label: 'Mean Time to Recovery', value: '1.8hrs', target: '<2hrs', status: 'green' },
-                                { label: 'Configuration Accuracy', value: '92%', target: '95%', status: 'yellow' },
-                                { label: 'Avg Change Processing Time', value: '6.2 days', target: '5 days', status: 'yellow' },
-                                { label: 'Configuration Drift Detection', value: '15 min', target: '10 min', status: 'yellow' }
+                                { label: 'SYSTEM AVAILABILITY', value: '99.2%', target: '99.9%', status: 'warning' },
+                                { label: 'CHANGE SUCCESS RATE', value: '87%', target: '95%', status: 'alarm' },
+                                { label: 'MEAN TIME TO RECOVERY', value: '1.8 HRS', target: '<2 HRS', status: 'active' },
+                                { label: 'CONFIG ACCURACY', value: '92%', target: '95%', status: 'warning' },
+                                { label: 'CHANGE PROCESSING TIME', value: '6.2 DAYS', target: '5 DAYS', status: 'warning' },
+                                { label: 'DRIFT DETECTION TIME', value: '15 MIN', target: '10 MIN', status: 'warning' },
+                                { label: 'SECURITY INCIDENTS', value: '3/MONTH', target: '<2/MONTH', status: 'warning' },
+                                { label: 'COMPLIANCE SCORE', value: '89%', target: '95%', status: 'warning' }
                             ],
-                            type: 'metrics'
+                            type: 'metrics',
+                            status: 'active'
+                        },
+                        {
+                            id: 'improvement-initiatives',
+                            title: 'Continuous Improvement Initiatives',
+                            content: {
+                                headers: ['INITIATIVE', 'TARGET COMPLETION', 'EXPECTED IMPACT', 'STATUS', 'PROGRESS'],
+                                rows: [
+                                    ['Automated Baseline Verification', 'Q4 2025', 'Real-time validation', 'ACTIVE', '75%'],
+                                    ['Self-Service Change Portal', 'Q1 2026', 'Reduce processing 50%', 'WARNING', '30%'],
+                                    ['Predictive Analytics', 'Q2 2026', 'Early warning system', 'WARNING', '15%'],
+                                    ['AI-Powered CM', 'Q4 2026', 'Optimal configurations', 'ALARM', '5%'],
+                                    ['Zero-Touch Deployment', 'Q3 2026', 'Full automation', 'WARNING', '20%']
+                                ]
+                            },
+                            type: 'table',
+                            status: 'active'
                         }
                     ]
                 });
             }
 
-            addStudentActivitiesSection() {
+            addOTStudentActivitiesSection() {
                 this.sections.set('student-activities', {
                     id: 'student-activities',
-                    title: '🎓 Student Learning Activities',
+                    title: '🎯 Student Learning Activities & Simulations',
                     type: 'interactive',
+                    priority: 'medium',
                     subsections: [
                         {
-                            id: 'learning-intro',
-                            title: 'Learning Objectives',
-                            content: 'Master configuration management principles through hands-on interaction with enterprise-level CM tools and processes. Complete 5 practical tasks to demonstrate understanding.',
-                            type: 'text'
+                            id: 'learning-objectives',
+                            title: 'Training Objectives & Learning Outcomes',
+                            content: 'MISSION: Master industrial configuration management principles through hands-on interaction with enterprise-level CM tools and OT processes.\n\nOBJECTIVES:\n• Understand IT/OT integration challenges\n• Master change management procedures\n• Develop compliance assessment skills\n• Practice incident response scenarios\n• Learn predictive maintenance concepts\n\nCOMPLETE 5 PRACTICAL SCENARIOS TO DEMONSTRATE COMPETENCY',
+                            type: 'text',
+                            status: 'active'
                         }
                     ]
                 });
             }
 
-            setupTemplates() {
+            setupOTTemplates() {
                 this.templates.set('baseline', {
-                    name: 'Baseline Configuration Plan',
-                    description: 'Standard enterprise configuration management plan',
+                    name: 'Baseline Industrial CM Plan',
+                    description: 'Complete enterprise OT/IT configuration management',
                     sections: Array.from(this.sections.keys())
                 });
 
                 this.templates.set('emergency', {
                     name: 'Emergency Response Plan',
-                    description: 'Focused on emergency change procedures',
+                    description: 'Crisis response and incident management focus',
                     sections: ['executive-summary', 'change-management', 'tools']
                 });
 
                 this.templates.set('compliance', {
-                    name: 'Compliance-Focused Plan',
-                    description: 'Emphasis on regulatory compliance and audit',
+                    name: 'Compliance & Audit Plan',
+                    description: 'Regulatory compliance and audit preparation',
                     sections: ['executive-summary', 'compliance', 'training', 'metrics']
                 });
 
                 this.templates.set('minimal', {
-                    name: 'Minimal Template',
-                    description: 'Basic structure for small organizations',
-                    sections: ['executive-summary', 'change-management']
+                    name: 'Basic OT Template',
+                    description: 'Essential structure for small facilities',
+                    sections: ['executive-summary', 'change-management', 'baseline-management']
                 });
             }
 
-            setupValidationRules() {
+            setupOTValidationRules() {
                 this.validationRules.set('percentage', (value) => {
                     const num = parseFloat(value);
                     return !isNaN(num) && num >= 0 && num <= 100;
@@ -1188,36 +1602,40 @@
                 this.validationRules.set('required', (value) => {
                     return value && value.trim().length > 0;
                 });
+
+                this.validationRules.set('status', (value) => {
+                    const validStatuses = ['ACTIVE', 'WARNING', 'ALARM', 'OFFLINE'];
+                    return validStatuses.includes(value.toUpperCase());
+                });
             }
 
-            setupEventListeners() {
+            setupOTEventListeners() {
                 // Auto-save when content changes
                 document.addEventListener('input', (e) => {
-                    if (this.trainingMode && (e.target.classList.contains('editable') || 
-                        e.target.classList.contains('editable-cell') || 
-                        e.target.classList.contains('editable-content'))) {
+                    if (this.trainingMode && (e.target.classList.contains('ot-editable-cell') || 
+                        e.target.classList.contains('ot-editable-content'))) {
                         this.markAsChanged();
                         this.debounceAutoSave();
                     }
                 });
 
-                // Setup drag and drop
-                this.setupDragAndDrop();
+                // Setup OT drag and drop
+                this.setupOTDragAndDrop();
             }
 
-            setupDragAndDrop() {
+            setupOTDragAndDrop() {
                 let draggedElement = null;
 
                 document.addEventListener('dragstart', (e) => {
-                    if (e.target.classList.contains('drag-handle')) {
-                        draggedElement = e.target.closest('.subsection, .section, tr');
-                        e.target.closest('.subsection, .section, tr').classList.add('dragging');
+                    if (e.target.classList.contains('ot-drag-handle')) {
+                        draggedElement = e.target.closest('.ot-subsection, .ot-section, tr');
+                        e.target.closest('.ot-subsection, .ot-section, tr').classList.add('ot-dragging');
                     }
                 });
 
                 document.addEventListener('dragend', (e) => {
                     if (draggedElement) {
-                        draggedElement.classList.remove('dragging');
+                        draggedElement.classList.remove('ot-dragging');
                         draggedElement = null;
                     }
                 });
@@ -1228,48 +1646,53 @@
 
                 document.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    if (draggedElement && e.target.classList.contains('drop-zone')) {
-                        this.handleDrop(draggedElement, e.target);
+                    if (draggedElement && e.target.classList.contains('ot-drop-zone')) {
+                        this.handleOTDrop(draggedElement, e.target);
                     }
                 });
             }
 
             toggleTrainingMode() {
                 this.trainingMode = !this.trainingMode;
-                const toggle = document.querySelector('.training-mode-toggle');
+                this.systemStatus.training = this.trainingMode;
+                
+                const toggle = document.querySelector('.ot-training-toggle');
                 const body = document.body;
                 
                 if (this.trainingMode) {
                     body.classList.add('training-mode');
                     toggle.textContent = '🎓 Training Mode: ON';
                     toggle.classList.add('active');
-                    this.enableAutoSave();
-                    document.getElementById('training-status').textContent = 'Enabled';
-                    this.showTrainingHelp();
+                    this.enableOTAutoSave();
+                    document.getElementById('ot-training-status').textContent = 'ENABLED';
+                    document.querySelector('.ot-control-panel[style*="display: none"]').style.display = 'block';
+                    this.showOTTrainingHelp();
                 } else {
                     body.classList.remove('training-mode');
                     toggle.textContent = '🎓 Training Mode: OFF';
                     toggle.classList.remove('active');
-                    this.disableAutoSave();
-                    document.getElementById('training-status').textContent = 'Disabled';
+                    this.disableOTAutoSave();
+                    document.getElementById('ot-training-status').textContent = 'DISABLED';
+                    document.querySelector('.ot-control-panel[style*="display: block"]').style.display = 'none';
                 }
                 
-                this.renderAllSections();
+                this.updateOTSystemStatus();
+                this.renderOTSections();
             }
 
-            showTrainingHelp() {
+            showOTTrainingHelp() {
                 setTimeout(() => {
-                    alert('🎓 Training Mode Activated!\n\n✅ All content is now editable\n✅ Add/delete items using the action buttons\n✅ Drag and drop to reorder content\n✅ Changes are auto-saved\n✅ Use templates to load different scenarios\n\nStart by exploring the different sections and making modifications!');
+                    this.showOTNotification('🎓 TRAINING MODE ACTIVATED\n\n✅ ALL CONTENT EDITABLE\n✅ ADD/DELETE OPERATIONS ENABLED\n✅ DRAG & DROP REORDERING\n✅ AUTO-SAVE FUNCTIONALITY\n✅ TEMPLATE SCENARIOS AVAILABLE\n\nSTART EXPLORING THE INDUSTRIAL INTERFACE!', 'success');
                 }, 500);
             }
 
-            enableAutoSave() {
+            enableOTAutoSave() {
                 this.autoSaveInterval = setInterval(() => {
-                    this.autoSave();
+                    this.otAutoSave();
                 }, 30000); // Auto-save every 30 seconds
             }
 
-            disableAutoSave() {
+            disableOTAutoSave() {
                 if (this.autoSaveInterval) {
                     clearInterval(this.autoSaveInterval);
                     this.autoSaveInterval = null;
@@ -1277,65 +1700,66 @@
             }
 
             markAsChanged() {
-                const saveButton = document.querySelector('.floating-save');
+                const saveButton = document.querySelector('.ot-floating-save');
                 if (saveButton) {
-                    saveButton.style.background = '#ffc107';
-                    saveButton.textContent = '💾 Unsaved Changes';
+                    saveButton.style.background = 'linear-gradient(135deg, var(--ot-warning), #dd6b20)';
+                    saveButton.textContent = '⚠️ UNSAVED DATA';
                 }
             }
 
             debounceAutoSave() {
                 clearTimeout(this.autoSaveTimeout);
                 this.autoSaveTimeout = setTimeout(() => {
-                    this.autoSave();
+                    this.otAutoSave();
                 }, 2000);
             }
 
-            autoSave() {
-                this.saveCurrentState();
-                const saveButton = document.querySelector('.floating-save');
+            otAutoSave() {
+                this.saveOTCurrentState();
+                const saveButton = document.querySelector('.ot-floating-save');
                 if (saveButton) {
-                    saveButton.style.background = '#28a745';
-                    saveButton.textContent = '✅ Saved';
+                    saveButton.style.background = 'linear-gradient(135deg, var(--ot-success), #2f855a)';
+                    saveButton.textContent = '✅ DATA SAVED';
                     setTimeout(() => {
-                        saveButton.style.background = '#4a7c59';
-                        saveButton.textContent = '💾 Save Progress';
+                        saveButton.style.background = 'linear-gradient(135deg, var(--ot-success), #2f855a)';
+                        saveButton.textContent = '💾 SAVE DATA';
                     }, 2000);
                 }
             }
 
             quickSave() {
-                this.saveCurrentState();
-                this.showNotification('Progress saved successfully!', 'success');
+                this.saveOTCurrentState();
+                this.showOTNotification('CONFIGURATION DATA SAVED SUCCESSFULLY', 'success');
             }
 
-            saveCurrentState() {
+            saveOTCurrentState() {
                 try {
-                    // Collect all current data
                     const currentState = {
                         sections: Array.from(this.sections.entries()),
-                        metadata: this.collectMetadata(),
-                        timestamp: new Date().toISOString()
+                        metadata: this.collectOTMetadata(),
+                        systemStatus: this.systemStatus,
+                        timestamp: new Date().toISOString(),
+                        version: '2.1'
                     };
                     
-                    // Store in memory (localStorage not available)
                     this.lastSavedState = currentState;
                     this.lastSaved = new Date();
-                    document.getElementById('last-saved').textContent = this.lastSaved.toLocaleTimeString();
+                    document.getElementById('ot-last-saved').textContent = this.lastSaved.toLocaleTimeString();
                     
                     this.changeLog.push({
                         action: 'save',
                         timestamp: new Date(),
+                        operator: 'Training User',
                         state: JSON.parse(JSON.stringify(currentState))
                     });
                     
                 } catch (error) {
-                    console.error('Save failed:', error);
-                    this.showNotification('Save failed: ' + error.message, 'error');
+                    console.error('OT Save failed:', error);
+                    this.showOTNotification('SAVE OPERATION FAILED: ' + error.message, 'error');
                 }
             }
 
-            collectMetadata() {
+            collectOTMetadata() {
                 const editableElements = document.querySelectorAll('[data-field]');
                 const metadata = {};
                 editableElements.forEach(element => {
@@ -1344,116 +1768,139 @@
                 return metadata;
             }
 
-            renderAllSections() {
-                const container = document.getElementById('sections-container');
+            updateOTSystemStatus() {
+                const statusIndicators = document.querySelectorAll('.ot-status-indicator');
+                statusIndicators.forEach((indicator, index) => {
+                    const led = indicator.querySelector('.ot-led');
+                    switch(index) {
+                        case 0: // System Online
+                            led.className = this.systemStatus.online ? 'ot-led active' : 'ot-led alarm';
+                            break;
+                        case 1: // Training Mode
+                            led.className = this.systemStatus.training ? 'ot-led warning' : 'ot-led';
+                            break;
+                        case 2: // Database
+                            led.className = this.systemStatus.database ? 'ot-led active' : 'ot-led alarm';
+                            break;
+                        case 3: // Network
+                            led.className = this.systemStatus.network ? 'ot-led active' : 'ot-led alarm';
+                            break;
+                    }
+                });
+            }
+
+            renderOTSections() {
+                const container = document.getElementById('ot-sections-container');
                 container.innerHTML = '';
                 
                 this.sections.forEach((section, sectionId) => {
-                    const sectionElement = this.createSectionElement(section);
+                    const sectionElement = this.createOTSectionElement(section);
                     container.appendChild(sectionElement);
                 });
 
-                this.updateNavigation();
+                this.updateOTNavigation();
             }
 
-            createSectionElement(section) {
+            createOTSectionElement(section) {
                 const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'section';
+                sectionDiv.className = 'ot-section';
                 sectionDiv.id = section.id;
                 
                 sectionDiv.innerHTML = `
-                    <div class="section-header" onclick="toggleSection('${section.id}')">
-                        <span class="drag-handle" draggable="true">≡</span>
-                        <h2 class="editable-title" contenteditable="${this.trainingMode}" data-section="${section.id}">${section.title}</h2>
-                        <div class="section-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addSubsection('${section.id}')">+ Add</button>
-                            <button class="btn btn-small btn-warning" onclick="cmPlan.editSectionProperties('${section.id}')">⚙️</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteSection('${section.id}')">🗑️</button>
+                    <div class="ot-section-header" onclick="toggleOTSection('${section.id}')">
+                        <span class="ot-drag-handle" draggable="true">≡</span>
+                        <h2 class="ot-section-title ot-editable-cell" contenteditable="${this.trainingMode}" data-section="${section.id}">${section.title}</h2>
+                        <div class="ot-section-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTSubsection('${section.id}')">+ ADD</button>
+                            <button class="ot-btn ot-btn-small ot-btn-warning" onclick="otSystem.editOTSection('${section.id}')">⚙️ EDIT</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTSection('${section.id}')">🗑️ DEL</button>
                         </div>
-                        <span class="section-toggle">+</span>
+                        <span class="ot-section-toggle">+</span>
                     </div>
-                    <div class="section-content">
-                        ${this.renderSubsections(section.subsections, section.id)}
+                    <div class="ot-section-content">
+                        ${this.renderOTSubsections(section.subsections, section.id)}
                     </div>
                 `;
                 
                 return sectionDiv;
             }
 
-            renderSubsections(subsections, sectionId) {
+            renderOTSubsections(subsections, sectionId) {
                 if (!subsections || subsections.length === 0) {
-                    return '<div class="subsection"><h3>Empty Section</h3><p>Add content using the training mode controls.</p></div>';
+                    return '<div class="ot-subsection"><div class="ot-subsection-header"><h3 class="ot-subsection-title">EMPTY SECTION</h3></div><p style="color: var(--ot-text-muted);">Use training mode controls to add content.</p></div>';
                 }
                 
                 return subsections.map((subsection, index) => {
-                    return this.renderSubsection(subsection, sectionId, index);
+                    return this.renderOTSubsection(subsection, sectionId, index);
                 }).join('');
             }
 
-            renderSubsection(subsection, sectionId, index) {
-                const content = this.renderSubsectionContent(subsection);
+            renderOTSubsection(subsection, sectionId, index) {
+                const content = this.renderOTSubsectionContent(subsection);
                 
                 return `
-                    <div class="subsection" data-section="${sectionId}" data-index="${index}">
-                        <div class="subsection-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.duplicateSubsection('${sectionId}', ${index})">📋</button>
-                            <button class="btn btn-small btn-warning" onclick="cmPlan.editSubsection('${sectionId}', ${index})">✏️</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteSubsection('${sectionId}', ${index})">🗑️</button>
+                    <div class="ot-subsection" data-section="${sectionId}" data-index="${index}">
+                        <div class="ot-subsection-header">
+                            <span class="ot-drag-handle" draggable="true">≡</span>
+                            <h3 class="ot-subsection-title ot-editable-cell" contenteditable="${this.trainingMode}">${subsection.title}</h3>
+                            <div class="ot-subsection-controls">
+                                <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.duplicateOTSubsection('${sectionId}', ${index})">📋</button>
+                                <button class="ot-btn ot-btn-small ot-btn-warning" onclick="otSystem.editOTSubsection('${sectionId}', ${index})">✏️</button>
+                                <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTSubsection('${sectionId}', ${index})">🗑️</button>
+                            </div>
                         </div>
-                        <span class="drag-handle" draggable="true">≡</span>
-                        <h3 class="editable-title" contenteditable="${this.trainingMode}">${subsection.title}</h3>
                         ${content}
                     </div>
                 `;
             }
 
-            renderSubsectionContent(subsection) {
+            renderOTSubsectionContent(subsection) {
                 switch (subsection.type) {
                     case 'text':
-                        return `<textarea class="editable-content" ${this.trainingMode ? '' : 'readonly'}>${subsection.content}</textarea>`;
+                        return `<textarea class="ot-editable-content" ${this.trainingMode ? '' : 'readonly'}>${subsection.content}</textarea>`;
                     
                     case 'list':
-                        return this.renderEditableList(subsection.content);
+                        return this.renderOTList(subsection.content);
                     
                     case 'table':
-                        return this.renderEditableTable(subsection.content);
+                        return this.renderOTTable(subsection.content);
                     
                     case 'metrics':
-                        return this.renderEditableMetrics(subsection.content);
+                        return this.renderOTMetrics(subsection.content);
                     
                     case 'process':
-                        return this.renderEditableProcess(subsection.content);
+                        return this.renderOTProcess(subsection.content);
                     
                     default:
-                        return `<div class="editable-content">${subsection.content}</div>`;
+                        return `<div class="ot-editable-content">${subsection.content}</div>`;
                 }
             }
 
-            renderEditableList(items) {
+            renderOTList(items) {
                 const listItems = items.map((item, index) => `
-                    <li>
-                        <span class="drag-handle" draggable="true">≡</span>
-                        <input type="text" class="list-item-content" value="${item}" ${this.trainingMode ? '' : 'readonly'}>
-                        <div class="list-item-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this)">+</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteListItem(this)">-</button>
+                    <li class="ot-list-item">
+                        <span class="ot-drag-handle" draggable="true">≡</span>
+                        <input type="text" class="ot-list-content" value="${item}" ${this.trainingMode ? '' : 'readonly'}>
+                        <div class="ot-subsection-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTListItem(this)">+</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTListItem(this)">-</button>
                         </div>
                     </li>
                 `).join('');
                 
                 return `
-                    <ul class="editable-list">${listItems}</ul>
-                    ${this.trainingMode ? '<button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this, true)">+ Add Item</button>' : ''}
+                    <ul class="ot-list">${listItems}</ul>
+                    ${this.trainingMode ? '<button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTListItem(this, true)">+ ADD ITEM</button>' : ''}
                 `;
             }
 
-            renderEditableTable(tableData) {
+            renderOTTable(tableData) {
                 const headers = tableData.headers.map((header, index) => `
                     <th>
-                        <span class="editable-cell" contenteditable="${this.trainingMode}">${header}</span>
-                        <div class="column-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, ${index})">+</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableColumn(this, ${index})">-</button>
+                        <span class="ot-editable-cell" contenteditable="${this.trainingMode}">${header}</span>
+                        <div class="ot-subsection-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableColumn(this, ${index})">+</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTTableColumn(this, ${index})">-</button>
                         </div>
                     </th>
                 `).join('');
@@ -1462,23 +1909,25 @@
                     <tr>
                         ${row.map((cell, cellIndex) => `
                             <td>
-                                <span class="editable-cell" contenteditable="${this.trainingMode}">${cell}</span>
+                                <span class="ot-editable-cell" contenteditable="${this.trainingMode}">${cell}</span>
                             </td>
                         `).join('')}
-                        <td class="row-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, ${rowIndex})">+</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableRow(this, ${rowIndex})">-</button>
+                        <td style="text-align: center;">
+                            <div class="ot-subsection-controls" style="display: ${this.trainingMode ? 'flex' : 'none'};">
+                                <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableRow(this, ${rowIndex})">+</button>
+                                <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTTableRow(this, ${rowIndex})">-</button>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
                 
                 return `
-                    <div class="table-controls">
-                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, -1)">+ Add Row</button>
-                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, -1)">+ Add Column</button>
+                    <div style="display: ${this.trainingMode ? 'flex' : 'none'}; gap: 10px; margin-bottom: 10px;">
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableRow(this, -1)">+ ADD ROW</button>
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableColumn(this, -1)">+ ADD COLUMN</button>
                     </div>
-                    <div class="table-container">
-                        <table>
+                    <div class="ot-table-container">
+                        <table class="ot-table">
                             <thead><tr>${headers}</tr></thead>
                             <tbody>${rows}</tbody>
                         </table>
@@ -1486,309 +1935,335 @@
                 `;
             }
 
-            renderEditableMetrics(metrics) {
+            renderOTMetrics(metrics) {
                 const metricCards = metrics.map((metric, index) => `
-                    <div class="metric-card">
-                        <div class="metric-controls">
-                            <button class="btn btn-small btn-warning" onclick="cmPlan.editMetric(this, ${index})">✏️</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteMetric(this, ${index})">🗑️</button>
+                    <div class="ot-metric-card">
+                        <div class="ot-subsection-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-warning" onclick="otSystem.editOTMetric(this, ${index})">✏️</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTMetric(this, ${index})">🗑️</button>
                         </div>
-                        <div class="metric-value">
-                            <input type="text" class="editable-metric-value" value="${metric.value}" ${this.trainingMode ? '' : 'readonly'}>
+                        <div class="ot-metric-value">
+                            <input type="text" class="ot-editable-cell" value="${metric.value}" ${this.trainingMode ? '' : 'readonly'} style="background: transparent; border: none; color: var(--ot-glow); font-size: 2.5rem; font-weight: bold; text-align: center; width: 100%; font-family: 'Courier New', monospace;">
                         </div>
-                        <div class="metric-label">
-                            <input type="text" class="editable-metric-label" value="${metric.label}" ${this.trainingMode ? '' : 'readonly'}>
+                        <div class="ot-metric-label">
+                            <input type="text" class="ot-editable-cell" value="${metric.label}" ${this.trainingMode ? '' : 'readonly'} style="background: transparent; border: none; color: var(--ot-text-muted); font-size: 0.8rem; text-align: center; width: 100%; text-transform: uppercase;">
                         </div>
-                        <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                            Target: ${metric.target} | Status: <span class="status-indicator status-${metric.status}"></span>
+                        <div class="ot-metric-status">
+                            <span class="ot-status ot-status-${metric.status}">TARGET: ${metric.target}</span>
                         </div>
                     </div>
                 `).join('');
                 
                 return `
-                    <div class="dashboard-controls">
-                        <button class="btn btn-small btn-success" onclick="cmPlan.addMetric(this)">+ Add Metric</button>
+                    <div style="display: ${this.trainingMode ? 'flex' : 'none'}; margin-bottom: 15px;">
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTMetric(this)">+ ADD METRIC</button>
                     </div>
-                    <div class="dashboard-grid">${metricCards}</div>
+                    <div class="ot-metrics-grid">${metricCards}</div>
                 `;
             }
 
-            renderEditableProcess(steps) {
+            renderOTProcess(steps) {
                 const processSteps = steps.map((step, index) => `
-                    <div class="process-step">
-                        <div class="process-step-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, ${index})">+</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteProcessStep(this, ${index})">-</button>
+                    <div class="ot-process-step">
+                        <div class="ot-subsection-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTProcessStep(this, ${index})">+</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTProcessStep(this, ${index})">-</button>
                         </div>
-                        <h4 class="editable-title" contenteditable="${this.trainingMode}">${step.title}</h4>
-                        <p class="editable-content" contenteditable="${this.trainingMode}">${step.description}</p>
+                        <h4 class="ot-process-title ot-editable-cell" contenteditable="${this.trainingMode}">${step.title}</h4>
+                        <p class="ot-process-desc ot-editable-cell" contenteditable="${this.trainingMode}">${step.description}</p>
                     </div>
                 `).join('');
                 
                 return `
-                    <div class="process-flow">${processSteps}</div>
-                    ${this.trainingMode ? '<button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, -1)">+ Add Step</button>' : ''}
+                    <div class="ot-process-flow">${processSteps}</div>
+                    ${this.trainingMode ? '<button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTProcessStep(this, -1)">+ ADD STEP</button>' : ''}
                 `;
             }
 
-            // CRUD Operations
+            // CRUD Operations for OT System
             addSection(type, title) {
-                const sectionId = 'section-' + Date.now();
+                const sectionId = 'ot-section-' + Date.now();
                 const newSection = {
                     id: sectionId,
-                    title: title || 'New Section',
+                    title: title || 'NEW SECTION',
                     type: type,
+                    priority: 'medium',
                     subsections: [
                         {
-                            id: 'subsection-' + Date.now(),
-                            title: 'New Subsection',
-                            content: type === 'table' ? { headers: ['Column 1'], rows: [['Data 1']] } : 
-                                    type === 'list' ? ['Item 1'] :
-                                    type === 'metrics' ? [{ label: 'New Metric', value: '0%', target: '100%', status: 'yellow' }] :
-                                    type === 'process' ? [{ title: 'Step 1', description: 'Description' }] :
-                                    'New content',
-                            type: type
+                            id: 'ot-subsection-' + Date.now(),
+                            title: 'NEW SUBSECTION',
+                            content: type === 'table' ? { headers: ['COLUMN 1'], rows: [['DATA 1']] } : 
+                                    type === 'list' ? ['ITEM 1'] :
+                                    type === 'metrics' ? [{ label: 'NEW METRIC', value: '0%', target: '100%', status: 'warning' }] :
+                                    type === 'process' ? [{ title: 'STEP 1', description: 'DESCRIPTION' }] :
+                                    'NEW CONTENT',
+                            type: type,
+                            status: 'active'
                         }
                     ]
                 };
                 
                 this.sections.set(sectionId, newSection);
-                this.renderAllSections();
+                this.renderOTSections();
                 this.markAsChanged();
-                this.scrollToSection(sectionId);
+                this.scrollToOTSection(sectionId);
             }
 
-            deleteSection(sectionId) {
-                if (confirm('Are you sure you want to delete this section?')) {
+            deleteOTSection(sectionId) {
+                if (confirm('DELETE THIS SECTION? OPERATION CANNOT BE UNDONE.')) {
                     this.sections.delete(sectionId);
-                    this.renderAllSections();
+                    this.renderOTSections();
                     this.markAsChanged();
+                    this.showOTNotification('SECTION DELETED SUCCESSFULLY', 'warning');
                 }
             }
 
-            addSubsection(sectionId) {
+            addOTSubsection(sectionId) {
                 const section = this.sections.get(sectionId);
                 if (section) {
                     const newSubsection = {
-                        id: 'subsection-' + Date.now(),
-                        title: 'New Subsection',
-                        content: 'New content',
-                        type: 'text'
+                        id: 'ot-subsection-' + Date.now(),
+                        title: 'NEW SUBSECTION',
+                        content: 'NEW CONTENT',
+                        type: 'text',
+                        status: 'active'
                     };
                     section.subsections.push(newSubsection);
                     this.sections.set(sectionId, section);
-                    this.renderAllSections();
+                    this.renderOTSections();
                     this.markAsChanged();
+                    this.showOTNotification('SUBSECTION ADDED SUCCESSFULLY', 'success');
                 }
             }
 
-            deleteSubsection(sectionId, index) {
+            deleteOTSubsection(sectionId, index) {
                 const section = this.sections.get(sectionId);
-                if (section && confirm('Delete this subsection?')) {
+                if (section && confirm('DELETE THIS SUBSECTION?')) {
                     section.subsections.splice(index, 1);
                     this.sections.set(sectionId, section);
-                    this.renderAllSections();
+                    this.renderOTSections();
                     this.markAsChanged();
+                    this.showOTNotification('SUBSECTION DELETED', 'warning');
                 }
             }
 
-            duplicateSubsection(sectionId, index) {
+            duplicateOTSubsection(sectionId, index) {
                 const section = this.sections.get(sectionId);
                 if (section) {
                     const original = section.subsections[index];
                     const duplicate = JSON.parse(JSON.stringify(original));
-                    duplicate.id = 'subsection-' + Date.now();
-                    duplicate.title += ' (Copy)';
+                    duplicate.id = 'ot-subsection-' + Date.now();
+                    duplicate.title += ' (COPY)';
                     section.subsections.splice(index + 1, 0, duplicate);
                     this.sections.set(sectionId, section);
-                    this.renderAllSections();
+                    this.renderOTSections();
                     this.markAsChanged();
+                    this.showOTNotification('SUBSECTION DUPLICATED', 'success');
                 }
             }
 
-            // List Operations
-            addListItem(button, isNewList = false) {
+            // OT List Operations
+            addOTListItem(button, isNewList = false) {
                 if (isNewList) {
                     const list = button.previousElementSibling;
                     const newItem = document.createElement('li');
+                    newItem.className = 'ot-list-item';
                     newItem.innerHTML = `
-                        <span class="drag-handle" draggable="true">≡</span>
-                        <input type="text" class="list-item-content" value="New item" placeholder="Enter item">
-                        <div class="list-item-controls">
-                            <button class="btn btn-small btn-success" onclick="cmPlan.addListItem(this)">+</button>
-                            <button class="btn btn-small btn-danger" onclick="cmPlan.deleteListItem(this)">-</button>
+                        <span class="ot-drag-handle" draggable="true">≡</span>
+                        <input type="text" class="ot-list-content" value="NEW ITEM" placeholder="ENTER ITEM">
+                        <div class="ot-subsection-controls">
+                            <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTListItem(this)">+</button>
+                            <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTListItem(this)">-</button>
                         </div>
                     `;
                     list.appendChild(newItem);
                 } else {
                     const listItem = button.closest('li');
                     const newItem = listItem.cloneNode(true);
-                    newItem.querySelector('.list-item-content').value = 'New item';
+                    newItem.querySelector('.ot-list-content').value = 'NEW ITEM';
                     listItem.parentNode.insertBefore(newItem, listItem.nextSibling);
                 }
                 this.markAsChanged();
+                this.showOTNotification('LIST ITEM ADDED', 'success');
             }
 
-            deleteListItem(button) {
+            deleteOTListItem(button) {
                 const listItem = button.closest('li');
                 const list = listItem.closest('ul');
                 if (list.children.length > 1) {
                     listItem.remove();
                     this.markAsChanged();
+                    this.showOTNotification('LIST ITEM REMOVED', 'warning');
                 } else {
-                    alert('Cannot delete the last item in the list.');
+                    this.showOTNotification('CANNOT DELETE LAST ITEM', 'error');
                 }
             }
 
-            // Table Operations
-            addTableRow(button, rowIndex) {
-                const table = button.closest('.table-container').querySelector('table tbody');
+            // OT Table Operations
+            addOTTableRow(button, rowIndex) {
+                const table = button.closest('.ot-table-container').querySelector('table tbody');
                 const newRow = table.insertRow(rowIndex + 1);
                 const columnCount = table.closest('table').querySelector('thead tr').cells.length;
                 
-                for (let i = 0; i < columnCount; i++) {
+                for (let i = 0; i < columnCount - 1; i++) { // -1 for control column
                     const cell = newRow.insertCell();
-                    cell.innerHTML = `<span class="editable-cell" contenteditable="${this.trainingMode}">New data</span>`;
+                    cell.innerHTML = `<span class="ot-editable-cell" contenteditable="${this.trainingMode}">NEW DATA</span>`;
                 }
                 
                 const controlCell = newRow.insertCell();
-                controlCell.className = 'row-controls';
+                controlCell.style.textAlign = 'center';
                 controlCell.innerHTML = `
-                    <button class="btn btn-small btn-success" onclick="cmPlan.addTableRow(this, ${rowIndex + 1})">+</button>
-                    <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableRow(this, ${rowIndex + 1})">-</button>
+                    <div class="ot-subsection-controls" style="display: ${this.trainingMode ? 'flex' : 'none'};">
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableRow(this, ${rowIndex + 1})">+</button>
+                        <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTTableRow(this, ${rowIndex + 1})">-</button>
+                    </div>
                 `;
                 
                 this.markAsChanged();
+                this.showOTNotification('TABLE ROW ADDED', 'success');
             }
 
-            deleteTableRow(button, rowIndex) {
-                const table = button.closest('.table-container').querySelector('table tbody');
+            deleteOTTableRow(button, rowIndex) {
+                const table = button.closest('.ot-table-container').querySelector('table tbody');
                 if (table.rows.length > 1) {
                     table.deleteRow(rowIndex);
                     this.markAsChanged();
+                    this.showOTNotification('TABLE ROW DELETED', 'warning');
                 } else {
-                    alert('Cannot delete the last row.');
+                    this.showOTNotification('CANNOT DELETE LAST ROW', 'error');
                 }
             }
 
-            addTableColumn(button, columnIndex) {
-                const table = button.closest('.table-container').querySelector('table');
+            addOTTableColumn(button, columnIndex) {
+                const table = button.closest('.ot-table-container').querySelector('table');
                 const headerRow = table.querySelector('thead tr');
                 const newHeader = headerRow.insertCell(columnIndex + 1);
                 newHeader.innerHTML = `
-                    <span class="editable-cell" contenteditable="${this.trainingMode}">New Column</span>
-                    <div class="column-controls">
-                        <button class="btn btn-small btn-success" onclick="cmPlan.addTableColumn(this, ${columnIndex + 1})">+</button>
-                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteTableColumn(this, ${columnIndex + 1})">-</button>
+                    <span class="ot-editable-cell" contenteditable="${this.trainingMode}">NEW COLUMN</span>
+                    <div class="ot-subsection-controls">
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTTableColumn(this, ${columnIndex + 1})">+</button>
+                        <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTTableColumn(this, ${columnIndex + 1})">-</button>
                     </div>
                 `;
                 
                 const bodyRows = table.querySelectorAll('tbody tr');
                 bodyRows.forEach(row => {
                     const newCell = row.insertCell(columnIndex + 1);
-                    newCell.innerHTML = `<span class="editable-cell" contenteditable="${this.trainingMode}">New data</span>`;
+                    newCell.innerHTML = `<span class="ot-editable-cell" contenteditable="${this.trainingMode}">NEW DATA</span>`;
                 });
                 
                 this.markAsChanged();
+                this.showOTNotification('TABLE COLUMN ADDED', 'success');
             }
 
-            deleteTableColumn(button, columnIndex) {
-                const table = button.closest('.table-container').querySelector('table');
+            deleteOTTableColumn(button, columnIndex) {
+                const table = button.closest('.ot-table-container').querySelector('table');
                 const headerRow = table.querySelector('thead tr');
                 
-                if (headerRow.cells.length > 2) { // Keep at least one data column plus controls
+                if (headerRow.cells.length > 3) { // Keep at least 2 data columns plus control column
                     headerRow.deleteCell(columnIndex);
                     const bodyRows = table.querySelectorAll('tbody tr');
                     bodyRows.forEach(row => {
                         row.deleteCell(columnIndex);
                     });
                     this.markAsChanged();
+                    this.showOTNotification('TABLE COLUMN DELETED', 'warning');
                 } else {
-                    alert('Cannot delete the last column.');
+                    this.showOTNotification('MINIMUM COLUMNS REQUIRED', 'error');
                 }
             }
 
-            // Metric Operations
-            addMetric(button) {
+            // OT Metric Operations
+            addOTMetric(button) {
                 const dashboard = button.nextElementSibling;
                 const newMetric = document.createElement('div');
-                newMetric.className = 'metric-card';
+                newMetric.className = 'ot-metric-card';
                 newMetric.innerHTML = `
-                    <div class="metric-controls">
-                        <button class="btn btn-small btn-warning" onclick="cmPlan.editMetric(this, 0)">✏️</button>
-                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteMetric(this, 0)">🗑️</button>
+                    <div class="ot-subsection-controls">
+                        <button class="ot-btn ot-btn-small ot-btn-warning" onclick="otSystem.editOTMetric(this, 0)">✏️</button>
+                        <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTMetric(this, 0)">🗑️</button>
                     </div>
-                    <div class="metric-value">
-                        <input type="text" class="editable-metric-value" value="0%" ${this.trainingMode ? '' : 'readonly'}>
+                    <div class="ot-metric-value">
+                        <input type="text" class="ot-editable-cell" value="0%" ${this.trainingMode ? '' : 'readonly'} style="background: transparent; border: none; color: var(--ot-glow); font-size: 2.5rem; font-weight: bold; text-align: center; width: 100%; font-family: 'Courier New', monospace;">
                     </div>
-                    <div class="metric-label">
-                        <input type="text" class="editable-metric-label" value="New Metric" ${this.trainingMode ? '' : 'readonly'}>
+                    <div class="ot-metric-label">
+                        <input type="text" class="ot-editable-cell" value="NEW METRIC" ${this.trainingMode ? '' : 'readonly'} style="background: transparent; border: none; color: var(--ot-text-muted); font-size: 0.8rem; text-align: center; width: 100%; text-transform: uppercase;">
                     </div>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                        Target: 100% | Status: <span class="status-indicator status-yellow"></span>
+                    <div class="ot-metric-status">
+                        <span class="ot-status ot-status-warning">TARGET: 100%</span>
                     </div>
                 `;
                 dashboard.appendChild(newMetric);
                 this.markAsChanged();
+                this.showOTNotification('METRIC ADDED', 'success');
             }
 
-            deleteMetric(button, index) {
-                const metricCard = button.closest('.metric-card');
+            deleteOTMetric(button, index) {
+                const metricCard = button.closest('.ot-metric-card');
                 const dashboard = metricCard.parentNode;
                 if (dashboard.children.length > 1) {
                     metricCard.remove();
                     this.markAsChanged();
+                    this.showOTNotification('METRIC DELETED', 'warning');
                 } else {
-                    alert('Cannot delete the last metric.');
+                    this.showOTNotification('MINIMUM METRICS REQUIRED', 'error');
                 }
             }
 
-            // Process Operations
-            addProcessStep(button, index) {
-                const processFlow = button.closest('.process-flow') || button.previousElementSibling;
+            editOTMetric(button, index) {
+                const metricCard = button.closest('.ot-metric-card');
+                const valueInput = metricCard.querySelector('.ot-metric-value input');
+                const labelInput = metricCard.querySelector('.ot-metric-label input');
+                
+                valueInput.focus();
+                valueInput.select();
+                this.showOTNotification('METRIC EDIT MODE ACTIVATED', 'success');
+            }
+
+            // OT Process Operations
+            addOTProcessStep(button, index) {
+                const processFlow = button.closest('.ot-process-flow') || button.previousElementSibling;
                 const newStep = document.createElement('div');
-                newStep.className = 'process-step';
+                newStep.className = 'ot-process-step';
                 newStep.innerHTML = `
-                    <div class="process-step-controls">
-                        <button class="btn btn-small btn-success" onclick="cmPlan.addProcessStep(this, ${index + 1})">+</button>
-                        <button class="btn btn-small btn-danger" onclick="cmPlan.deleteProcessStep(this, ${index + 1})">-</button>
+                    <div class="ot-subsection-controls">
+                        <button class="ot-btn ot-btn-small ot-btn-success" onclick="otSystem.addOTProcessStep(this, ${index + 1})">+</button>
+                        <button class="ot-btn ot-btn-small ot-btn-danger" onclick="otSystem.deleteOTProcessStep(this, ${index + 1})">-</button>
                     </div>
-                    <h4 class="editable-title" contenteditable="${this.trainingMode}">New Step</h4>
-                    <p class="editable-content" contenteditable="${this.trainingMode}">Step description</p>
+                    <h4 class="ot-process-title ot-editable-cell" contenteditable="${this.trainingMode}">NEW STEP</h4>
+                    <p class="ot-process-desc ot-editable-cell" contenteditable="${this.trainingMode}">STEP DESCRIPTION</p>
                 `;
                 
                 if (index >= 0) {
-                    const steps = processFlow.querySelectorAll('.process-step');
+                    const steps = processFlow.querySelectorAll('.ot-process-step');
                     processFlow.insertBefore(newStep, steps[index + 1]);
                 } else {
                     processFlow.appendChild(newStep);
                 }
                 this.markAsChanged();
+                this.showOTNotification('PROCESS STEP ADDED', 'success');
             }
 
-            deleteProcessStep(button, index) {
-                const processStep = button.closest('.process-step');
+            deleteOTProcessStep(button, index) {
+                const processStep = button.closest('.ot-process-step');
                 const processFlow = processStep.parentNode;
                 if (processFlow.children.length > 1) {
                     processStep.remove();
                     this.markAsChanged();
+                    this.showOTNotification('PROCESS STEP DELETED', 'warning');
                 } else {
-                    alert('Cannot delete the last process step.');
+                    this.showOTNotification('MINIMUM STEPS REQUIRED', 'error');
                 }
             }
 
-            // Template Operations
+            // OT Template Operations
             loadTemplate(templateName) {
-                if (confirm(`Load ${templateName} template? This will replace current content.`)) {
+                if (confirm(`LOAD ${templateName.toUpperCase()} TEMPLATE? CURRENT DATA WILL BE REPLACED.`)) {
                     const template = this.templates.get(templateName);
                     if (template) {
-                        // Clear current sections
                         this.sections.clear();
+                        this.addOTDefaultSections();
                         
-                        // Load template sections
-                        this.addDefaultSections(); // Reset to default
-                        
-                        // Filter sections based on template
                         const filteredSections = new Map();
                         template.sections.forEach(sectionId => {
                             if (this.sections.has(sectionId)) {
@@ -1797,44 +2272,46 @@
                         });
                         
                         this.sections = filteredSections;
-                        this.renderAllSections();
+                        this.renderOTSections();
                         this.markAsChanged();
-                        this.showNotification(`${template.name} loaded successfully!`, 'success');
+                        this.showOTNotification(`${template.name.toUpperCase()} LOADED SUCCESSFULLY`, 'success');
                     }
                 }
             }
 
             saveAsTemplate() {
-                const templateName = prompt('Enter template name:');
+                const templateName = prompt('ENTER TEMPLATE NAME:');
                 if (templateName) {
                     this.templates.set(templateName.toLowerCase().replace(/\s+/g, '-'), {
-                        name: templateName,
-                        description: 'Custom template',
+                        name: templateName.toUpperCase(),
+                        description: 'CUSTOM OT TEMPLATE',
                         sections: Array.from(this.sections.keys()),
                         data: Array.from(this.sections.entries())
                     });
-                    this.showNotification(`Template "${templateName}" saved!`, 'success');
+                    this.showOTNotification(`TEMPLATE "${templateName.toUpperCase()}" SAVED`, 'success');
                 }
             }
 
             resetPlan() {
-                if (confirm('Reset to default plan? All changes will be lost.')) {
+                if (confirm('RESET TO DEFAULT CONFIGURATION? ALL CHANGES WILL BE LOST.')) {
                     this.sections.clear();
-                    this.addDefaultSections();
-                    this.renderAllSections();
+                    this.addOTDefaultSections();
+                    this.renderOTSections();
                     this.markAsChanged();
-                    this.showNotification('Plan reset to default', 'success');
+                    this.showOTNotification('SYSTEM RESET TO DEFAULT STATE', 'warning');
                 }
             }
 
-            // Import/Export Functions
+            // Import/Export Functions for OT System
             exportPlan() {
                 try {
                     const exportData = {
-                        metadata: this.collectMetadata(),
+                        metadata: this.collectOTMetadata(),
                         sections: Array.from(this.sections.entries()),
+                        systemStatus: this.systemStatus,
                         timestamp: new Date().toISOString(),
-                        version: '1.0'
+                        version: '2.1',
+                        platform: 'OT-Industrial'
                     };
                     
                     const dataStr = JSON.stringify(exportData, null, 2);
@@ -1843,18 +2320,18 @@
                     
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = `freshflow-cm-plan-${new Date().toISOString().split('T')[0]}.json`;
+                    link.download = `freshflow-ot-cm-plan-${new Date().toISOString().split('T')[0]}.json`;
                     link.click();
                     
                     URL.revokeObjectURL(url);
-                    this.showNotification('Plan exported successfully!', 'success');
+                    this.showOTNotification('CONFIGURATION DATA EXPORTED SUCCESSFULLY', 'success');
                 } catch (error) {
-                    this.showNotification('Export failed: ' + error.message, 'error');
+                    this.showOTNotification('EXPORT OPERATION FAILED: ' + error.message, 'error');
                 }
             }
 
             importPlan() {
-                document.getElementById('fileInput').click();
+                document.getElementById('ot-fileInput').click();
             }
 
             handleFileImport(event) {
@@ -1864,19 +2341,18 @@
                     reader.onload = (e) => {
                         try {
                             const importData = JSON.parse(e.target.result);
-                            this.loadImportedData(importData);
+                            this.loadOTImportedData(importData);
                         } catch (error) {
-                            this.showNotification('Import failed: Invalid file format', 'error');
+                            this.showOTNotification('IMPORT FAILED: INVALID FILE FORMAT', 'error');
                         }
                     };
                     reader.readAsText(file);
                 }
             }
 
-            loadImportedData(data) {
-                if (confirm('Import new plan? Current changes will be lost.')) {
+            loadOTImportedData(data) {
+                if (confirm('IMPORT NEW CONFIGURATION? CURRENT DATA WILL BE LOST.')) {
                     try {
-                        // Load metadata
                         if (data.metadata) {
                             Object.keys(data.metadata).forEach(key => {
                                 const element = document.querySelector(`[data-field="${key}"]`);
@@ -1886,20 +2362,24 @@
                             });
                         }
                         
-                        // Load sections
                         if (data.sections) {
                             this.sections = new Map(data.sections);
-                            this.renderAllSections();
+                            this.renderOTSections();
                             this.markAsChanged();
-                            this.showNotification('Plan imported successfully!', 'success');
+                            this.showOTNotification('CONFIGURATION IMPORTED SUCCESSFULLY', 'success');
+                        }
+
+                        if (data.systemStatus) {
+                            this.systemStatus = data.systemStatus;
+                            this.updateOTSystemStatus();
                         }
                     } catch (error) {
-                        this.showNotification('Import failed: ' + error.message, 'error');
+                        this.showOTNotification('IMPORT FAILED: ' + error.message, 'error');
                     }
                 }
             }
 
-            // Validation Functions
+            // OT Validation Functions
             validatePlan() {
                 const errors = [];
                 const warnings = [];
@@ -1909,44 +2389,53 @@
                 requiredFields.forEach(field => {
                     const element = document.querySelector(`[data-field="${field}"]`);
                     if (!element || !element.textContent.trim()) {
-                        errors.push(`Missing required field: ${field}`);
+                        errors.push(`MISSING REQUIRED FIELD: ${field.toUpperCase()}`);
                     }
                 });
                 
                 // Validate sections
                 if (this.sections.size === 0) {
-                    errors.push('No sections found');
+                    errors.push('NO SECTIONS FOUND');
                 } else {
                     this.sections.forEach((section, sectionId) => {
                         if (!section.title || section.title.trim() === '') {
-                            errors.push(`Section ${sectionId} has no title`);
+                            errors.push(`SECTION ${sectionId.toUpperCase()} HAS NO TITLE`);
                         }
                         
                         if (!section.subsections || section.subsections.length === 0) {
-                            warnings.push(`Section ${sectionId} has no content`);
+                            warnings.push(`SECTION ${sectionId.toUpperCase()} HAS NO CONTENT`);
                         }
                     });
                 }
-                
+
+                // Validate system status
+                if (!this.systemStatus.online) {
+                    errors.push('SYSTEM STATUS: OFFLINE');
+                }
+
+                if (!this.systemStatus.database) {
+                    errors.push('DATABASE CONNECTION: FAILED');
+                }
+
                 // Show validation results
-                this.showValidationResults(errors, warnings);
+                this.showOTValidationResults(errors, warnings);
             }
 
-            showValidationResults(errors, warnings) {
-                let message = '📋 Plan Validation Results\n\n';
+            showOTValidationResults(errors, warnings) {
+                let message = '📋 SYSTEM VALIDATION RESULTS\n\n';
                 
                 if (errors.length === 0 && warnings.length === 0) {
-                    message += '✅ Plan validation passed!\nNo errors or warnings found.';
-                    this.showNotification(message, 'success');
+                    message += '✅ VALIDATION PASSED\nALL SYSTEMS OPERATIONAL';
+                    this.showOTNotification(message, 'success');
                 } else {
                     if (errors.length > 0) {
-                        message += `❌ Errors (${errors.length}):\n`;
+                        message += `❌ CRITICAL ERRORS (${errors.length}):\n`;
                         errors.forEach(error => message += `• ${error}\n`);
                         message += '\n';
                     }
                     
                     if (warnings.length > 0) {
-                        message += `⚠️ Warnings (${warnings.length}):\n`;
+                        message += `⚠️ WARNINGS (${warnings.length}):\n`;
                         warnings.forEach(warning => message += `• ${warning}\n`);
                     }
                     
@@ -1954,45 +2443,45 @@
                 }
             }
 
-            // Utility Functions
-            updateNavigation() {
-                const navGrid = document.getElementById('navigation-grid');
-                const existingNavItems = navGrid.querySelectorAll('.nav-item:not([onclick*="student-activities"])');
+            // OT Utility Functions
+            updateOTNavigation() {
+                const navGrid = document.getElementById('ot-navigation-grid');
+                const existingNavButtons = navGrid.querySelectorAll('.ot-nav-button:not([onclick*="student-activities"])');
                 
-                // Remove dynamically created nav items
-                existingNavItems.forEach(item => {
-                    if (!item.onclick.toString().includes('executive-summary') &&
-                        !item.onclick.toString().includes('framework') &&
-                        !item.onclick.toString().includes('change-management') &&
-                        !item.onclick.toString().includes('baseline-management') &&
-                        !item.onclick.toString().includes('compliance') &&
-                        !item.onclick.toString().includes('tools') &&
-                        !item.onclick.toString().includes('training') &&
-                        !item.onclick.toString().includes('metrics')) {
-                        item.remove();
+                // Remove dynamically created nav buttons
+                existingNavButtons.forEach(button => {
+                    if (!button.onclick.toString().includes('executive-summary') &&
+                        !button.onclick.toString().includes('framework') &&
+                        !button.onclick.toString().includes('change-management') &&
+                        !button.onclick.toString().includes('baseline-management') &&
+                        !button.onclick.toString().includes('compliance') &&
+                        !button.onclick.toString().includes('tools') &&
+                        !button.onclick.toString().includes('training') &&
+                        !button.onclick.toString().includes('metrics')) {
+                        button.remove();
                     }
                 });
                 
-                // Add nav items for custom sections
+                // Add nav buttons for custom sections
                 this.sections.forEach((section, sectionId) => {
                     if (!document.querySelector(`[onclick*="${sectionId}"]`)) {
-                        const navItem = document.createElement('div');
-                        navItem.className = 'nav-item';
-                        navItem.onclick = () => this.scrollToSection(sectionId);
-                        navItem.textContent = section.title.replace(/^\d+\.\s*/, '');
-                        navGrid.appendChild(navItem);
+                        const navButton = document.createElement('button');
+                        navButton.className = 'ot-nav-button';
+                        navButton.onclick = () => this.scrollToOTSection(sectionId);
+                        navButton.textContent = section.title.replace(/^\d+\.\s*/, '').replace(/^[🔧🗺️📊🏗️🔄⚙️✅🛠️🎓📈🎯]\s*/, '');
+                        navGrid.appendChild(navButton);
                     }
                 });
             }
 
-            scrollToSection(sectionId) {
+            scrollToOTSection(sectionId) {
                 const section = document.getElementById(sectionId);
                 if (section) {
                     section.scrollIntoView({ behavior: 'smooth' });
                     
                     // Auto-expand the section
-                    const content = section.querySelector('.section-content');
-                    const toggle = section.querySelector('.section-toggle');
+                    const content = section.querySelector('.ot-section-content');
+                    const toggle = section.querySelector('.ot-section-toggle');
                     if (content && toggle) {
                         content.classList.add('active');
                         toggle.textContent = '−';
@@ -2000,18 +2489,13 @@
                 }
             }
 
-            showNotification(message, type = 'info') {
+            showOTNotification(message, type = 'info') {
                 const notification = document.createElement('div');
-                notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'warning'}`;
-                notification.style.position = 'fixed';
-                notification.style.top = '20px';
-                notification.style.right = '20px';
-                notification.style.zIndex = '10000';
-                notification.style.minWidth = '300px';
-                notification.style.animation = 'fadeIn 0.3s ease';
+                notification.className = `ot-notification ot-notification-${type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning'}`;
                 notification.innerHTML = `
-                    <strong>${type === 'error' ? '❌' : type === 'success' ? '✅' : '⚠️'}</strong> ${message}
-                    <button style="float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer;" onclick="this.parentElement.remove()">×</button>
+                    <strong>${type === 'error' ? '❌ ERROR' : type === 'success' ? '✅ SUCCESS' : '⚠️ WARNING'}</strong><br>
+                    ${message}
+                    <button style="float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: inherit;" onclick="this.parentElement.remove()">×</button>
                 `;
                 
                 document.body.appendChild(notification);
@@ -2024,16 +2508,18 @@
 
             generateReport() {
                 const reportData = {
-                    title: 'Configuration Management Plan Executive Report',
+                    title: 'FRESHFLOW SYSTEMS - OT CONFIGURATION MANAGEMENT REPORT',
                     timestamp: new Date().toLocaleString(),
-                    metadata: this.collectMetadata(),
+                    metadata: this.collectOTMetadata(),
+                    systemStatus: this.systemStatus,
                     sectionCount: this.sections.size,
                     subsectionCount: Array.from(this.sections.values()).reduce((total, section) => total + (section.subsections?.length || 0), 0),
-                    lastModified: this.lastSaved ? this.lastSaved.toLocaleString() : 'Never',
+                    lastModified: this.lastSaved ? this.lastSaved.toLocaleString() : 'NEVER',
                     sections: Array.from(this.sections.entries()).map(([id, section]) => ({
-                        id,
+                        id: id.toUpperCase(),
                         title: section.title,
-                        type: section.type,
+                        type: section.type.toUpperCase(),
+                        priority: section.priority ? section.priority.toUpperCase() : 'MEDIUM',
                         subsectionCount: section.subsections?.length || 0
                     }))
                 };
@@ -2045,82 +2531,178 @@
                     <head>
                         <title>${reportData.title}</title>
                         <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-                            .header { background: #4a7c59; color: white; padding: 20px; border-radius: 8px; }
-                            .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
-                            .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-                            .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
-                            .stat-value { font-size: 2rem; font-weight: bold; color: #4a7c59; }
+                            body { 
+                                font-family: 'Consolas', 'Monaco', monospace; 
+                                margin: 20px; 
+                                line-height: 1.6; 
+                                background: #1a202c; 
+                                color: #e2e8f0; 
+                            }
+                            .ot-header { 
+                                background: linear-gradient(135deg, #1e3a5f, #2c5282); 
+                                color: white; 
+                                padding: 20px; 
+                                border-radius: 8px; 
+                                text-align: center;
+                                margin-bottom: 30px;
+                            }
+                            .ot-section { 
+                                margin: 20px 0; 
+                                padding: 15px; 
+                                border: 2px solid #4a5568; 
+                                border-radius: 8px; 
+                                background: #2d3748;
+                            }
+                            .ot-stats { 
+                                display: grid; 
+                                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                                gap: 15px; 
+                                margin: 20px 0; 
+                            }
+                            .ot-stat-card { 
+                                background: #4a5568; 
+                                padding: 15px; 
+                                border-radius: 8px; 
+                                text-align: center; 
+                                border: 2px solid #63b3ed;
+                            }
+                            .ot-stat-value { 
+                                font-size: 2rem; 
+                                font-weight: bold; 
+                                color: #63b3ed; 
+                                font-family: 'Courier New', monospace;
+                            }
+                            .ot-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 15px 0;
+                            }
+                            .ot-table th {
+                                background: #1e3a5f;
+                                color: white;
+                                padding: 12px;
+                                border: 1px solid #4a5568;
+                                text-transform: uppercase;
+                            }
+                            .ot-table td {
+                                background: #2d3748;
+                                color: #e2e8f0;
+                                padding: 10px;
+                                border: 1px solid #4a5568;
+                            }
+                            .ot-status {
+                                display: inline-block;
+                                padding: 4px 8px;
+                                border-radius: 4px;
+                                font-size: 0.8rem;
+                                text-transform: uppercase;
+                                font-weight: bold;
+                            }
+                            .ot-status-online { background: #16a34a; color: white; }
+                            .ot-status-offline { background: #e53e3e; color: white; }
                         </style>
                     </head>
                     <body>
-                        <div class="header">
+                        <div class="ot-header">
                             <h1>${reportData.title}</h1>
-                            <p>Generated: ${reportData.timestamp}</p>
+                            <p>GENERATED: ${reportData.timestamp}</p>
+                            <p>PLATFORM VERSION: 2.1 - INDUSTRIAL OT DESIGN</p>
                         </div>
                         
-                        <div class="section">
-                            <h2>Document Overview</h2>
-                            <div class="stats">
-                                <div class="stat-card">
-                                    <div class="stat-value">${reportData.sectionCount}</div>
-                                    <div>Total Sections</div>
+                        <div class="ot-section">
+                            <h2>SYSTEM STATUS OVERVIEW</h2>
+                            <div class="ot-stats">
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.systemStatus.online ? 'ONLINE' : 'OFFLINE'}</div>
+                                    <div>SYSTEM STATUS</div>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">${reportData.subsectionCount}</div>
-                                    <div>Total Subsections</div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.systemStatus.training ? 'ENABLED' : 'DISABLED'}</div>
+                                    <div>TRAINING MODE</div>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">${reportData.metadata.version || 'N/A'}</div>
-                                    <div>Version</div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.systemStatus.database ? 'ACTIVE' : 'ERROR'}</div>
+                                    <div>DATABASE</div>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-value">${reportData.lastModified}</div>
-                                    <div>Last Modified</div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.systemStatus.network ? 'CONNECTED' : 'DISCONNECTED'}</div>
+                                    <div>NETWORK</div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="section">
-                            <h2>Section Summary</h2>
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead style="background: #4a7c59; color: white;">
+                        <div class="ot-section">
+                            <h2>CONFIGURATION STATISTICS</h2>
+                            <div class="ot-stats">
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.sectionCount}</div>
+                                    <div>TOTAL SECTIONS</div>
+                                </div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.subsectionCount}</div>
+                                    <div>TOTAL SUBSECTIONS</div>
+                                </div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.metadata.version || 'N/A'}</div>
+                                    <div>VERSION</div>
+                                </div>
+                                <div class="ot-stat-card">
+                                    <div class="ot-stat-value">${reportData.lastModified !== 'NEVER' ? 'CURRENT' : 'NEVER'}</div>
+                                    <div>LAST MODIFIED</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ot-section">
+                            <h2>SECTION ANALYSIS</h2>
+                            <table class="ot-table">
+                                <thead>
                                     <tr>
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Section</th>
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Type</th>
-                                        <th style="padding: 10px; border: 1px solid #ddd;">Subsections</th>
+                                        <th>SECTION ID</th>
+                                        <th>TITLE</th>
+                                        <th>TYPE</th>
+                                        <th>PRIORITY</th>
+                                        <th>SUBSECTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${reportData.sections.map(section => `
                                         <tr>
-                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.title}</td>
-                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.type}</td>
-                                            <td style="padding: 10px; border: 1px solid #ddd;">${section.subsectionCount}</td>
+                                            <td>${section.id}</td>
+                                            <td>${section.title}</td>
+                                            <td>${section.type}</td>
+                                            <td><span class="ot-status">${section.priority}</span></td>
+                                            <td>${section.subsectionCount}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
                         
-                        <div class="section">
-                            <h2>Metadata</h2>
-                            <table style="width: 100%; border-collapse: collapse;">
+                        <div class="ot-section">
+                            <h2>SYSTEM METADATA</h2>
+                            <table class="ot-table">
                                 <tbody>
                                     ${Object.entries(reportData.metadata).map(([key, value]) => `
                                         <tr>
-                                            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${key}</td>
-                                            <td style="padding: 8px; border: 1px solid #ddd;">${value}</td>
+                                            <td style="font-weight: bold; text-transform: uppercase;">${key}</td>
+                                            <td>${value}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <div class="ot-section" style="text-align: center; margin-top: 30px;">
+                            <p><strong>FRESHFLOW SYSTEMS - LIMA, OHIO OPERATIONS</strong></p>
+                            <p>INDUSTRIAL CONFIGURATION MANAGEMENT PLATFORM</p>
+                            <p>REPORT CLASSIFICATION: CONFIDENTIAL</p>
+                        </div>
                     </body>
                     </html>
                 `);
                 
-                this.showNotification('Executive report generated successfully!', 'success');
+                this.showOTNotification('EXECUTIVE REPORT GENERATED SUCCESSFULLY', 'success');
             }
 
             printPlan() {
@@ -2128,15 +2710,15 @@
             }
         }
 
-        // Initialize the Configuration Management Plan
-        let cmPlan;
+        // Initialize the OT Configuration Management System
+        let otSystem;
         
-        // Section Toggle Functionality
-        function toggleSection(sectionId) {
+        // OT Section Toggle Functionality
+        function toggleOTSection(sectionId) {
             const section = document.getElementById(sectionId);
             if (section) {
-                const content = section.querySelector('.section-content');
-                const toggle = section.querySelector('.section-toggle');
+                const content = section.querySelector('.ot-section-content');
+                const toggle = section.querySelector('.ot-section-toggle');
                 
                 if (content.classList.contains('active')) {
                     content.classList.remove('active');
@@ -2148,84 +2730,77 @@
             }
         }
 
-        // Training Mode Toggle
+        // Global Function Wrappers for OT System
         function toggleTrainingMode() {
-            cmPlan.toggleTrainingMode();
+            otSystem.toggleTrainingMode();
         }
 
-        // Template Functions
         function loadTemplate(templateName) {
-            cmPlan.loadTemplate(templateName);
+            otSystem.loadTemplate(templateName);
         }
 
         function saveAsTemplate() {
-            cmPlan.saveAsTemplate();
+            otSystem.saveAsTemplate();
         }
 
         function resetPlan() {
-            cmPlan.resetPlan();
+            otSystem.resetPlan();
         }
 
-        // Section Management
         function addSection(type, title) {
-            cmPlan.addSection(type, title);
+            otSystem.addSection(type, title);
         }
 
         function scrollToSection(sectionId) {
-            cmPlan.scrollToSection(sectionId);
+            otSystem.scrollToOTSection(sectionId);
         }
 
-        // File Operations
         function exportPlan() {
-            cmPlan.exportPlan();
+            otSystem.exportPlan();
         }
 
         function importPlan() {
-            cmPlan.importPlan();
+            otSystem.importPlan();
         }
 
         function handleFileImport(event) {
-            cmPlan.handleFileImport(event);
+            otSystem.handleFileImport(event);
         }
 
         function generateReport() {
-            cmPlan.generateReport();
+            otSystem.generateReport();
         }
 
         function validatePlan() {
-            cmPlan.validatePlan();
+            otSystem.validatePlan();
         }
 
         function printPlan() {
-            cmPlan.printPlan();
+            otSystem.printPlan();
         }
 
         function quickSave() {
-            cmPlan.quickSave();
+            otSystem.quickSave();
         }
 
-        // Initialize when DOM is loaded
+        // Initialize OT System when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            cmPlan = new ConfigurationManagementPlan();
+            otSystem = new OTConfigurationSystem();
             
             // Show the executive summary by default
             setTimeout(() => {
-                toggleSection('executive-summary');
+                toggleOTSection('executive-summary');
             }, 500);
             
-            console.log('🎓 FreshFlow Systems Configuration Management Plan (Training Edition) loaded successfully!');
-            console.log('Features: Full CRUD operations, drag & drop, templates, validation, import/export');
+            // Setup periodic system status updates
+            setInterval(() => {
+                otSystem.updateOTSystemStatus();
+            }, 5000);
+            
+            console.log('🏭 FreshFlow Systems Configuration Management Platform loaded successfully!');
+            console.log('🎯 White/Dark Green/Black Theme Active');
+            console.log('⚙️ Features: Full CRUD, Templates, Clean UI, Real-time Status');
         });
-
-        // Add CSS animation for notifications
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
