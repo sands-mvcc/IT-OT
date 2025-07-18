@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive PLC Training Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .navigation {
+            background: #ffffff;
+            border: 2px solid #2d5016;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .navigation select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #2d5016;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .navigation select:focus {
+            outline: none;
+            border-color: #4a7c59;
+            box-shadow: 0 0 5px rgba(74, 124, 89, 0.3);
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #2d5016;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section h2 {
+            color: #2d5016;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4a7c59;
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section h3 {
+            color: #4a7c59;
+            font-size: 1.3rem;
+            margin: 1.5rem 0 0.8rem 0;
+        }
+
+        .content-section p, .content-section li {
+            margin-bottom: 0.8rem;
+            text-align: justify;
+        }
+
+        .content-section ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .programming-languages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .language-card {
+            background: #f8fffe;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .language-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .simulation-container {
+            background: #1a1a1a;
+            border: 3px solid #2d5016;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .plc-simulator {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .inputs-panel, .outputs-panel {
+            background: #2d2d2d;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .logic-panel {
+            background: #2d2d2d;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 300px;
+        }
+
+        .panel-title {
+            color: #4a7c59;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .io-item {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 1rem;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4a7c59;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .output-led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #333;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .output-led.active {
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .ladder-rung {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .contact {
+            border: 2px solid #4a7c59;
+            padding: 0.3rem 0.6rem;
+            margin: 0 0.5rem;
+            background: #1a1a1a;
+            border-radius: 3px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .contact.active {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .coil {
+            border: 2px solid #4a7c59;
+            padding: 0.3rem 0.8rem;
+            margin-left: auto;
+            background: #1a1a1a;
+            border-radius: 50px;
+            margin-right: 1rem;
+        }
+
+        .coil.active {
+            background: #4a7c59;
+            color: white;
+        }
+
+        .connection-line {
+            height: 2px;
+            background: #4a7c59;
+            flex: 1;
+            margin: 0 0.5rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .status-display {
+            background: #1a1a1a;
+            border: 2px solid #4a7c59;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .plc-simulator {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .programming-languages {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 Interactive PLC Training Center</h1>
+        <p>Master the fundamentals of Programmable Logic Controllers in Operational Technology</p>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <select id="sectionSelector" onchange="showSection()">
+                <option value="introduction">📚 Introduction & Purpose</option>
+                <option value="background">🏭 Background & History</option>
+                <option value="operations">⚙️ PLC Operations</option>
+                <option value="programming">💻 Programming Methods</option>
+                <option value="simulation">🎮 Interactive Simulation</option>
+            </select>
+        </div>
+
+        <!-- Introduction Section -->
+        <div id="introduction" class="content-section active">
+            <h2>📚 Introduction & Purpose of PLCs</h2>
+            
+            <div class="highlight-box">
+                <h3>What is a PLC?</h3>
+                <p>A <strong>Programmable Logic Controller (PLC)</strong> is a specialized industrial computer designed to control and monitor machinery and processes in real-time. PLCs are the backbone of modern industrial automation, providing reliable, flexible, and efficient control solutions for manufacturing, utilities, and process industries.</p>
+            </div>
+
+            <h3>🎯 Primary Purposes of PLCs:</h3>
+            <ul>
+                <li><strong>Process Automation:</strong> Automate repetitive tasks and complex industrial processes</li>
+                <li><strong>Real-time Control:</strong> Provide immediate response to input changes and system conditions</li>
+                <li><strong>Safety Management:</strong> Implement safety interlocks and emergency shutdown procedures</li>
+                <li><strong>Data Collection:</strong> Monitor and record operational parameters for analysis</li>
+                <li><strong>Communication:</strong> Interface with other systems like SCADA, HMI, and databases</li>
+            </ul>
+
+            <h3>🏢 Key Applications in Operational Technology:</h3>
+            <ul>
+                <li><strong>Manufacturing:</strong> Assembly lines, packaging, quality control, material handling</li>
+                <li><strong>Utilities:</strong> Water treatment, power distribution, waste management</li>
+                <li><strong>Chemical Processing:</strong> Batch control, continuous processes, safety systems</li>
+                <li><strong>Automotive:</strong> Robotic welding, painting systems, conveyor control</li>
+                <li><strong>Food & Beverage:</strong> Processing, packaging, temperature control</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h3>🔧 Why PLCs are Essential in OT:</h3>
+                <p>In Operational Technology environments, PLCs bridge the gap between Information Technology (IT) and physical processes. They provide deterministic, real-time control while enabling data connectivity for modern Industrial IoT (IIoT) applications. PLCs ensure operational continuity, safety, and efficiency in critical industrial processes.</p>
+            </div>
+        </div>
+
+        <!-- Background Section -->
+        <div id="background" class="content-section">
+            <h2>🏭 Background & History</h2>
+            
+            <h3>📜 Historical Development:</h3>
+            <p><strong>1968 - The Birth of PLCs:</strong> Dick Morley invented the first PLC, the Modicon 084, for General Motors. The automotive industry needed a flexible alternative to hard-wired relay logic systems that were expensive, difficult to modify, and required extensive maintenance.</p>
+
+            <div class="highlight-box">
+                <h3>🔄 Evolution from Relay Logic:</h3>
+                <p>Before PLCs, industrial control relied heavily on electromechanical relay systems. These systems used physical relays, timers, and switches wired together in large control panels. Any process changes required rewiring, which was time-consuming, expensive, and error-prone.</p>
+            </div>
+
+            <h3>⏰ Key Milestones:</h3>
+            <ul>
+                <li><strong>1960s:</strong> Relay-based control systems dominated manufacturing</li>
+                <li><strong>1968:</strong> First PLC (Modicon 084) developed for GM</li>
+                <li><strong>1970s:</strong> PLCs gained acceptance in automotive and manufacturing</li>
+                <li><strong>1980s:</strong> Introduction of communication capabilities and networking</li>
+                <li><strong>1990s:</strong> Integration with computers and HMI systems</li>
+                <li><strong>2000s:</strong> Ethernet connectivity and advanced programming languages</li>
+                <li><strong>2010s-Present:</strong> IIoT integration, cloud connectivity, and cybersecurity focus</li>
+            </ul>
+
+            <h3>🏆 Advantages Over Previous Systems:</h3>
+            <ul>
+                <li><strong>Flexibility:</strong> Easy reconfiguration through software changes</li>
+                <li><strong>Reliability:</strong> Solid-state components with no moving parts</li>
+                <li><strong>Compactness:</strong> Smaller footprint than relay panels</li>
+                <li><strong>Cost-Effectiveness:</strong> Lower installation and maintenance costs</li>
+                <li><strong>Diagnostics:</strong> Built-in troubleshooting capabilities</li>
+                <li><strong>Documentation:</strong> Software-based documentation and version control</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h3>🌟 Modern PLC Capabilities:</h3>
+                <p>Today's PLCs are sophisticated computers capable of complex mathematical operations, data handling, communication protocols, and integration with enterprise systems. They support multiple programming languages, advanced diagnostics, and cyber-secure communications while maintaining the reliability and deterministic behavior required for industrial applications.</p>
+            </div>
+        </div>
+
+        <!-- Operations Section -->
+        <div id="operations" class="content-section">
+            <h2>⚙️ PLC Operations</h2>
+            
+            <h3>🔄 PLC Scan Cycle:</h3>
+            <p>PLCs operate on a continuous <strong>scan cycle</strong> that ensures deterministic and predictable operation:</p>
+            
+            <div class="highlight-box">
+                <h3>📊 Four-Stage Scan Cycle:</h3>
+                <ol>
+                    <li><strong>Input Scan:</strong> Read all input device states and store in input image table</li>
+                    <li><strong>Program Execution:</strong> Execute user program logic using input image data</li>
+                    <li><strong>Output Update:</strong> Update all output devices based on program results</li>
+                    <li><strong>Housekeeping:</strong> Perform communication, diagnostics, and system maintenance</li>
+                </ol>
+            </div>
+
+            <h3>🏗️ PLC Architecture Components:</h3>
+            <ul>
+                <li><strong>Central Processing Unit (CPU):</strong> Executes control logic and manages system operations</li>
+                <li><strong>Memory:</strong> Stores operating system, user program, and data
+                    <ul>
+                        <li>RAM: Temporary storage for variables and data tables</li>
+                        <li>ROM/Flash: Permanent storage for OS and user programs</li>
+                    </ul>
+                </li>
+                <li><strong>Input/Output (I/O) Modules:</strong> Interface with field devices
+                    <ul>
+                        <li>Digital I/O: On/off signals (switches, relays, motors)</li>
+                        <li>Analog I/O: Variable signals (temperature, pressure, flow)</li>
+                    </ul>
+                </li>
+                <li><strong>Power Supply:</strong> Provides stable DC power to PLC components</li>
+                <li><strong>Communication Interfaces:</strong> Enable networking and data exchange</li>
+            </ul>
+
+            <h3>📡 Input/Output Processing:</h3>
+            <p><strong>Input Processing:</strong> PLCs interface with various sensors and input devices including limit switches, push buttons, temperature sensors, pressure transmitters, and photoelectric sensors. Input modules condition these signals and convert them to digital format for CPU processing.</p>
+            
+            <p><strong>Output Processing:</strong> Based on program logic, PLCs control output devices such as motor starters, solenoid valves, indicator lights, variable frequency drives, and actuators. Output modules provide the necessary signal conditioning and power to operate these devices.</p>
+
+            <div class="highlight-box">
+                <h3>⚡ Real-Time Operation:</h3>
+                <p>PLCs are <strong>hard real-time systems</strong>, meaning they must respond to inputs within a guaranteed time frame. Typical scan times range from microseconds to milliseconds, ensuring immediate response to critical process conditions and safety requirements.</p>
+            </div>
+
+            <h3>🔧 PLC Types by Size:</h3>
+            <ul>
+                <li><strong>Nano PLCs:</strong> Small applications, 8-20 I/O points, integrated design</li>
+                <li><strong>Micro PLCs:</strong> Medium applications, 20-100 I/O points, modular options</li>
+                <li><strong>Compact PLCs:</strong> Large applications, 100-500 I/O points, advanced features</li>
+                <li><strong>Modular PLCs:</strong> Complex systems, 500+ I/O points, distributed architecture</li>
+            </ul>
+        </div>
+
+        <!-- Programming Section -->
+        <div id="programming" class="content-section">
+            <h2>💻 Programming Methods</h2>
+            
+            <p>The <strong>IEC 61131-3 standard</strong> defines five official PLC programming languages, each suited for different applications and programmer preferences:</p>
+
+            <div class="programming-languages">
+                <div class="language-card">
+                    <h3>🪜 Ladder Logic (LD)</h3>
+                    <p><strong>Most Popular</strong><br>
+                    Graphical language resembling electrical relay circuits. Uses contacts, coils, and rungs to represent logic flow.</p>
+                </div>
+                
+                <div class="language-card">
+                    <h3>📦 Function Block Diagram (FBD)</h3>
+                    <p><strong>Visual & Intuitive</strong><br>
+                    Uses interconnected function blocks to represent control logic. Ideal for process control and complex algorithms.</p>
+                </div>
+                
+                <div class="language-card">
+                    <h3>📝 Structured Text (ST)</h3>
+                    <p><strong>High-Level Text</strong><br>
+                    Similar to Pascal/C languages. Best for complex calculations, data manipulation, and advanced programming constructs.</p>
+                </div>
+                
+                <div class="language-card">
+                    <h3>🔄 Sequential Function Chart (SFC)</h3>
+                    <p><strong>Sequential Processes</strong><br>
+                    Flowchart-style language for step-by-step processes. Perfect for batch control and state machines.</p>
+                </div>
+                
+                <div class="language-card">
+                    <h3>📜 Instruction List (IL)</h3>
+                    <p><strong>Low-Level Assembly</strong><br>
+                    Text-based, assembly-like language. Mostly deprecated in favor of other languages.</p>
+                </div>
+            </div>
+
+            <h3>🪜 Ladder Logic - Deep Dive:</h3>
+            <div class="highlight-box">
+                <p><strong>Why Ladder Logic Dominates:</strong> Ladder Logic accounts for approximately 80% of all PLC programming worldwide. Its popularity stems from its visual similarity to electrical relay circuits, making it intuitive for electricians and technicians with electrical backgrounds.</p>
+                
+                <h4>Key Elements:</h4>
+                <ul>
+                    <li><strong>Rails:</strong> Vertical power lines (left rail = power, right rail = neutral)</li>
+                    <li><strong>Rungs:</strong> Horizontal logic lines containing contacts and coils</li>
+                    <li><strong>Contacts:</strong> Input conditions (Normally Open/Normally Closed)</li>
+                    <li><strong>Coils:</strong> Output actions and internal memory bits</li>
+                    <li><strong>Functions:</strong> Timers, counters, mathematical operations</li>
+                </ul>
+            </div>
+
+            <h3>🛠️ Programming Tools & Software:</h3>
+            <ul>
+                <li><strong>Manufacturer-Specific:</strong> RSLogix 5000/Studio 5000 (Rockwell), TIA Portal (Siemens), CX-Programmer (Omron)</li>
+                <li><strong>Open Source:</strong> OpenPLC, CODESYS, Beremiz</li>
+                <li><strong>Educational:</strong> LogixPro, Factory I/O, PLCLogix</li>
+                <li><strong>Web-Based:</strong> Online PLC simulators and training platforms</li>
+            </ul>
+
+            <h3>📋 Programming Best Practices:</h3>
+            <ul>
+                <li><strong>Documentation:</strong> Use descriptive tag names and comprehensive comments</li>
+                <li><strong>Organization:</strong> Structure programs with clear routines and subroutines</li>
+                <li><strong>Safety:</strong> Implement proper safety interlocks and fail-safe logic</li>
+                <li><strong>Testing:</strong> Thoroughly test all logic paths and edge cases</li>
+                <li><strong>Version Control:</strong> Maintain program versions and change documentation</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h3>🎯 Choosing the Right Language:</h3>
+                <p><strong>Use Ladder Logic for:</strong> Basic control, relay replacement, simple logic<br>
+                <strong>Use FBD for:</strong> Process control, PID loops, analog processing<br>
+                <strong>Use Structured Text for:</strong> Complex math, data handling, advanced algorithms<br>
+                <strong>Use SFC for:</strong> Sequential operations, batch processes, state machines</p>
+            </div>
+        </div>
+
+        <!-- Simulation Section -->
+        <div id="simulation" class="content-section">
+            <h2>🎮 Interactive PLC Simulation</h2>
+            
+            <p>Experience hands-on PLC operation with this interactive simulator. Toggle inputs to see how they affect outputs through ladder logic processing.</p>
+
+            <div class="simulation-container">
+                <div class="status-display">
+                    <strong>PLC STATUS:</strong> <span id="plcStatus">RUNNING</span> | 
+                    <strong>SCAN TIME:</strong> <span id="scanTime">2.5ms</span> | 
+                    <strong>CYCLE COUNT:</strong> <span id="cycleCount">0</span>
+                </div>
+
+                <div class="plc-simulator">
+                    <!-- Inputs Panel -->
+                    <div class="inputs-panel">
+                        <div class="panel-title">📥 INPUTS</div>
+                        
+                        <div class="io-item">
+                            <label class="switch">
+                                <input type="checkbox" id="input1" onchange="updateLogic()">
+                                <span class="slider"></span>
+                            </label>
+                            <span>I:0/0 - Start Button</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <label class="switch">
+                                <input type="checkbox" id="input2" onchange="updateLogic()">
+                                <span class="slider"></span>
+                            </label>
+                            <span>I:0/1 - Stop Button (NC)</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <label class="switch">
+                                <input type="checkbox" id="input3" onchange="updateLogic()">
+                                <span class="slider"></span>
+                            </label>
+                            <span>I:0/2 - Emergency Stop</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <label class="switch">
+                                <input type="checkbox" id="input4" onchange="updateLogic()">
+                                <span class="slider"></span>
+                            </label>
+                            <span>I:0/3 - Sensor Input</span>
+                        </div>
+                    </div>
+
+                    <!-- Logic Panel -->
+                    <div class="logic-panel">
+                        <div class="panel-title">🔧 LADDER LOGIC</div>
+                        
+                        <div class="ladder-rung">
+                            <span>Rung 1:</span>
+                            <div class="contact" id="contact1">I:0/0</div>
+                            <div class="contact" id="contact2">I:0/1</div>
+                            <div class="connection-line"></div>
+                            <div class="coil" id="coil1">O:0/0</div>
+                        </div>
+                        
+                        <div class="ladder-rung">
+                            <span>Rung 2:</span>
+                            <div class="contact" id="contact3">O:0/0</div>
+                            <div class="contact" id="contact4">I:0/2</div>
+                            <div class="connection-line"></div>
+                            <div class="coil" id="coil2">O:0/1</div>
+                        </div>
+                        
+                        <div class="ladder-rung">
+                            <span>Rung 3:</span>
+                            <div class="contact" id="contact5">I:0/3</div>
+                            <div class="contact" id="contact6">O:0/1</div>
+                            <div class="connection-line"></div>
+                            <div class="coil" id="coil3">O:0/2</div>
+                        </div>
+                    </div>
+
+                    <!-- Outputs Panel -->
+                    <div class="outputs-panel">
+                        <div class="panel-title">📤 OUTPUTS</div>
+                        
+                        <div class="io-item">
+                            <div class="output-led" id="output1"></div>
+                            <span>O:0/0 - Motor Starter</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <div class="output-led" id="output2"></div>
+                            <span>O:0/1 - Run Indicator</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <div class="output-led" id="output3"></div>
+                            <span>O:0/2 - Process Active</span>
+                        </div>
+                        
+                        <div class="io-item">
+                            <div class="output-led" id="output4"></div>
+                            <span>O:0/3 - Alarm Light</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn" onclick="resetSimulation()">🔄 Reset Simulation</button>
+                    <button class="btn" onclick="togglePLC()">⏯️ Start/Stop PLC</button>
+                    <button class="btn" onclick="showLogicExplanation()">❓ Explain Logic</button>
+                </div>
+
+                <div class="status-display" id="logicExplanation" style="display: none; margin-top: 1rem;">
+                    <strong>LOGIC EXPLANATION:</strong><br>
+                    • Rung 1: Start button (I:0/0) AND Stop button NOT pressed (!I:0/1) = Motor Starter (O:0/0)<br>
+                    • Rung 2: Motor running (O:0/0) AND Emergency Stop NOT pressed (!I:0/2) = Run Indicator (O:0/1)<br>
+                    • Rung 3: Sensor active (I:0/3) AND System running (O:0/1) = Process Active (O:0/2)<br>
+                    • Emergency Stop or any fault condition will shut down the system safely
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🎯 Learning Objectives:</h3>
+                <ul>
+                    <li>Understand how input changes affect output states</li>
+                    <li>See ladder logic execution in real-time</li>
+                    <li>Experience the PLC scan cycle concept</li>
+                    <li>Learn the relationship between inputs, logic, and outputs</li>
+                    <li>Practice troubleshooting control logic</li>
+                </ul>
+            </div>
+
+            <h3>🔬 Simulation Features:</h3>
+            <ul>
+                <li><strong>Real-time Logic Execution:</strong> See how changes propagate through the system</li>
+                <li><strong>Visual Feedback:</strong> Active contacts and coils are highlighted</li>
+                <li><strong>Status Monitoring:</strong> Track PLC operational parameters</li>
+                <li><strong>Interactive Controls:</strong> Toggle inputs and observe system response</li>
+                <li><strong>Safety Logic:</strong> Experience proper emergency stop implementation</li>
+            </ul>
+
+            <div class="highlight-box">
+                <h3>💡 Try These Scenarios:</h3>
+                <ol>
+                    <li><strong>Normal Startup:</strong> Press Start Button, observe Motor Starter activation</li>
+                    <li><strong>Stop Sequence:</strong> Press Stop Button to safely shut down</li>
+                    <li><strong>Emergency Stop:</strong> Test emergency stop functionality</li>
+                    <li><strong>Sensor Integration:</strong> Activate the sensor and watch process indication</li>
+                    <li><strong>Fault Conditions:</strong> Create various fault scenarios and observe safety responses</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cycleCounter = 0;
+        let plcRunning = true;
+        let simulationInterval;
+
+        // Initialize simulation
+        function initializeSimulation() {
+            // Set default states
+            document.getElementById('input2').checked = true; // Stop button is normally closed
+            updateLogic();
+            
+            // Start simulation cycle
+            simulationInterval = setInterval(() => {
+                if (plcRunning) {
+                    cycleCounter++;
+                    document.getElementById('cycleCount').textContent = cycleCounter;
+                    
+                    // Simulate scan time variation
+                    const scanTime = (2.0 + Math.random() * 1.0).toFixed(1);
+                    document.getElementById('scanTime').textContent = scanTime + 'ms';
+                }
+            }, 100);
+        }
+
+        // Show selected section
+        function showSection() {
+            const selector = document.getElementById('sectionSelector');
+            const selectedSection = selector.value;
+            
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(selectedSection).classList.add('active');
+        }
+
+        // Update logic based on inputs
+        function updateLogic() {
+            if (!plcRunning) return;
+
+            // Read inputs
+            const input1 = document.getElementById('input1').checked; // Start button
+            const input2 = !document.getElementById('input2').checked; // Stop button (NC logic)
+            const input3 = !document.getElementById('input3').checked; // Emergency stop (NC logic)
+            const input4 = document.getElementById('input4').checked; // Sensor
+
+            // Get current output states for latching logic
+            const currentOutput1 = document.getElementById('output1').classList.contains('active');
+
+            // Logic execution
+            // Rung 1: (Start OR Motor Running) AND Stop Button = Motor Starter
+            const output1 = (input1 || currentOutput1) && input2;
+            
+            // Rung 2: Motor Running AND Emergency Stop = Run Indicator
+            const output2 = output1 && input3;
+            
+            // Rung 3: Sensor AND System Running = Process Active
+            const output3 = input4 && output2;
+            
+            // Output 4: Alarm (any fault condition)
+            const output4 = !input2 || !input3;
+
+            // Update contact states in ladder logic display
+            updateContact('contact1', input1);
+            updateContact('contact2', input2);
+            updateContact('contact3', output1);
+            updateContact('contact4', input3);
+            updateContact('contact5', input4);
+            updateContact('contact6', output2);
+
+            // Update coil states
+            updateCoil('coil1', output1);
+            updateCoil('coil2', output2);
+            updateCoil('coil3', output3);
+
+            // Update output LEDs
+            updateOutput('output1', output1);
+            updateOutput('output2', output2);
+            updateOutput('output3', output3);
+            updateOutput('output4', output4);
+        }
+
+        // Update contact visual state
+        function updateContact(contactId, state) {
+            const contact = document.getElementById(contactId);
+            if (state) {
+                contact.classList.add('active');
+            } else {
+                contact.classList.remove('active');
+            }
+        }
+
+        // Update coil visual state
+        function updateCoil(coilId, state) {
+            const coil = document.getElementById(coilId);
+            if (state) {
+                coil.classList.add('active');
+            } else {
+                coil.classList.remove('active');
+            }
+        }
+
+        // Update output LED state
+        function updateOutput(outputId, state) {
+            const output = document.getElementById(outputId);
+            if (state) {
+                output.classList.add('active');
+            } else {
+                output.classList.remove('active');
+            }
+        }
+
+        // Reset simulation to initial state
+        function resetSimulation() {
+            // Reset all inputs except stop button (NC)
+            document.getElementById('input1').checked = false;
+            document.getElementById('input2').checked = true;
+            document.getElementById('input3').checked = false;
+            document.getElementById('input4').checked = false;
+            
+            // Reset cycle counter
+            cycleCounter = 0;
+            
+            // Update logic
+            updateLogic();
+            
+            // Hide explanation
+            document.getElementById('logicExplanation').style.display = 'none';
+        }
+
+        // Toggle PLC running state
+        function togglePLC() {
+            plcRunning = !plcRunning;
+            const status = document.getElementById('plcStatus');
+            
+            if (plcRunning) {
+                status.textContent = 'RUNNING';
+                status.style.color = '#00ff00';
+                updateLogic();
+            } else {
+                status.textContent = 'STOPPED';
+                status.style.color = '#ff4444';
+                
+                // Turn off all outputs when PLC stops
+                ['output1', 'output2', 'output3', 'output4'].forEach(id => {
+                    document.getElementById(id).classList.remove('active');
+                });
+                
+                // Clear all contact and coil states
+                ['contact1', 'contact2', 'contact3', 'contact4', 'contact5', 'contact6'].forEach(id => {
+                    document.getElementById(id).classList.remove('active');
+                });
+                
+                ['coil1', 'coil2', 'coil3'].forEach(id => {
+                    document.getElementById(id).classList.remove('active');
+                });
+            }
+        }
+
+        // Show/hide logic explanation
+        function showLogicExplanation() {
+            const explanation = document.getElementById('logicExplanation');
+            if (explanation.style.display === 'none' || explanation.style.display === '') {
+                explanation.style.display = 'block';
+            } else {
+                explanation.style.display = 'none';
+            }
+        }
+
+        // Initialize when page loads
+        window.onload = function() {
+            initializeSimulation();
+        };
+
+        // Cleanup on page unload
+        window.onbeforeunload = function() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+            }
+        };
+    </script>
+</body>
+</html>
