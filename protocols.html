@@ -13,8 +13,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #00cc00 0%, #1a1a1a 100%);
-            color: white;
+            background: #fff;
+            color: #222;
             min-height: 100vh;
         }
 
@@ -27,20 +27,20 @@
         .header {
             text-align: center;
             padding: 30px 0;
-            border-bottom: 2px solid #00ff00;
+            border-bottom: 2px solid #42b72a;
             margin-bottom: 30px;
         }
 
         .header h1 {
             font-size: 2.5em;
-            color: #00ff00;
+            color: #29981c;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            text-shadow: 0 0 3px #f5fff5, 0 2px 4px #e3e3e3;
         }
 
         .header p {
             font-size: 1.2em;
-            color: #cccccc;
+            color: #555;
         }
 
         .search-container {
@@ -53,27 +53,27 @@
             width: 400px;
             padding: 12px 20px;
             font-size: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #00ff00;
+            background: #fff;
+            border: 2px solid #42b72a;
             border-radius: 25px;
-            color: white;
+            color: #222;
             outline: none;
             transition: all 0.3s ease;
         }
 
         .search-input::placeholder {
-            color: #cccccc;
+            color: #999;
         }
 
         .search-input:focus {
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
-            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 10px #b9e7c4;
+            background: #fafefa;
         }
 
         .progress-bar {
             width: 100%;
             height: 10px;
-            background: #333;
+            background: #eee;
             border-radius: 5px;
             margin-bottom: 30px;
             overflow: hidden;
@@ -81,7 +81,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00ff00, #00cc00);
+            background: linear-gradient(90deg, #42b72a, #48c774);
             width: 0%;
             transition: width 0.5s ease;
         }
@@ -93,16 +93,16 @@
         }
 
         .category {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
+            background: #f8f8f8;
+            border: 1px solid #d0d0d0;
             border-radius: 15px;
             padding: 25px;
             transition: all 0.3s ease;
         }
 
         .category:hover {
-            border-color: #00ff00;
-            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.2);
+            border-color: #42b72a;
+            box-shadow: 0 5px 16px rgba(66, 183, 42, 0.1);
             transform: translateY(-5px);
         }
 
@@ -120,7 +120,7 @@
 
         .category-title {
             font-size: 1.4em;
-            color: #00ff00;
+            color: #29981c;
             font-weight: bold;
         }
 
@@ -145,8 +145,8 @@
         }
 
         .protocol {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #444;
+            background: #fff;
+            border: 1px solid #e1e1e1;
             border-radius: 10px;
             padding: 20px;
             cursor: pointer;
@@ -154,20 +154,20 @@
         }
 
         .protocol:hover {
-            border-color: #00ff00;
-            background: rgba(0, 255, 0, 0.1);
+            border-color: #42b72a;
+            background: #f0fff6;
             transform: scale(1.02);
         }
 
         .protocol.completed {
-            border-color: #00ff00;
-            background: rgba(0, 255, 0, 0.15);
+            border-color: #42b72a;
+            background: #e7fbe7;
         }
 
         .protocol-name {
             font-size: 1.3em;
             font-weight: bold;
-            color: #00ff00;
+            color: #29981c;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -178,16 +178,16 @@
             font-size: 0.9em;
             padding: 5px 10px;
             border-radius: 15px;
-            background: rgba(0, 0, 0, 0.5);
+            background: #f0f0f0;
         }
 
         .protocol.completed .protocol-status {
-            background: #00ff00;
-            color: black;
+            background: #42b72a;
+            color: white;
         }
 
         .protocol-description {
-            color: #cccccc;
+            color: #666;
             line-height: 1.6;
             margin-bottom: 15px;
         }
@@ -196,7 +196,7 @@
             display: none;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid #444;
+            border-top: 1px solid #e1e1e1;
         }
 
         .protocol.expanded .protocol-details {
@@ -204,14 +204,14 @@
         }
 
         .protocol-purpose {
-            background: rgba(0, 255, 0, 0.1);
+            background: #f8fff8;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 15px;
         }
 
         .protocol-purpose h4 {
-            color: #00ff00;
+            color: #29981c;
             margin-bottom: 8px;
         }
 
@@ -227,7 +227,7 @@
 
         .protocol-features li:before {
             content: "▶";
-            color: #00ff00;
+            color: #29981c;
             position: absolute;
             left: 0;
         }
@@ -239,7 +239,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             z-index: 1000;
         }
 
@@ -248,8 +248,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #1a1a1a;
-            border: 2px solid #00ff00;
+            background: #fff;
+            border: 2px solid #42b72a;
             border-radius: 15px;
             padding: 30px;
             max-width: 600px;
@@ -263,15 +263,15 @@
             top: 15px;
             right: 20px;
             font-size: 24px;
-            color: #00ff00;
+            color: #42b72a;
             cursor: pointer;
             background: none;
             border: none;
         }
 
         .quiz-button {
-            background: linear-gradient(45deg, #00ff00, #00cc00);
-            color: black;
+            background: linear-gradient(45deg, #42b72a, #48c774);
+            color: white;
             border: none;
             padding: 12px 25px;
             border-radius: 25px;
@@ -283,22 +283,23 @@
 
         .quiz-button:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(66, 183, 42, 0.18);
         }
 
         .stats {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00ff00;
+            background: #fcfcfc;
+            border: 1px solid #42b72a;
             border-radius: 10px;
             padding: 15px;
             font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(66, 183, 42, 0.06);
         }
 
         .stats h4 {
-            color: #00ff00;
+            color: #29981c;
             margin-bottom: 10px;
         }
 
@@ -306,11 +307,11 @@
             .categories {
                 grid-template-columns: 1fr;
             }
-            
+
             .search-input {
                 width: 100%;
             }
-            
+
             .stats {
                 position: relative;
                 top: auto;
@@ -692,21 +693,21 @@
             const modalContent = document.getElementById('modalContent');
 
             modalContent.innerHTML = `
-                <h2 style="color: #00ff00; margin-bottom: 20px;">${protocolName}</h2>
-                <h3 style="color: #ccc; margin-bottom: 20px;">${protocolData.fullName}</h3>
+                <h2 style="color: #42b72a; margin-bottom: 20px;">${protocolName}</h2>
+                <h3 style="color: #666; margin-bottom: 20px;">${protocolData.fullName}</h3>
                 
                 <div class="protocol-purpose">
                     <h4>Purpose & Overview</h4>
                     <p>${protocolData.purpose}</p>
                 </div>
 
-                <h4 style="color: #00ff00; margin-bottom: 10px;">Key Features:</h4>
+                <h4 style="color: #42b72a; margin-bottom: 10px;">Key Features:</h4>
                 <ul class="protocol-features">
                     ${protocolData.features.map(feature => `<li>${feature}</li>`).join('')}
                 </ul>
 
-                <h4 style="color: #00ff00; margin: 20px 0 10px 0;">Common Use Cases:</h4>
-                <p style="color: #ccc; line-height: 1.6;">${protocolData.useCases}</p>
+                <h4 style="color: #42b72a; margin: 20px 0 10px 0;">Common Use Cases:</h4>
+                <p style="color: #666; line-height: 1.6;">${protocolData.useCases}</p>
 
                 <button class="quiz-button" onclick="markAsCompleted('${protocolName}')">
                     Mark as Completed ✓
