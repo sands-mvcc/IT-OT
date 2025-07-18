@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPv4 Interactive Training Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 50%, #e8f5e8 100%);
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(45, 90, 39, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border: 2px solid #4a7c59;
+        }
+
+        .nav-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d5a27;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 2px solid #4a7c59;
+            border-radius: 8px;
+            background: white;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover, select:focus {
+            border-color: #2d5a27;
+            box-shadow: 0 0 10px rgba(45, 90, 39, 0.2);
+            outline: none;
+        }
+
+        .content-area {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+            border: 2px solid #e8f5e8;
+            min-height: 600px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h2 {
+            color: #2d5a27;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #4a7c59;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #4a7c59;
+            font-size: 1.5rem;
+            margin: 25px 0 15px 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            border: 2px solid #4a7c59;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .highlight-box::before {
+            content: "💡";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 0 10px;
+            font-size: 1.2rem;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .address-demo {
+            background: #f8f9fa;
+            border: 2px dashed #4a7c59;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .address-demo input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #4a7c59;
+            border-radius: 4px;
+            width: 80px;
+            text-align: center;
+        }
+
+        .class-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .class-table th, .class-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8f5e8;
+        }
+
+        .class-table th {
+            background: #4a7c59;
+            color: white;
+            font-weight: bold;
+        }
+
+        .class-table tr:hover {
+            background: #f0f8f0;
+        }
+
+        .header-diagram {
+            background: white;
+            border: 2px solid #4a7c59;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .header-field {
+            display: inline-block;
+            border: 1px solid #2d5a27;
+            padding: 8px 4px;
+            text-align: center;
+            background: #f0f8f0;
+            font-size: 0.8rem;
+            vertical-align: top;
+        }
+
+        .interactive-calc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #4a7c59;
+            margin: 20px 0;
+        }
+
+        .calc-input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #4a7c59;
+            border-radius: 4px;
+        }
+
+        .calc-result {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2d5a27;
+        }
+
+        .binary-display {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #4a7c59;
+            border-top: 2px solid #e8f5e8;
+        }
+
+        .special-addresses {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .address-card {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            border: 2px solid #4a7c59;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .address-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(45, 90, 39, 0.2);
+        }
+
+        .address-card h4 {
+            color: #2d5a27;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4a7c59 0%, #2d5a27 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 90, 39, 0.3);
+        }
+
+        .quiz-section {
+            background: #f8f9fa;
+            border: 2px solid #4a7c59;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz-question {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #2d5a27;
+        }
+
+        .quiz-options {
+            margin: 10px 0;
+        }
+
+        .quiz-options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .quiz-options label:hover {
+            background: #e8f5e8;
+        }
+
+        .correct {
+            background: #d4edda !important;
+            border: 2px solid #28a745;
+        }
+
+        .incorrect {
+            background: #f8d7da !important;
+            border: 2px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>IPv4 Interactive Training Tool</h1>
+            <p>Master Internet Protocol Version 4 - From Basics to Advanced Concepts</p>
+        </header>
+
+        <div class="navigation">
+            <label for="topicSelect" class="nav-label">Choose a Topic to Explore:</label>
+            <select id="topicSelect" onchange="showSection(this.value)">
+                <option value="overview">Overview & Definition</option>
+                <option value="numbering">Numbering System & Address Size</option>
+                <option value="classes">Address Classes</option>
+                <option value="special">Special Addresses</option>
+                <option value="header">Packet Header Format</option>
+                <option value="interactive">Interactive Tools</option>
+            </select>
+        </div>
+
+        <div class="content-area">
+            <!-- Overview Section -->
+            <div id="overview" class="section active">
+                <h2>IPv4 Overview & Definition</h2>
+                
+                <div class="highlight-box">
+                    <strong>Internet Protocol Version 4 (IPv4)</strong> is the fourth version of the Internet Protocol and remains the most widely used version for routing internet traffic today, despite the ongoing deployment of IPv6.
+                </div>
+
+                <h3>Historical Background</h3>
+                <p>IPv4 was first deployed for production use on SATNET in 1982 and on ARPANET in January 1983. It was developed as part of the Defense Advanced Research Projects Agency (DARPA) internet project and has been the backbone of internet communications for over four decades.</p>
+
+                <h3>Key Characteristics</h3>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>32-bit addressing:</strong> Provides 4,294,967,296 (2³²) unique addresses</li>
+                    <li><strong>Connectionless protocol:</strong> Each packet is treated independently</li>
+                    <li><strong>Best-effort delivery:</strong> No guarantee of packet delivery, order, or error-free transmission</li>
+                    <li><strong>Hierarchical addressing:</strong> Supports network and host portions</li>
+                    <li><strong>Fragmentation support:</strong> Can split large packets for transmission</li>
+                </ul>
+
+                <h3>Current Status</h3>
+                <p>While IPv4 continues to handle most internet traffic, address exhaustion has led to the development and gradual deployment of IPv6. Techniques like Network Address Translation (NAT) and Classless Inter-Domain Routing (CIDR) have helped extend IPv4's usability.</p>
+
+                <div class="highlight-box">
+                    <strong>Fun Fact:</strong> The total IPv4 address space could theoretically assign one IP address to every square meter of Earth's surface about 84 times over!
+                </div>
+            </div>
+
+            <!-- Numbering System Section -->
+            <div id="numbering" class="section">
+                <h2>IPv4 Numbering System & Address Size</h2>
+
+                <h3>32-Bit Address Structure</h3>
+                <p>IPv4 addresses consist of 32 bits, typically represented as four 8-bit octets in dotted decimal notation.</p>
+
+                <div class="address-demo">
+                    <h4>Address Format Demonstration</h4>
+                    <p>Enter values (0-255) to see the binary representation:</p>
+                    <input type="number" id="octet1" value="192" min="0" max="255" onchange="updateBinary()"> .
+                    <input type="number" id="octet2" value="168" min="0" max="255" onchange="updateBinary()"> .
+                    <input type="number" id="octet3" value="1" min="0" max="255" onchange="updateBinary()"> .
+                    <input type="number" id="octet4" value="1" min="0" max="255" onchange="updateBinary()">
+                    
+                    <div class="binary-display" id="binaryDisplay">
+                        11000000.10101000.00000001.00000001
+                    </div>
+                    <div class="calc-result" id="totalBits">Total: 32 bits providing 4,294,967,296 possible addresses</div>
+                </div>
+
+                <h3>Dotted Decimal Notation</h3>
+                <p>Each octet represents 8 bits and can have values from 0 to 255 (2⁸ = 256 possible values). This human-readable format makes IP addresses easier to remember and work with than their binary equivalents.</p>
+
+                <div class="code-block">
+Binary:     11000000 10101000 00000001 00000001
+Decimal:    192      168      1        1
+Address:    192.168.1.1
+                </div>
+
+                <h3>Network vs. Host Portions</h3>
+                <p>IPv4 addresses are divided into network and host portions:</p>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>Network Portion:</strong> Identifies the specific network</li>
+                    <li><strong>Host Portion:</strong> Identifies the specific device within that network</li>
+                    <li><strong>Subnet Mask:</strong> Determines the boundary between network and host portions</li>
+                </ul>
+
+                <div class="highlight-box">
+                    The division between network and host portions is flexible and determined by the subnet mask, enabling efficient address allocation and routing.
+                </div>
+            </div>
+
+            <!-- Classes Section -->
+            <div id="classes" class="section">
+                <h2>IPv4 Address Classes</h2>
+
+                <p>Traditional IPv4 addressing used a classful system that divided the address space into five classes (A through E) based on the first few bits of the address.</p>
+
+                <table class="class-table">
+                    <tr>
+                        <th>Class</th>
+                        <th>First Bits</th>
+                        <th>Address Range</th>
+                        <th>Network Bits</th>
+                        <th>Host Bits</th>
+                        <th>Networks</th>
+                        <th>Hosts per Network</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>Class A</td>
+                        <td>0</td>
+                        <td>1.0.0.0 - 127.255.255.255</td>
+                        <td>8</td>
+                        <td>24</td>
+                        <td>126</td>
+                        <td>16,777,214</td>
+                        <td>Large networks (ISPs, large corporations)</td>
+                    </tr>
+                    <tr>
+                        <td>Class B</td>
+                        <td>10</td>
+                        <td>128.0.0.0 - 191.255.255.255</td>
+                        <td>16</td>
+                        <td>16</td>
+                        <td>16,384</td>
+                        <td>65,534</td>
+                        <td>Medium-sized networks</td>
+                    </tr>
+                    <tr>
+                        <td>Class C</td>
+                        <td>110</td>
+                        <td>192.0.0.0 - 223.255.255.255</td>
+                        <td>24</td>
+                        <td>8</td>
+                        <td>2,097,152</td>
+                        <td>254</td>
+                        <td>Small networks (home, small business)</td>
+                    </tr>
+                    <tr>
+                        <td>Class D</td>
+                        <td>1110</td>
+                        <td>224.0.0.0 - 239.255.255.255</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>Multicast addressing</td>
+                    </tr>
+                    <tr>
+                        <td>Class E</td>
+                        <td>1111</td>
+                        <td>240.0.0.0 - 255.255.255.255</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>Experimental/reserved</td>
+                    </tr>
+                </table>
+
+                <h3>Modern Classless Addressing (CIDR)</h3>
+                <p>The classful system was largely replaced by Classless Inter-Domain Routing (CIDR) in 1993. CIDR uses variable-length subnet masking (VLSM) for more efficient address allocation.</p>
+
+                <div class="highlight-box">
+                    <h4>CIDR Notation Examples:</h4>
+                    <ul>
+                        <li><strong>192.168.1.0/24</strong> - Network with 24 network bits, 8 host bits (254 hosts)</li>
+                        <li><strong>10.0.0.0/8</strong> - Network with 8 network bits, 24 host bits (16,777,214 hosts)</li>
+                        <li><strong>172.16.0.0/16</strong> - Network with 16 network bits, 16 host bits (65,534 hosts)</li>
+                    </ul>
+                </div>
+
+                <h3>Benefits of CIDR over Classful Addressing</h3>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>Efficient Address Utilization:</strong> Reduces wasted addresses</li>
+                    <li><strong>Flexible Subnetting:</strong> Custom network sizes</li>
+                    <li><strong>Route Aggregation:</strong> Reduces routing table size</li>
+                    <li><strong>Hierarchical Addressing:</strong> Better network organization</li>
+                </ul>
+            </div>
+
+            <!-- Special Addresses Section -->
+            <div id="special" class="section">
+                <h2>IPv4 Special Addresses</h2>
+
+                <p>Several IPv4 address ranges are reserved for special purposes and are not routable on the public internet.</p>
+
+                <div class="special-addresses">
+                    <div class="address-card">
+                        <h4>🏠 Private Addresses (RFC 1918)</h4>
+                        <p><strong>Class A:</strong> 10.0.0.0/8<br>
+                        <strong>Class B:</strong> 172.16.0.0/12<br>
+                        <strong>Class C:</strong> 192.168.0.0/16</p>
+                        <p><em>Purpose:</em> Internal network use, not routable on internet. Enables NAT and conserves public addresses.</p>
+                    </div>
+
+                    <div class="address-card">
+                        <h4>🔄 Loopback Addresses</h4>
+                        <p><strong>Range:</strong> 127.0.0.0/8<br>
+                        <strong>Common:</strong> 127.0.0.1 (localhost)</p>
+                        <p><em>Purpose:</em> Self-referencing for testing and local services. Traffic never leaves the host.</p>
+                    </div>
+
+                    <div class="address-card">
+                        <h4>📡 Multicast Addresses</h4>
+                        <p><strong>Range:</strong> 224.0.0.0/4<br>
+                        <strong>Notable:</strong> 224.0.0.1 (All Hosts)<br>
+                        224.0.0.2 (All Routers)</p>
+                        <p><em>Purpose:</em> One-to-many communication, streaming media, routing protocols.</p>
+                    </div>
+
+                    <div class="address-card">
+                        <h4>🔗 Link-Local Addresses</h4>
+                        <p><strong>Range:</strong> 169.254.0.0/16</p>
+                        <p><em>Purpose:</em> Automatic addressing when DHCP fails. Local segment communication only.</p>
+                    </div>
+
+                    <div class="address-card">
+                        <h4>📋 Documentation Addresses</h4>
+                        <p><strong>Ranges:</strong><br>
+                        192.0.2.0/24 (TEST-NET-1)<br>
+                        198.51.100.0/24 (TEST-NET-2)<br>
+                        203.0.113.0/24 (TEST-NET-3)</p>
+                        <p><em>Purpose:</em> Safe for documentation and examples.</p>
+                    </div>
+
+                    <div class="address-card">
+                        <h4>📢 Broadcast Addresses</h4>
+                        <p><strong>Limited:</strong> 255.255.255.255<br>
+                        <strong>Directed:</strong> Network + all host bits set</p>
+                        <p><em>Purpose:</em> Send to all hosts on network or subnet.</p>
+                    </div>
+                </div>
+
+                <h3>Special Address Usage Examples</h3>
+                <div class="code-block">
+# Ping localhost (loopback test)
+ping 127.0.0.1
+
+# Check for link-local addresses (Windows)
+ipconfig | findstr "169.254"
+
+# Multicast ping to all hosts on local network
+ping 224.0.0.1
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Important:</strong> These special addresses serve critical networking functions and should never be assigned to regular host interfaces on the public internet.
+                </div>
+            </div>
+
+            <!-- Header Format Section -->
+            <div id="header" class="section">
+                <h2>IPv4 Packet Header Format</h2>
+
+                <p>The IPv4 header contains essential information for packet routing and delivery. It consists of a fixed 20-byte section plus optional fields.</p>
+
+                <div class="header-diagram">
+                    <h4>IPv4 Header Structure (20-60 bytes)</h4>
+                    <div style="font-family: monospace; font-size: 12px; margin: 20px 0;">
+                        <div>0                   1                   2                   3</div>
+                        <div>0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|Version|  IHL  |Type of Service|          Total Length         |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|         Identification        |Flags|      Fragment Offset    |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|  Time to Live |    Protocol   |         Header Checksum       |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|                       Source Address                          |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|                    Destination Address                        |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                        <div>|                    Options                    |    Padding    |</div>
+                        <div>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</div>
+                    </div>
+                </div>
+
+                <h3>Header Field Descriptions</h3>
+                
+                <table class="class-table">
+                    <tr>
+                        <th>Field</th>
+                        <th>Size</th>
+                        <th>Description</th>
+                        <th>Values/Notes</th>
+                    </tr>
+                    <tr>
+                        <td>Version</td>
+                        <td>4 bits</td>
+                        <td>IP protocol version</td>
+                        <td>Always 4 for IPv4</td>
+                    </tr>
+                    <tr>
+                        <td>IHL</td>
+                        <td>4 bits</td>
+                        <td>Internet Header Length</td>
+                        <td>5-15 (×4 bytes), minimum 20 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>Type of Service</td>
+                        <td>8 bits</td>
+                        <td>QoS and priority information</td>
+                        <td>DSCP (6 bits) + ECN (2 bits)</td>
+                    </tr>
+                    <tr>
+                        <td>Total Length</td>
+                        <td>16 bits</td>
+                        <td>Total packet size (header + data)</td>
+                        <td>20-65,535 bytes</td>
+                    </tr>
+                    <tr>
+                        <td>Identification</td>
+                        <td>16 bits</td>
+                        <td>Unique packet identifier</td>
+                        <td>Used for fragmentation/reassembly</td>
+                    </tr>
+                    <tr>
+                        <td>Flags</td>
+                        <td>3 bits</td>
+                        <td>Fragmentation control</td>
+                        <td>Reserved(0), DF, MF</td>
+                    </tr>
+                    <tr>
+                        <td>Fragment Offset</td>
+                        <td>13 bits</td>
+                        <td>Position of fragment in original packet</td>
+                        <td>In 8-byte units</td>
+                    </tr>
+                    <tr>
+                        <td>Time to Live</td>
+                        <td>8 bits</td>
+                        <td>Maximum hops before discard</td>
+                        <td>0-255, decremented by each router</td>
+                    </tr>
+                    <tr>
+                        <td>Protocol</td>
+                        <td>8 bits</td>
+                        <td>Next-level protocol identifier</td>
+                        <td>1=ICMP, 6=TCP, 17=UDP</td>
+                    </tr>
+                    <tr>
+                        <td>Header Checksum</td>
+                        <td>16 bits</td>
+                        <td>Error detection for header</td>
+                        <td>Recalculated at each hop</td>
+                    </tr>
+                    <tr>
+                        <td>Source Address</td>
+                        <td>32 bits</td>
+                        <td>Sender's IP address</td>
+                        <td>May be modified by NAT</td>
+                    </tr>
+                    <tr>
+                        <td>Destination Address</td>
+                        <td>32 bits</td>
+                        <td>Receiver's IP address</td>
+                        <td>Target of the packet</td>
+                    </tr>
+                    <tr>
+                        <td>Options</td>
+                        <td>0-320 bits</td>
+                        <td>Optional features</td>
+                        <td>Security, routing, timestamps</td>
+                    </tr>
+                </table>
+
+                <h3>Header Analysis Tool</h3>
+                <div class="interactive-calc">
+                    <h4>Decode IPv4 Header Fields</h4>
+                    <p>Enter a sample header value to see the field breakdown:</p>
+                    <label>Version + IHL (first byte): </label>
+                    <input type="text" id="versionIHL" placeholder="e.g., 45" class="calc-input" onchange="decodeHeader()">
+                    <br>
+                    <label>Total Length (bytes): </label>
+                    <input type="number" id="totalLength" placeholder="e.g., 1500" class="calc-input" onchange="decodeHeader()">
+                    <br>
+                    <label>TTL: </label>
+                    <input type="number" id="ttl" placeholder="e.g., 64" min="0" max="255" class="calc-input" onchange="decodeHeader()">
+                    <br>
+                    <label>Protocol: </label>
+                    <select id="protocol" class="calc-input" onchange="decodeHeader()">
+                        <option value="1">1 - ICMP</option>
+                        <option value="6">6 - TCP</option>
+                        <option value="17">17 - UDP</option>
+                        <option value="89">89 - OSPF</option>
+                    </select>
+                    
+                    <div class="calc-result" id="headerResult">
+                        Enter values above to see header analysis
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Key Header Concepts:</h4>
+                    <ul>
+                        <li><strong>Fragmentation:</strong> Large packets split into smaller fragments for transmission</li>
+                        <li><strong>TTL Purpose:</strong> Prevents infinite routing loops</li>
+                        <li><strong>Checksum:</strong> Only covers header, not data payload</li>
+                        <li><strong>Options:</strong> Rarely used in modern networks due to performance impact</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Interactive Tools Section -->
+            <div id="interactive" class="section">
+                <h2>Interactive IPv4 Tools</h2>
+
+                <h3>🧮 CIDR Calculator</h3>
+                <div class="interactive-calc">
+                    <label>IP Address: </label>
+                    <input type="text" id="cidrIP" placeholder="192.168.1.0" class="calc-input">
+                    <label>Subnet Mask or CIDR: </label>
+                    <input type="text" id="cidrMask" placeholder="/24 or 255.255.255.0" class="calc-input">
+                    <button onclick="calculateCIDR()">Calculate Network Info</button>
+                    
+                    <div class="calc-result" id="cidrResult">
+                        Enter IP and subnet information above
+                    </div>
+                </div>
+
+                <h3>🔍 Address Class Identifier</h3>
+                <div class="interactive-calc">
+                    <label>IP Address: </label>
+                    <input type="text" id="classIP" placeholder="192.168.1.1" class="calc-input">
+                    <button onclick="identifyClass()">Identify Class & Type</button>
+                    
+                    <div class="calc-result" id="classResult">
+                        Enter an IP address above
+                    </div>
+                </div>
+
+                <h3>🧪 IPv4 Knowledge Quiz</h3>
+                <div class="quiz-section">
+                    <div id="quiz-container">
+                        <div class="quiz-question" id="question">
+                            Click "Start Quiz" to begin testing your IPv4 knowledge!
+                        </div>
+                        <div class="quiz-options" id="options">
+                        </div>
+                        <button onclick="startQuiz()">Start Quiz</button>
+                        <button onclick="nextQuestion()" id="nextBtn" style="display:none;">Next Question</button>
+                        <div id="score" style="margin-top: 15px; font-weight: bold;"></div>
+                    </div>
+                </div>
+
+                <h3>📊 Binary Converter</h3>
+                <div class="interactive-calc">
+                    <label>Decimal (0-255): </label>
+                    <input type="number" id="decInput" min="0" max="255" placeholder="192" class="calc-input" onchange="convertToBinary()">
+                    <label>Binary (8 bits): </label>
+                    <input type="text" id="binInput" placeholder="11000000" maxlength="8" class="calc-input" onchange="convertToDecimal()">
+                    
+                    <div class="calc-result" id="conversionResult">
+                        Enter a value to see the conversion
+                    </div>
+                </div>
+
+                <h3>🌐 Subnetting Practice</h3>
+                <div class="interactive-calc">
+                    <label>Network: </label>
+                    <input type="text" id="subnetNetwork" placeholder="192.168.1.0/24" class="calc-input">
+                    <label>Subnets Needed: </label>
+                    <input type="number" id="subnetsNeeded" placeholder="4" min="2" max="256" class="calc-input">
+                    <button onclick="calculateSubnets()">Calculate Subnets</button>
+                    
+                    <div class="calc-result" id="subnetResult">
+                        Enter network and subnet requirements above
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 IPv4 Interactive Training Tool - Master the fundamentals of Internet Protocol Version 4</p>
+            <p>Developed for educational purposes - Understanding networking one packet at a time</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for quiz
+        let currentQuestion = 0;
+        let score = 0;
+        let quizQuestions = [
+            {
+                question: "How many bits are in an IPv4 address?",
+                options: ["16 bits", "24 bits", "32 bits", "64 bits"],
+                correct: 2
+            },
+            {
+                question: "Which address range is reserved for Class A private networks?",
+                options: ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8", "127.0.0.0/8"],
+                correct: 2
+            },
+            {
+                question: "What is the loopback address in IPv4?",
+                options: ["192.168.1.1", "127.0.0.1", "10.0.0.1", "172.16.0.1"],
+                correct: 1
+            },
+            {
+                question: "What does CIDR stand for?",
+                options: ["Class Inter-Domain Routing", "Classless Inter-Domain Routing", "Central Internet Data Routing", "Certified IP Domain Registry"],
+                correct: 1
+            },
+            {
+                question: "Which field in the IPv4 header prevents infinite routing loops?",
+                options: ["Fragment Offset", "Protocol", "Time to Live (TTL)", "Header Checksum"],
+                correct: 2
+            }
+        ];
+
+        // Show section based on dropdown selection
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Update binary display when decimal values change
+        function updateBinary() {
+            const octet1 = parseInt(document.getElementById('octet1').value) || 0;
+            const octet2 = parseInt(document.getElementById('octet2').value) || 0;
+            const octet3 = parseInt(document.getElementById('octet3').value) || 0;
+            const octet4 = parseInt(document.getElementById('octet4').value) || 0;
+            
+            const bin1 = octet1.toString(2).padStart(8, '0');
+            const bin2 = octet2.toString(2).padStart(8, '0');
+            const bin3 = octet3.toString(2).padStart(8, '0');
+            const bin4 = octet4.toString(2).padStart(8, '0');
+            
+            document.getElementById('binaryDisplay').textContent = 
+                `${bin1}.${bin2}.${bin3}.${bin4}`;
+        }
+
+        // Decode IPv4 header fields
+        function decodeHeader() {
+            const versionIHL = document.getElementById('versionIHL').value;
+            const totalLength = parseInt(document.getElementById('totalLength').value) || 0;
+            const ttl = parseInt(document.getElementById('ttl').value) || 0;
+            const protocol = parseInt(document.getElementById('protocol').value) || 0;
+            
+            if (versionIHL.length >= 2) {
+                const byte = parseInt(versionIHL, 16) || parseInt(versionIHL);
+                const version = (byte >> 4) & 0x0F;
+                const ihl = byte & 0x0F;
+                const headerLength = ihl * 4;
+                
+                const protocolNames = {
+                    1: "ICMP", 6: "TCP", 17: "UDP", 89: "OSPF"
+                };
+                
+                const result = `
+                    <strong>Header Analysis:</strong><br>
+                    Version: ${version} (Should be 4 for IPv4)<br>
+                    IHL: ${ihl} (Header length: ${headerLength} bytes)<br>
+                    Total Length: ${totalLength} bytes<br>
+                    TTL: ${ttl} hops remaining<br>
+                    Protocol: ${protocol} (${protocolNames[protocol] || 'Unknown'})<br>
+                    <em>Data payload: ${Math.max(0, totalLength - headerLength)} bytes</em>
+                `;
+                
+                document.getElementById('headerResult').innerHTML = result;
+            }
+        }
+
+        // Calculate CIDR network information
+        function calculateCIDR() {
+            const ip = document.getElementById('cidrIP').value;
+            const mask = document.getElementById('cidrMask').value;
+            
+            try {
+                const ipParts = ip.split('.').map(Number);
+                let subnetBits;
+                
+                if (mask.startsWith('/')) {
+                    subnetBits = parseInt(mask.substring(1));
+                } else if (mask.includes('.')) {
+                    // Convert subnet mask to CIDR
+                    const maskParts = mask.split('.').map(Number);
+                    const maskBinary = (maskParts[0] << 24) + (maskParts[1] << 16) + (maskParts[2] << 8) + maskParts[3];
+                    subnetBits = 32 - Math.log2((~maskBinary >>> 0) + 1);
+                } else {
+                    subnetBits = parseInt(mask);
+                }
+                
+                const hostBits = 32 - subnetBits;
+                const numHosts = Math.pow(2, hostBits) - 2; // Subtract network and broadcast
+                const numNetworks = Math.pow(2, subnetBits);
+                
+                const ipInt = (ipParts[0] << 24) + (ipParts[1] << 16) + (ipParts[2] << 8) + ipParts[3];
+                const maskInt = (~((1 << hostBits) - 1)) >>> 0;
+                const networkInt = ipInt & maskInt;
+                const broadcastInt = networkInt | ((1 << hostBits) - 1);
+                
+                const networkAddr = [
+                    (networkInt >>> 24) & 255,
+                    (networkInt >>> 16) & 255,
+                    (networkInt >>> 8) & 255,
+                    networkInt & 255
+                ].join('.');
+                
+                const broadcastAddr = [
+                    (broadcastInt >>> 24) & 255,
+                    (broadcastInt >>> 16) & 255,
+                    (broadcastInt >>> 8) & 255,
+                    broadcastInt & 255
+                ].join('.');
+                
+                const firstHost = [
+                    (networkInt >>> 24) & 255,
+                    (networkInt >>> 16) & 255,
+                    (networkInt >>> 8) & 255,
+                    (networkInt & 255) + 1
+                ].join('.');
+                
+                const lastHost = [
+                    (broadcastInt >>> 24) & 255,
+                    (broadcastInt >>> 16) & 255,
+                    (broadcastInt >>> 8) & 255,
+                    (broadcastInt & 255) - 1
+                ].join('.');
+                
+                const result = `
+                    <strong>Network Information:</strong><br>
+                    Network Address: ${networkAddr}/${subnetBits}<br>
+                    Broadcast Address: ${broadcastAddr}<br>
+                    First Host: ${firstHost}<br>
+                    Last Host: ${lastHost}<br>
+                    Available Hosts: ${numHosts}<br>
+                    Subnet Mask: ${[
+                        (maskInt >>> 24) & 255,
+                        (maskInt >>> 16) & 255,
+                        (maskInt >>> 8) & 255,
+                        maskInt & 255
+                    ].join('.')}
+                `;
+                
+                document.getElementById('cidrResult').innerHTML = result;
+            } catch (error) {
+                document.getElementById('cidrResult').innerHTML = 
+                    '<span style="color: red;">Invalid IP address or subnet mask format</span>';
+            }
+        }
+
+        // Identify IP address class and type
+        function identifyClass() {
+            const ip = document.getElementById('classIP').value;
+            
+            try {
+                const parts = ip.split('.').map(Number);
+                const firstOctet = parts[0];
+                
+                let addressClass, type, description;
+                
+                if (firstOctet >= 1 && firstOctet <= 126) {
+                    addressClass = "Class A";
+                    if (firstOctet === 10) {
+                        type = "Private";
+                        description = "RFC 1918 private address space";
+                    } else if (firstOctet === 127) {
+                        type = "Loopback";
+                        description = "Local loopback address";
+                    } else {
+                        type = "Public";
+                        description = "Globally routable address";
+                    }
+                } else if (firstOctet >= 128 && firstOctet <= 191) {
+                    addressClass = "Class B";
+                    if (firstOctet === 172 && parts[1] >= 16 && parts[1] <= 31) {
+                        type = "Private";
+                        description = "RFC 1918 private address space";
+                    } else if (firstOctet === 169 && parts[1] === 254) {
+                        type = "Link-Local";
+                        description = "APIPA/Link-local address";
+                    } else {
+                        type = "Public";
+                        description = "Globally routable address";
+                    }
+                } else if (firstOctet >= 192 && firstOctet <= 223) {
+                    addressClass = "Class C";
+                    if (firstOctet === 192 && parts[1] === 168) {
+                        type = "Private";
+                        description = "RFC 1918 private address space";
+                    } else {
+                        type = "Public";
+                        description = "Globally routable address";
+                    }
+                } else if (firstOctet >= 224 && firstOctet <= 239) {
+                    addressClass = "Class D";
+                    type = "Multicast";
+                    description = "Multicast group address";
+                } else if (firstOctet >= 240 && firstOctet <= 255) {
+                    addressClass = "Class E";
+                    type = "Experimental";
+                    description = "Reserved for experimental use";
+                } else {
+                    addressClass = "Invalid";
+                    type = "Error";
+                    description = "Invalid IP address";
+                }
+                
+                const binary = parts.map(octet => 
+                    octet.toString(2).padStart(8, '0')).join('.');
+                
+                const result = `
+                    <strong>Address Analysis:</strong><br>
+                    IP Address: ${ip}<br>
+                    Binary: ${binary}<br>
+                    Class: ${addressClass}<br>
+                    Type: ${type}<br>
+                    Description: ${description}<br>
+                    First Octet: ${firstOctet}
+                `;
+                
+                document.getElementById('classResult').innerHTML = result;
+            } catch (error) {
+                document.getElementById('classResult').innerHTML = 
+                    '<span style="color: red;">Invalid IP address format</span>';
+            }
+        }
+
+        // Start quiz
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            showQuestion();
+            document.querySelector('button[onclick="startQuiz()"]').style.display = 'none';
+        }
+
+        // Show current quiz question
+        function showQuestion() {
+            if (currentQuestion < quizQuestions.length) {
+                const q = quizQuestions[currentQuestion];
+                document.getElementById('question').textContent = `Question ${currentQuestion + 1}: ${q.question}`;
+                
+                const optionsHtml = q.options.map((option, index) => 
+                    `<label><input type="radio" name="quiz" value="${index}"> ${option}</label>`
+                ).join('');
+                
+                document.getElementById('options').innerHTML = optionsHtml;
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                endQuiz();
+            }
+        }
+
+        // Next question
+        function nextQuestion() {
+            const selected = document.querySelector('input[name="quiz"]:checked');
+            if (selected) {
+                const answer = parseInt(selected.value);
+                const correct = quizQuestions[currentQuestion].correct;
+                
+                if (answer === correct) {
+                    score++;
+                    selected.parentElement.classList.add('correct');
+                } else {
+                    selected.parentElement.classList.add('incorrect');
+                    document.querySelectorAll('input[name="quiz"]')[correct].parentElement.classList.add('correct');
+                }
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    showQuestion();
+                }, 1500);
+            } else {
+                alert('Please select an answer!');
+            }
+        }
+
+        // End quiz
+        function endQuiz() {
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            document.getElementById('question').textContent = 'Quiz Complete!';
+            document.getElementById('options').innerHTML = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('score').innerHTML = 
+                `<strong>Final Score: ${score}/${quizQuestions.length} (${percentage}%)</strong><br>
+                ${percentage >= 80 ? '🎉 Excellent work!' : percentage >= 60 ? '👍 Good job!' : '📚 Keep studying!'}`;
+            document.querySelector('button[onclick="startQuiz()"]').style.display = 'inline-block';
+            document.querySelector('button[onclick="startQuiz()"]').textContent = 'Restart Quiz';
+        }
+
+        // Convert decimal to binary
+        function convertToBinary() {
+            const decimal = parseInt(document.getElementById('decInput').value) || 0;
+            if (decimal >= 0 && decimal <= 255) {
+                const binary = decimal.toString(2).padStart(8, '0');
+                document.getElementById('binInput').value = binary;
+                document.getElementById('conversionResult').innerHTML = 
+                    `<strong>${decimal}</strong> decimal = <strong>${binary}</strong> binary`;
+            }
+        }
+
+        // Convert binary to decimal
+        function convertToDecimal() {
+            const binary = document.getElementById('binInput').value;
+            if (/^[01]{1,8}$/.test(binary)) {
+                const decimal = parseInt(binary, 2);
+                document.getElementById('decInput').value = decimal;
+                document.getElementById('conversionResult').innerHTML = 
+                    `<strong>${binary.padStart(8, '0')}</strong> binary = <strong>${decimal}</strong> decimal`;
+            }
+        }
+
+        // Calculate subnet divisions
+        function calculateSubnets() {
+            const network = document.getElementById('subnetNetwork').value;
+            const subnetsNeeded = parseInt(document.getElementById('subnetsNeeded').value) || 2;
+            
+            try {
+                const [ip, cidr] = network.split('/');
+                const originalCidr = parseInt(cidr);
+                const subnetBits = Math.ceil(Math.log2(subnetsNeeded));
+                const newCidr = originalCidr + subnetBits;
+                
+                if (newCidr > 30) {
+                    document.getElementById('subnetResult').innerHTML = 
+                        '<span style="color: red;">Too many subnets requested for this network size</span>';
+                    return;
+                }
+                
+                const hostBits = 32 - newCidr;
+                const hostsPerSubnet = Math.pow(2, hostBits) - 2;
+                const actualSubnets = Math.pow(2, subnetBits);
+                
+                const ipParts = ip.split('.').map(Number);
+                const ipInt = (ipParts[0] << 24) + (ipParts[1] << 16) + (ipParts[2] << 8) + ipParts[3];
+                const subnetSize = Math.pow(2, hostBits + 1);
+                
+                let subnetsHtml = '<strong>Subnet Divisions:</strong><br>';
+                for (let i = 0; i < Math.min(actualSubnets, 8); i++) {
+                    const subnetInt = ipInt + (i * subnetSize);
+                    const subnetAddr = [
+                        (subnetInt >>> 24) & 255,
+                        (subnetInt >>> 16) & 255,
+                        (subnetInt >>> 8) & 255,
+                        subnetInt & 255
+                    ].join('.');
+                    subnetsHtml += `Subnet ${i + 1}: ${subnetAddr}/${newCidr} (${hostsPerSubnet} hosts)<br>`;
+                }
+                
+                if (actualSubnets > 8) {
+                    subnetsHtml += `... and ${actualSubnets - 8} more subnets<br>`;
+                }
+                
+                subnetsHtml += `<br><strong>Summary:</strong><br>
+                    New subnet mask: /${newCidr}<br>
+                    Hosts per subnet: ${hostsPerSubnet}<br>
+                    Total subnets created: ${actualSubnets}`;
+                
+                document.getElementById('subnetResult').innerHTML = subnetsHtml;
+            } catch (error) {
+                document.getElementById('subnetResult').innerHTML = 
+                    '<span style="color: red;">Invalid network format. Use format: 192.168.1.0/24</span>';
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBinary();
+        });
+    </script>
+</body>
+</html>
