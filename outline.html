@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Compliance Workshop: AI-Driven Documentation & Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #2c5530;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            background-color: #1e3a21;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: #4CAF50;
+            border-left-color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background-color: #4CAF50;
+            border-left-color: white;
+        }
+
+        .nav-item h3 {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+
+        .nav-item.active h3 {
+            color: white;
+        }
+
+        .nav-item p {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            width: calc(100% - 280px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #4CAF50 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section h2 {
+            color: #2c5530;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .content-section h3 {
+            color: #4CAF50;
+            margin: 20px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .time-indicator {
+            background-color: #e8f5e8;
+            color: #2c5530;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .ai-highlight {
+            background-color: #f0f8f0;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .ai-highlight h4 {
+            color: #2c5530;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-highlight h4::before {
+            content: "🤖";
+            margin-right: 8px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .demo-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+            color: #666;
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            height: 6px;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #4CAF50;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .workshop-info {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Workshop Navigation</h2>
+            <div class="nav-item active" data-section="overview">
+                <h3>Workshop Overview</h3>
+                <p>Introduction & Objectives</p>
+            </div>
+            <div class="nav-item" data-section="threat-landscape">
+                <h3>Threat Landscape</h3>
+                <p>Current cybersecurity threats & trends</p>
+            </div>
+            <div class="nav-item" data-section="frameworks">
+                <h3>Frameworks & Standards</h3>
+                <p>NIST RMF, FISMA, CMMC navigation</p>
+            </div>
+            <div class="nav-item" data-section="audit-tools">
+                <h3>Audit Tools & Preparation</h3>
+                <p>Assessment methodologies & prep</p>
+            </div>
+            <div class="nav-item" data-section="compliance-docs">
+                <h3>Compliance Documents</h3>
+                <p>POA&M, SSP, SAR & other artifacts</p>
+            </div>
+            <div class="nav-item" data-section="ai-applications">
+                <h3>AI-Driven Solutions</h3>
+                <p>Automation & generation tools</p>
+            </div>
+            <div class="nav-item" data-section="practical-demo">
+                <h3>Practical Demonstrations</h3>
+                <p>Live AI tool examples</p>
+            </div>
+            <div class="nav-item" data-section="implementation">
+                <h3>Implementation Strategy</h3>
+                <p>Action plans & next steps</p>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="header">
+                <h1>Cybersecurity Compliance Workshop</h1>
+                <p>AI-Driven Documentation & Compliance Tools for Modern Organizations</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <section class="content-section active" id="overview">
+                <div class="time-indicator">⏱️ 5 minutes</div>
+                <h2>Workshop Overview & Objectives</h2>
+                
+                <div class="workshop-info">
+                    <h3>Session Details</h3>
+                    <ul>
+                        <li><strong>Duration:</strong> 50 minutes</li>
+                        <li><strong>Format:</strong> Interactive presentation with demonstrations</li>
+                        <li><strong>Audience:</strong> Cybersecurity professionals, compliance officers, IT managers</li>
+                    </ul>
+                </div>
+
+                <h3>Learning Objectives</h3>
+                <ul>
+                    <li>Understand the current cybersecurity threat landscape for 2025</li>
+                    <li>Navigate key compliance frameworks (NIST RMF, FISMA, CMMC)</li>
+                    <li>Master essential compliance documentation requirements</li>
+                    <li>Explore AI-powered solutions for compliance automation</li>
+                    <li>Develop actionable implementation strategies</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>AI Integration Focus</h4>
+                    <p>Throughout this workshop, we'll demonstrate how artificial intelligence can transform your compliance program from a manual, time-intensive process into an automated, intelligent system that adapts to evolving threats and regulatory requirements.</p>
+                </div>
+            </section>
+
+            <!-- Threat Landscape Section -->
+            <section class="content-section" id="threat-landscape">
+                <div class="time-indicator">⏱️ 8 minutes</div>
+                <h2>2025 Cybersecurity Threat Landscape</h2>
+
+                <h3>Key Threat Trends</h3>
+                <ul>
+                    <li><strong>AI-Powered Attacks:</strong> Sophisticated phishing, deepfakes, and automated exploitation</li>
+                    <li><strong>Supply Chain Vulnerabilities:</strong> 54% of organizations cite this as the biggest challenge</li>
+                    <li><strong>Ransomware Evolution:</strong> Double extortion and critical infrastructure targeting</li>
+                    <li><strong>Nation-State Activity:</strong> 150% increase in China-nexus cyber operations</li>
+                    <li><strong>Cloud Security Gaps:</strong> Multi-cloud complexity driving new attack vectors</li>
+                    <li><strong>Identity-Based Threats:</strong> 79% of detections are now malware-free</li>
+                </ul>
+
+                <div class="demo-box">
+                    <strong>Interactive Element:</strong> Live threat intelligence dashboard showing current global cyber activity and emerging attack patterns.
+                </div>
+
+                <h3>Impact on Compliance</h3>
+                <ul>
+                    <li>Faster breakout times (51-second record) requiring automated response</li>
+                    <li>Regulatory bodies adapting frameworks to address AI threats</li>
+                    <li>Increased focus on continuous monitoring vs. periodic assessments</li>
+                    <li>Supply chain risk assessment becoming mandatory</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>AI Threat Detection Capabilities</h4>
+                    <p>Modern AI systems can analyze 30,000+ vulnerabilities disclosed annually, identifying patterns and predicting attack vectors faster than human analysts. This capability is essential for maintaining compliance in today's threat environment.</p>
+                </div>
+            </section>
+
+            <!-- Frameworks Section -->
+            <section class="content-section" id="frameworks">
+                <div class="time-indicator">⏱️ 10 minutes</div>
+                <h2>Navigating Frameworks & Standards</h2>
+
+                <h3>NIST Risk Management Framework (RMF)</h3>
+                <ul>
+                    <li><strong>7-Step Process:</strong> Prepare → Categorize → Select → Implement → Assess → Authorize → Monitor</li>
+                    <li><strong>2025 Updates:</strong> Enhanced AI governance and supply chain focus</li>
+                    <li><strong>Continuous Monitoring:</strong> Real-time risk assessment capabilities</li>
+                    <li><strong>Integration Points:</strong> Seamless alignment with Cybersecurity Framework 2.0</li>
+                </ul>
+
+                <h3>Federal Information Security Modernization Act (FISMA)</h3>
+                <ul>
+                    <li>Mandatory for federal agencies and contractors</li>
+                    <li>Annual compliance reporting requirements</li>
+                    <li>Integration with NIST SP 800-53 controls</li>
+                    <li>Emphasis on continuous monitoring programs</li>
+                </ul>
+
+                <h3>Cybersecurity Maturity Model Certification (CMMC)</h3>
+                <ul>
+                    <li><strong>Level 1:</strong> Basic cyber hygiene (self-assessment)</li>
+                    <li><strong>Level 2:</strong> Advanced practices (third-party assessment)</li>
+                    <li><strong>Level 3:</strong> Expert practices (government validation)</li>
+                    <li><strong>2025 Implementation:</strong> Mandatory for DoD contractors</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>AI-Enhanced Framework Navigation</h4>
+                    <p>AI tools can automatically map your current security posture to framework requirements, identify gaps, and generate remediation roadmaps. This reduces framework assessment time by up to 70%.</p>
+                </div>
+
+                <div class="demo-box">
+                    <strong>Interactive Tool:</strong> Framework mapping visualization showing control overlaps and optimization opportunities across NIST, FISMA, and CMMC requirements.
+                </div>
+            </section>
+
+            <!-- Audit Tools Section -->
+            <section class="content-section" id="audit-tools">
+                <div class="time-indicator">⏱️ 6 minutes</div>
+                <h2>Audit Tools & Preparation Strategies</h2>
+
+                <h3>Modern Audit Methodologies</h3>
+                <ul>
+                    <li><strong>Continuous Compliance Monitoring:</strong> Real-time control validation</li>
+                    <li><strong>Risk-Based Assessments:</strong> Prioritizing high-impact areas</li>
+                    <li><strong>Automated Evidence Collection:</strong> Reducing manual documentation burden</li>
+                    <li><strong>Collaborative Platforms:</strong> Streamlined auditor-organization interaction</li>
+                </ul>
+
+                <h3>Audit Preparation Best Practices</h3>
+                <ul>
+                    <li>Maintain current asset inventories and system categorizations</li>
+                    <li>Implement robust change management processes</li>
+                    <li>Establish clear roles and responsibilities</li>
+                    <li>Document all security control implementations</li>
+                    <li>Conduct regular internal assessments</li>
+                </ul>
+
+                <h3>Technology-Enabled Auditing</h3>
+                <ul>
+                    <li><strong>CSAM/eMASS Integration:</strong> Federal tracking systems</li>
+                    <li><strong>GRC Platforms:</strong> Centralized compliance management</li>
+                    <li><strong>Vulnerability Scanners:</strong> Automated technical assessments</li>
+                    <li><strong>Configuration Management:</strong> Baseline compliance monitoring</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>AI-Powered Audit Preparation</h4>
+                    <p>AI systems can predict audit findings based on historical data, automatically generate evidence packages, and identify potential compliance gaps weeks before formal assessments begin.</p>
+                </div>
+            </section>
+
+            <!-- Compliance Documents Section -->
+            <section class="content-section" id="compliance-docs">
+                <div class="time-indicator">⏱️ 12 minutes</div>
+                <h2>Essential Compliance Documents</h2>
+
+                <h3>Plan of Action & Milestones (POA&M)</h3>
+                <ul>
+                    <li><strong>Purpose:</strong> Track and remediate identified security weaknesses</li>
+                    <li><strong>Components:</strong> Weakness description, responsible party, milestones, resources, timeline</li>
+                    <li><strong>Updates:</strong> Monthly reporting required for federal systems</li>
+                    <li><strong>CMMC Considerations:</strong> Restrictions on high-value controls</li>
+                </ul>
+
+                <h3>System Security Plan (SSP)</h3>
+                <ul>
+                    <li>Comprehensive security control implementation documentation</li>
+                    <li>System boundary definitions and data flow diagrams</li>
+                    <li>Control inheritance and shared responsibility models</li>
+                    <li>Regular updates required for system changes</li>
+                </ul>
+
+                <h3>Security Assessment Report (SAR)</h3>
+                <ul>
+                    <li>Independent evaluation of security control effectiveness</li>
+                    <li>Finding categorization and risk impact analysis</li>
+                    <li>Recommendations for improvement</li>
+                    <li>Basis for authorization decisions</li>
+                </ul>
+
+                <h3>Additional Critical Documents</h3>
+                <ul>
+                    <li><strong>Asset Inventory & Categorization:</strong> Complete system component listing</li>
+                    <li><strong>Access Control Matrix:</strong> User permissions and role definitions</li>
+                    <li><strong>Incident Response Plan:</strong> Breach response procedures</li>
+                    <li><strong>Configuration Management Plan:</strong> Change control processes</li>
+                    <li><strong>Vulnerability Scan Reports:</strong> Technical security assessments</li>
+                    <li><strong>Audit Log Reports:</strong> System activity monitoring</li>
+                    <li><strong>Maintenance Reports:</strong> System update and patching records</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>Document Generation & Maintenance</h4>
+                    <p>AI can automatically generate initial document templates, populate them with system-specific information, track changes, and ensure consistency across all compliance artifacts. This reduces documentation time by 60-80%.</p>
+                </div>
+
+                <div class="demo-box">
+                    <strong>Live Demo:</strong> AI-powered POA&M generation from vulnerability scan results, showing automatic risk scoring, milestone creation, and resource estimation.
+                </div>
+            </section>
+
+            <!-- AI Applications Section -->
+            <section class="content-section" id="ai-applications">
+                <div class="time-indicator">⏱️ 10 minutes</div>
+                <h2>AI-Driven Compliance Solutions</h2>
+
+                <h3>Automated Document Generation</h3>
+                <ul>
+                    <li><strong>Template Intelligence:</strong> Context-aware document creation</li>
+                    <li><strong>Data Integration:</strong> Automatic population from multiple sources</li>
+                    <li><strong>Version Control:</strong> Intelligent change tracking and approval workflows</li>
+                    <li><strong>Compliance Mapping:</strong> Automatic alignment with framework requirements</li>
+                </ul>
+
+                <h3>Continuous Monitoring & Assessment</h3>
+                <ul>
+                    <li><strong>Real-time Control Validation:</strong> 24/7 compliance status monitoring</li>
+                    <li><strong>Anomaly Detection:</strong> Behavioral analysis for insider threats</li>
+                    <li><strong>Predictive Analytics:</strong> Risk forecasting and trend analysis</li>
+                    <li><strong>Automated Reporting:</strong> Executive dashboards and regulatory submissions</li>
+                </ul>
+
+                <h3>Intelligent Risk Management</h3>
+                <ul>
+                    <li><strong>Dynamic Risk Scoring:</strong> Context-aware vulnerability prioritization</li>
+                    <li><strong>Threat Intelligence Integration:</strong> External threat data correlation</li>
+                    <li><strong>Impact Analysis:</strong> Business process risk modeling</li>
+                    <li><strong>Remediation Planning:</strong> Resource-optimized action plans</li>
+                </ul>
+
+                <h3>Benefits of AI Implementation</h3>
+                <ul>
+                    <li>68% of organizations expect transformational compliance impact</li>
+                    <li>30% reduction in compliance costs through automation</li>
+                    <li>55% faster alert investigation and triage</li>
+                    <li>90% reduction in fraud-related losses</li>
+                    <li>$3M average reduction in data breach costs</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>Current AI Capabilities in Cybersecurity</h4>
+                    <p>57% of organizations use AI for anomaly detection, 50% for malware detection, and 49% for automated incident response. The adoption curve is steep, with 27% planning AI implementation within the year.</p>
+                </div>
+            </section>
+
+            <!-- Practical Demo Section -->
+            <section class="content-section" id="practical-demo">
+                <div class="time-indicator">⏱️ 12 minutes</div>
+                <h2>Practical AI Tool Demonstrations</h2>
+
+                <h3>Demo 1: AI-Powered POA&M Generation</h3>
+                <div class="demo-box">
+                    <strong>Scenario:</strong> Converting vulnerability scan results into structured POA&M entries
+                    <ul>
+                        <li>Import vulnerability data from multiple scanners</li>
+                        <li>AI risk scoring and prioritization</li>
+                        <li>Automatic milestone creation with realistic timelines</li>
+                        <li>Resource estimation and assignment</li>
+                        <li>Integration with project management systems</li>
+                    </ul>
+                </div>
+
+                <h3>Demo 2: Intelligent SSP Development</h3>
+                <div class="demo-box">
+                    <strong>Scenario:</strong> Creating a comprehensive System Security Plan using AI assistance
+                    <ul>
+                        <li>System boundary definition through network discovery</li>
+                        <li>Control inheritance mapping</li>
+                        <li>Automatic control implementation descriptions</li>
+                        <li>Evidence attachment and validation</li>
+                        <li>Multi-framework compliance checking</li>
+                    </ul>
+                </div>
+
+                <h3>Demo 3: Continuous Compliance Monitoring</h3>
+                <div class="demo-box">
+                    <strong>Scenario:</strong> Real-time compliance status dashboard with predictive insights
+                    <ul>
+                        <li>Live control effectiveness monitoring</li>
+                        <li>Anomaly detection and alerting</li>
+                        <li>Trend analysis and risk forecasting</li>
+                        <li>Automated report generation</li>
+                        <li>Executive summary creation</li>
+                    </ul>
+                </div>
+
+                <h3>Demo 4: AI-Enhanced Audit Preparation</h3>
+                <div class="demo-box">
+                    <strong>Scenario:</strong> Automated evidence collection and audit readiness assessment
+                    <ul>
+                        <li>Evidence gap identification</li>
+                        <li>Document completeness validation</li>
+                        <li>Audit finding prediction</li>
+                        <li>Remediation timeline optimization</li>
+                        <li>Auditor communication facilitation</li>
+                    </ul>
+                </div>
+
+                <div class="ai-highlight">
+                    <h4>Key Takeaways from Demonstrations</h4>
+                    <p>These demonstrations show how AI transforms compliance from reactive documentation to proactive risk management, reducing manual effort while improving accuracy and consistency across all compliance activities.</p>
+                </div>
+            </section>
+
+            <!-- Implementation Section -->
+            <section class="content-section" id="implementation">
+                <div class="time-indicator">⏱️ 7 minutes</div>
+                <h2>Implementation Strategy & Next Steps</h2>
+
+                <h3>Phase 1: Assessment & Planning (Weeks 1-4)</h3>
+                <ul>
+                    <li>Current state compliance maturity assessment</li>
+                    <li>AI readiness evaluation</li>
+                    <li>Tool selection and vendor evaluation</li>
+                    <li>Resource allocation and timeline development</li>
+                    <li>Stakeholder buy-in and change management planning</li>
+                </ul>
+
+                <h3>Phase 2: Pilot Implementation (Weeks 5-12)</h3>
+                <ul>
+                    <li>Select pilot use case (recommend POA&M automation)</li>
+                    <li>Deploy AI tools in controlled environment</li>
+                    <li>Train staff on new processes and technologies</li>
+                    <li>Establish success metrics and monitoring</li>
+                    <li>Gather feedback and refine approach</li>
+                </ul>
+
+                <h3>Phase 3: Full Deployment (Weeks 13-26)</h3>
+                <ul>
+                    <li>Scale successful pilot to all compliance documents</li>
+                    <li>Integrate with existing GRC platforms</li>
+                    <li>Implement continuous monitoring capabilities</li>
+                    <li>Establish ongoing training and support</li>
+                    <li>Measure ROI and compliance improvements</li>
+                </ul>
+
+                <h3>Critical Success Factors</h3>
+                <ul>
+                    <li><strong>Executive Sponsorship:</strong> Leadership commitment to AI transformation</li>
+                    <li><strong>Data Quality:</strong> Clean, consistent source data for AI training</li>
+                    <li><strong>Staff Training:</strong> Upskilling teams for AI-enhanced processes</li>
+                    <li><strong>Change Management:</strong> Addressing resistance and cultural barriers</li>
+                    <li><strong>Vendor Partnership:</strong> Strong relationships with AI solution providers</li>
+                </ul>
+
+                <div class="ai-highlight">
+                    <h4>Expected Outcomes</h4>
+                    <p>Organizations following this implementation strategy typically see 60-80% reduction in compliance documentation time, 70% improvement in audit readiness, and 50% faster response to regulatory changes within the first year.</p>
+                </div>
+
+                <h3>Resources & Support</h3>
+                <ul>
+                    <li>NIST AI Risk Management Framework guidance</li>
+                    <li>Industry best practice communities</li>
+                    <li>Vendor training and certification programs</li>
+                    <li>Professional services for implementation support</li>
+                    <li>Ongoing monitoring and optimization services</li>
+                </ul>
+
+                <div class="workshop-info">
+                    <h3>Workshop Conclusion</h3>
+                    <p>Thank you for participating in this comprehensive exploration of AI-driven cybersecurity compliance. The integration of artificial intelligence into compliance processes represents a fundamental shift toward proactive, intelligent risk management that will define the next decade of cybersecurity practice.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        const navItems = document.querySelectorAll('.nav-item');
+        const contentSections = document.querySelectorAll('.content-section');
+        const progressBar = document.getElementById('progressBar');
+        
+        let currentSection = 0;
+        const totalSections = navItems.length;
+
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                // Remove active class from all nav items and content sections
+                navItems.forEach(nav => nav.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked item and corresponding content
+                item.classList.add('active');
+                const sectionId = item.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Update progress bar
+                currentSection = index;
+                updateProgressBar();
+            });
+        });
+
+        function updateProgressBar() {
+            const progress = ((currentSection + 1) / totalSections) * 100;
+            progressBar.style.width = progress + '%';
+        }
+
+        // Initialize progress bar
+        updateProgressBar();
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentSection < totalSections - 1) {
+                navItems[currentSection + 1].click();
+            } else if (e.key === 'ArrowLeft' && currentSection > 0) {
+                navItems[currentSection - 1].click();
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelector('.main-content').scrollTop = 0;
+            });
+        });
+
+        // Auto-advance functionality (optional)
+        let autoAdvance = false;
+        function toggleAutoAdvance() {
+            autoAdvance = !autoAdvance;
+            if (autoAdvance) {
+                const interval = setInterval(() => {
+                    if (!autoAdvance) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    if (currentSection < totalSections - 1) {
+                        navItems[currentSection + 1].click();
+                    } else {
+                        autoAdvance = false;
+                        clearInterval(interval);
+                    }
+                }, 30000); // 30 seconds per section
+            }
+        }
+
+        // Add context menu for additional features
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            // Could add additional functionality here
+        });
+    </script>
+</body>
+</html>
