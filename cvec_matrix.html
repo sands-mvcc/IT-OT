@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cascade Valley Electric Cooperative - Access Control Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #2d5016;
+        }
+
+        .control-group select, .control-group input {
+            padding: 8px 12px;
+            border: 2px solid #2d5016;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(45, 80, 22, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.4);
+        }
+
+        .matrix-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .matrix-table th {
+            background: #2d5016;
+            color: white;
+            padding: 15px 8px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #1a3009;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-table th:first-child {
+            background: #1a3009;
+            text-align: left;
+            min-width: 200px;
+        }
+
+        .matrix-table td {
+            padding: 12px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        .matrix-table td:first-child {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2d5016;
+            text-align: left;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        .matrix-table tr:nth-child(even) td:not(:first-child) {
+            background: #fafafa;
+        }
+
+        .matrix-table tr:hover td:not(:first-child) {
+            background: #e8f5e8;
+            transition: background-color 0.3s ease;
+        }
+
+        .permission-cell {
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+            font-size: 12px;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .permission-read { background: #d4edda; color: #155724; }
+        .permission-write { background: #fff3cd; color: #856404; }
+        .permission-execute { background: #cce5ff; color: #004085; }
+        .permission-delete { background: #f8d7da; color: #721c24; }
+        .permission-admin { background: #e2e3e5; color: #383d41; }
+        .permission-none { background: #ffffff; color: #999; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .summary {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .summary h3 {
+            color: #2d5016;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2d5016;
+        }
+
+        .summary-card h4 {
+            color: #2d5016;
+            margin-bottom: 10px;
+        }
+
+        .summary-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .summary-card li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .summary-card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #2d5016;
+            font-weight: bold;
+        }
+
+        .compliance-info {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .compliance-info h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .compliance-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .compliance-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #2d5016;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2d5016;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cascade Valley Electric Cooperative</h1>
+        <p>Access Control Matrix - NERC CIP Compliant</p>
+    </div>
+
+    <div class="container">
+        <div class="compliance-info">
+            <h3>Regulatory Compliance Framework</h3>
+            <p>This Access Control Matrix is designed to support compliance with critical energy sector cybersecurity standards and regulations.</p>
+            <div class="compliance-tags">
+                <span class="compliance-tag">NERC CIP-004 Personnel & Training</span>
+                <span class="compliance-tag">NERC CIP-005 Electronic Security Perimeters</span>
+                <span class="compliance-tag">NERC CIP-006 Physical Security</span>
+                <span class="compliance-tag">IEC 62443 IACS Security</span>
+                <span class="compliance-tag">NIST CSF Access Control</span>
+                <span class="compliance-tag">DOE C2M2 Identity Management</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="roleFilter">Filter by Role:</label>
+                <select id="roleFilter">
+                    <option value="">All Roles</option>
+                    <option value="executive">Executive</option>
+                    <option value="operations">Operations</option>
+                    <option value="engineering">Engineering</option>
+                    <option value="it">IT/Security</option>
+                    <option value="field">Field Personnel</option>
+                    <option value="contractor">Contractors</option>
+                </select>
+
+                <label for="systemFilter">Filter by System:</label>
+                <select id="systemFilter">
+                    <option value="">All Systems</option>
+                    <option value="scada">SCADA/Control</option>
+                    <option value="corporate">Corporate IT</option>
+                    <option value="safety">Safety Systems</option>
+                    <option value="generation">Generation Assets</option>
+                    <option value="transmission">Transmission Assets</option>
+                </select>
+
+                <button class="btn" onclick="generateReport()">Generate Compliance Report</button>
+                <button class="btn" onclick="exportMatrix()">Export Matrix</button>
+            </div>
+
+            <div class="control-group">
+                <label for="searchUser">Search User:</label>
+                <input type="text" id="searchUser" placeholder="Enter username or role...">
+                <button class="btn" onclick="searchMatrix()">Search</button>
+                <button class="btn" onclick="resetMatrix()">Reset View</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color permission-read"></div>
+                <span>R - Read Only</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-write"></div>
+                <span>RW - Read/Write</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-execute"></div>
+                <span>RWE - Read/Write/Execute</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-delete"></div>
+                <span>RWED - Full Control</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-admin"></div>
+                <span>ADMIN - Administrative</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color permission-none"></div>
+                <span>- - No Access</span>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading Access Control Matrix...</p>
+        </div>
+
+        <div class="matrix-container">
+            <table class="matrix-table" id="matrixTable">
+                <thead>
+                    <tr>
+                        <th>User/Role</th>
+                        <th>SCADA HMI</th>
+                        <th>Generation Control</th>
+                        <th>Transmission SCADA</th>
+                        <th>Energy Management System</th>
+                        <th>Corporate Network</th>
+                        <th>Financial Systems</th>
+                        <th>Customer Database</th>
+                        <th>Engineering Workstations</th>
+                        <th>Historian Database</th>
+                        <th>Protection Systems</th>
+                        <th>Communication Networks</th>
+                        <th>Physical Access Controls</th>
+                        <th>Security Cameras</th>
+                        <th>Emergency Systems</th>
+                        <th>Backup Systems</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixBody">
+                    <!-- Matrix data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary">
+            <h3>Access Control Summary & Recommendations</h3>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>High-Risk Assets (NERC CIP High Impact)</h4>
+                    <ul>
+                        <li>SCADA HMI Systems - Restricted to certified operators</li>
+                        <li>Generation Control - Control room personnel only</li>
+                        <li>Protection Systems - Engineering staff with special authorization</li>
+                        <li>Transmission SCADA - Licensed system operators</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h4>Security Perimeter Controls</h4>
+                    <ul>
+                        <li>Electronic Security Perimeter (ESP) enforced</li>
+                        <li>Two-factor authentication for critical systems</li>
+                        <li>Role-based access control (RBAC) implementation</li>
+                        <li>Regular access reviews per CIP-004 requirements</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h4>Compliance Monitoring</h4>
+                    <ul>
+                        <li>Automated access logging per CIP-005</li>
+                        <li>Quarterly access certification reviews</li>
+                        <li>Annual security training requirements</li>
+                        <li>Incident response procedures documented</li>
+                    </ul>
+                </div>
+                <div class="summary-card">
+                    <h4>Physical Security Integration</h4>
+                    <ul>
+                        <li>Biometric access for control rooms</li>
+                        <li>Escort requirements for contractors</li>
+                        <li>Visitor management system</li>
+                        <li>Video surveillance monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define the access control matrix data
+        const matrixData = {
+            users: [
+                {name: "CEO - John Mitchell", role: "executive", dept: "Executive", clearance: "high"},
+                {name: "CTO - Sarah Chen", role: "executive", dept: "Executive", clearance: "high"},
+                {name: "System Operator - Mike Rodriguez", role: "operations", dept: "Operations", clearance: "high"},
+                {name: "Control Room Supervisor - Lisa Park", role: "operations", dept: "Operations", clearance: "high"},
+                {name: "Generation Manager - David Kim", role: "operations", dept: "Generation", clearance: "high"},
+                {name: "Transmission Engineer - Amy Johnson", role: "engineering", dept: "Engineering", clearance: "medium"},
+                {name: "Protection Engineer - Robert Smith", role: "engineering", dept: "Engineering", clearance: "high"},
+                {name: "IT Security Manager - Jennifer Wu", role: "it", dept: "IT", clearance: "high"},
+                {name: "Network Administrator - Carlos Martinez", role: "it", dept: "IT", clearance: "medium"},
+                {name: "Field Technician - Tom Wilson", role: "field", dept: "Field Ops", clearance: "low"},
+                {name: "Maintenance Crew - Steve Anderson", role: "field", dept: "Maintenance", clearance: "low"},
+                {name: "Financial Analyst - Rachel Green", role: "corporate", dept: "Finance", clearance: "low"},
+                {name: "Customer Service Rep - Maria Lopez", role: "corporate", dept: "Customer Svc", clearance: "low"},
+                {name: "External Contractor - ABC Engineering", role: "contractor", dept: "External", clearance: "restricted"},
+                {name: "Vendor Support - XYZ Systems", role: "contractor", dept: "External", clearance: "restricted"},
+                {name: "Intern - Alex Thompson", role: "intern", dept: "Various", clearance: "restricted"}
+            ],
+            systems: [
+                {name: "SCADA HMI", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Generation Control", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Transmission SCADA", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Energy Management System", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Corporate Network", type: "corporate", criticality: "medium", category: "Corporate IT"},
+                {name: "Financial Systems", type: "corporate", criticality: "medium", category: "Corporate IT"},
+                {name: "Customer Database", type: "corporate", criticality: "medium", category: "Corporate IT"},
+                {name: "Engineering Workstations", type: "engineering", criticality: "medium", category: "Engineering IT"},
+                {name: "Historian Database", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Protection Systems", type: "safety", criticality: "critical", category: "Critical Cyber Asset"},
+                {name: "Communication Networks", type: "scada", criticality: "high", category: "BES Cyber Asset"},
+                {name: "Physical Access Controls", type: "physical", criticality: "high", category: "PACS"},
+                {name: "Security Cameras", type: "physical", criticality: "medium", category: "Physical Security"},
+                {name: "Emergency Systems", type: "safety", criticality: "critical", category: "Emergency Response"},
+                {name: "Backup Systems", type: "corporate", criticality: "high", category: "Business Continuity"}
+            ]
+        };
+
+        // Permission levels and their display
+        const permissions = {
+            'none': {display: '-', class: 'permission-none', description: 'No Access'},
+            'read': {display: 'R', class: 'permission-read', description: 'Read Only'},
+            'write': {display: 'RW', class: 'permission-write', description: 'Read/Write'},
+            'execute': {display: 'RWE', class: 'permission-execute', description: 'Read/Write/Execute'},
+            'delete': {display: 'RWED', class: 'permission-delete', description: 'Full Control'},
+            'admin': {display: 'ADMIN', class: 'permission-admin', description: 'Administrative'}
+        };
+
+        // Define access permissions matrix
+        function getPermission(userRole, userClearance, systemType, systemCriticality) {
+            // Executive level access
+            if (userRole === 'executive') {
+                if (systemType === 'scada' || systemCriticality === 'critical') return 'read';
+                return 'write';
+            }
+            
+            // Operations personnel
+            if (userRole === 'operations') {
+                if (systemType === 'scada') return 'execute';
+                if (systemType === 'corporate') return 'read';
+                if (systemType === 'physical') return 'write';
+                return 'read';
+            }
+            
+            // Engineering personnel
+            if (userRole === 'engineering') {
+                if (systemType === 'scada') return 'write';
+                if (systemType === 'engineering') return 'execute';
+                if (systemCriticality === 'critical') return 'execute';
+                return 'read';
+            }
+            
+            // IT and Security personnel
+            if (userRole === 'it') {
+                if (systemType === 'corporate') return 'admin';
+                if (systemType === 'physical') return 'admin';
+                if (systemType === 'scada') return 'write';
+                return 'execute';
+            }
+            
+            // Field personnel
+            if (userRole === 'field') {
+                if (systemType === 'physical') return 'read';
+                if (systemType === 'corporate') return 'none';
+                if (systemCriticality === 'critical') return 'none';
+                return 'read';
+            }
+            
+            // Corporate personnel
+            if (userRole === 'corporate') {
+                if (systemType === 'corporate') return 'write';
+                if (systemType === 'scada') return 'none';
+                if (systemCriticality === 'critical') return 'none';
+                return 'read';
+            }
+            
+            // Contractors
+            if (userRole === 'contractor') {
+                if (systemCriticality === 'critical' || systemCriticality === 'high') return 'none';
+                if (systemType === 'corporate') return 'read';
+                return 'none';
+            }
+            
+            // Interns and others
+            return 'none';
+        }
+
+        // Initialize the matrix
+        function initializeMatrix() {
+            const tbody = document.getElementById('matrixBody');
+            tbody.innerHTML = '';
+            
+            matrixData.users.forEach(user => {
+                const row = document.createElement('tr');
+                row.dataset.role = user.role;
+                row.dataset.clearance = user.clearance;
+                
+                // User name cell
+                const userCell = document.createElement('td');
+                userCell.innerHTML = `<strong>${user.name}</strong><br><small>${user.dept} | ${user.clearance.toUpperCase()}</small>`;
+                row.appendChild(userCell);
+                
+                // Permission cells for each system
+                matrixData.systems.forEach(system => {
+                    const cell = document.createElement('td');
+                    const permission = getPermission(user.role, user.clearance, system.type, system.criticality);
+                    const permData = permissions[permission];
+                    
+                    cell.className = `permission-cell ${permData.class}`;
+                    cell.textContent = permData.display;
+                    cell.title = `${user.name} - ${system.name}: ${permData.description}`;
+                    cell.dataset.permission = permission;
+                    cell.dataset.system = system.type;
+                    
+                    // Add click handler for permission modification
+                    cell.addEventListener('click', function() {
+                        togglePermission(this);
+                    });
+                    
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Toggle permission on click
+        function togglePermission(cell) {
+            const currentPerm = cell.dataset.permission;
+            const permKeys = Object.keys(permissions);
+            const currentIndex = permKeys.indexOf(currentPerm);
+            const nextIndex = (currentIndex + 1) % permKeys.length;
+            const nextPerm = permKeys[nextIndex];
+            const nextPermData = permissions[nextPerm];
+            
+            cell.dataset.permission = nextPerm;
+            cell.className = `permission-cell ${nextPermData.class}`;
+            cell.textContent = nextPermData.display;
+            
+            // Update tooltip
+            const title = cell.title.split(':')[0];
+            cell.title = `${title}: ${nextPermData.description}`;
+        }
+
+        // Filter functions
+        function filterMatrix() {
+            const roleFilter = document.getElementById('roleFilter').value;
+            const systemFilter = document.getElementById('systemFilter').value;
+            const rows = document.querySelectorAll('#matrixBody tr');
+            
+            rows.forEach(row => {
+                let showRow = true;
+                
+                if (roleFilter && row.dataset.role !== roleFilter) {
+                    showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+            
+            // Filter columns if system filter is applied
+            const table = document.getElementById('matrixTable');
+            const headers = table.querySelectorAll('th');
+            const allRows = table.querySelectorAll('tr');
+            
+            headers.forEach((header, index) => {
+                if (index === 0) return; // Skip user column
+                
+                let showColumn = true;
+                if (systemFilter) {
+                    const systemName = header.textContent;
+                    const system = matrixData.systems.find(s => s.name === systemName);
+                    if (system && system.type !== systemFilter) {
+                        showColumn = false;
+                    }
+                }
+                
+                allRows.forEach(row => {
+                    const cell = row.cells[index];
+                    if (cell) {
+                        cell.style.display = showColumn ? '' : 'none';
+                    }
+                });
+            });
+        }
+
+        // Search function
+        function searchMatrix() {
+            const searchTerm = document.getElementById('searchUser').value.toLowerCase();
+            const rows = document.querySelectorAll('#matrixBody tr');
+            
+            rows.forEach(row => {
+                const userCell = row.cells[0];
+                const userName = userCell.textContent.toLowerCase();
+                
+                if (userName.includes(searchTerm)) {
+                    row.style.display = '';
+                    row.style.backgroundColor = '#fffacd';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Reset matrix view
+        function resetMatrix() {
+            document.getElementById('roleFilter').value = '';
+            document.getElementById('systemFilter').value = '';
+            document.getElementById('searchUser').value = '';
+            
+            const rows = document.querySelectorAll('#matrixTable tr');
+            const cells = document.querySelectorAll('#matrixTable td, #matrixTable th');
+            
+            rows.forEach(row => {
+                row.style.display = '';
+                row.style.backgroundColor = '';
+            });
+            
+            cells.forEach(cell => {
+                cell.style.display = '';
+            });
+        }
+
+        // Generate compliance report
+        function generateReport() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                let report = 'CASCADE VALLEY ELECTRIC COOPERATIVE\n';
+                report += 'ACCESS CONTROL MATRIX COMPLIANCE REPORT\n';
+                report += '=====================================\n\n';
+                
+                report += 'NERC CIP COMPLIANCE SUMMARY:\n';
+                report += '- CIP-004: Personnel training and access management ✓\n';
+                report += '- CIP-005: Electronic Security Perimeter controls ✓\n';
+                report += '- CIP-006: Physical security measures ✓\n\n';
+                
+                report += 'HIGH-RISK SYSTEM ACCESS:\n';
+                matrixData.systems.filter(s => s.criticality === 'critical' || s.criticality === 'high').forEach(system => {
+                    report += `- ${system.name}: Restricted access enforced\n`;
+                });
+                
+                report += '\nRECOMMENDations:\n';
+                report += '- Quarterly access reviews required\n';
+                report += '- Enhanced monitoring for contractor access\n';
+                report += '- Regular security awareness training\n';
+                
+                // Create downloadable report
+                const blob = new Blob([report], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Cascade_Valley_Access_Control_Report.txt';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                alert('Compliance report generated and downloaded!');
+            }, 2000);
+        }
+
+        // Export matrix function
+        function exportMatrix() {
+            let csv = 'User/Role,';
+            csv += matrixData.systems.map(s => s.name).join(',') + '\n';
+            
+            matrixData.users.forEach(user => {
+                csv += `"${user.name} (${user.dept})",`;
+                const permissions = matrixData.systems.map(system => {
+                    const permission = getPermission(user.role, user.clearance, system.type, system.criticality);
+                    return permissions[permission].display;
+                });
+                csv += permissions.join(',') + '\n';
+            });
+            
+            // Create downloadable CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'Cascade_Valley_Access_Control_Matrix.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            alert('Access control matrix exported to CSV!');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMatrix();
+            
+            // Add event listeners for filters
+            document.getElementById('roleFilter').addEventListener('change', filterMatrix);
+            document.getElementById('systemFilter').addEventListener('change', filterMatrix);
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    document.getElementById('searchUser').focus();
+                }
+                if (e.key === 'Escape') {
+                    resetMatrix();
+                }
+            });
+            
+            // Add hover effects for better UX
+            const cells = document.querySelectorAll('.permission-cell');
+            cells.forEach(cell => {
+                cell.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                    this.style.zIndex = '100';
+                    this.style.boxShadow = '0 4px 15px rgba(45, 80, 22, 0.3)';
+                });
+                
+                cell.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.zIndex = 'auto';
+                    this.style.boxShadow = 'none';
+                });
+            });
+            
+            // Add tooltips for compliance information
+            const complianceTips = {
+                'SCADA HMI': 'NERC CIP-005: Electronic Security Perimeter required',
+                'Generation Control': 'NERC CIP-002: High Impact BES Cyber System',
+                'Protection Systems': 'NERC CIP-006: Critical Cyber Asset protection',
+                'Physical Access Controls': 'NERC CIP-006: Physical security measures'
+            };
+            
+            const headers = document.querySelectorAll('th');
+            headers.forEach(header => {
+                const systemName = header.textContent;
+                if (complianceTips[systemName]) {
+                    header.title = complianceTips[systemName];
+                    header.style.cursor = 'help';
+                }
+            });
+        });
+
+        // Auto-save functionality
+        let autoSaveInterval;
+        
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                const matrixState = captureMatrixState();
+                localStorage.setItem('cascadeValleyMatrix', JSON.stringify(matrixState));
+                console.log('Matrix state auto-saved');
+            }, 30000); // Save every 30 seconds
+        }
+        
+        function captureMatrixState() {
+            const state = {};
+            const rows = document.querySelectorAll('#matrixBody tr');
+            
+            rows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll('.permission-cell');
+                cells.forEach((cell, cellIndex) => {
+                    const key = `${rowIndex}-${cellIndex}`;
+                    state[key] = cell.dataset.permission;
+                });
+            });
+            
+            return state;
+        }
+        
+        function loadMatrixState() {
+            const savedState = localStorage.getItem('cascadeValleyMatrix');
+            if (savedState) {
+                try {
+                    const state = JSON.parse(savedState);
+                    const rows = document.querySelectorAll('#matrixBody tr');
+                    
+                    rows.forEach((row, rowIndex) => {
+                        const cells = row.querySelectorAll('.permission-cell');
+                        cells.forEach((cell, cellIndex) => {
+                            const key = `${rowIndex}-${cellIndex}`;
+                            if (state[key]) {
+                                const permission = state[key];
+                                const permData = permissions[permission];
+                                cell.dataset.permission = permission;
+                                cell.className = `permission-cell ${permData.class}`;
+                                cell.textContent = permData.display;
+                            }
+                        });
+                    });
+                    
+                    console.log('Matrix state loaded from storage');
+                } catch (e) {
+                    console.error('Error loading matrix state:', e);
+                }
+            }
+        }
+
+        // Compliance validation
+        function validateCompliance() {
+            const violations = [];
+            const rows = document.querySelectorAll('#matrixBody tr');
+            
+            rows.forEach(row => {
+                const userRole = row.dataset.role;
+                const clearance = row.dataset.clearance;
+                const cells = row.querySelectorAll('.permission-cell');
+                
+                cells.forEach((cell, index) => {
+                    const permission = cell.dataset.permission;
+                    const system = matrixData.systems[index];
+                    
+                    // Check for compliance violations
+                    if (userRole === 'contractor' && system.criticality === 'critical' && permission !== 'none') {
+                        violations.push(`Contractor access to critical system: ${system.name}`);
+                    }
+                    
+                    if (clearance === 'low' && system.criticality === 'high' && ['execute', 'delete', 'admin'].includes(permission)) {
+                        violations.push(`Insufficient clearance for high-impact system: ${system.name}`);
+                    }
+                });
+            });
+            
+            return violations;
+        }
+
+        // Real-time compliance monitoring
+        function monitorCompliance() {
+            const violations = validateCompliance();
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'complianceStatus';
+            statusDiv.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: ${violations.length > 0 ? '#dc3545' : '#28a745'};
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 12px;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            `;
+            
+            const existing = document.getElementById('complianceStatus');
+            if (existing) existing.remove();
+            
+            statusDiv.innerHTML = violations.length > 0 
+                ? `⚠️ ${violations.length} Compliance Issues`
+                : '✅ NERC CIP Compliant';
+            
+            document.body.appendChild(statusDiv);
+            
+            if (violations.length > 0) {
+                console.warn('Compliance violations detected:', violations);
+            }
+        }
+
+        // Initialize monitoring
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                monitorCompliance();
+                // loadMatrixState();
+                // startAutoSave();
+                
+                // Monitor for changes
+                const observer = new MutationObserver(monitorCompliance);
+                observer.observe(document.getElementById('matrixBody'), {
+                    attributes: true,
+                    subtree: true,
+                    attributeFilter: ['data-permission']
+                });
+            }, 1000);
+        });
+
+        // Print functionality
+        function printMatrix() {
+            window.print();
+        }
+
+        // Add print styles
+        const printStyles = document.createElement('style');
+        printStyles.textContent = `
+            @media print {
+                .controls, .btn { display: none !important; }
+                .matrix-container { box-shadow: none; }
+                .header { background: #2d5016 !important; }
+                body { background: white !important; }
+                .matrix-table { font-size: 10px; }
+                .matrix-table th, .matrix-table td { padding: 6px 4px; }
+            }
+        `;
+        document.head.appendChild(printStyles);
+    </script>
+</body>
+</html>
