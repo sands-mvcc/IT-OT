@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnergySec Summit 2025 - Cybersecurity Frameworks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #000;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #2d5016 0%, #1a3009 100%);
+            padding: 20px 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo p {
+            color: #b8d4a3;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-link.active {
+            background: #4a7c59;
+            box-shadow: 0 4px 15px rgba(74, 124, 89, 0.4);
+            border-left: 4px solid #ffffff;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(45, 80, 22, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .framework-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #2d5016;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #2d5016, #4a7c59, #2d5016);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .framework-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .framework-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .framework-card h3 {
+            color: #2d5016;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .framework-card p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .key-features {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .key-features h4 {
+            color: #2d5016;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2d5016;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: #2d5016;
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover {
+            background: #e8f5e8;
+            transition: background-color 0.3s ease;
+        }
+
+        .interactive-button {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+        }
+
+        .interactive-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 80, 22, 0.4);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-top: 4px solid #2d5016;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d5016;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .welcome-content {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-content h1 {
+            font-size: 3rem;
+            color: #2d5016;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .welcome-content p {
+            font-size: 1.3rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .framework-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Sidebar -->
+        <nav class="nav-sidebar">
+            <div class="logo">
+                <h1>EnergySec 2025</h1>
+                <p>Cybersecurity Frameworks</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#welcome" class="nav-link active" data-section="welcome">🏠 Welcome</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#nerc-cip" class="nav-link" data-section="nerc-cip">⚡ NERC CIP</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#iec-62443" class="nav-link" data-section="iec-62443">🏭 IEC 62443</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#nist-csf" class="nav-link" data-section="nist-csf">🛡️ NIST CSF</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doe-c2m2" class="nav-link" data-section="doe-c2m2">📊 DOE C2M2</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#comparison" class="nav-link" data-section="comparison">📋 Comparison</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <section id="welcome" class="content-section active">
+                <div class="welcome-content">
+                    <h1 class="pulse">EnergySec Summit 2025</h1>
+                    <p>Navigate the complex landscape of cybersecurity frameworks in the energy generation industry. This interactive tool provides comprehensive insights into the four critical frameworks that define modern energy sector cybersecurity.</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Key Frameworks</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">$1.3M</span>
+                            <span class="stat-label">Max NERC CIP Fine</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">356</span>
+                            <span class="stat-label">C2M2 Practices</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">13</span>
+                            <span class="stat-label">CIP Standards</span>
+                        </div>
+                    </div>
+                    
+                    <button class="interactive-button" onclick="showSection('nerc-cip')">Begin Exploration</button>
+                </div>
+            </section>
+
+            <!-- NERC CIP Section -->
+            <section id="nerc-cip" class="content-section">
+                <div class="section-header">
+                    <h2>NERC CIP Standards</h2>
+                    <p>Critical Infrastructure Protection for North American Bulk Electric System</p>
+                </div>
+                
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <h3>Mandatory Requirements</h3>
+                        <p>NERC CIP provides mandatory cybersecurity standards for the North American power industry, covering access control, personnel safety, physical security, network security, incident response, and disaster recovery.</p>
+                        
+                        <div class="key-features">
+                            <h4>Key Standards</h4>
+                            <ul class="feature-list">
+                                <li>CIP-002: BES Cyber System Categorization</li>
+                                <li>CIP-003: Security Management Controls</li>
+                                <li>CIP-004: Personnel & Training</li>
+                                <li>CIP-005: Electronic Security Perimeters</li>
+                                <li>CIP-006: Physical Security of BES Cyber Systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="framework-card">
+                        <h3>Enforcement & Compliance</h3>
+                        <p>Regulated by FERC with strict enforcement through the Compliance Monitoring and Enforcement Program (CMEP). Non-compliance can result in significant financial penalties.</p>
+                        
+                        <div class="key-features">
+                            <h4>Enforcement Mechanisms</h4>
+                            <ul class="feature-list">
+                                <li>Fines up to $1,291,894 per violation</li>
+                                <li>Mandatory corrective actions</li>
+                                <li>Regular audits and spot checks</li>
+                                <li>Sanctions for severe violations</li>
+                                <li>Public reporting of violations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="framework-card">
+                    <h3>Risk-Based Approach</h3>
+                    <p>NERC CIP employs a risk-based methodology requiring organizations to continuously assess threats and vulnerabilities, allocating resources based on risk levels to protect critical cyber assets that support the Bulk Electric System.</p>
+                </div>
+            </section>
+
+            <!-- IEC 62443 Section -->
+            <section id="iec-62443" class="content-section">
+                <div class="section-header">
+                    <h2>IEC 62443 Standards</h2>
+                    <p>International Standard for Industrial Automation and Control Systems Security</p>
+                </div>
+                
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <h3>Comprehensive IACS Security</h3>
+                        <p>IEC 62443 provides requirements and processes for implementing electronically secure industrial automation and control systems, addressing the unique cybersecurity challenges of OT environments.</p>
+                        
+                        <div class="key-features">
+                            <h4>Four Main Categories</h4>
+                            <ul class="feature-list">
+                                <li>General: Common concepts and terminology</li>
+                                <li>Policies & Procedures: Organizational requirements</li>
+                                <li>System: Technical requirements and risk assessment</li>
+                                <li>Component: Secure development lifecycle</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="framework-card">
+                        <h3>Energy Sector Application</h3>
+                        <p>Particularly relevant for utilities, with chapters 3-1 to 3-3 focusing on system security of critical infrastructure. Complements ISO 27001 by providing OT-specific guidance.</p>
+                        
+                        <div class="key-features">
+                            <h4>Key Benefits</h4>
+                            <ul class="feature-list">
+                                <li>Horizontal standard across industries</li>
+                                <li>Zone and conduit security model</li>
+                                <li>Security level classifications</li>
+                                <li>Lifecycle approach to security</li>
+                                <li>Vendor-neutral implementation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="framework-card">
+                    <h3>Continuous Improvement Process</h3>
+                    <p>IEC 62443 follows a Plan-Do-Check-Act (PDCA) cycle, emphasizing that cybersecurity is an ongoing process requiring continuous reassessment and improvement of risk situations and system efficiency.</p>
+                </div>
+            </section>
+
+            <!-- NIST CSF Section -->
+            <section id="nist-csf" class="content-section">
+                <div class="section-header">
+                    <h2>NIST Cybersecurity Framework</h2>
+                    <p>Voluntary Framework for Improving Critical Infrastructure Cybersecurity</p>
+                </div>
+                
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <h3>Five Core Functions</h3>
+                        <p>The NIST CSF provides a policy framework of computer security guidance for organizations to assess and improve their ability to prevent, detect, and respond to cyber attacks.</p>
+                        
+                        <div class="key-features">
+                            <h4>Core Functions</h4>
+                            <ul class="feature-list">
+                                <li>Identify: Asset management and risk assessment</li>
+                                <li>Protect: Access control and protective technology</li>
+                                <li>Detect: Anomaly detection and monitoring</li>
+                                <li>Respond: Response planning and communications</li>
+                                <li>Recover: Recovery planning and improvements</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="framework-card">
+                        <h3>Smart Grid Profile</h3>
+                        <p>NIST developed a specific Smart Grid Profile that provides cybersecurity risk management guidance tailored to power system owners and operators, addressing distributed energy resources.</p>
+                        
+                        <div class="key-features">
+                            <h4>Energy Applications</h4>
+                            <ul class="feature-list">
+                                <li>Grid modernization guidance</li>
+                                <li>Distributed energy resource security</li>
+                                <li>IT/OT convergence challenges</li>
+                                <li>Supply chain risk management</li>
+                                <li>Incident response coordination</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="framework-card">
+                    <h3>Framework Integration</h3>
+                    <p>NIST CSF serves as a common language for cybersecurity, easily mapping to other frameworks like NERC CIP and IEC 62443, enabling organizations to demonstrate compliance across multiple standards simultaneously.</p>
+                </div>
+            </section>
+
+            <!-- DOE C2M2 Section -->
+            <section id="doe-c2m2" class="content-section">
+                <div class="section-header">
+                    <h2>DOE C2M2 Model</h2>
+                    <p>Cybersecurity Capability Maturity Model for Energy Sector</p>
+                </div>
+                
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <h3>Maturity Assessment</h3>
+                        <p>C2M2 is a free tool helping organizations evaluate cybersecurity capabilities and optimize security investments through industry-vetted practices focused on both IT and OT environments.</p>
+                        
+                        <div class="key-features">
+                            <h4>10 Key Domains</h4>
+                            <ul class="feature-list">
+                                <li>Asset, Change, and Configuration Management</li>
+                                <li>Threat and Vulnerability Management</li>
+                                <li>Risk Management</li>
+                                <li>Identity and Access Management</li>
+                                <li>Situational Awareness</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="framework-card">
+                        <h3>Maturity Indicator Levels</h3>
+                        <p>C2M2 uses a progression scale from basic implementation to optimized performance, allowing organizations to benchmark their current state and plan improvement roadmaps.</p>
+                        
+                        <div class="key-features">
+                            <h4>Assessment Benefits</h4>
+                            <ul class="feature-list">
+                                <li>Self-evaluation in one day</li>
+                                <li>356 cybersecurity practices</li>
+                                <li>Detailed graphical reporting</li>
+                                <li>Investment prioritization</li>
+                                <li>Benchmarking capabilities</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="framework-card">
+                    <h3>Energy Sector Focus</h3>
+                    <p>Developed specifically for the energy industry with input from hundreds of energy sector stakeholders, C2M2 addresses the unique challenges of securing critical energy infrastructure and OT systems.</p>
+                </div>
+            </section>
+
+            <!-- Comparison Section -->
+            <section id="comparison" class="content-section">
+                <div class="section-header">
+                    <h2>Framework Comparison</h2>
+                    <p>Understanding the Relationships and Applications</p>
+                </div>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Framework</th>
+                                <th>Type</th>
+                                <th>Scope</th>
+                                <th>Enforcement</th>
+                                <th>Primary Focus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>NERC CIP</strong></td>
+                                <td>Mandatory Standard</td>
+                                <td>North American BES</td>
+                                <td>FERC Fines up to $1.3M</td>
+                                <td>Electric Grid Protection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IEC 62443</strong></td>
+                                <td>International Standard</td>
+                                <td>Industrial Control Systems</td>
+                                <td>Voluntary/Regulatory</td>
+                                <td>OT/IACS Security</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NIST CSF</strong></td>
+                                <td>Voluntary Framework</td>
+                                <td>All Critical Infrastructure</td>
+                                <td>Voluntary</td>
+                                <td>Risk Management</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DOE C2M2</strong></td>
+                                <td>Maturity Model</td>
+                                <td>Energy Sector</td>
+                                <td>Voluntary Assessment</td>
+                                <td>Capability Measurement</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="framework-grid">
+                    <div class="framework-card">
+                        <h3>Integration Strategy</h3>
+                        <p>Most energy organizations employ multiple frameworks simultaneously, leveraging their complementary strengths to address comprehensive cybersecurity requirements.</p>
+                        
+                        <div class="key-features">
+                            <h4>Best Practices</h4>
+                            <ul class="feature-list">
+                                <li>Use NERC CIP for mandatory compliance</li>
+                                <li>Apply IEC 62443 for OT security design</li>
+                                <li>Leverage NIST CSF for risk management</li>
+                                <li>Utilize C2M2 for maturity assessment</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="framework-card">
+                        <h3>Implementation Approach</h3>
+                        <p>Organizations should adopt a holistic approach, mapping frameworks to avoid duplication while ensuring comprehensive coverage of IT and OT environments.</p>
+                        
+                        <div class="key-features">
+                            <h4>Key Considerations</h4>
+                            <ul class="feature-list">
+                                <li>Regulatory requirements first</li>
+                                <li>Risk-based prioritization</li>
+                                <li>Continuous improvement mindset</li>
+                                <li>Cross-framework mapping</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const activeLink = document.querySelector(`[data-section="${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Event listeners for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            });
+            
+            // Add hover effects for cards
+            const cards = document.querySelectorAll('.framework-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // Animate stats on welcome page
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = stat.textContent;
+                if (!isNaN(finalValue.replace(/[^0-9.]/g, ''))) {
+                    animateValue(stat, 0, parseFloat(finalValue.replace(/[^0-9.]/g, '')), 2000, finalValue.includes('$'), finalValue.includes('M'));
+                }
+            });
+        });
+
+        // Animate number counting
+        function animateValue(element, start, end, duration, isCurrency = false, isMillion = false) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                
+                let displayValue = current.toString();
+                if (isCurrency) displayValue = '$' + displayValue;
+                if (isMillion) displayValue += 'M';
+                
+                element.textContent = displayValue;
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Add interactive button functionality
+        document.querySelectorAll('.interactive-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const sections = ['welcome', 'nerc-cip', 'iec-62443', 'nist-csf', 'doe-c2m2', 'comparison'];
+            const currentSection = document.querySelector('.content-section.active').id;
+            const currentIndex = sections.indexOf(currentSection);
+            
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                const nextIndex = (currentIndex + 1) % sections.length;
+                showSection(sections[nextIndex]);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prevIndex = (currentIndex - 1 + sections.length) % sections.length;
+                showSection(sections[prevIndex]);
+            }
+        });
+
+        // Add section transition effects
+        function addTransitionEffects() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.framework-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // Initialize transition effects
+        addTransitionEffects();
+
+        // Add responsive navigation toggle for mobile
+        function createMobileToggle() {
+            if (window.innerWidth <= 768) {
+                const nav = document.querySelector('.nav-sidebar');
+                const main = document.querySelector('.main-content');
+                
+                // Create mobile toggle button
+                const toggleBtn = document.createElement('button');
+                toggleBtn.innerHTML = '☰';
+                toggleBtn.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    z-index: 1001;
+                    background: #2d5016;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    font-size: 18px;
+                    cursor: pointer;
+                `;
+                
+                document.body.appendChild(toggleBtn);
+                
+                let navVisible = false;
+                toggleBtn.addEventListener('click', () => {
+                    navVisible = !navVisible;
+                    nav.style.transform = navVisible ? 'translateX(0)' : 'translateX(-100%)';
+                    nav.style.position = 'fixed';
+                    nav.style.transition = 'transform 0.3s ease';
+                });
+            }
+        }
+
+        // Initialize mobile features
+        window.addEventListener('resize', createMobileToggle);
+        createMobileToggle();
+
+        // Add smooth scroll behavior for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Add focus management for accessibility
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('focus', function() {
+                this.style.outline = '2px solid #ffffff';
+                this.style.outlineOffset = '2px';
+            });
+            
+            link.addEventListener('blur', function() {
+                this.style.outline = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
