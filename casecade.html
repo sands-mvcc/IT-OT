@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cascade Valley Electric Cooperative - Interactive Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo::before {
+            content: "⚡";
+            margin-right: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+
+        .nav-item {
+            margin: 0;
+        }
+
+        .nav-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .section {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 2px solid #2c5530;
+        }
+
+        .hero h1 {
+            color: #2c5530;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #2c5530;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #2c5530;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card h3 {
+            color: #4a7c59;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .org-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .dept-card {
+            background: #f8f9fa;
+            border: 2px solid #2c5530;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .dept-card:hover {
+            background: #2c5530;
+            color: white;
+        }
+
+        .dept-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .dept-count {
+            font-size: 1.5rem;
+            color: #4a7c59;
+        }
+
+        .dept-card:hover .dept-count {
+            color: white;
+        }
+
+        .infrastructure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .asset-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .asset-item {
+            background: #f8f9fa;
+            margin: 0.5rem 0;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border-left: 3px solid #2c5530;
+            transition: all 0.3s ease;
+        }
+
+        .asset-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .risk-meter {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .risk-bar {
+            flex-grow: 1;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 1rem;
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .risk-low { background: #4a7c59; }
+        .risk-medium { background: #ffc107; }
+        .risk-high { background: #dc3545; }
+
+        .interactive-btn {
+            background: #2c5530;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .interactive-btn:hover {
+            background: #4a7c59;
+            transform: translateY(-2px);
+        }
+
+        .hidden-info {
+            display: none;
+            background: #f8f9fa;
+            border-left: 4px solid #2c5530;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">CVEC Profile</div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#overview" class="nav-link active">Overview</a></li>
+                    <li class="nav-item"><a href="#organization" class="nav-link">Organization</a></li>
+                    <li class="nav-item"><a href="#infrastructure" class="nav-link">Infrastructure</a></li>
+                    <li class="nav-item"><a href="#cybersecurity" class="nav-link">Cybersecurity</a></li>
+                    <li class="nav-item"><a href="#facilities" class="nav-link">Facilities</a></li>
+                    <li class="nav-item"><a href="#risks" class="nav-link">Risk Assessment</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Overview Section -->
+        <section id="overview" class="section active">
+            <div class="hero">
+                <h1>Cascade Valley Electric Cooperative</h1>
+                <p>Serving rural communities in the Columbia River Gorge region since 1952</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">12,500</span>
+                    <div class="stat-label">Customers Served</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">850</span>
+                    <div class="stat-label">Square Miles Coverage</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">1,280</span>
+                    <div class="stat-label">Miles of Lines</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">68</span>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Company Information</h2>
+                <p><strong>Founded:</strong> 1952</p>
+                <p><strong>Type:</strong> Rural Electric Cooperative</p>
+                <p><strong>Headquarters:</strong> Hood River, Washington</p>
+                <p><strong>Service Territory:</strong> Rural communities in Columbia River Gorge (WA & OR)</p>
+                <p><strong>Peak Demand:</strong> 45 MW</p>
+                <p><strong>Annual Energy Sales:</strong> 285 GWh</p>
+                <p><strong>Average Rate:</strong> $0.11/kWh</p>
+            </div>
+
+            <div class="card">
+                <h2>Mission Statement</h2>
+                <p>To provide safe, reliable, and affordable electricity to rural communities while maintaining strong environmental stewardship and community engagement.</p>
+            </div>
+
+            <div class="alert-box">
+                <strong>Audit Focus:</strong> This interactive profile is designed for cybersecurity compliance audit training. Pay attention to IT/OT infrastructure, security controls, and risk factors throughout each section.
+            </div>
+        </section>
+
+        <!-- Organization Section -->
+        <section id="organization" class="section">
+            <div class="card">
+                <h2>Organizational Structure</h2>
+                <p>Total Full-Time Equivalent Employees: <strong>68</strong></p>
+            </div>
+
+            <div class="org-chart">
+                <div class="dept-card">
+                    <div class="dept-title">Executive Leadership</div>
+                    <div class="dept-count">4</div>
+                    <small>CEO, CFO, Asst. GM, Board Secretary</small>
+                </div>
+                <div class="dept-card">
+                    <div class="dept-title">Operations</div>
+                    <div class="dept-count">28</div>
+                    <small>Linemen, Operators, Technicians</small>
+                </div>
+                <div class="dept-card">
+                    <div class="dept-title">Engineering</div>
+                    <div class="dept-count">12</div>
+                    <small>Engineers, GIS, Construction</small>
+                </div>
+                <div class="dept-card">
+                    <div class="dept-title">Customer Services</div>
+                    <div class="dept-count">14</div>
+                    <small>Service Reps, Billing, Communications</small>
+                </div>
+                <div class="dept-card">
+                    <div class="dept-title">Administration</div>
+                    <div class="dept-count">10</div>
+                    <small>HR, Accounting, IT, Safety</small>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Key Personnel with System Access</h2>
+                <button class="interactive-btn" onclick="toggleInfo('critical-access')">Show Critical Access Personnel</button>
+                <div id="critical-access" class="hidden-info">
+                    <h3>High-Privilege Access Users:</h3>
+                    <ul>
+                        <li><strong>System Operators (2):</strong> 24/7 SCADA control access</li>
+                        <li><strong>IT Support Specialists (2):</strong> Administrative access to all systems</li>
+                        <li><strong>Chief Engineer:</strong> Engineering systems and protection settings</li>
+                        <li><strong>Operations Manager:</strong> Field operations and maintenance systems</li>
+                        <li><strong>General Manager:</strong> Executive dashboard and reporting systems</li>
+                    </ul>
+                    <div class="alert-box">
+                        <strong>Audit Note:</strong> These personnel require enhanced background checks and regular access reviews per NERC CIP requirements.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Workforce Challenges</h2>
+                <div class="risk-meter">
+                    <span>Retirement Risk:</span>
+                    <div class="risk-bar">
+                        <div class="risk-fill risk-high" style="width: 75%"></div>
+                    </div>
+                    <span>35% eligible within 10 years</span>
+                </div>
+                <ul>
+                    <li>Knowledge transfer programs in development</li>
+                    <li>Apprenticeship programs for technical positions</li>
+                    <li>Cross-training initiatives to reduce single points of failure</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Infrastructure Section -->
+        <section id="infrastructure" class="section">
+            <div class="card">
+                <h2>IT Infrastructure Overview</h2>
+                <p>Total IT Assets: <strong>142 devices</strong></p>
+            </div>
+
+            <div class="infrastructure-grid">
+                <div class="card">
+                    <h3>Servers & Virtualization</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">12 Physical Servers</li>
+                        <li class="asset-item">4 Virtualization Hosts</li>
+                        <li class="asset-item">28 Virtual Machines</li>
+                        <li class="asset-item">600 sq ft Data Center</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>End-User Devices</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">72 Desktop Workstations</li>
+                        <li class="asset-item">18 Laptops (Field Personnel)</li>
+                        <li class="asset-item">12 Ruggedized Tablets</li>
+                        <li class="asset-item">15 Printers/MFDs</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Network Infrastructure</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">24 Managed Switches</li>
+                        <li class="asset-item">8 Routers</li>
+                        <li class="asset-item">6 Wireless Access Points</li>
+                        <li class="asset-item">Fiber Backbone Network</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Operational Technology (OT) Systems</h2>
+                <button class="interactive-btn" onclick="toggleInfo('scada-details')">View SCADA Infrastructure</button>
+                <div id="scada-details" class="hidden-info">
+                    <h3>SCADA System Components:</h3>
+                    <ul>
+                        <li><strong>Master Station:</strong> Redundant servers with GE iFIX HMI</li>
+                        <li><strong>RTUs:</strong> 28 Remote Terminal Units at substations</li>
+                        <li><strong>Communication:</strong> DNP3 over IP, serial, and radio</li>
+                        <li><strong>Data Historian:</strong> PI System for archiving and analytics</li>
+                    </ul>
+                    <div class="success-box">
+                        <strong>Security Note:</strong> All SCADA communications are encrypted and use industrial firewalls for network segmentation.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Generation & Distribution Assets</h2>
+                <div class="infrastructure-grid">
+                    <div>
+                        <h3>Substations (8 total)</h3>
+                        <ul>
+                            <li>2 Transmission (115kV/25kV)</li>
+                            <li>6 Distribution (25kV/12.47kV)</li>
+                            <li>SEL Protection Relays</li>
+                            <li>Fiber + Cellular Backup</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Generation</h3>
+                        <ul>
+                            <li>2.5 MW Hydro Plant (1958)</li>
+                            <li>1.2 MW Solar Arrays</li>
+                            <li>3 Emergency Diesel Generators</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Smart Grid Implementation</h2>
+                <div class="risk-meter">
+                    <span>AMI Deployment:</span>
+                    <div class="risk-bar">
+                        <div class="risk-fill risk-medium" style="width: 68%"></div>
+                    </div>
+                    <span>8,500 of 12,500 meters</span>
+                </div>
+                <ul>
+                    <li>45 Automated distribution switches</li>
+                    <li>18 Automated capacitor banks</li>
+                    <li>125 Fault indicators</li>
+                    <li>Target: 100% AMI deployment by 2026</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Cybersecurity Section -->
+        <section id="cybersecurity" class="section">
+            <div class="card">
+                <h2>Cybersecurity Infrastructure</h2>
+                <div class="alert-box">
+                    <strong>Compliance Framework:</strong> NERC CIP Standards, NIST Cybersecurity Framework
+                </div>
+            </div>
+
+            <div class="infrastructure-grid">
+                <div class="card">
+                    <h3>Network Security</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">2 Enterprise Firewalls (Primary/Backup)</li>
+                        <li class="asset-item">8 Industrial Firewalls (Substations)</li>
+                        <li class="asset-item">Network Segmentation (IT/OT)</li>
+                        <li class="asset-item">VPN Access Control</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Monitoring & Detection</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">24/7 Managed SIEM Service</li>
+                        <li class="asset-item">Network Traffic Analysis</li>
+                        <li class="asset-item">Endpoint Detection & Response</li>
+                        <li class="asset-item">NRECA Essence Program</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Identity & Access</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">Active Directory</li>
+                        <li class="asset-item">Multi-Factor Authentication</li>
+                        <li class="asset-item">Role-Based Access Control</li>
+                        <li class="asset-item">Privileged Account Management</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Security Assessment</h2>
+                <button class="interactive-btn" onclick="showSecurityMetrics()">Analyze Security Posture</button>
+                <div id="security-metrics" class="hidden-info">
+                    <h3>Current Security Metrics:</h3>
+                    <div class="risk-meter">
+                        <span>Patch Management:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 85%"></div>
+                        </div>
+                        <span>85% compliant</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Employee Training:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-low" style="width: 95%"></div>
+                        </div>
+                        <span>95% completion</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Backup Testing:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-low" style="width: 100%"></div>
+                        </div>
+                        <span>Monthly verified</span>
+                    </div>
+                    <div class="alert-box">
+                        <strong>Recommendation:</strong> Improve patch management processes to achieve 95%+ compliance within 60 days.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Incident Response Capabilities</h2>
+                <ul>
+                    <li><strong>Response Team:</strong> 5 trained personnel (IT, Operations, Management)</li>
+                    <li><strong>Communication Plan:</strong> Automated notification system</li>
+                    <li><strong>Recovery Procedures:</strong> Documented playbooks for major scenarios</li>
+                    <li><strong>External Support:</strong> 24/7 managed security services contract</li>
+                </ul>
+                <button class="interactive-btn" onclick="toggleInfo('incident-contacts')">Show Emergency Contacts</button>
+                <div id="incident-contacts" class="hidden-info">
+                    <h3>Emergency Response Contacts:</h3>
+                    <ul>
+                        <li><strong>Internal CISO:</strong> (509) 555-0101</li>
+                        <li><strong>Managed SOC:</strong> (800) 555-CYBER</li>
+                        <li><strong>FBI Cyber Division:</strong> (855) 292-3937</li>
+                        <li><strong>NRECA Cyber Support:</strong> (703) 907-5500</li>
+                        <li><strong>Washington State Patrol:</strong> (360) 596-4000</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="facilities" class="section">
+            <div class="card">
+                <h2>Physical Infrastructure</h2>
+                <p>CVEC operates multiple facilities across its service territory to ensure reliable power delivery.</p>
+            </div>
+
+            <div class="infrastructure-grid">
+                <div class="card">
+                    <h3>Headquarters Complex</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">12,000 sq ft Main Building</li>
+                        <li class="asset-item">8,000 sq ft Warehouse</li>
+                        <li class="asset-item">4-Bay Vehicle Garage</li>
+                        <li class="asset-item">200kW Backup Generator</li>
+                    </ul>
+                    <button class="interactive-btn" onclick="toggleInfo('hq-security')">Security Details</button>
+                    <div id="hq-security" class="hidden-info">
+                        <strong>Physical Security Measures:</strong>
+                        <ul>
+                            <li>Card-based access control system</li>
+                            <li>12 IP surveillance cameras</li>
+                            <li>Monitored intrusion detection</li>
+                            <li>24/7 security patrol service</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Field Facilities</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">Satellite Office (Oregon) - 2,000 sq ft</li>
+                        <li class="asset-item">3 Material Storage Yards</li>
+                        <li class="asset-item">8 Substation Control Houses</li>
+                        <li class="asset-item">Emergency Response Trailers (2)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Vehicle Fleet</h3>
+                    <ul class="asset-list">
+                        <li class="asset-item">12 Line/Bucket Trucks</li>
+                        <li class="asset-item">8 Service Pickup Trucks</li>
+                        <li class="asset-item">6 Administrative Vehicles</li>
+                        <li class="asset-item">GPS Tracking on All Vehicles</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Physical Security Assessment</h2>
+                <button class="interactive-btn" onclick="assessPhysicalSecurity()">Evaluate Physical Security</button>
+                <div id="physical-assessment" class="hidden-info">
+                    <h3>Security Posture Analysis:</h3>
+                    <div class="risk-meter">
+                        <span>Access Control:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-low" style="width: 90%"></div>
+                        </div>
+                        <span>Strong</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Video Surveillance:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 70%"></div>
+                        </div>
+                        <span>Adequate</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Perimeter Security:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 75%"></div>
+                        </div>
+                        <span>Moderate</span>
+                    </div>
+                    <div class="alert-box">
+                        <strong>Recommendation:</strong> Consider additional camera coverage at remote substation locations and enhanced perimeter lighting.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Environmental & Safety Features</h2>
+                <ul>
+                    <li><strong>Fire Suppression:</strong> Automated systems in data center and control rooms</li>
+                    <li><strong>Climate Control:</strong> Redundant HVAC systems for critical facilities</li>
+                    <li><strong>Emergency Power:</strong> UPS systems and backup generators</li>
+                    <li><strong>Safety Equipment:</strong> PPE storage, eye wash stations, AED units</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Risk Assessment Section -->
+        <section id="risks" class="section">
+            <div class="card">
+                <h2>Comprehensive Risk Assessment</h2>
+                <p>Analysis of operational, cybersecurity, and business risks facing CVEC.</p>
+            </div>
+
+            <div class="card">
+                <h2>Cybersecurity Risk Profile</h2>
+                <button class="interactive-btn" onclick="showCyberRisks()">Analyze Cyber Risks</button>
+                <div id="cyber-risks" class="hidden-info">
+                    <h3>Primary Cyber Threats:</h3>
+                    <div class="risk-meter">
+                        <span>Ransomware:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-high" style="width: 85%"></div>
+                        </div>
+                        <span>High Risk</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Social Engineering:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-high" style="width: 80%"></div>
+                        </div>
+                        <span>High Risk</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Supply Chain:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 70%"></div>
+                        </div>
+                        <span>Medium Risk</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Insider Threats:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 60%"></div>
+                        </div>
+                        <span>Medium Risk</span>
+                    </div>
+                    <div class="alert-box">
+                        <strong>Critical Finding:</strong> Legacy SCADA equipment at 3 substations lacks modern security features. Recommend immediate upgrade planning.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Operational Risk Factors</h2>
+                <div class="infrastructure-grid">
+                    <div>
+                        <h3>Natural Hazards</h3>
+                        <ul>
+                            <li><strong>Wildfire:</strong> High risk during summer months</li>
+                            <li><strong>Ice Storms:</strong> Regional weather pattern concern</li>
+                            <li><strong>Earthquakes:</strong> Cascadia subduction zone proximity</li>
+                            <li><strong>Flooding:</strong> Columbia River gorge vulnerability</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Infrastructure Aging</h3>
+                        <ul>
+                            <li><strong>Distribution Lines:</strong> 25% over 40 years old</li>
+                            <li><strong>Transformers:</strong> 15% nearing end-of-life</li>
+                            <li><strong>SCADA System:</strong> Some components from 2008</li>
+                            <li><strong>Control Systems:</strong> Mixed vintage equipment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Business Continuity Assessment</h2>
+                <button class="interactive-btn" onclick="showBusinessContinuity()">Evaluate BCP Readiness</button>
+                <div id="bcp-assessment" class="hidden-info">
+                    <h3>Business Continuity Capabilities:</h3>
+                    <div class="risk-meter">
+                        <span>Backup Systems:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-low" style="width: 90%"></div>
+                        </div>
+                        <span>Excellent</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Recovery Procedures:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-low" style="width: 85%"></div>
+                        </div>
+                        <span>Good</span>
+                    </div>
+                    <div class="risk-meter">
+                        <span>Staff Cross-Training:</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill risk-medium" style="width: 65%"></div>
+                        </div>
+                        <span>Needs Improvement</span>
+                    </div>
+                    <div class="success-box">
+                        <strong>Strength:</strong> Mutual aid agreements with 12 neighboring utilities provide excellent emergency response capability.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Regulatory Compliance Status</h2>
+                <div class="infrastructure-grid">
+                    <div>
+                        <h3>NERC CIP Compliance</h3>
+                        <ul>
+                            <li><strong>CIP-002:</strong> Asset identification - Compliant</li>
+                            <li><strong>CIP-003:</strong> Security management - Compliant</li>
+                            <li><strong>CIP-007:</strong> System security - 95% compliant</li>
+                            <li><strong>CIP-011:</strong> Information protection - Compliant</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Other Regulations</h3>
+                        <ul>
+                            <li><strong>NIST Framework:</strong> Tier 2 implementation</li>
+                            <li><strong>State PUC:</strong> All filings current</li>
+                            <li><strong>Environmental:</strong> Clean Air Act compliant</li>
+                            <li><strong>Safety:</strong> OSHA compliance - No violations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Risk Mitigation Strategies</h2>
+                <button class="interactive-btn" onclick="showMitigation()">View Action Plan</button>
+                <div id="risk-mitigation" class="hidden-info">
+                    <h3>Priority Risk Mitigation Actions:</h3>
+                    <ol>
+                        <li><strong>Cybersecurity Enhancement (Q2 2025):</strong>
+                            <ul>
+                                <li>Upgrade 3 legacy SCADA RTUs</li>
+                                <li>Implement zero-trust network architecture</li>
+                                <li>Enhanced security awareness training</li>
+                            </ul>
+                        </li>
+                        <li><strong>Infrastructure Modernization (2025-2027):</strong>
+                            <ul>
+                                <li>Complete AMI meter deployment</li>
+                                <li>Replace aging distribution equipment</li>
+                                <li>Upgrade substation protection systems</li>
+                            </ul>
+                        </li>
+                        <li><strong>Workforce Development (Ongoing):</strong>
+                            <ul>
+                                <li>Expand apprenticeship programs</li>
+                                <li>Knowledge transfer documentation</li>
+                                <li>Cross-training initiatives</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <div class="alert-box">
+                        <strong>Budget Impact:</strong> Total risk mitigation investments: $8.2M over 3 years
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Audit Recommendations Summary</h2>
+                <div class="alert-box">
+                    <strong>For Student Review:</strong> Based on this risk assessment, what would be your top 3 recommendations for improving CVEC's cybersecurity posture?
+                </div>
+                <button class="interactive-btn" onclick="showAuditSummary()">Show Auditor Findings</button>
+                <div id="audit-summary" class="hidden-info">
+                    <h3>Key Audit Findings:</h3>
+                    <div class="success-box">
+                        <strong>Strengths:</strong>
+                        <ul>
+                            <li>Strong incident response capabilities</li>
+                            <li>Comprehensive backup and recovery procedures</li>
+                            <li>Effective employee security training program</li>
+                            <li>Good physical security at critical facilities</li>
+                        </ul>
+                    </div>
+                    <div class="alert-box">
+                        <strong>Areas for Improvement:</strong>
+                        <ul>
+                            <li>Legacy SCADA equipment security vulnerabilities</li>
+                            <li>Patch management process inconsistencies</li>
+                            <li>Limited network segmentation between IT/OT systems</li>
+                            <li>Workforce knowledge transfer risks due to retirements</li>
+                        </ul>
+                    </div>
+                    <h3>Recommended Priority Actions:</h3>
+                    <ol>
+                        <li><strong>Immediate (0-90 days):</strong> Upgrade legacy SCADA RTUs, improve patch management</li>
+                        <li><strong>Short-term (3-12 months):</strong> Enhance network segmentation, security monitoring</li>
+                        <li><strong>Long-term (1-3 years):</strong> Complete grid modernization, workforce development</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Cascade Valley Electric Cooperative - Interactive Profile for Educational Use</p>
+        <p>This is a fictitious utility created for cybersecurity compliance training purposes</p>
+    </footer>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+            }
+            
+            // Add active class to clicked nav link
+            const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+        // Add click event listeners to navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('href').substring(1);
+                    showSection(sectionId);
+                });
+            });
+        });
+
+        // Interactive functionality
+        function toggleInfo(elementId) {
+            const element = document.getElementById(elementId);
+            if (element.style.display === 'none' || element.style.display === '') {
+                element.style.display = 'block';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+
+        function showSecurityMetrics() {
+            const element = document.getElementById('security-metrics');
+            element.style.display = 'block';
+            // Animate the risk bars
+            setTimeout(() => {
+                const riskBars = element.querySelectorAll('.risk-fill');
+                riskBars.forEach(bar => {
+                    bar.style.transition = 'width 2s ease-in-out';
+                });
+            }, 100);
+        }
+
+        function assessPhysicalSecurity() {
+            const element = document.getElementById('physical-assessment');
+            element.style.display = 'block';
+            // Animate the risk bars
+            setTimeout(() => {
+                const riskBars = element.querySelectorAll('.risk-fill');
+                riskBars.forEach(bar => {
+                    bar.style.transition = 'width 2s ease-in-out';
+                });
+            }, 100);
+        }
+
+        function showCyberRisks() {
+            const element = document.getElementById('cyber-risks');
+            element.style.display = 'block';
+            // Animate the risk bars
+            setTimeout(() => {
+                const riskBars = element.querySelectorAll('.risk-fill');
+                riskBars.forEach(bar => {
+                    bar.style.transition = 'width 2s ease-in-out';
+                });
+            }, 100);
+        }
+
+        function showBusinessContinuity() {
+            const element = document.getElementById('bcp-assessment');
+            element.style.display = 'block';
+            // Animate the risk bars
+            setTimeout(() => {
+                const riskBars = element.querySelectorAll('.risk-fill');
+                riskBars.forEach(bar => {
+                    bar.style.transition = 'width 2s ease-in-out';
+                });
+            }, 100);
+        }
+
+        function showMitigation() {
+            toggleInfo('risk-mitigation');
+        }
+
+        function showAuditSummary() {
+            toggleInfo('audit-summary');
+        }
+
+        // Add smooth scrolling and entrance animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat cards on page load
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Add hover effects to department cards
+            const deptCards = document.querySelectorAll('.dept-card');
+            deptCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Initialize risk bar animations
+            const riskBars = document.querySelectorAll('.risk-fill');
+            riskBars.forEach(bar => {
+                const targetWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = targetWidth;
+                }, 500);
+            });
+        });
+
+        // Educational interaction tracking
+        let interactionCount = 0;
+        const originalToggleInfo = toggleInfo;
+        
+        function trackInteraction() {
+            interactionCount++;
+            if (interactionCount === 5) {
+                alert('Great job exploring! You\'ve discovered 5 interactive elements. This kind of detailed investigation is crucial for effective cybersecurity audits.');
+            }
+        }
+
+        // Override toggleInfo to track interactions
+        window.toggleInfo = function(elementId) {
+            trackInteraction();
+            originalToggleInfo(elementId);
+        };
+
+        // Add educational tooltips
+        function addTooltips() {
+            const tooltipElements = [
+                { selector: '.stat-number', text: 'Click on different sections to explore this utility\'s infrastructure' },
+                { selector: '.risk-high', text: 'High risk areas require immediate attention in your audit' },
+                { selector: '.interactive-btn', text: 'Interactive elements provide deeper insights for your audit' }
+            ];
+
+            tooltipElements.forEach(tooltip => {
+                const elements = document.querySelectorAll(tooltip.selector);
+                elements.forEach(el => {
+                    el.title = tooltip.text;
+                });
+            });
+        }
+
+        // Initialize tooltips when page loads
+        document.addEventListener('DOMContentLoaded', addTooltips);
+    </script>
+</body>
+</html>
