@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT/OT Convergence Cybersecurity Workshop - Interactive Outline</title>
+    <title>Moraine Valley Community College AI Innovation Portal</title>
     <style>
         * {
             margin: 0;
@@ -13,288 +13,88 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: white;
+            color: black;
             line-height: 1.6;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            color: #1a1a1a;
+            padding: 20px;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #2c5530 0%, #1e3a20 100%);
+            background: linear-gradient(135deg, #2d5016, #4a7c28);
             color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(44, 85, 48, 0.3);
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
-            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .header p {
-            font-size: 1.1rem;
-            text-align: center;
-            opacity: 0.9;
-        }
-
-        .progress-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #2c5530;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2c5530 0%, #4a7c59 100%);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 10px;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-weight: bold;
-            color: #2c5530;
-        }
-
-        .navigation {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .nav-btn {
-            background: #2c5530;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .nav-btn:hover {
-            background: #4a7c59;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(44, 85, 48, 0.3);
-        }
-
-        .workshop-part {
-            background: white;
-            margin-bottom: 30px;
-            border-radius: 15px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border-left: 6px solid #2c5530;
-            transition: all 0.3s ease;
-        }
-
-        .workshop-part:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-        }
-
-        .part-header {
-            background: linear-gradient(135deg, #2c5530 0%, #1e3a20 100%);
-            color: white;
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .part-header:hover {
-            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
-        }
-
-        .part-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-        }
-
-        .part-duration {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        .toggle-icon {
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .part-content {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
-
-        .part-content.active {
-            max-height: 2000px;
-            padding: 30px;
-        }
-
-        .learning-objectives {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 4px solid #2c5530;
-        }
-
-        .objectives-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-
-        .objectives-title {
             font-size: 1.2rem;
-            font-weight: bold;
-            color: #2c5530;
-            margin-bottom: 10px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
 
-        .objectives-list {
-            display: none;
+        .search-container {
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid green;
         }
 
-        .objectives-list.show {
-            display: block;
-        }
-
-        .objective-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #4a7c28;
+            border-radius: 25px;
+            outline: none;
             transition: all 0.3s ease;
         }
 
-        .objective-item:hover {
-            background: #f0f8f0;
-            transform: translateX(5px);
+        .search-box:focus {
+            border-color: #2d5016;
+            box-shadow: 0 0 10px rgba(74, 124, 40, 0.3);
         }
 
-        .objective-checkbox {
-            margin-right: 12px;
-            margin-top: 3px;
-            cursor: pointer;
-            accent-color: #2c5530;
-        }
-
-        .objective-text {
-            flex: 1;
-            color: #1a1a1a;
-        }
-
-        .section-content {
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            color: #2c5530;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .subsection {
-            margin-bottom: 20px;
-        }
-
-        .subsection h4 {
-            color: #1e3a20;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .subsection ul {
-            padding-left: 20px;
-        }
-
-        .subsection li {
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .activity-box {
-            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border-left: 4px solid #2c5530;
-        }
-
-        .activity-title {
-            font-weight: bold;
-            color: #2c5530;
-            margin-bottom: 8px;
-        }
-
-        .summary-section {
-            background: white;
+        .content {
             padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-            border-left: 6px solid #2c5530;
         }
 
-        .completion-tracker {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .completion-stats {
+        .repo-stats {
             display: flex;
             justify-content: space-around;
-            margin-top: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+            border-radius: 10px;
+            border-left: 5px solid green;
         }
 
         .stat-item {
@@ -304,1001 +104,797 @@
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #2c5530;
+            color: #2d5016;
         }
 
         .stat-label {
             font-size: 0.9rem;
             color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .print-btn {
-            background: #1a1a1a;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
             transition: all 0.3s ease;
-            margin-left: 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .print-btn:hover {
-            background: #333;
-            transform: translateY(-2px);
+        .file-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(74, 124, 40, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .file-item:hover::before {
+            left: 100%;
+        }
+
+        .file-item:hover {
+            border-color: green;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #4a7c28;
+        }
+
+        .file-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #2d5016;
+        }
+
+        .file-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .file-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .category-filter {
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #4a7c28;
+            color: #4a7c28;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #4a7c28;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4a7c28;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
             .header h1 {
                 font-size: 2rem;
             }
             
-            .nav-buttons {
-                flex-direction: column;
+            .file-grid {
+                grid-template-columns: 1fr;
             }
             
-            .part-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
-            }
-            
-            .completion-stats {
+            .repo-stats {
                 flex-direction: column;
                 gap: 15px;
-            }
-        }
-
-        @media print {
-            .navigation, .completion-tracker, .print-btn {
-                display: none;
-            }
-            
-            .part-content {
-                max-height: none !important;
-                padding: 20px !important;
-            }
-            
-            .workshop-part {
-                break-inside: avoid;
-                page-break-inside: avoid;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>IT/OT Convergence Cybersecurity Workshop</h1>
-            <p>Enhanced Professional Development Program - Interactive Outline</p>
+        <header class="header">
+            <h1>🚀 Moraine Valley Community College</h1>
+            <p>AI Innovation Portal - OT/IT Cybersecurity Training Resources</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchBox" class="search-box" placeholder="🔍 Search OT/IT cybersecurity training resources...">
         </div>
 
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-text" id="progressText">Workshop Progress: 0% Complete</div>
-        </div>
-
-        <div class="completion-tracker">
-            <h3>Learning Progress</h3>
-            <div class="completion-stats">
+        <div class="content">
+            <div class="repo-stats">
                 <div class="stat-item">
-                    <div class="stat-number" id="completedObjectives">0</div>
-                    <div class="stat-label">Objectives Completed</div>
+                    <div class="stat-number" id="totalFiles">47</div>
+                    <div class="stat-label">Training Modules</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number" id="totalObjectives">36</div>
-                    <div class="stat-label">Total Objectives</div>
+                    <div class="stat-number" id="totalFolders">10</div>
+                    <div class="stat-label">Categories</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number" id="partsCompleted">0</div>
-                    <div class="stat-label">Parts Completed</div>
+                    <div class="stat-number" id="lastUpdated">Active</div>
+                    <div class="stat-label">Status</div>
                 </div>
             </div>
-        </div>
 
-        <div class="navigation">
-            <div class="nav-buttons">
-                <a href="#part1" class="nav-btn">Part 1: Foundations</a>
-                <a href="#part2" class="nav-btn">Part 2: IT Infrastructure</a>
-                <a href="#part3" class="nav-btn">Part 3: OT Deep Dive</a>
-                <a href="#part4" class="nav-btn">Part 4: Threat Landscape</a>
-                <a href="#part5" class="nav-btn">Part 5: Security Frameworks</a>
-                <a href="#part6" class="nav-btn">Part 6: Governance</a>
-                <button onclick="window.print()" class="print-btn">Print Outline</button>
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">All Resources</button>
+                <button class="filter-btn" data-category="protocols">Protocols</button>
+                <button class="filter-btn" data-category="simulation">Simulations</button>
+                <button class="filter-btn" data-category="security">Security</button>
+                <button class="filter-btn" data-category="frameworks">Frameworks</button>
+                <button class="filter-btn" data-category="tools">Tools</button>
+                <button class="filter-btn" data-category="case-studies">Case Studies</button>
+                <button class="filter-btn" data-category="curriculum">Curriculum</button>
+                <button class="filter-btn" data-category="labs">Labs</button>
+                <button class="filter-btn" data-category="governance">Governance</button>
+                <button class="filter-btn" data-category="docs">Documentation</button>
             </div>
-        </div>
 
-        <div class="summary-section">
-            <h2>Workshop Overview</h2>
-            <p><strong>Duration:</strong> 2 Days (16 contact hours)</p>
-            <p><strong>Format:</strong> Hybrid Online/Hands-on Learning</p>
-            <p><strong>Target Audience:</strong> Community college faculty teaching cybersecurity, networking, industrial technology, or related courses</p>
-            
-            <h3 style="margin-top: 20px;">Enhanced Learning Outcomes</h3>
-            <p>Upon successful completion of this workshop, participants will be able to analyze and differentiate IT/OT systems, evaluate threat landscapes, apply security frameworks, design practical learning experiences, teach current industry practice, develop integrated curriculum, and assess student learning effectively.</p>
-        </div>
-
-        <!-- Part 1 -->
-        <div class="workshop-part" id="part1">
-            <div class="part-header" onclick="togglePart('part1')">
-                <div>
-                    <div class="part-title">Part 1: Foundations of IT/OT Convergence</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 1 Morning</div>
-                </div>
-                <div class="part-duration">4 hours</div>
-                <div class="toggle-icon" id="icon-part1">▼</div>
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading repository contents...</p>
             </div>
-            <div class="part-content" id="content-part1">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives1')">
-                        <div class="objectives-title">Learning Objectives for Part 1 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives1">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Define</strong> IT and OT systems with precise technical terminology and explain their historical development paths</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Compare and contrast</strong> the fundamental principles, priorities, and operational constraints of IT versus OT environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Analyze</strong> the business drivers and economic factors compelling organizations toward IT/OT convergence</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Evaluate</strong> the benefits and challenges of convergence from both technical and organizational perspectives</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Identify</strong> key components and technologies within each domain and their integration points</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Create</strong> visual representations of IT/OT system architectures for use in student instruction</div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="section-content">
-                    <div class="section-title">1.1 Understanding the Convergence Imperative</div>
-                    <div class="subsection">
-                        <h4>Digital Transformation Drivers</h4>
-                        <ul>
-                            <li>Industry 4.0 and Industrial Internet of Things (IIoT) adoption</li>
-                            <li>Improved efficiency and productivity through predictive maintenance, real-time analytics, and optimized operations</li>
-                            <li>Economic impact: Enhanced competitiveness and operational resilience</li>
-                            <li>Remote monitoring and data-driven decision making</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Business Benefits and Challenges</h4>
-                        <ul>
-                            <li>Cost reduction through unified systems, streamlined processes, and lower operational costs</li>
-                            <li>Enhanced regulatory compliance and audit capabilities</li>
-                            <li>Innovation opportunities and competitive advantages</li>
-                            <li>Cultural and operational integration challenges</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">1.2 Defining Information Technology (IT) Systems</div>
-                    <div class="subsection">
-                        <h4>Core Principles and Architecture</h4>
-                        <ul>
-                            <li>CIA Triad: Confidentiality, Integrity, Availability</li>
-                            <li>Network-centric design and connectivity paradigms</li>
-                            <li>Standardized communication protocols and interfaces</li>
-                            <li>Scalability and flexibility considerations</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Key Components and Technologies</h4>
-                        <ul>
-                            <li>Computing devices: servers, workstations, mobile devices</li>
-                            <li>Network infrastructure: routers, switches, firewalls, wireless access points</li>
-                            <li>Communication protocols: TCP/IP stack, HTTP/HTTPS, DNS, DHCP</li>
-                            <li>Enterprise applications and cloud services</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">1.3 Defining Operational Technology (OT) Systems</div>
-                    <div class="subsection">
-                        <h4>Core Principles and Architecture</h4>
-                        <ul>
-                            <li>Safety, reliability, and uptime as primary concerns</li>
-                            <li>Real-time performance requirements and deterministic behavior</li>
-                            <li>Physical process control and monitoring focus</li>
-                            <li>Legacy system considerations and long lifecycle management</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Industrial Control Systems (ICS) Components</h4>
-                        <ul>
-                            <li>Programmable Logic Controllers (PLCs) and Distributed Control Systems (DCS)</li>
-                            <li>Supervisory Control and Data Acquisition (SCADA) systems</li>
-                            <li>Human-Machine Interfaces (HMIs) and operator workstations</li>
-                            <li>Field devices: sensors, actuators, and smart instruments</li>
-                            <li>Industrial protocols: Modbus, DNP3, IEC 61850, OPC-UA, Profibus</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">1.4 The Convergence Reality</div>
-                    <div class="subsection">
-                        <h4>Current State Assessment</h4>
-                        <ul>
-                            <li>Historical "air-gapped" OT networks versus modern connectivity requirements</li>
-                            <li>Three accepted approaches: separate networks, unified networks, and hybrid architectures</li>
-                            <li>Integration challenges and technical hurdles</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Hands-on Activity:</div>
-                    Network Topology Analysis Exercise using Cisco Packet Tracer
-                </div>
+            <div id="fileGrid" class="file-grid" style="display: none;">
+                <!-- Repository files will be populated here -->
             </div>
-        </div>
 
-        <!-- Part 2 -->
-        <div class="workshop-part" id="part2">
-            <div class="part-header" onclick="togglePart('part2')">
-                <div>
-                    <div class="part-title">Part 2: Modern IT Infrastructure in Converged Environments</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 1 Afternoon</div>
-                </div>
-                <div class="part-duration">4 hours</div>
-                <div class="toggle-icon" id="icon-part2">▼</div>
+            <div id="noResults" class="no-results" style="display: none;">
+                <h3>📚 OT/IT Cybersecurity Training Portal</h3>
+                <p>Interactive training modules for operational technology and cybersecurity education</p>
             </div>
-            <div class="part-content" id="content-part2">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives2')">
-                        <div class="objectives-title">Learning Objectives for Part 2 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives2">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Categorize</strong> modern IT infrastructure components and their roles in supporting OT integration</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Configure</strong> essential network services (DHCP, DNS, NTP) in simulation environments for teaching purposes</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Design</strong> network architectures that accommodate both IT and OT requirements and constraints</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Apply</strong> security services and access control mechanisms appropriate for converged environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Demonstrate</strong> hands-on configuration of IT services using industry-standard tools and simulators</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Develop</strong> lab exercises that illustrate IT infrastructure concepts for student learning</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">2.1 Core IT Infrastructure Components</div>
-                    <div class="subsection">
-                        <h4>Computing and Processing Systems</h4>
-                        <ul>
-                            <li>Servers: physical, virtual, and cloud-based architectures</li>
-                            <li>Edge computing devices for distributed processing</li>
-                            <li>Workstations and endpoint devices</li>
-                            <li>Mobile and tablet integration strategies</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Network Infrastructure and Services</h4>
-                        <ul>
-                            <li>Network devices: enterprise switches, routers, and security appliances</li>
-                            <li>Wireless technologies: 802.11 standards, 5G/6G integration</li>
-                            <li>Communication media: fiber optic, copper, and wireless transmission</li>
-                            <li>Network addressing: IPv4, IPv6, and port management</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">2.2 Essential Network Services for IT/OT Integration</div>
-                    <div class="subsection">
-                        <h4>Core Infrastructure Services</h4>
-                        <ul>
-                            <li>Dynamic Host Configuration Protocol (DHCP) for automated addressing</li>
-                            <li>Domain Name System (DNS) for name resolution</li>
-                            <li>Network Time Protocol (NTP) for synchronization</li>
-                            <li>Simple Network Management Protocol (SNMP) for monitoring</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Security and Access Services</h4>
-                        <ul>
-                            <li>IEEE 802.1X for network access control</li>
-                            <li>Virtual Private Network (VPN) services for secure remote access</li>
-                            <li>Intrusion Detection/Prevention Systems (IDS/IPS)</li>
-                            <li>Network segmentation and micro-segmentation strategies</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">2.3 Enterprise Software and Emerging Technologies</div>
-                    <div class="subsection">
-                        <h4>Business Applications</h4>
-                        <ul>
-                            <li>Enterprise Resource Planning (ERP) systems</li>
-                            <li>Manufacturing Execution Systems (MES)</li>
-                            <li>Customer Relationship Management (CRM) platforms</li>
-                            <li>Business Intelligence (BI) and analytics tools</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Emerging Technology Integration</h4>
-                        <ul>
-                            <li>Artificial Intelligence (AI) and Machine Learning (ML) applications</li>
-                            <li>Cloud computing: IaaS, PaaS, and SaaS models</li>
-                            <li>Big data analytics and data lakes</li>
-                            <li>Blockchain for supply chain and data integrity</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Hands-on Activity:</div>
-                    Configure IT services in a simulated environment
-                </div>
-            </div>
-        </div>
-
-        <!-- Part 3 -->
-        <div class="workshop-part" id="part3">
-            <div class="part-header" onclick="togglePart('part3')">
-                <div>
-                    <div class="part-title">Part 3: Operational Technology Deep Dive</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Morning</div>
-                </div>
-                <div class="part-duration">4 hours</div>
-                <div class="toggle-icon" id="icon-part3">▼</div>
-            </div>
-            <div class="part-content" id="content-part3">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives3')">
-                        <div class="objectives-title">Learning Objectives for Part 3 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives3">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Identify</strong> and classify IIoT devices, sensors, and their specific industrial applications</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Explain</strong> the function and operation of industrial control systems including PLCs, SCADA, and DCS</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Differentiate</strong> between various industrial communication protocols and their security implications</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Simulate</strong> OT device configurations and protocol communications using appropriate tools</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Assess</strong> the unique operational requirements and constraints of OT systems in real-time environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Create</strong> practical exercises that demonstrate OT concepts and hands-on skills for students</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">3.1 Industrial Internet of Things (IIoT) Ecosystem</div>
-                    <div class="subsection">
-                        <h4>Smart Sensor Technologies</h4>
-                        <ul>
-                            <li>Environmental monitoring: temperature, humidity, pressure, chemical detection</li>
-                            <li>Equipment monitoring: vibration, proximity, flow, and position sensors</li>
-                            <li>Safety systems: fire detection, gas detection, and flood monitoring</li>
-                            <li>Advanced sensor technologies: wireless, battery-powered, and self-diagnosing</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Control and Automation Devices</h4>
-                        <ul>
-                            <li>Actuators and control elements</li>
-                            <li>RFID and asset tracking systems</li>
-                            <li>Edge computing gateways and protocol converters</li>
-                            <li>Industrial communication interfaces</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">3.2 Industrial Control Systems Architecture</div>
-                    <div class="subsection">
-                        <h4>Control System Fundamentals</h4>
-                        <ul>
-                            <li>Analog-to-digital conversion and signal processing</li>
-                            <li>Real-time control loops and feedback systems</li>
-                            <li>Safety Instrumented Systems (SIS) and fail-safe design</li>
-                            <li>Redundancy and fault tolerance mechanisms</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Modern Control Platforms</h4>
-                        <ul>
-                            <li>Advanced PLCs with embedded security features</li>
-                            <li>Distributed Control Systems (DCS) with cybersecurity capabilities</li>
-                            <li>SCADA systems and centralized monitoring</li>
-                            <li>Cyber-physical systems integration</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">3.3 OT Communication Protocols and Standards</div>
-                    <div class="subsection">
-                        <h4>Traditional Industrial Protocols</h4>
-                        <ul>
-                            <li>Modbus RTU/TCP for device communication</li>
-                            <li>DNP3 for utility and SCADA applications</li>
-                            <li>Profibus and Profinet for manufacturing automation</li>
-                            <li>IEC 61850 for electrical substation automation</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Modern Secure Protocols</h4>
-                        <ul>
-                            <li>OPC-UA with security extensions</li>
-                            <li>Ethernet/IP with CIP Security</li>
-                            <li>Secure communication standards and encryption</li>
-                            <li>Protocol gateway and translation services</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Hands-on Activity:</div>
-                    Configure OT devices and protocols in simulation environment
-                </div>
-            </div>
-        </div>
-
-        <!-- Part 4 -->
-        <div class="workshop-part" id="part4">
-            <div class="part-header" onclick="togglePart('part4')">
-                <div>
-                    <div class="part-title">Part 4: Current Threat Landscape and Attack Vectors</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
-                </div>
-                <div class="part-duration">2 hours</div>
-                <div class="toggle-icon" id="icon-part4">▼</div>
-            </div>
-            <div class="part-content" id="content-part4">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives4')">
-                        <div class="objectives-title">Learning Objectives for Part 4 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives4">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Analyze</strong> current threat actors, their motivations, and attack methodologies targeting IT/OT environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Evaluate</strong> real-world attack vectors and their potential impact on industrial operations and critical infrastructure</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Examine</strong> case studies of actual IT/OT security incidents and extract relevant lessons learned</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Assess</strong> vulnerability patterns and risk factors specific to converged environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Apply</strong> threat modeling techniques to hypothetical IT/OT scenarios</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Design</strong> case study-based learning activities that engage students in threat analysis</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">4.1 Contemporary Threat Actor Analysis</div>
-                    <div class="subsection">
-                        <h4>Nation-State Actors</h4>
-                        <ul>
-                            <li>Advanced Persistent Threats (APTs) targeting critical infrastructure</li>
-                            <li>Recent examples including Stuxnet and German steel mill attacks</li>
-                            <li>Geopolitical motivations and strategic objectives</li>
-                            <li>Attribution challenges and intelligence sharing</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Cybercriminal Organizations</h4>
-                        <ul>
-                            <li>Ransomware-as-a-Service (RaaS) operators</li>
-                            <li>Double and triple extortion tactics</li>
-                            <li>Supply chain attack methodologies</li>
-                            <li>Financial motivation and business disruption goals</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Insider Threats and Human Factors</h4>
-                        <ul>
-                            <li>Privileged access abuse scenarios</li>
-                            <li>Unintentional security violations</li>
-                            <li>Social engineering and phishing campaigns</li>
-                            <li>Contractor and third-party risks</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">4.2 Attack Vectors and Current Statistics</div>
-                    <div class="subsection">
-                        <h4>Primary Attack Pathways</h4>
-                        <ul>
-                            <li>IT network breaches leading to OT compromise (48% of OT incidents)</li>
-                            <li>Phishing attacks targeting OT personnel</li>
-                            <li>Supply chain compromises affecting industrial equipment</li>
-                            <li>Remote access vulnerabilities in converged environments</li>
-                            <li>Legacy system exploitation due to unpatched vulnerabilities</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Real-World Impact Assessment</h4>
-                        <ul>
-                            <li>Manufacturing companies integrating IT and OT systems experiencing enhanced production efficiency but introducing vulnerabilities</li>
-                            <li>Water treatment facility attacks affecting public health</li>
-                            <li>Energy sector disruptions and grid stability concerns</li>
-                            <li>Transportation system vulnerabilities and cascading effects</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">4.3 Case Study Analysis</div>
-                    <div class="subsection">
-                        <h4>Manufacturing Sector Incidents</h4>
-                        <ul>
-                            <li>Production line disruptions and economic impact</li>
-                            <li>Quality control system compromises</li>
-                            <li>Intellectual property theft scenarios</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Critical Infrastructure Events</h4>
-                        <ul>
-                            <li>Water treatment facility security breaches</li>
-                            <li>Electrical grid and energy distribution attacks</li>
-                            <li>Transportation system vulnerabilities</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Interactive Activity:</div>
-                    Threat modeling exercise using real case studies
-                </div>
-            </div>
-        </div>
-
-        <!-- Part 5 -->
-        <div class="workshop-part" id="part5">
-            <div class="part-header" onclick="togglePart('part5')">
-                <div>
-                    <div class="part-title">Part 5: Security Frameworks and Controls Implementation</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
-                </div>
-                <div class="part-duration">2 hours</div>
-                <div class="toggle-icon" id="icon-part5">▼</div>
-            </div>
-            <div class="part-content" id="content-part5">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives5')">
-                        <div class="objectives-title">Learning Objectives for Part 5 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives5">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Compare</strong> major security frameworks (IEC 62443, NIST SP 800-82, NIST CSF) and their applicability to IT/OT environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Apply</strong> framework requirements to specific IT/OT convergence scenarios and use cases</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Design</strong> security architectures incorporating Zero Trust principles and defense-in-depth strategies</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Implement</strong> risk assessment methodologies appropriate for converged industrial environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Map</strong> security controls across different frameworks to avoid duplication and ensure comprehensive coverage</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Develop</strong> framework-based curriculum modules and assessment rubrics for student evaluation</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">5.1 Industry-Standard Security Frameworks</div>
-                    <div class="subsection">
-                        <h4>IEC 62443 Comprehensive Framework</h4>
-                        <ul>
-                            <li>Four families of standards: General, Policies and Procedures, System, and Component standards</li>
-                            <li>Seven Foundational Requirements (FRs) with detailed Requirement Enhancements (REs)</li>
-                            <li>Zone and conduit model for network segmentation</li>
-                            <li>Security levels and risk assessment methodologies</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>NIST Special Publication 800-82</h4>
-                        <ul>
-                            <li>OT-specific guidance for industrial control systems security</li>
-                            <li>Integration with NIST Cybersecurity Framework</li>
-                            <li>OT overlay for NIST SP 800-53 Revision 5 security controls providing tailored security control baselines</li>
-                            <li>Performance, reliability, and safety considerations</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>NIST Cybersecurity Framework (CSF) 2.0</h4>
-                        <ul>
-                            <li>Five core functions: Identify, Protect, Detect, Respond, and Recover</li>
-                            <li>Framework profiles and implementation tiers for organizational maturity assessment</li>
-                            <li>Integration with industry-specific requirements</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">5.2 Integrated Security Architecture Design</div>
-                    <div class="subsection">
-                        <h4>Zero Trust Implementation</h4>
-                        <ul>
-                            <li>Zero Trust architecture essential to reduce vulnerabilities, ensuring both IT and OT environments are monitored and segmented</li>
-                            <li>Micro-segmentation strategies for OT networks</li>
-                            <li>Identity and access management (IAM) for converged environments</li>
-                            <li>Continuous verification and monitoring principles</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Defense in Depth Strategies</h4>
-                        <ul>
-                            <li>Layered defense principles for industrial environments</li>
-                            <li>Network segmentation and DMZ implementation</li>
-                            <li>Endpoint protection and device hardening</li>
-                            <li>Security monitoring and incident detection</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">5.3 Risk Management and Compliance</div>
-                    <div class="subsection">
-                        <h4>Risk Assessment Methodologies</h4>
-                        <ul>
-                            <li>ISO 31000 risk management principles adapted for IT/OT environments</li>
-                            <li>Asset inventory and criticality assessment</li>
-                            <li>Vulnerability identification and prioritization</li>
-                            <li>Business impact analysis for operational disruptions</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Regulatory Compliance Considerations</h4>
-                        <ul>
-                            <li>GDPR, NERC CIP, and regional regulatory frameworks</li>
-                            <li>NIS2 compliance using existing cybersecurity frameworks</li>
-                            <li>Audit preparation and documentation requirements</li>
-                            <li>Continuous compliance monitoring strategies</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Hands-on Activity:</div>
-                    Security framework mapping exercise
-                </div>
-            </div>
-        </div>
-
-        <!-- Part 6 -->
-        <div class="workshop-part" id="part6">
-            <div class="part-header" onclick="togglePart('part6')">
-                <div>
-                    <div class="part-title">Part 6: Governance, Implementation, and Continuous Improvement</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Day 2 Afternoon</div>
-                </div>
-                <div class="part-duration">2 hours</div>
-                <div class="toggle-icon" id="icon-part6">▼</div>
-            </div>
-            <div class="part-content" id="content-part6">
-                <div class="learning-objectives">
-                    <div class="objectives-header" onclick="toggleObjectives('objectives6')">
-                        <div class="objectives-title">Learning Objectives for Part 6 ▼</div>
-                    </div>
-                    <div class="objectives-list show" id="objectives6">
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Establish</strong> organizational governance structures and team integration strategies for IT/OT convergence programs</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Plan</strong> comprehensive asset management and incident response procedures for converged environments</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Implement</strong> continuous monitoring and improvement processes using industry best practices</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Create</strong> performance metrics and KPIs to measure security program effectiveness and maturity</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Synthesize</strong> all workshop concepts into a cohesive curriculum development plan</div>
-                        </div>
-                        <div class="objective-item">
-                            <input type="checkbox" class="objective-checkbox" onchange="updateProgress()">
-                            <div class="objective-text"><strong>Evaluate</strong> their own institutional readiness for implementing IT/OT convergence cybersecurity education</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">6.1 Organizational Structure and Governance</div>
-                    <div class="subsection">
-                        <h4>Leadership and Oversight</h4>
-                        <ul>
-                            <li>Chief Information Security Officer (CISO) responsibility for overall coordination and board reporting</li>
-                            <li>Cross-functional team development and management</li>
-                            <li>Executive sponsorship and resource allocation</li>
-                            <li>Board-level cybersecurity reporting and metrics</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>IT/OT Team Integration Strategies</h4>
-                        <ul>
-                            <li>Methods to ease transition including workshops to reconcile perspectives and cross-pollination of groups</li>
-                            <li>Building competencies and having OT engineers with the right technical skills, and CISOs with the right mindset about OT</li>
-                            <li>Communication protocols and collaboration frameworks</li>
-                            <li>Skills development and cross-training programs</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">6.2 Operational Implementation</div>
-                    <div class="subsection">
-                        <h4>Asset Management and Visibility</h4>
-                        <ul>
-                            <li>Comprehensive asset inventory for IT and OT systems</li>
-                            <li>Configuration management and change control</li>
-                            <li>Lifecycle management and refresh strategies</li>
-                            <li>Third-party and vendor risk management</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Incident Response and Recovery</h4>
-                        <ul>
-                            <li>Unified incident response procedures for IT/OT environments</li>
-                            <li>Communication protocols during security incidents</li>
-                            <li>Business continuity and disaster recovery planning</li>
-                            <li>Lessons learned and improvement processes</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section-content">
-                    <div class="section-title">6.3 Continuous Monitoring and Improvement</div>
-                    <div class="subsection">
-                        <h4>Security Operations Center (SOC) Integration</h4>
-                        <ul>
-                            <li>Integration of third parties with specific capabilities to address ongoing shortages in cybersecurity professionals</li>
-                            <li>Real-time monitoring and threat detection</li>
-                            <li>Security information and event management (SIEM) integration</li>
-                            <li>Automated response and orchestration capabilities</li>
-                        </ul>
-                    </div>
-                    <div class="subsection">
-                        <h4>Performance Metrics and KPIs</h4>
-                        <ul>
-                            <li>Security maturity assessment frameworks</li>
-                            <li>Risk reduction metrics and trend analysis</li>
-                            <li>Operational efficiency measurements</li>
-                            <li>Compliance status reporting and dashboards</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="activity-box">
-                    <div class="activity-title">Hands-on Activity:</div>
-                    Develop governance framework template
-                </div>
-            </div>
-        </div>
-
-        <div class="summary-section">
-            <h2>Progressive Learning Objective Analysis</h2>
-            <p>The workshop's learning objectives are designed with intentional progression following Bloom's taxonomy, building from foundational knowledge to advanced application and synthesis:</p>
-            
-            <h3>Knowledge Foundation (Parts 1-3):</h3>
-            <ul>
-                <li><strong>Remember & Understand:</strong> Define, identify, and explain core IT/OT concepts</li>
-                <li><strong>Apply:</strong> Configure systems and demonstrate technical skills in simulation environments</li>
-                <li><strong>Analyze:</strong> Compare, contrast, and categorize different technologies and approaches</li>
-            </ul>
-            
-            <h3>Critical Application (Parts 4-5):</h3>
-            <ul>
-                <li><strong>Analyze:</strong> Evaluate threats, assess risks, and examine real-world case studies</li>
-                <li><strong>Apply:</strong> Implement frameworks and design security architectures</li>
-                <li><strong>Evaluate:</strong> Compare frameworks and assess their effectiveness in various scenarios</li>
-            </ul>
-            
-            <h3>Advanced Synthesis (Part 6):</h3>
-            <ul>
-                <li><strong>Create:</strong> Develop comprehensive governance structures and curriculum materials</li>
-                <li><strong>Synthesize:</strong> Integrate all concepts into cohesive educational programs</li>
-                <li><strong>Evaluate:</strong> Assess institutional readiness and program effectiveness</li>
-            </ul>
-            
-            <h3>Cross-Cutting Competencies:</h3>
-            <p>Throughout all parts, participants develop the ability to design practical learning experiences, create teaching materials and curriculum resources, and develop industry-relevant case studies and exercises.</p>
         </div>
     </div>
 
     <script>
-        function togglePart(partId) {
-            const content = document.getElementById('content-' + partId);
-            const icon = document.getElementById('icon-' + partId);
-            
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                content.classList.add('active');
-                icon.style.transform = 'rotate(180deg)';
+        // Repository data for MVCC OT Training Portal
+        const repositoryData = [
+            {
+                name: "Actuator Simulation",
+                type: "file",
+                category: "simulation",
+                description: "Interactive simulation for understanding actuator behavior and control systems",
+                size: "HTML",
+                modified: "Active",
+                icon: "⚙️",
+                url: "https://sands-mvcc.github.io/ot/actuators.html"
+            },
+            {
+                name: "BACnet/IP Protocol Overview",
+                type: "file",
+                category: "protocols",
+                description: "Comprehensive overview of Building Automation and Control Networks Internet Protocol",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏢",
+                url: "https://sands-mvcc.github.io/ot/bacnet.html"
+            },
+            {
+                name: "Instructor Bio",
+                type: "file",
+                category: "docs",
+                description: "Information about the course instructor and expertise",
+                size: "HTML",
+                modified: "Active",
+                icon: "👨‍🏫",
+                url: "https://sands-mvcc.github.io/ot/bio.html"
+            },
+            {
+                name: "Bluetooth Protocol Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Interactive training module for Bluetooth communication protocols",
+                size: "HTML",
+                modified: "Active",
+                icon: "📱",
+                url: "https://sands-mvcc.github.io/ot/bluetooth.html"
+            },
+            {
+                name: "Case Study: Cascade Valley Electric Cooperative",
+                type: "file",
+                category: "case-studies",
+                description: "Real-world case study examining cybersecurity in electric utility operations",
+                size: "HTML",
+                modified: "Active",
+                icon: "⚡",
+                url: "https://sands-mvcc.github.io/ot/cascade.html"
+            },
+            {
+                name: "Case Study 2",
+                type: "file",
+                category: "case-studies",
+                description: "Additional case study for practical cybersecurity analysis",
+                size: "HTML",
+                modified: "Active",
+                icon: "📋",
+                url: "https://sands-mvcc.github.io/ot/case1.html"
+            },
+            {
+                name: "Cisco Discovery Protocol Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Interactive training for Cisco Discovery Protocol implementation",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔍",
+                url: "https://sands-mvcc.github.io/ot/cdp.html"
+            },
+            {
+                name: "Checklist Dashboard",
+                type: "file",
+                category: "tools",
+                description: "Interactive dashboard for cybersecurity compliance checklists",
+                size: "HTML",
+                modified: "Active",
+                icon: "✅",
+                url: "https://sands-mvcc.github.io/ot/checklist.html"
+            },
+            {
+                name: "Configuration Management Platform v2.1",
+                type: "file",
+                category: "tools",
+                description: "Advanced configuration management and tracking platform",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔧",
+                url: "https://sands-mvcc.github.io/ot/configuration.html"
+            },
+            {
+                name: "CVE Matrix",
+                type: "file",
+                category: "security",
+                description: "Common Vulnerabilities and Exposures matrix for threat analysis",
+                size: "HTML",
+                modified: "Active",
+                icon: "🛡️",
+                url: "https://sands-mvcc.github.io/ot/cvec_matrix.html"
+            },
+            {
+                name: "DHCP Simulator DORA",
+                type: "file",
+                category: "protocols",
+                description: "Dynamic Host Configuration Protocol Discover, Offer, Request, Acknowledge simulator",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔄",
+                url: "https://sands-mvcc.github.io/ot/dhcp-dora.html"
+            },
+            {
+                name: "DHCP Pool Generator",
+                type: "file",
+                category: "tools",
+                description: "Tool for generating and managing DHCP address pools",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏊",
+                url: "https://sands-mvcc.github.io/ot/dhcp-pool.html"
+            },
+            {
+                name: "DHCP Training Tool",
+                type: "file",
+                category: "protocols",
+                description: "Comprehensive training tool for DHCP configuration and management",
+                size: "HTML",
+                modified: "Active",
+                icon: "🎯",
+                url: "https://sands-mvcc.github.io/ot/dhcptool.html"
+            },
+            {
+                name: "DNS Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Domain Name System interactive training module",
+                size: "HTML",
+                modified: "Active",
+                icon: "🌐",
+                url: "https://sands-mvcc.github.io/ot/dns.html"
+            },
+            {
+                name: "Interactive Ethernet Protocol Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Hands-on training for Ethernet protocol fundamentals",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔌",
+                url: "https://sands-mvcc.github.io/ot/ethernet.html"
+            },
+            {
+                name: "Landscape of Cybersecurity Frameworks",
+                type: "file",
+                category: "frameworks",
+                description: "Comprehensive overview of major cybersecurity frameworks and standards",
+                size: "HTML",
+                modified: "Active",
+                icon: "🗺️",
+                url: "https://sands-mvcc.github.io/ot/frameworkes.html"
+            },
+            {
+                name: "ICS Automated Bottle Filling",
+                type: "file",
+                category: "simulation",
+                description: "Industrial Control Systems simulation for automated manufacturing processes",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏭",
+                url: "https://sands-mvcc.github.io/ot/ics.html"
+            },
+            {
+                name: "IEC 62443 Framework",
+                type: "file",
+                category: "frameworks",
+                description: "International Electrotechnical Commission cybersecurity framework for industrial systems",
+                size: "HTML",
+                modified: "Active",
+                icon: "📊",
+                url: "https://sands-mvcc.github.io/ot/iec.html"
+            },
+            {
+                name: "IPv4 Subnetting Learning Simulator",
+                type: "file",
+                category: "protocols",
+                description: "Interactive simulator for learning IPv4 subnetting concepts",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔢",
+                url: "https://sands-mvcc.github.io/ot/ip.html"
+            },
+            {
+                name: "IPv4 Interactive Training Tool",
+                type: "file",
+                category: "protocols",
+                description: "Comprehensive IPv4 addressing and configuration training",
+                size: "HTML",
+                modified: "Active",
+                icon: "4️⃣",
+                url: "https://sands-mvcc.github.io/ot/ipv4.html"
+            },
+            {
+                name: "IPv6 Interactive Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Next-generation IP protocol training and simulation",
+                size: "HTML",
+                modified: "Active",
+                icon: "6️⃣",
+                url: "https://sands-mvcc.github.io/ot/ipv6.html"
+            },
+            {
+                name: "ISO 27001 Framework",
+                type: "file",
+                category: "frameworks",
+                description: "International Organization for Standardization information security management",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏛️",
+                url: "https://sands-mvcc.github.io/ot/iso.html"
+            },
+            {
+                name: "Class Lab Activities",
+                type: "file",
+                category: "labs",
+                description: "Collection of hands-on laboratory exercises and activities",
+                size: "HTML",
+                modified: "Active",
+                icon: "🧪",
+                url: "https://sands-mvcc.github.io/ot/labs.html"
+            },
+            {
+                name: "Media Access Control Addressing",
+                type: "file",
+                category: "protocols",
+                description: "MAC address structure, assignment, and management training",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏷️",
+                url: "https://sands-mvcc.github.io/ot/mac.html"
+            },
+            {
+                name: "Interactive Access Control Matrix Training Platform",
+                type: "file",
+                category: "security",
+                description: "Training platform for access control matrices and permissions",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔐",
+                url: "https://sands-mvcc.github.io/ot/matrix.html"
+            },
+            {
+                name: "Modbus Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Industrial communication protocol training for SCADA systems",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔗",
+                url: "https://sands-mvcc.github.io/ot/modbus.html"
+            },
+            {
+                name: "Network Address Translation Simulator",
+                type: "file",
+                category: "protocols",
+                description: "NAT configuration and troubleshooting simulation",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔀",
+                url: "https://sands-mvcc.github.io/ot/nat.html"
+            },
+            {
+                name: "Network Time Protocol Simulator",
+                type: "file",
+                category: "protocols",
+                description: "NTP synchronization and time management simulation",
+                size: "HTML",
+                modified: "Active",
+                icon: "⏰",
+                url: "https://sands-mvcc.github.io/ot/ntp.html"
+            },
+            {
+                name: "Open Platform Communications Unified Architecture",
+                type: "file",
+                category: "protocols",
+                description: "OPC UA industrial communication and interoperability training",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏗️",
+                url: "https://sands-mvcc.github.io/ot/opc.html"
+            },
+            {
+                name: "OT-Relevant IT Protocols",
+                type: "file",
+                category: "protocols",
+                description: "Overview of IT protocols relevant to operational technology environments",
+                size: "HTML",
+                modified: "Active",
+                icon: "🌉",
+                url: "https://sands-mvcc.github.io/ot/otprotocols.html"
+            },
+            {
+                name: "Course Outline",
+                type: "file",
+                category: "docs",
+                description: "Comprehensive course outline and learning objectives",
+                size: "HTML",
+                modified: "Active",
+                icon: "📋",
+                url: "https://sands-mvcc.github.io/ot/outline.html"
+            },
+            {
+                name: "Part 1: Understanding IT/OT Convergence",
+                type: "file",
+                category: "curriculum",
+                description: "Introduction to Information Technology and Operational Technology integration",
+                size: "HTML",
+                modified: "Active",
+                icon: "1️⃣",
+                url: "https://sands-mvcc.github.io/ot/part1.html"
+            },
+            {
+                name: "Part 2: Understanding IT Technologies",
+                type: "file",
+                category: "curriculum",
+                description: "Deep dive into Information Technology systems and protocols",
+                size: "HTML",
+                modified: "Active",
+                icon: "2️⃣",
+                url: "https://sands-mvcc.github.io/ot/part2.html"
+            },
+            {
+                name: "Part 3: Understanding OT Technologies",
+                type: "file",
+                category: "curriculum",
+                description: "Exploration of Operational Technology systems and protocols",
+                size: "HTML",
+                modified: "Active",
+                icon: "3️⃣",
+                url: "https://sands-mvcc.github.io/ot/part3.html"
+            },
+            {
+                name: "OT Threat Landscape",
+                type: "file",
+                category: "security",
+                description: "Analysis of cybersecurity threats targeting operational technology",
+                size: "HTML",
+                modified: "Active",
+                icon: "⚠️",
+                url: "https://sands-mvcc.github.io/ot/part4.html"
+            },
+            {
+                name: "IT/OT Convergence Overview",
+                type: "file",
+                category: "curriculum",
+                description: "Strategic overview of IT and OT system integration challenges",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔄",
+                url: "https://sands-mvcc.github.io/ot/part5.html"
+            },
+            {
+                name: "Master Governance, Risk Management, and Compliance",
+                type: "file",
+                category: "governance",
+                description: "Comprehensive GRC framework for cybersecurity management",
+                size: "HTML",
+                modified: "Active",
+                icon: "👑",
+                url: "https://sands-mvcc.github.io/ot/part6.html"
+            },
+            {
+                name: "Plan of Action & Milestones - Security Remediation Tracking",
+                type: "file",
+                category: "tools",
+                description: "POA&M tracking system for security remediation efforts",
+                size: "HTML",
+                modified: "Active",
+                icon: "📈",
+                url: "https://sands-mvcc.github.io/ot/poam.html"
+            },
+            {
+                name: "Cybersecurity Dashboard & Incident Management",
+                type: "file",
+                category: "tools",
+                description: "Real-time cybersecurity monitoring and incident response dashboard",
+                size: "HTML",
+                modified: "Active",
+                icon: "📊",
+                url: "https://sands-mvcc.github.io/ot/poam1.html"
+            },
+            {
+                name: "Interactive Organizational Profile & Security Management",
+                type: "file",
+                category: "tools",
+                description: "Organizational cybersecurity profile and management interface",
+                size: "HTML",
+                modified: "Active",
+                icon: "🏢",
+                url: "https://sands-mvcc.github.io/ot/profile.html"
+            },
+            {
+                name: "Protocol Overview Dashboard",
+                type: "file",
+                category: "protocols",
+                description: "Comprehensive dashboard for network and industrial protocols",
+                size: "HTML",
+                modified: "Active",
+                icon: "📡",
+                url: "https://sands-mvcc.github.io/ot/protocols.html"
+            },
+            {
+                name: "Transforming the Energy Sector Through Intelligent Automation",
+                type: "file",
+                category: "case-studies",
+                description: "Energy sector transformation and cybersecurity rationale study",
+                size: "HTML",
+                modified: "Active",
+                icon: "⚡",
+                url: "https://sands-mvcc.github.io/ot/rationale_energysec.html"
+            },
+            {
+                name: "SCADA Protocols Workshop",
+                type: "file",
+                category: "protocols",
+                description: "Supervisory Control and Data Acquisition protocols training workshop",
+                size: "HTML",
+                modified: "Active",
+                icon: "🎛️",
+                url: "https://sands-mvcc.github.io/ot/scada.html"
+            },
+            {
+                name: "Sensors Interactive Simulator",
+                type: "file",
+                category: "simulation",
+                description: "Interactive simulation for understanding sensor technologies and applications",
+                size: "HTML",
+                modified: "Active",
+                icon: "📡",
+                url: "https://sands-mvcc.github.io/ot/sensors.html"
+            },
+            {
+                name: "Servo Interactive Simulator",
+                type: "file",
+                category: "simulation",
+                description: "Interactive simulation for servo motor control and applications",
+                size: "PNG",
+                modified: "Active",
+                icon: "🎮",
+                url: "https://sands-mvcc.github.io/ot/servo.png"
+            },
+            {
+                name: "Syslog Trainer",
+                type: "file",
+                category: "protocols",
+                description: "System logging protocol training and message analysis",
+                size: "HTML",
+                modified: "Active",
+                icon: "📝",
+                url: "https://sands-mvcc.github.io/ot/syslog.html"
+            },
+            {
+                name: "TCP Protocol Interactive Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Transmission Control Protocol hands-on training and simulation",
+                size: "HTML",
+                modified: "Active",
+                icon: "🔗",
+                url: "https://sands-mvcc.github.io/ot/tcp.html"
+            },
+            {
+                name: "WiFi Interactive Trainer",
+                type: "file",
+                category: "protocols",
+                description: "Wireless networking protocol training and configuration",
+                size: "HTML",
+                modified: "Active",
+                icon: "📶",
+                url: "https://sands-mvcc.github.io/ot/wifi.html"
             }
-        }
+        ];
 
-        function toggleObjectives(objectivesId) {
-            const objectives = document.getElementById(objectivesId);
-            const header = objectives.previousElementSibling.querySelector('.objectives-title');
-            
-            if (objectives.classList.contains('show')) {
-                objectives.classList.remove('show');
-                header.innerHTML = header.innerHTML.replace('▲', '▼');
-            } else {
-                objectives.classList.add('show');
-                header.innerHTML = header.innerHTML.replace('▼', '▲');
+        class RepositoryPortal {
+            constructor() {
+                this.data = repositoryData;
+                this.filteredData = this.data;
+                this.currentCategory = 'all';
+                this.searchTerm = '';
+                this.init();
             }
-        }
 
-        function updateProgress() {
-            const checkboxes = document.querySelectorAll('.objective-checkbox');
-            const totalObjectives = checkboxes.length;
-            const completedObjectives = document.querySelectorAll('.objective-checkbox:checked').length;
-            
-            const progressPercentage = Math.round((completedObjectives / totalObjectives) * 100);
-            
-            document.getElementById('progressFill').style.width = progressPercentage + '%';
-            document.getElementById('progressText').textContent = `Workshop Progress: ${progressPercentage}% Complete`;
-            document.getElementById('completedObjectives').textContent = completedObjectives;
-            
-            // Count completed parts (all objectives in a part checked)
-            let partsCompleted = 0;
-            for (let i = 1; i <= 6; i++) {
-                const partCheckboxes = document.querySelectorAll(`#objectives${i} .objective-checkbox`);
-                const partCompleted = document.querySelectorAll(`#objectives${i} .objective-checkbox:checked`);
-                if (partCheckboxes.length === partCompleted.length && partCheckboxes.length > 0) {
-                    partsCompleted++;
-                }
+            init() {
+                this.setupEventListeners();
+                this.updateStats();
+                setTimeout(() => this.renderFiles(), 1000); // Simulate loading
             }
-            document.getElementById('partsCompleted').textContent = partsCompleted;
-        }
 
-        // Smooth scrolling for navigation
-        document.querySelectorAll('.nav-btn[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    
-                    // Auto-expand the clicked section
-                    const content = target.querySelector('.part-content');
-                    const icon = target.querySelector('.toggle-icon');
-                    if (content && !content.classList.contains('active')) {
-                        content.classList.add('active');
-                        if (icon) {
-                            icon.style.transform = 'rotate(180deg)';
-                        }
-                    }
-                }
-            });
-        });
-
-        // Initialize all objectives as visible
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial state for all objectives to be visible
-            document.querySelectorAll('.objectives-list').forEach(list => {
-                list.classList.add('show');
-            });
-            
-            // Update initial progress
-            updateProgress();
-        });
-
-        // Save progress to localStorage
-        function saveProgress() {
-            const checkboxes = document.querySelectorAll('.objective-checkbox');
-            const progress = [];
-            checkboxes.forEach((checkbox, index) => {
-                progress[index] = checkbox.checked;
-            });
-            localStorage.setItem('workshopProgress', JSON.stringify(progress));
-        }
-
-        // Load progress from localStorage
-        function loadProgress() {
-            const savedProgress = localStorage.getItem('workshopProgress');
-            if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                const checkboxes = document.querySelectorAll('.objective-checkbox');
-                checkboxes.forEach((checkbox, index) => {
-                    if (progress[index]) {
-                        checkbox.checked = true;
-                    }
+            setupEventListeners() {
+                // Search functionality
+                document.getElementById('searchBox').addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase();
+                    this.filterAndRender();
                 });
-                updateProgress();
+
+                // Category filters
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.currentCategory = e.target.dataset.category;
+                        this.filterAndRender();
+                    });
+                });
+            }
+
+            updateStats() {
+                const files = this.data.filter(item => item.type === 'file').length;
+                const folders = this.data.filter(item => item.type === 'folder').length;
+                
+                document.getElementById('totalFiles').textContent = files;
+                document.getElementById('totalFolders').textContent = folders;
+                document.getElementById('lastUpdated').textContent = 'Today';
+            }
+
+            filterAndRender() {
+                this.filteredData = this.data.filter(item => {
+                    const matchesCategory = this.currentCategory === 'all' || item.category === this.currentCategory;
+                    const matchesSearch = this.searchTerm === '' || 
+                        item.name.toLowerCase().includes(this.searchTerm) ||
+                        item.description.toLowerCase().includes(this.searchTerm);
+                    
+                    return matchesCategory && matchesSearch;
+                });
+
+                this.renderFiles();
+            }
+
+            renderFiles() {
+                const loadingState = document.getElementById('loadingState');
+                const fileGrid = document.getElementById('fileGrid');
+                const noResults = document.getElementById('noResults');
+
+                loadingState.style.display = 'none';
+
+                if (this.filteredData.length === 0) {
+                    fileGrid.style.display = 'none';
+                    noResults.style.display = 'block';
+                    return;
+                }
+
+                noResults.style.display = 'none';
+                fileGrid.style.display = 'grid';
+
+                fileGrid.innerHTML = this.filteredData.map(item => `
+                    <div class="file-item" onclick="window.open('${item.url}', '_blank')">
+                        <div class="file-icon">${item.icon}</div>
+                        <div class="file-name">${item.name}</div>
+                        <div class="file-description">${item.description}</div>
+                        <div class="file-meta">
+                            <span>${item.size}</span>
+                            <span>${item.modified}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add staggered animation
+                document.querySelectorAll('.file-item').forEach((item, index) => {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.5s ease';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
             }
         }
 
-        // Add event listeners for saving progress
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('objective-checkbox')) {
-                saveProgress();
-            }
+        // Initialize the portal when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new RepositoryPortal();
         });
 
-        // Load progress on page load
-        document.addEventListener('DOMContentLoaded', loadProgress);
+        // Add some interactive features
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchBox').focus();
+            }
+        });
     </script>
 </body>
 </html>
