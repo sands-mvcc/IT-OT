@@ -270,38 +270,51 @@
     padding: 14px 0 16px;
   }
 
-  /* FLIP CARDS */
+  /* FLIP CARDS
+     Faces are stacked with CSS grid (grid-area: 1/1) instead of absolute
+     positioning, so both stay in flow and the card sizes itself to its
+     tallest face. Overflow stays visible so the 3D context is never
+     flattened. The button does no layout work. */
   .flip-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 16px;
+    list-style: none;
+    align-items: stretch;
   }
   .flip-card {
-    background: none; border: 0; padding: 0;
-    font-family: inherit; color: inherit;
-    perspective: 1000px;
-    cursor: pointer;
-    text-align: left;
+    perspective: 1200px;
+    display: flex;
+  }
+  .flip-btn {
     display: block;
     width: 100%;
-    min-height: 170px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 12px;
   }
-  .concepts .flip-card { min-height: 220px; }
   .flip-inner {
-    position: relative;
+    display: grid;
     width: 100%;
-    min-height: inherit;
     height: 100%;
-    transition: transform 0.55s;
+    min-height: 158px;
+    -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
-  .flip-card[aria-pressed="true"] .flip-inner { transform: rotateY(180deg); }
+  .concepts .flip-inner { min-height: 196px; }
+  .flip-btn[aria-pressed="true"] .flip-inner { transform: rotateY(180deg); }
+
   .flip-face {
-    position: absolute;
-    inset: 0;
+    grid-area: 1 / 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 8px;
     padding: 16px 18px;
     border-radius: 12px;
@@ -309,29 +322,40 @@
     box-shadow: var(--shadow);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    overflow: auto;
+    overflow-wrap: anywhere;
   }
   .flip-front {
     background: var(--surface2);
     color: var(--text);
-    align-items: flex-start;
+    justify-content: center;
   }
-  .flip-card:hover .flip-front { background: var(--card-hover); }
-  .flip-front .term { font-size: 1rem; font-weight: 700; line-height: 1.25; }
-  .flip-front .prompt { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .flip-btn:hover .flip-front { background: var(--card-hover); }
   .flip-back {
     background: var(--flip-back);
     color: var(--flip-back-text);
-    transform: rotateY(180deg);
     border-color: var(--accent);
     justify-content: flex-start;
+    transform: rotateY(180deg);
   }
-  .flip-back .label {
-    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--accent2);
+  .face-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
-  [data-theme="dark"] .flip-back .label { color: var(--accent); }
-  .flip-back p { font-size: 0.84rem; line-height: 1.5; }
+  .flip-back .face-label { color: var(--accent2); }
+  [data-theme="dark"] .flip-back .face-label { color: var(--accent); }
+  .face-term { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+  .face-text { font-size: 0.85rem; line-height: 1.5; }
+  .face-cue {
+    margin-top: auto;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .flip-btn:hover .face-cue, .flip-btn:focus-visible .face-cue { opacity: 1; }
 
   /* OUTLINE */
   .outline-item {
@@ -434,6 +458,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     *, .flip-inner { transition: none !important; }
+    .face-cue { opacity: 1; }
     .nav-btn:hover { transform: none; }
   }
 </style>
@@ -519,221 +544,252 @@
     <div class="accordion">
       <button class="acc-header" id="acc-terms-btn" aria-expanded="false" aria-controls="acc-terms-panel" data-accordion>
         <span>Key Terms — 16 flip cards</span>
-        <span class="acc-meta">Expand <span class="acc-icon" aria-hidden="true">▾</span></span>
+        <span class="acc-meta"><span class="acc-action">Expand</span> <span class="acc-icon" aria-hidden="true">▾</span></span>
       </button>
       <div class="acc-panel" id="acc-terms-panel" role="region" aria-labelledby="acc-terms-btn" hidden>
         <p class="acc-hint">Click a card to reveal more. Cards are keyboard accessible — press Tab to move between them and Enter or Space to flip.</p>
-        <div class="flip-grid">
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">ICS (Industrial Control System)</span>
+        <ul class="flip-grid">
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">ICS (Industrial Control System)</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A broad term for systems that monitor and control industrial processes using integrated mechanical, electrical, and digital components.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A broad term for systems that monitor and control industrial processes using integrated mechanical, electrical, and digital components.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">OT (Operational Technology)</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">Hardware and software that directly monitor or control physical devices, processes, and events in industrial environments.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">OT (Operational Technology)</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">SCADA</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A supervisory system used to monitor and control geographically distributed industrial assets and remote field devices.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>Hardware and software that directly monitor or control physical devices, processes, and events in industrial environments.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">DCS</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A distributed control system used to manage large numbers of control points within a localized industrial process.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">SCADA</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">PLC</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A programmable industrial computer that receives sensor input and executes logic to control machines and processes.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A supervisory system used to monitor and control geographically distributed industrial assets and remote field devices.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">HMI</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A human-machine interface that allows operators to monitor conditions, issue commands, and adjust control settings.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">DCS</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">RTU</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A remote terminal unit that gathers data from field devices and communicates it to supervisory systems.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A distributed control system used to manage large numbers of control points within a localized industrial process.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">IIoT</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">The Industrial Internet of Things; connected industrial devices and sensors that improve visibility and automation but also expand cyber risk.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">PLC</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Purdue Model</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A layered reference architecture used to describe and segment industrial and enterprise environments.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A programmable industrial computer that receives sensor input and executes logic to control machines and processes.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">DMZ</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A buffer network segment placed between trusted zones to control and inspect communications.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">HMI</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Zone</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A logical or physical grouping of assets with similar security requirements.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A human-machine interface that allows operators to monitor conditions, issue commands, and adjust control settings.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Conduit</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A controlled communication path between zones.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">RTU</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Defense in Depth</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A layered security strategy that uses multiple safeguards so no single failure exposes the system.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A remote terminal unit that gathers data from field devices and communicates it to supervisory systems.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Critical Infrastructure</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">Systems and assets essential to public safety, economic stability, and national security.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">IIoT</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Engineering Workstation</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A system used by engineers to configure, program, or maintain control devices and industrial applications.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>The Industrial Internet of Things; connected industrial devices and sensors that improve visibility and automation but also expand cyber risk.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Term</span>
+                  <span class="face-term">Historian</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Definition</span>
+                  <span class="face-text">A system that collects and stores process and operational data for analysis, reporting, and troubleshooting.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Purdue Model</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A layered reference architecture used to describe and segment industrial and enterprise environments.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">DMZ</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A buffer network segment placed between trusted zones to control and inspect communications.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Zone</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A logical or physical grouping of assets with similar security requirements.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Conduit</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A controlled communication path between zones.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Defense in Depth</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A layered security strategy that uses multiple safeguards so no single failure exposes the system.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Critical Infrastructure</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>Systems and assets essential to public safety, economic stability, and national security.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Engineering Workstation</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A system used by engineers to configure, program, or maintain control devices and industrial applications.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Term</span>
-                <span class="term">Historian</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Definition</span>
-                <p>A system that collects and stores process and operational data for analysis, reporting, and troubleshooting.</p>
-              </span>
-            </span>
-          </button>
-
-        </div>
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -745,143 +801,162 @@
     <div class="accordion concepts">
       <button class="acc-header" id="acc-concepts-btn" aria-expanded="false" aria-controls="acc-concepts-panel" data-accordion>
         <span>Major Concepts — 10 flip cards</span>
-        <span class="acc-meta">Expand <span class="acc-icon" aria-hidden="true">▾</span></span>
+        <span class="acc-meta"><span class="acc-action">Expand</span> <span class="acc-icon" aria-hidden="true">▾</span></span>
       </button>
       <div class="acc-panel" id="acc-concepts-panel" role="region" aria-labelledby="acc-concepts-btn" hidden>
         <p class="acc-hint">Click a card to reveal more. Use these as discussion starters — each back face is a claim students can argue with.</p>
-        <div class="flip-grid">
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">ICS vs. IT</span>
+        <ul class="flip-grid">
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">ICS vs. IT</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Industrial systems prioritize safe and reliable physical operations, while traditional IT often prioritizes confidentiality, integrity, and availability of information systems. In OT, a security action that interrupts production may create unacceptable operational consequences.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Industrial systems prioritize safe and reliable physical operations, while traditional IT often prioritizes confidentiality, integrity, and availability of information systems. In OT, a security action that interrupts production may create unacceptable operational consequences.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Safety, Quality, and Uptime</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Industrial organizations often make security decisions through the lens of worker safety, product quality, and continuous operations. These priorities strongly shape patching, maintenance, scanning, and incident response choices.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Safety, Quality, and Uptime</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">IT/OT Convergence</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Industrial systems are increasingly connected to enterprise networks and digital services. This improves efficiency and visibility but also increases exposure to cyber threats that were once mostly confined to IT.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Industrial organizations often make security decisions through the lens of worker safety, product quality, and continuous operations. These priorities strongly shape patching, maintenance, scanning, and incident response choices.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Purdue Model Segmentation</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">The Purdue Model helps organize industrial assets into layers from field devices up through enterprise systems. It supports segmentation and controlled communications between layers.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">IT/OT Convergence</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Legacy System Risk</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Many industrial assets were designed before modern cybersecurity expectations. Older systems may be difficult to patch, may rely on outdated operating systems, and may be too sensitive for aggressive scanning.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Industrial systems are increasingly connected to enterprise networks and digital services. This improves efficiency and visibility but also increases exposure to cyber threats that were once mostly confined to IT.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Flat Network Risk</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">When industrial networks are poorly segmented, malware or unauthorized access can move too easily between devices and processes. Flat architecture increases the blast radius of a compromise.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Purdue Model Segmentation</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Asset Visibility</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Organizations cannot adequately protect devices they do not know they have. Asset inventory and monitoring are foundational because many industrial environments contain unmanaged or poorly documented assets.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>The Purdue Model helps organize industrial assets into layers from field devices up through enterprise systems. It supports segmentation and controlled communications between layers.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Critical Infrastructure Dependency</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Many industrial environments support essential services such as power, water, transportation, and manufacturing. A cyber event can therefore affect communities, supply chains, and public safety.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Legacy System Risk</span>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Defense in Depth for OT</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Industrial security should rely on multiple overlapping safeguards, including segmentation, access control, monitoring, hardening, and physical security. This layered approach reduces the chance that one weakness leads directly to disruption.</span>
+                </span>
               </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Many industrial assets were designed before modern cybersecurity expectations. Older systems may be difficult to patch, may rely on outdated operating systems, and may be too sensitive for aggressive scanning.</p>
+            </button>
+          </li>
+          <li class="flip-card">
+            <button class="flip-btn" type="button" aria-pressed="false" data-flip>
+              <span class="flip-inner">
+                <span class="flip-face flip-front">
+                  <span class="face-label">Concept</span>
+                  <span class="face-term">Frameworks and Guidance</span>
+                  <span class="face-cue" aria-hidden="true">Click to flip</span>
+                </span>
+                <span class="flip-face flip-back">
+                  <span class="face-label">Explanation</span>
+                  <span class="face-text">Industrial cybersecurity programs often rely on standards and guidance such as IEC 62443 and NIST SP 800-82. These frameworks help organizations structure security improvements in complex OT environments.</span>
+                </span>
               </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Flat Network Risk</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>When industrial networks are poorly segmented, malware or unauthorized access can move too easily between devices and processes. Flat architecture increases the blast radius of a compromise.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Asset Visibility</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Organizations cannot adequately protect devices they do not know they have. Asset inventory and monitoring are foundational because many industrial environments contain unmanaged or poorly documented assets.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Critical Infrastructure Dependency</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Many industrial environments support essential services such as power, water, transportation, and manufacturing. A cyber event can therefore affect communities, supply chains, and public safety.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Defense in Depth for OT</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Industrial security should rely on multiple overlapping safeguards, including segmentation, access control, monitoring, hardening, and physical security. This layered approach reduces the chance that one weakness leads directly to disruption.</p>
-              </span>
-            </span>
-          </button>
-
-          <button class="flip-card" aria-pressed="false" data-flip>
-            <span class="flip-inner">
-              <span class="flip-face flip-front">
-                <span class="prompt">Concept</span>
-                <span class="term">Frameworks and Guidance</span>
-              </span>
-              <span class="flip-face flip-back">
-                <span class="label">Explanation</span>
-                <p>Industrial cybersecurity programs often rely on standards and guidance such as IEC 62443 and NIST SP 800-82. These frameworks help organizations structure security improvements in complex OT environments.</p>
-              </span>
-            </span>
-          </button>
-
-        </div>
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -1109,7 +1184,7 @@
       var panel = document.getElementById(header.getAttribute('aria-controls'));
       header.setAttribute('aria-expanded', open ? 'true' : 'false');
       panel.hidden = !open;
-      header.querySelector('.acc-meta').firstChild.nodeValue = open ? 'Collapse ' : 'Expand ';
+      header.querySelector('.acc-action').textContent = open ? 'Collapse' : 'Expand';
     }
 
     headers.forEach(function (header) {
