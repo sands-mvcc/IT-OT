@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1: Foundations of Industrial Cybersecurity | Teaching Operational Technologies</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-found: #e65100;
+    --tag-proto: #1565c0;
+    --tag-threat: #c0392b;
+    --tag-gov: #6a1b9a;
+    --tag-idm: #00695c;
+    --tag-ops: #276221;
+    --tag-safety: #b45309;
+    --tag-found-bg: #fff3e0;
+    --tag-proto-bg: #e3f0fd;
+    --tag-threat-bg: #fdecea;
+    --tag-idm-bg: #e0f2f1;
+    --tag-ops-bg: #e8f5e9;
+    --tag-safety-bg: #fdf3e3;
+    --flip-back: #1a1e2e;
+    --flip-back-text: #e8ecf4;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-found: #ffcc80;
+    --tag-proto: #90caf9;
+    --tag-threat: #ef9a9a;
+    --tag-gov: #ce93d8;
+    --tag-idm: #80cbc4;
+    --tag-ops: #a5d6a7;
+    --tag-safety: #fbbf24;
+    --tag-found-bg: #2a1a00;
+    --tag-proto-bg: #0d1f35;
+    --tag-threat-bg: #2a1010;
+    --tag-idm-bg: #0d2520;
+    --tag-ops-bg: #0d2010;
+    --tag-safety-bg: #2a1c05;
+    --flip-back: #252840;
+    --flip-back-text: #e8ecf4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 200;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* HEADER */
+  header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 14px; }
+  .brand-icon {
+    width: 44px; height: 44px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900;
+    color: var(--on-accent);
+    flex-shrink: 0; letter-spacing: -1px;
+  }
+  .brand-text h1 { font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+  .brand-text p { font-size: 0.78rem; opacity: 0.65; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .course-badge {
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .theme-toggle {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--header-text);
+    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem; font-weight: 600;
+    font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.2s;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #1a1e2e 0%, #22304a 60%, #b4530933 100%);
+    color: #fff;
+    padding: 40px 24px;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; }
+  .hero .eyebrow {
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    opacity: 0.7; margin-bottom: 8px; display: block;
+  }
+  .hero h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2; }
+  .hero p { opacity: 0.82; font-size: 0.95rem; max-width: 72ch; margin-bottom: 10px; }
+  .back-link {
+    display: inline-block; margin-top: 16px;
+    color: #fff; text-decoration: none;
+    font-size: 0.8rem; font-weight: 600;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .back-link:hover { background: rgba(255,255,255,0.22); }
+
+  /* MAIN */
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 48px; }
+  section { margin-bottom: 36px; }
+  .section-label {
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+  }
+  .panel p + p { margin-top: 10px; }
+
+  /* ESSENTIALS CALLOUT */
+  .essentials {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .essentials h3 {
+    font-size: 1rem; font-weight: 800; color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .fact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .fact {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .fact h4 { font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; }
+  .fact p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; }
+
+  .safety-note {
+    margin-top: 16px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.79rem; color: var(--text-muted);
+  }
+  .safety-note strong { color: var(--tag-safety); }
+
+  /* OBJECTIVES */
+  .objectives ul { list-style: none; }
+  .objectives li {
+    position: relative;
+    padding: 8px 0 8px 30px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .objectives li:last-child { border-bottom: 0; }
+  .objectives li::before {
+    content: "▸";
+    position: absolute; left: 8px; top: 8px;
+    color: var(--accent); font-weight: 800;
+  }
+
+  /* ACCORDION */
+  .accordion { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .acc-header {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--surface);
+    border: 0; border-left: 5px solid var(--accent);
+    color: var(--text);
+    font-family: inherit; font-size: 1rem; font-weight: 700;
+    text-align: left;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .acc-header:hover { background: var(--card-hover); }
+  .acc-header .acc-meta { font-size: 0.74rem; font-weight: 600; color: var(--text-muted); }
+  .acc-icon {
+    font-size: 0.9rem; color: var(--accent);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .acc-header[aria-expanded="true"] .acc-icon { transform: rotate(180deg); }
+  .acc-panel { padding: 0 20px 20px; border-top: 1px solid var(--border); }
+  .acc-panel[hidden] { display: none; }
+  .acc-hint {
+    font-size: 0.78rem; color: var(--text-muted);
+    padding: 14px 0 16px;
+  }
+
+  /* FLIP CARDS */
+  .flip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .flip-card {
+    background: none; border: 0; padding: 0;
+    font-family: inherit; color: inherit;
+    perspective: 1000px;
+    cursor: pointer;
+    text-align: left;
+    display: block;
+    width: 100%;
+    min-height: 170px;
+  }
+  .concepts .flip-card { min-height: 220px; }
+  .flip-inner {
+    position: relative;
+    width: 100%;
+    min-height: inherit;
+    height: 100%;
+    transition: transform 0.55s;
+    transform-style: preserve-3d;
+  }
+  .flip-card[aria-pressed="true"] .flip-inner { transform: rotateY(180deg); }
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    overflow: auto;
+  }
+  .flip-front {
+    background: var(--surface2);
+    color: var(--text);
+    align-items: flex-start;
+  }
+  .flip-card:hover .flip-front { background: var(--card-hover); }
+  .flip-front .term { font-size: 1rem; font-weight: 700; line-height: 1.25; }
+  .flip-front .prompt { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .flip-back {
+    background: var(--flip-back);
+    color: var(--flip-back-text);
+    transform: rotateY(180deg);
+    border-color: var(--accent);
+    justify-content: flex-start;
+  }
+  .flip-back .label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent2);
+  }
+  [data-theme="dark"] .flip-back .label { color: var(--accent); }
+  .flip-back p { font-size: 0.84rem; line-height: 1.5; }
+
+  /* OUTLINE */
+  .outline-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px 18px 20px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .outline-num {
+    width: 46px; height: 46px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.05rem; font-weight: 800;
+  }
+  .outline-item h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 8px; }
+  .outline-item > div > p { font-size: 0.87rem; color: var(--text-muted); margin-bottom: 10px; }
+  .focus-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;
+  }
+  .outline-item ul { list-style: none; }
+  .outline-item li {
+    position: relative;
+    padding: 4px 0 4px 20px;
+    font-size: 0.85rem;
+  }
+  .outline-item li::before {
+    content: "—";
+    position: absolute; left: 0; top: 4px;
+    color: var(--accent);
+  }
+
+  /* CHECK UNDERSTANDING */
+  .questions { counter-reset: q; list-style: none; }
+  .questions li {
+    counter-increment: q;
+    position: relative;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tag-proto);
+    border-radius: 10px;
+    padding: 14px 16px 14px 52px;
+    margin-bottom: 12px;
+    font-size: 0.88rem;
+  }
+  .questions li::before {
+    content: "Q" counter(q);
+    position: absolute; left: 14px; top: 13px;
+    font-size: 0.76rem; font-weight: 800;
+    color: var(--tag-proto);
+  }
+  .questions li:last-child { margin-bottom: 0; }
+
+  /* NEXT NAV */
+  .lesson-nav {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .nav-btn {
+    text-decoration: none;
+    font-size: 0.84rem; font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 8px 16px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .nav-btn:hover { transform: translateY(-2px); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 22px 20px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 560px) {
+    .header-inner { padding: 14px 16px; }
+    .brand-text h1 { font-size: 0.95rem; }
+    .hero { padding: 30px 16px; }
+    .hero h2 { font-size: 1.4rem; }
+    main { padding: 24px 16px 40px; }
+    .outline-item { grid-template-columns: 1fr; }
+    .outline-num { width: 40px; height: 40px; font-size: 0.95rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, .flip-inner { transition: none !important; }
+    .nav-btn:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to lesson content</a>
+
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon">OT</div>
+      <div class="brand-text">
+        <h1>Teaching Operational Technologies</h1>
+        <p>Faculty Development Workshop — Day 1</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="course-badge">Lesson 1</span>
+      <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙 Dark</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Day 1 · Foundations</span>
+    <h2>Lesson 1: Foundations of Industrial Cybersecurity</h2>
+    <p>Industrial cybersecurity is the protection of the industrial control systems and operational technology that run physical processes — the pumps, breakers, mixers, conveyors, and turbines behind manufacturing, energy, water, and transportation.</p>
+    <p>It is not enterprise IT security applied to a different network. When an industrial system fails or is taken offline, the consequences are physical: a safety incident, a disrupted process, ruined product quality, or days of unplanned downtime. That difference in consequence drives nearly every design decision in the rest of this course.</p>
+    <a class="back-link" href="index.html">← Course Navigation</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- LESSON ESSENTIALS -->
+  <section aria-labelledby="essentials-title">
+    <div class="essentials">
+      <h3 id="essentials-title">⚡ Lesson essentials</h3>
+      <div class="fact-grid">
+        <div class="fact">
+          <h4>Consequence is physical</h4>
+          <p>An OT compromise can injure a worker, damage equipment, or stop a process. IT risk is usually measured in data; OT risk is measured in safety and production.</p>
+        </div>
+        <div class="fact">
+          <h4>Availability leads</h4>
+          <p>OT reorders the classic triad. Safety first, then availability and integrity, with confidentiality typically last — the opposite of most enterprise environments.</p>
+        </div>
+        <div class="fact">
+          <h4>Equipment outlives the network</h4>
+          <p>A PLC installed in 2004 may still be running. Long lifecycles, thin patch windows, and unauthenticated legacy protocols are normal conditions, not exceptions.</p>
+        </div>
+        <div class="fact">
+          <h4>Segmentation is the workhorse</h4>
+          <p>When patching is constrained, architecture carries the load. The Purdue Model and IEC 62443 zones and conduits give you a structure students can draw.</p>
+        </div>
+      </div>
+      <p class="safety-note"><strong>⚠ Safeguards reminder:</strong> Every activity in this course is simulation-based and defensive in scope. No exercise touches a live process, an energized panel, campus building automation, or an employer's equipment.</p>
+    </div>
+  </section>
+
+  <!-- LEARNING OBJECTIVES -->
+  <section aria-labelledby="objectives-title">
+    <div class="section-label" id="objectives-title">🎯 Learning objectives</div>
+    <div class="panel objectives">
+      <p style="font-size:0.87rem;color:var(--text-muted);margin-bottom:8px;">By the end of this lesson, learners will be able to:</p>
+      <ul>
+        <li>Define industrial cybersecurity, ICS, OT, and critical infrastructure.</li>
+        <li>Distinguish IT security priorities from OT/ICS security priorities.</li>
+        <li>Identify major ICS components and architectures, including SCADA, DCS, PLC, and HMI.</li>
+        <li>Explain why safety, quality, and uptime shape industrial cyber risk decisions.</li>
+        <li>Describe how the Purdue Model supports segmentation between industrial and enterprise environments.</li>
+        <li>Recognize major industrial cyber risk drivers such as legacy systems, flat networks, and IIoT adoption.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- KEY TERMS ACCORDION -->
+  <section aria-labelledby="terms-title">
+    <div class="section-label" id="terms-title">🔑 Key terms</div>
+
+    <div class="accordion">
+      <button class="acc-header" id="acc-terms-btn" aria-expanded="false" aria-controls="acc-terms-panel" data-accordion>
+        <span>Key Terms — 16 flip cards</span>
+        <span class="acc-meta">Expand <span class="acc-icon" aria-hidden="true">▾</span></span>
+      </button>
+      <div class="acc-panel" id="acc-terms-panel" role="region" aria-labelledby="acc-terms-btn" hidden>
+        <p class="acc-hint">Click a card to reveal more. Cards are keyboard accessible — press Tab to move between them and Enter or Space to flip.</p>
+        <div class="flip-grid">
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">ICS (Industrial Control System)</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A broad term for systems that monitor and control industrial processes using integrated mechanical, electrical, and digital components.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">OT (Operational Technology)</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>Hardware and software that directly monitor or control physical devices, processes, and events in industrial environments.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">SCADA</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A supervisory system used to monitor and control geographically distributed industrial assets and remote field devices.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">DCS</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A distributed control system used to manage large numbers of control points within a localized industrial process.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">PLC</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A programmable industrial computer that receives sensor input and executes logic to control machines and processes.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">HMI</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A human-machine interface that allows operators to monitor conditions, issue commands, and adjust control settings.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">RTU</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A remote terminal unit that gathers data from field devices and communicates it to supervisory systems.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">IIoT</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>The Industrial Internet of Things; connected industrial devices and sensors that improve visibility and automation but also expand cyber risk.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Purdue Model</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A layered reference architecture used to describe and segment industrial and enterprise environments.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">DMZ</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A buffer network segment placed between trusted zones to control and inspect communications.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Zone</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A logical or physical grouping of assets with similar security requirements.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Conduit</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A controlled communication path between zones.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Defense in Depth</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A layered security strategy that uses multiple safeguards so no single failure exposes the system.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Critical Infrastructure</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>Systems and assets essential to public safety, economic stability, and national security.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Engineering Workstation</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A system used by engineers to configure, program, or maintain control devices and industrial applications.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Term</span>
+                <span class="term">Historian</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Definition</span>
+                <p>A system that collects and stores process and operational data for analysis, reporting, and troubleshooting.</p>
+              </span>
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAJOR CONCEPTS ACCORDION -->
+  <section aria-labelledby="concepts-title">
+    <div class="section-label" id="concepts-title">🧠 Major concepts</div>
+
+    <div class="accordion concepts">
+      <button class="acc-header" id="acc-concepts-btn" aria-expanded="false" aria-controls="acc-concepts-panel" data-accordion>
+        <span>Major Concepts — 10 flip cards</span>
+        <span class="acc-meta">Expand <span class="acc-icon" aria-hidden="true">▾</span></span>
+      </button>
+      <div class="acc-panel" id="acc-concepts-panel" role="region" aria-labelledby="acc-concepts-btn" hidden>
+        <p class="acc-hint">Click a card to reveal more. Use these as discussion starters — each back face is a claim students can argue with.</p>
+        <div class="flip-grid">
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">ICS vs. IT</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Industrial systems prioritize safe and reliable physical operations, while traditional IT often prioritizes confidentiality, integrity, and availability of information systems. In OT, a security action that interrupts production may create unacceptable operational consequences.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Safety, Quality, and Uptime</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Industrial organizations often make security decisions through the lens of worker safety, product quality, and continuous operations. These priorities strongly shape patching, maintenance, scanning, and incident response choices.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">IT/OT Convergence</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Industrial systems are increasingly connected to enterprise networks and digital services. This improves efficiency and visibility but also increases exposure to cyber threats that were once mostly confined to IT.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Purdue Model Segmentation</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>The Purdue Model helps organize industrial assets into layers from field devices up through enterprise systems. It supports segmentation and controlled communications between layers.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Legacy System Risk</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Many industrial assets were designed before modern cybersecurity expectations. Older systems may be difficult to patch, may rely on outdated operating systems, and may be too sensitive for aggressive scanning.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Flat Network Risk</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>When industrial networks are poorly segmented, malware or unauthorized access can move too easily between devices and processes. Flat architecture increases the blast radius of a compromise.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Asset Visibility</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Organizations cannot adequately protect devices they do not know they have. Asset inventory and monitoring are foundational because many industrial environments contain unmanaged or poorly documented assets.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Critical Infrastructure Dependency</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Many industrial environments support essential services such as power, water, transportation, and manufacturing. A cyber event can therefore affect communities, supply chains, and public safety.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Defense in Depth for OT</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Industrial security should rely on multiple overlapping safeguards, including segmentation, access control, monitoring, hardening, and physical security. This layered approach reduces the chance that one weakness leads directly to disruption.</p>
+              </span>
+            </span>
+          </button>
+
+          <button class="flip-card" aria-pressed="false" data-flip>
+            <span class="flip-inner">
+              <span class="flip-face flip-front">
+                <span class="prompt">Concept</span>
+                <span class="term">Frameworks and Guidance</span>
+              </span>
+              <span class="flip-face flip-back">
+                <span class="label">Explanation</span>
+                <p>Industrial cybersecurity programs often rely on standards and guidance such as IEC 62443 and NIST SP 800-82. These frameworks help organizations structure security improvements in complex OT environments.</p>
+              </span>
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAILED OUTLINE -->
+  <section aria-labelledby="outline-title">
+    <div class="section-label" id="outline-title">📋 Detailed lesson outline</div>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">1</div>
+      <div>
+        <h3>Why industrial cybersecurity matters</h3>
+        <p>Open the lesson with consequence, not technology. A compromised business laptop leaks data; a compromised control system can vent a tank, trip a substation, or stop a production line for a week. That single distinction is what students should carry out of the first hour.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Cyber events in OT can produce physical, safety, and environmental outcomes.</li>
+          <li>Downtime cost is measured in production hours, not help desk tickets.</li>
+          <li>Industrial sectors are deliberately targeted because disruption creates leverage.</li>
+          <li>Employers in the region hire for this gap — connect the lesson to local job titles.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">2</div>
+      <div>
+        <h3>What ICS and OT systems do</h3>
+        <p>Every control system runs the same basic loop: sense a physical condition, compare it to a setpoint, and act on the process. Once students can name the loop, the acronyms stop being a vocabulary list and start being roles inside a system.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>The sense → decide → actuate control loop, with a concrete example.</li>
+          <li>Setpoints, process variables, and what "out of tolerance" means to an operator.</li>
+          <li>Continuous, batch, and discrete manufacturing behave differently under stress.</li>
+          <li>OT measures success as a process that stays inside its safe operating envelope.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">3</div>
+      <div>
+        <h3>Common ICS architectures and components</h3>
+        <p>Introduce SCADA and DCS as two answers to different problems — distance versus density — then place the devices inside them. A single labeled drawing carried through the whole course works better than ten separate diagrams.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>SCADA for geographically distributed assets; DCS for a dense localized process.</li>
+          <li>PLCs and RTUs as the devices that actually execute control logic in the field.</li>
+          <li>HMIs and engineering workstations as the human entry points into the process.</li>
+          <li>Historians and reporting servers as the data bridge toward the enterprise.</li>
+          <li>Sensors and actuators as the boundary between the network and the physical world.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">4</div>
+      <div>
+        <h3>How OT differs from enterprise IT</h3>
+        <p>Students arriving from an IT program have habits that will get them thrown out of a control room. Make the differences explicit rather than letting them discover them in a lab.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Priority order: safety, then availability and integrity, with confidentiality last.</li>
+          <li>Asset lifecycles of 15 to 25 years versus a three-to-five-year IT refresh.</li>
+          <li>Deterministic timing requirements that an active scan can disrupt.</li>
+          <li>Protocols designed for a trusted, isolated network with no authentication.</li>
+          <li>Change control governed by production schedules and engineering sign-off.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">5</div>
+      <div>
+        <h3>Why safety, quality, and uptime change security decisions</h3>
+        <p>The control the textbook recommends is often the control the plant cannot accept. Teach students to propose alternatives instead of repeating a best practice that will be refused.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Patching waits for a maintenance window that may come twice a year.</li>
+          <li>Vulnerability scanning may be passive-only, or barred from certain segments.</li>
+          <li>"Isolate the host" can mean stopping the process — containment needs an alternative.</li>
+          <li>Safety instrumented systems are protected by their own change discipline.</li>
+          <li>Compensating controls are the normal answer, not a sign of a weak program.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">6</div>
+      <div>
+        <h3>The Purdue Model and segmentation</h3>
+        <p>The Purdue Model is a teaching scaffold, not a compliance mandate. Its value in class is that it gives students a shared drawing to argue over — where does this asset live, and what is allowed to cross this line?</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Levels 0 through 5, from field instrumentation up to enterprise business systems.</li>
+          <li>The industrial DMZ as the controlled meeting point between IT and OT.</li>
+          <li>Zones and conduits as the IEC 62443 vocabulary for the same idea.</li>
+          <li>Historian replication and jump hosts as patterns that avoid direct IT-to-OT paths.</li>
+          <li>Where cloud services and IIoT gateways strain the classic layered picture.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">7</div>
+      <div>
+        <h3>Major sources of industrial cyber risk</h3>
+        <p>Most industrial incidents begin with ordinary conditions rather than exotic techniques. Frame risk drivers as things a student could find on a walkthrough with a clipboard.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Legacy systems and unsupported operating systems that cannot be patched.</li>
+          <li>Flat or partially segmented networks that let access spread laterally.</li>
+          <li>Remote vendor access, shared operator credentials, and forgotten accounts.</li>
+          <li>IIoT devices and cellular gateways added outside the network team's view.</li>
+          <li>Transient media, contractor laptops, and undocumented assets.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">8</div>
+      <div>
+        <h3>Critical infrastructure and real-world consequences</h3>
+        <p>Use documented incidents as case studies: what conditions allowed it, what the impact was, and what changed afterward. Analyze the attack path at the architecture level — this course does not reconstruct attacks as procedures.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>The interdependence of power, water, transportation, and manufacturing.</li>
+          <li>How an IT-side ransomware event can force a precautionary OT shutdown.</li>
+          <li>Cascading effects on communities, supply chains, and public confidence.</li>
+          <li>Reading an incident for root cause and control gaps rather than for technique.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">9</div>
+      <div>
+        <h3>Foundational security approaches and frameworks</h3>
+        <p>Close the technical portion with the structures that turn concern into a program. Pick one framework as the spine of your course and reference the others rather than teaching all of them at once.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>IEC 62443 as the OT-native standard family, organized by zones and security levels.</li>
+          <li>NIST SP 800-82 as practical ICS guidance, mapped to the Cybersecurity Framework.</li>
+          <li>Asset inventory and network visibility as the prerequisite to every other control.</li>
+          <li>Defense in depth: segmentation, access control, hardening, monitoring, physical security.</li>
+          <li>Backup and recovery of controller logic and configurations, not just servers.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="outline-item">
+      <div class="outline-num" aria-hidden="true">10</div>
+      <div>
+        <h3>Lesson recap and reflection</h3>
+        <p>Return to the opening claim and check whether students can now defend it in their own words. The reflection questions below work as an exit ticket, a discussion board prompt, or the first five minutes of Lesson 2.</p>
+        <div class="focus-label">Focus on</div>
+        <ul>
+          <li>Restating why consequence, not technology, separates OT security from IT security.</li>
+          <li>Naming ICS components and placing them on a Purdue drawing without notes.</li>
+          <li>Identifying at least three risk drivers in a described facility.</li>
+          <li>Previewing Lesson 2, where these principles become architecture decisions.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <!-- CHECK YOUR UNDERSTANDING -->
+  <section aria-labelledby="check-title">
+    <div class="section-label" id="check-title">💬 Check your understanding</div>
+    <div class="panel">
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">Discussion questions — not auto-graded. Use them for class discussion, an exit ticket, or a short written response.</p>
+      <ol class="questions">
+        <li>A plant manager tells you that a critical patch cannot be applied for six months because the line runs continuously. What compensating controls would you propose in the meantime, and how would you justify each one to someone whose main concern is production?</li>
+        <li>Explain to a first-semester IT student why confidentiality is usually the lowest priority in an OT environment. What example would you use, and what misconception are you trying to correct?</li>
+        <li>You are handed a network drawing for a facility with no industrial DMZ — the historian sits on the control network and business analysts query it directly. Describe the risk in terms a non-technical executive would accept, and sketch what you would change first.</li>
+        <li>Compare SCADA and DCS architectures. What characteristics of a facility would lead you to expect one rather than the other, and how does that choice affect where you would place monitoring?</li>
+        <li>Asset visibility is described as foundational. In an environment where active scanning is not permitted, how would you build an accurate inventory, and what would you do about devices nobody can identify?</li>
+      </ol>
+    </div>
+  </section>
+
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a class="nav-btn" href="index.html">← Course Navigation</a>
+    <a class="nav-btn" href="lesson02.html">Lesson 2: IT/OT Security Principles →</a>
+  </nav>
+
+</main>
+
+<footer>
+  Lesson 1 • Industrial Cybersecurity Foundations<br>
+  Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
+  Educational use only. All exercises are simulation-based and defensive in scope.
+</footer>
+
+<script>
+  /* THEME — light by default, dark only if previously chosen */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (theme === 'dark') {
+      btn.textContent = '☀️ Light';
+      btn.setAttribute('aria-label', 'Switch to light mode');
+    } else {
+      btn.textContent = '🌙 Dark';
+      btn.setAttribute('aria-label', 'Switch to dark mode');
+    }
+    try { localStorage.setItem('otfac-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('otfac-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ACCORDIONS — collapsed by default, one panel open at a time */
+  (function () {
+    var headers = document.querySelectorAll('[data-accordion]');
+
+    function setState(header, open) {
+      var panel = document.getElementById(header.getAttribute('aria-controls'));
+      header.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.hidden = !open;
+      header.querySelector('.acc-meta').firstChild.nodeValue = open ? 'Collapse ' : 'Expand ';
+    }
+
+    headers.forEach(function (header) {
+      header.addEventListener('click', function () {
+        var isOpen = header.getAttribute('aria-expanded') === 'true';
+        headers.forEach(function (other) { setState(other, false); });
+        setState(header, !isOpen);
+      });
+    });
+  })();
+
+  /* FLIP CARDS — click or keyboard (native button activation) */
+  (function () {
+    document.querySelectorAll('[data-flip]').forEach(function (card) {
+      card.addEventListener('click', function () {
+        var flipped = card.getAttribute('aria-pressed') === 'true';
+        card.setAttribute('aria-pressed', flipped ? 'false' : 'true');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
