@@ -70,6 +70,8 @@
     --flip-back-text: #e8ecf4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
@@ -357,21 +359,71 @@
   }
   .flip-btn:hover .face-cue, .flip-btn:focus-visible .face-cue { opacity: 1; }
 
-  /* OUTLINE */
+  /* RUNNING CASE */
+  .case-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--tag-proto);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+  .case-box h3 { font-size: 0.98rem; font-weight: 700; color: var(--tag-proto); margin-bottom: 8px; }
+  .case-box p { font-size: 0.87rem; color: var(--text-muted); line-height: 1.6; max-width: 78ch; }
+
+  /* SECTION JUMP NAV */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 16px 20px 18px;
+    margin-bottom: 24px;
+  }
+  .toc-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline;
+  }
+  .toc-meta { text-transform: none; letter-spacing: 0; font-weight: 600; opacity: 0.85; }
+  .toc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.78rem; font-weight: 600;
+    text-decoration: none;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 13px 5px 6px;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .toc-chip span {
+    width: 20px; height: 20px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--accent); color: var(--on-accent);
+    border-radius: 50%; font-size: 0.68rem; font-weight: 800;
+  }
+  .toc-chip:hover { background: var(--card-hover); border-color: var(--accent); transform: translateY(-2px); }
+
+  /* OUTLINE / NARRATIVE SECTIONS */
   .outline-item {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
     box-shadow: var(--shadow);
-    padding: 18px 20px 18px 20px;
-    margin-bottom: 16px;
-    display: grid;
-    grid-template-columns: 46px 1fr;
-    gap: 16px;
-    align-items: start;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    scroll-margin-top: 96px;
+  }
+  .outline-head {
+    display: flex; align-items: center; gap: 14px;
+    padding-bottom: 14px; margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
   .outline-num {
-    width: 46px; height: 46px;
+    width: 44px; height: 44px; flex-shrink: 0;
     background: var(--accent-light);
     color: var(--accent);
     border: 1px solid var(--accent);
@@ -379,23 +431,73 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 1.05rem; font-weight: 800;
   }
-  .outline-item h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 8px; }
-  .outline-item > div > p { font-size: 0.87rem; color: var(--text-muted); margin-bottom: 10px; }
+  .outline-item h3 { font-size: 1.12rem; font-weight: 700; line-height: 1.25; }
+  .narrative p {
+    font-size: 0.93rem;
+    line-height: 1.72;
+    max-width: 76ch;
+    margin-bottom: 14px;
+  }
+  .narrative p:last-child { margin-bottom: 0; }
+
+  .key-idea {
+    margin: 18px 0;
+    padding: 14px 18px;
+    background: var(--accent-light);
+    border-left: 5px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.6;
+    max-width: 76ch;
+  }
+  .key-idea-label {
+    display: block;
+    font-size: 0.66rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  [data-theme="dark"] .key-idea-label { color: var(--accent); }
+
+  .focus-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
   .focus-label {
     font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px;
   }
-  .outline-item ul { list-style: none; }
-  .outline-item li {
+  .focus-block ul { list-style: none; }
+  .focus-block li {
     position: relative;
     padding: 4px 0 4px 20px;
-    font-size: 0.85rem;
+    font-size: 0.86rem;
+    line-height: 1.5;
   }
-  .outline-item li::before {
-    content: "—";
+  .focus-block li::before {
+    content: "\2014";
     position: absolute; left: 0; top: 4px;
     color: var(--accent);
   }
+
+  .teach-note {
+    border: 1px dashed var(--tag-idm);
+    background: var(--tag-idm-bg);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .teach-label {
+    display: block;
+    font-size: 0.66rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--tag-idm);
+    margin-bottom: 5px;
+  }
+  .teach-note p { font-size: 0.86rem; line-height: 1.6; max-width: 76ch; }
 
   /* CHECK UNDERSTANDING */
   .questions { counter-reset: q; list-style: none; }
@@ -453,13 +555,15 @@
     .hero { padding: 30px 16px; }
     .hero h2 { font-size: 1.4rem; }
     main { padding: 24px 16px 40px; }
-    .outline-item { grid-template-columns: 1fr; }
-    .outline-num { width: 40px; height: 40px; font-size: 0.95rem; }
+    .outline-item { padding: 18px 16px; }
+    .outline-num { width: 38px; height: 38px; font-size: 0.95rem; }
+    .outline-item h3 { font-size: 1rem; }
+    .narrative p { font-size: 0.9rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, .flip-inner { transition: none !important; }
     .face-cue { opacity: 1; }
-    .nav-btn:hover { transform: none; }
+    .nav-btn:hover, .toc-chip:hover { transform: none; }
   }
 </style>
 </head>
@@ -963,161 +1067,315 @@
 
   <!-- DETAILED OUTLINE -->
   <section aria-labelledby="outline-title">
-    <div class="section-label" id="outline-title">📋 Detailed lesson outline</div>
+    <div class="section-label" id="outline-title">📋 The lesson — full narrative</div>
 
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">1</div>
-      <div>
+    <div class="case-box">
+      <h3>The running case: Clearwater Regional Water Reclamation</h3>
+      <p>One facility anchors every section below, and it is worth reusing for the rest of the course. Clearwater serves about forty thousand residents. Intake pumps feed a treatment train of screening, coagulation, filtration, and chemical disinfection. A PLC controls each stage; a SCADA system and two HMI consoles sit in the control room; a historian on the site network feeds the monthly compliance report the state requires. A vendor maintains the chemical dosing skid under contract and connects through a VPN when something needs attention. Contractors come and go with laptops. Nothing about this facility is unusual — that is exactly why it teaches well.</p>
+    </div>
+
+    <nav class="toc" aria-label="Lesson sections">
+      <div class="toc-label">Jump to a section <span class="toc-meta">≈ 35 min read</span></div>
+      <div class="toc-chips">
+      <a class="toc-chip" href="#s1"><span>1</span>Why industrial cybersecurity matters</a>
+      <a class="toc-chip" href="#s2"><span>2</span>What ICS and OT systems do</a>
+      <a class="toc-chip" href="#s3"><span>3</span>Common ICS architectures and components</a>
+      <a class="toc-chip" href="#s4"><span>4</span>How OT differs from enterprise IT</a>
+      <a class="toc-chip" href="#s5"><span>5</span>Why safety, quality, and uptime change security decisions</a>
+      <a class="toc-chip" href="#s6"><span>6</span>The Purdue Model and segmentation</a>
+      <a class="toc-chip" href="#s7"><span>7</span>Major sources of industrial cyber risk</a>
+      <a class="toc-chip" href="#s8"><span>8</span>Critical infrastructure and real-world consequences</a>
+      <a class="toc-chip" href="#s9"><span>9</span>Foundational security approaches and frameworks</a>
+      <a class="toc-chip" href="#s10"><span>10</span>Lesson recap and reflection</a>
+      </div>
+    </nav>
+
+    <article class="outline-item" id="s1">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">1</div>
         <h3>Why industrial cybersecurity matters</h3>
-        <p>Open the lesson with consequence, not technology. A compromised business laptop leaks data; a compromised control system can vent a tank, trip a substation, or stop a production line for a week. That single distinction is what students should carry out of the first hour.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Cyber events in OT can produce physical, safety, and environmental outcomes.</li>
-          <li>Downtime cost is measured in production hours, not help desk tickets.</li>
-          <li>Industrial sectors are deliberately targeted because disruption creates leverage.</li>
-          <li>Employers in the region hire for this gap — connect the lesson to local job titles.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Start with a comparison your students can feel. A hospital's billing server is compromised and patient records are exposed: the harm is real, it is expensive, and it is measured in records, notification letters, and regulatory penalties. Now change one variable. At Clearwater, an attacker who reaches the chemical dosing controller does not steal anything at all. They change a number — the sodium hypochlorite setpoint — and the harm is measured in parts per million, in a boil order issued to forty thousand households, and possibly in someone's health.</p>
+          <p>That is the whole distinction, and it is worth spending real time on before a single acronym appears. Industrial cybersecurity protects a process, not a database. The asset under threat is the physical outcome the system produces: water that is safe to drink, a weld that holds, a turbine that spins at the right speed, a batch that meets specification. Data matters mainly because it is the mechanism by which someone influences that outcome.</p>
+          <p>Once consequence is understood, the economics follow naturally. Downtime in an industrial setting is not a help desk queue; it is production hours that cannot be recovered. A line that stops for a shift may take longer to restart than it did to stop, because material in process has to be purged, equipment has to be brought back up in sequence, and quality has to be re-verified before the first sellable unit comes off the end. When a plant manager resists a control you propose, this is usually the arithmetic behind the resistance.</p>
+          <p>It is also worth telling students plainly that a great deal of industrial cyber harm is not an attack at all. A vulnerability scan aimed at a fragile device stack, a misconfigured firewall rule pushed during a maintenance window, a technician's laptop carrying commodity malware from a home network — these produce process upsets regularly. Framing the field as purely adversarial gives students an incomplete and slightly cinematic picture. Reliability and security are the same discipline here more often than not.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>In OT, the asset you are protecting is not the data — it is the physical process and the people around it.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Cyber events in OT can produce physical, safety, and environmental outcomes.</li>
+            <li>Downtime cost is measured in production hours, not help desk tickets.</li>
+            <li>Industrial sectors are deliberately targeted because disruption creates leverage.</li>
+            <li>Accidental disruption — a scan, a bad rule, a contractor laptop — is as common as attack.</li>
+            <li>Employers in the region hire for this gap — connect the lesson to local job titles.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Open with a plant-floor video and no vocabulary at all. Ask what breaks if this stops for eight hours, and who notices. Introduce the acronyms only after the class has already argued about consequence — the terms then land as labels for something they already understand.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">2</div>
-      <div>
+    <article class="outline-item" id="s2">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">2</div>
         <h3>What ICS and OT systems do</h3>
-        <p>Every control system runs the same basic loop: sense a physical condition, compare it to a setpoint, and act on the process. Once students can name the loop, the acronyms stop being a vocabulary list and start being roles inside a system.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>The sense → decide → actuate control loop, with a concrete example.</li>
-          <li>Setpoints, process variables, and what "out of tolerance" means to an operator.</li>
-          <li>Continuous, batch, and discrete manufacturing behave differently under stress.</li>
-          <li>OT measures success as a process that stays inside its safe operating envelope.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Underneath every industrial control system is one repeating idea: sense a condition, compare it to a target, act on the process, and repeat. A level transmitter in a clearwell reports that the tank is at 61 percent. The controller compares that measured value — the process variable — against the operator's setpoint of 65 percent, finds an error of four percent, and opens a valve or speeds a pump until the error closes. Then it does the whole thing again, and again, on a fixed cycle measured in milliseconds.</p>
+          <p>That fixed cycle is the part IT students tend to miss, and it explains a surprising amount of OT behavior. A programmable logic controller runs a scan: read all inputs, execute the logic, write all outputs, handle communications, repeat. The program is deterministic and the timing budget is tight. A device that spends an unexpected fifty milliseconds answering malformed network traffic is not merely slow — it may have missed a scan, and a missed scan on a fast process is a physical event.</p>
+          <p>Above the controllers sits the supervisory layer, which exists so people can see and steer what the controllers are doing. An HMI renders the process as a graphic with live values and alarms. An operator adjusts a setpoint from a console. A historian quietly records every tag at intervals so that engineers can troubleshoot last Tuesday's upset and so the compliance report to the state can be generated at month end. None of these systems control the process directly; they mediate between the people and the controllers that do.</p>
+          <p>Finally, remind students that processes come in different shapes and fail differently. A continuous process — water treatment, refining, power generation — runs for months and cannot simply be paused. A batch process makes discrete lots to a recipe, where an interruption may scrap the batch. A discrete manufacturing line assembles countable units, where a stop is costly but recoverable. The security conversation changes with the shape of the process, and students who ask which one they are looking at are already thinking correctly.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>Everything on an OT network exists, directly or indirectly, to keep a process variable near its setpoint.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>The sense → compare → actuate control loop, with a concrete example.</li>
+            <li>Setpoints, process variables, and what "out of tolerance" means to an operator.</li>
+            <li>The PLC scan cycle and why deterministic timing is a security constraint.</li>
+            <li>Continuous, batch, and discrete processes behave differently under stress.</li>
+            <li>OT measures success as a process that stays inside its safe operating envelope.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Teach the loop with a home thermostat before you name a single industrial device. Have every student draw the four-box loop from memory and label it for a process they choose. Students who can draw the loop can place any device you hand them for the rest of the term; students who cannot will memorize acronyms without understanding.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">3</div>
-      <div>
+    <article class="outline-item" id="s3">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">3</div>
         <h3>Common ICS architectures and components</h3>
-        <p>Introduce SCADA and DCS as two answers to different problems — distance versus density — then place the devices inside them. A single labeled drawing carried through the whole course works better than ten separate diagrams.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>SCADA for geographically distributed assets; DCS for a dense localized process.</li>
-          <li>PLCs and RTUs as the devices that actually execute control logic in the field.</li>
-          <li>HMIs and engineering workstations as the human entry points into the process.</li>
-          <li>Historians and reporting servers as the data bridge toward the enterprise.</li>
-          <li>Sensors and actuators as the boundary between the network and the physical world.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>SCADA and DCS are not competing products so much as two answers to two different problems. SCADA answers distance: a water utility with fifteen remote pump stations, a pipeline running two hundred miles, a distribution grid spread across a county. Control is largely local at each site, a supervisory system polls the field over whatever communications exist, and a few seconds of latency is tolerable. A DCS answers density: thousands of tightly coupled control points inside one facility, with redundant controllers, integrated engineering tools, and control loops that interact with one another continuously.</p>
+          <p>Inside either architecture, the same cast of devices appears. PLCs and RTUs execute logic in the field. Intelligent electronic devices carry protective functions in electrical systems. HMIs give operators a window and a set of controls. Historians and OPC servers move process data toward people who need to analyze it. Sensors and actuators sit at the boundary where the network stops being informational and starts being physical.</p>
+          <p>Spend extra time on the engineering workstation, because students consistently underrate it. The EWS holds the project files, the controller logic, and the software licensed to download that logic to devices. An attacker on the EWS does not need to craft protocol traffic or understand your process — they can use the vendor's own engineering tool exactly as intended. It is the machine that can rewrite what the plant does, it usually runs a general-purpose operating system, and it is frequently the least-maintained computer in the building.</p>
+          <p>Keep the safety instrumented system visually and conceptually separate from the moment you introduce it. The SIS exists to bring the process to a safe state independent of the control system — it is the last line, it is engineered and certified to its own discipline, and it is not a place where anyone experiments. Students should leave the lesson understanding that control and safety are deliberately different systems, for the same reason a building has both a thermostat and a sprinkler.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>The engineering workstation, not the server room, is usually the highest-value asset in the building.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>SCADA for geographically distributed assets; DCS for a dense localized process.</li>
+            <li>PLCs, RTUs, and IEDs as the devices that actually execute logic in the field.</li>
+            <li>HMIs and engineering workstations as the human entry points into the process.</li>
+            <li>Historians and OPC servers as the data bridge toward the enterprise.</li>
+            <li>The safety instrumented system as a separate, independently engineered protection layer.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Draw one labeled facility diagram on the board in this lesson and refuse to replace it for the rest of the course. Every later topic — protocols, segmentation, monitoring, incident response — gets annotated onto that same drawing. Continuity does more for retention here than a richer set of one-off slides.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">4</div>
-      <div>
+    <article class="outline-item" id="s4">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">4</div>
         <h3>How OT differs from enterprise IT</h3>
-        <p>Students arriving from an IT program have habits that will get them thrown out of a control room. Make the differences explicit rather than letting them discover them in a lab.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Priority order: safety, then availability and integrity, with confidentiality last.</li>
-          <li>Asset lifecycles of 15 to 25 years versus a three-to-five-year IT refresh.</li>
-          <li>Deterministic timing requirements that an active scan can disrupt.</li>
-          <li>Protocols designed for a trusted, isolated network with no authentication.</li>
-          <li>Change control governed by production schedules and engineering sign-off.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Students arriving from an IT program bring habits that are correct in their world and unwelcome in a control room. Make the differences explicit and early, because the alternative is a student who confidently recommends something that would shut down a plant and does not understand why the room went quiet.</p>
+          <p>The priority order inverts. In enterprise IT, confidentiality usually leads. In OT, safety leads absolutely, availability follows closely, integrity of process data matters because decisions are made from it, and confidentiality typically finishes last. Nobody at Clearwater is worried that an attacker learns the current tank level. They are worried that the level reading is wrong, or that the pump will not run.</p>
+          <p>Time scales differ by an order of magnitude. Enterprise hardware refreshes every three to five years; industrial equipment is specified for fifteen to twenty-five and often exceeds it. A controller installed when the plant was built may have no firmware update path, may speak a protocol designed for a private serial link, and may have a network stack that predates any expectation of hostile traffic. This is normal, not negligent, and students should stop treating it as a finding and start treating it as a design constraint.</p>
+          <p>Ownership differs too, and this may be the most consequential difference of all. OT typically reports to operations or engineering, not to the CIO. The people who own those assets are measured on production, safety, and regulatory compliance — not on patch percentages. A security professional who arrives with IT authority and no operational fluency will be politely ignored. Much of what makes someone effective in this field is the ability to translate a control into the language of uptime, safety, and cost.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>Same technologies, inverted priorities, different owner — and the ownership difference causes more failures than the technical one.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Priority order: safety, then availability and integrity, with confidentiality last.</li>
+            <li>Asset lifecycles of 15 to 25 years versus a three-to-five-year IT refresh.</li>
+            <li>Deterministic timing requirements that an active scan can disrupt.</li>
+            <li>Protocols designed for a trusted, isolated network, with no authentication.</li>
+            <li>Change control governed by production schedules and engineering sign-off.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Run a five-minute list: name IT practices that would be unacceptable in a control room. Expect automatic reboot after patching, blocking unknown traffic by default, forced credential rotation on a shared console, and aggressive scanning. Then ask the harder question — what would you propose instead? That pivot from criticism to alternative is the professional skill this lesson is really teaching.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">5</div>
-      <div>
+    <article class="outline-item" id="s5">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">5</div>
         <h3>Why safety, quality, and uptime change security decisions</h3>
-        <p>The control the textbook recommends is often the control the plant cannot accept. Teach students to propose alternatives instead of repeating a best practice that will be refused.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Patching waits for a maintenance window that may come twice a year.</li>
-          <li>Vulnerability scanning may be passive-only, or barred from certain segments.</li>
-          <li>"Isolate the host" can mean stopping the process — containment needs an alternative.</li>
-          <li>Safety instrumented systems are protected by their own change discipline.</li>
-          <li>Compensating controls are the normal answer, not a sign of a weak program.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Here is the situation that defines the job. A vulnerability is published for a controller running a critical process. The patch exists. The vendor has not yet validated it against the installed configuration, and even after validation the plant will not apply it until the next scheduled turnaround — which is in seven months. The textbook answer is unavailable to you for the better part of a year. What do you actually do?</p>
+          <p>The professional answer is compensating controls, and students should learn to reach for them without treating them as a compromise or a failure. If the vulnerability requires network reachability, restrict who can reach the device to a named jump host. If it requires a particular service, disable the service where the vendor permits. Increase monitoring on the segment so that exploitation would be visible. Verify that a known-good copy of the controller logic exists and that someone has actually restored it in a test. Each of these reduces risk without touching the process, and each can be explained to an operations manager in one sentence.</p>
+          <p>Scanning and containment need the same rethinking. Active scanning may be restricted to non-production periods or prohibited outright on sensitive segments, so visibility is built from passive traffic monitoring, configuration review, and physical walkdowns instead. And the reflexive incident response of isolating an affected host can be exactly wrong here: pulling an HMI off the network may leave an operator blind to a running process, which can be more dangerous than the intrusion. Containment strategies in OT have to be designed in advance, with engineering, for specific scenarios.</p>
+          <p>Quality belongs in this conversation as much as safety. In a regulated batch environment, an interruption at the wrong moment does not merely cost time — it can scrap product, trigger an investigation, and create a documentation trail that follows the plant for years. When you propose a control, someone in the room is calculating that exposure. Teaching students to anticipate that calculation is what turns a technically correct recommendation into an accepted one.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>The control that gets accepted and implemented beats the ideal control that gets refused.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Patching waits for a maintenance window or turnaround, often after vendor validation.</li>
+            <li>Vulnerability scanning may be passive-only, or barred from certain segments.</li>
+            <li>"Isolate the host" can mean blinding an operator — containment must be pre-designed.</li>
+            <li>Safety instrumented systems are protected by their own change discipline.</li>
+            <li>Compensating controls are the normal answer, not evidence of a weak program.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Role-play this one. You play the plant manager and say no to everything a student analyst proposes, with a real operational reason each time. Grade the negotiation rather than the recommendation. Students discover quickly that knowing the control is perhaps a third of the job.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">6</div>
-      <div>
+    <article class="outline-item" id="s6">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">6</div>
         <h3>The Purdue Model and segmentation</h3>
-        <p>The Purdue Model is a teaching scaffold, not a compliance mandate. Its value in class is that it gives students a shared drawing to argue over — where does this asset live, and what is allowed to cross this line?</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Levels 0 through 5, from field instrumentation up to enterprise business systems.</li>
-          <li>The industrial DMZ as the controlled meeting point between IT and OT.</li>
-          <li>Zones and conduits as the IEC 62443 vocabulary for the same idea.</li>
-          <li>Historian replication and jump hosts as patterns that avoid direct IT-to-OT paths.</li>
-          <li>Where cloud services and IIoT gateways strain the classic layered picture.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>The Purdue Model gives a shared drawing to a room full of people who otherwise use different words for the same things. Level 0 is the physical process itself — sensors and actuators. Level 1 is basic control, where PLCs and RTUs execute logic. Level 2 is area supervisory control: HMIs, engineering workstations, local alarm servers. Level 3 is site operations, where the historian, the OT domain services, and plant-wide applications live. Level 4 and 5 are the business: ERP, email, the corporate network, the internet.</p>
+          <p>Between Level 3 and Level 4 sits the piece that does the real work — the industrial DMZ, often written as Level 3.5. Its purpose is to eliminate any path where an enterprise system talks directly to a control system. The historian gets replicated into the DMZ so business analysts query the copy, never the original. Remote support terminates at a jump host in the DMZ where sessions are authenticated, mediated, and recorded. Where assurance requirements are highest, a unidirectional gateway allows data out while making inbound flow physically impossible.</p>
+          <p>IEC 62443 generalizes the same instinct with better vocabulary. Rather than fixed layers, it asks you to group assets that share security requirements into zones, and to define every permitted communication path between zones as a conduit with its own controls. This turns out to be more useful in practice, because real plants are messier than five clean levels — a wireless sensor network or a vendor-managed skid may not sit neatly anywhere.</p>
+          <p>Be honest with students about the model's limits. Cloud analytics platforms, IIoT gateways with cellular connections, and vendor remote-monitoring services all cross layers by design, and modern architectures are increasingly less strictly hierarchical. The Purdue Model remains valuable not as a mandate but as a forcing function. Every line on the drawing makes someone answer three questions: what is allowed to cross here, in which direction, and who initiates it?</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>The model's real value is that it forces a specific question at every boundary: what crosses, in which direction, initiated by whom?</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Levels 0 through 5, from field instrumentation to enterprise business systems.</li>
+            <li>The industrial DMZ (Level 3.5) as the controlled meeting point between IT and OT.</li>
+            <li>Zones and conduits as the IEC 62443 vocabulary for the same underlying idea.</li>
+            <li>Historian replication, jump hosts, and unidirectional gateways as standard patterns.</li>
+            <li>Where cloud services and IIoT gateways strain the classic layered picture.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Print asset cards — historian, PLC, badge reader, vendor laptop, wireless sensor, cloud dashboard — and have small groups place them on a blank Purdue drawing. The arguments are the lesson. The cards that cause disagreement are precisely the assets that cause architecture problems in real plants.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">7</div>
-      <div>
+    <article class="outline-item" id="s7">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">7</div>
         <h3>Major sources of industrial cyber risk</h3>
-        <p>Most industrial incidents begin with ordinary conditions rather than exotic techniques. Frame risk drivers as things a student could find on a walkthrough with a clipboard.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Legacy systems and unsupported operating systems that cannot be patched.</li>
-          <li>Flat or partially segmented networks that let access spread laterally.</li>
-          <li>Remote vendor access, shared operator credentials, and forgotten accounts.</li>
-          <li>IIoT devices and cellular gateways added outside the network team's view.</li>
-          <li>Transient media, contractor laptops, and undocumented assets.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Most industrial incidents do not begin with anything exotic. They begin with conditions that a reasonably prepared student could find in an afternoon with a clipboard and permission to ask questions. Framing risk this way is deliberately deflationary — it moves students away from the idea that this field requires rare skill and toward the realization that it mostly requires attention.</p>
+          <p>Legacy systems come first because they are unavoidable. Unsupported operating systems on HMIs, controllers with no firmware update path, and applications that require a specific outdated runtime are all normal findings. Flat networks come second and are more consequential: when the business network, the control network, and the guest wireless share address space and routing, one compromised laptop reaches everything, and the blast radius of an ordinary infection becomes the whole plant.</p>
+          <p>Access is the third cluster, and in practice the busiest. Persistent vendor VPN connections that nobody reviews. A support account shared by an integrator's whole team. Operator consoles logged in for an entire shift because logging in for each action is impractical mid-process. Accounts belonging to people who left two years ago. None of this is exotic and all of it is common, which is exactly why access control and identity get a full lesson of their own later in the course.</p>
+          <p>The last cluster is the stuff that arrives outside the process. IIoT sensors and cellular gateways installed by a department that never spoke to the network team — shadow OT that bypasses the firewall entirely. USB drives and contractor laptops moving between facilities. Field devices still carrying vendor default credentials. And underneath all of it, the absence of a reliable inventory, which means nobody can say with confidence what is even connected.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>Most incidents start with ordinary conditions — legacy equipment, flat networks, unmanaged access — rather than exotic technique.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Legacy systems and unsupported operating systems that cannot be patched.</li>
+            <li>Flat or partially segmented networks that let access spread laterally.</li>
+            <li>Remote vendor access, shared operator credentials, and orphaned accounts.</li>
+            <li>IIoT devices and cellular gateways added outside the network team's view.</li>
+            <li>Transient media, contractor laptops, default credentials, and undocumented assets.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Assign a "clipboard walkthrough" against a simulated facility: a set of photographs, a network drawing, and three staff interview transcripts you write in advance. Students produce ten findings ranked by consequence. It assesses judgment rather than recall, and it works without any lab equipment at all.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">8</div>
-      <div>
+    <article class="outline-item" id="s8">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">8</div>
         <h3>Critical infrastructure and real-world consequences</h3>
-        <p>Use documented incidents as case studies: what conditions allowed it, what the impact was, and what changed afterward. Analyze the attack path at the architecture level — this course does not reconstruct attacks as procedures.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>The interdependence of power, water, transportation, and manufacturing.</li>
-          <li>How an IT-side ransomware event can force a precautionary OT shutdown.</li>
-          <li>Cascading effects on communities, supply chains, and public confidence.</li>
-          <li>Reading an incident for root cause and control gaps rather than for technique.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>The United States designates sixteen critical infrastructure sectors, and the striking thing about the list is how thoroughly the entries depend on one another. Water treatment requires electricity. Electricity generation requires fuel delivery and communications. Fuel delivery requires pipelines, payment systems, and transportation. Hospitals require all of it. A disruption rarely stays inside the sector where it started, which is why an incident at a mid-size facility can produce consequences far out of proportion to the facility's size.</p>
+          <p>One pattern deserves particular attention because it recurs constantly and students routinely misread it. Ransomware lands on the business network — billing, scheduling, order management, none of it touching a controller. The operator nonetheless shuts down production. Not because the malware reached the process, but because they cannot prove it did not, and continuing to run a physical process with uncertain boundary integrity is not an acceptable risk. Poor segmentation and poor visibility convert an IT incident into an OT outage, without the attacker ever having to reach OT.</p>
+          <p>Teach real incidents, and teach a lot of them — but establish the protocol first. This course reads incidents at the level of conditions, control gaps, and outcomes: what made it possible, what detected it or failed to, what the operational impact was, and what the organization changed afterward. It does not reconstruct attacks as procedures, walk through tooling, or produce anything a student could carry out against a live system. That boundary is stated in the course safeguards and it holds in every case discussion.</p>
+          <p>Public advisories are a good habit to build early. Vendor security bulletins and national advisories give students current, defensible material and get them reading primary sources rather than headlines. A standing assignment — bring one advisory relevant to a device we have discussed, and explain the affected function in plain language — pays off all term.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>Analyze incidents for conditions and control gaps, never as a procedure that could be reproduced.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>The interdependence of power, water, transportation, communications, and manufacturing.</li>
+            <li>How an IT-side ransomware event can force a precautionary OT shutdown.</li>
+            <li>Cascading effects on communities, supply chains, and public confidence.</li>
+            <li>Reading an incident for root cause and control gaps rather than for technique.</li>
+            <li>Using public advisories as current, citable primary sources.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Give every case discussion the same four-question protocol and hold to it: what conditions made this possible, what should have detected it, what was the operational impact, and what changed afterward. Tool names and attack steps are out of scope by design — say so out loud the first time, and the rest of the term regulates itself.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">9</div>
-      <div>
+    <article class="outline-item" id="s9">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">9</div>
         <h3>Foundational security approaches and frameworks</h3>
-        <p>Close the technical portion with the structures that turn concern into a program. Pick one framework as the spine of your course and reference the others rather than teaching all of them at once.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>IEC 62443 as the OT-native standard family, organized by zones and security levels.</li>
-          <li>NIST SP 800-82 as practical ICS guidance, mapped to the Cybersecurity Framework.</li>
-          <li>Asset inventory and network visibility as the prerequisite to every other control.</li>
-          <li>Defense in depth: segmentation, access control, hardening, monitoring, physical security.</li>
-          <li>Backup and recovery of controller logic and configurations, not just servers.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>A defensible OT program has an order of operations, and inventory comes first. You cannot segment a network whose devices you cannot enumerate, monitor traffic whose baseline you have never established, or restore a controller whose logic nobody archived. In environments where active scanning is restricted, that inventory gets assembled from passive traffic analysis, configuration exports, purchase and maintenance records, and walkdowns — slower than a scan, and entirely achievable.</p>
+          <p>From there the layers stack in a sensible sequence. Segmentation and a real industrial DMZ limit reach. Access control removes standing vendor connections and grants privilege by role and by need. Hardening disables unused services and ports and removes default credentials wherever the vendor permits it. Monitoring — passive, with synchronized time across every log source so events can actually be correlated — provides detection. Backup and recovery covers controller logic and device configurations, not just servers, and the restore is tested rather than assumed. Physical security underpins all of it, because an unlocked panel defeats a great deal of network engineering.</p>
+          <p>Frameworks give this structure a common language. IEC 62443 is the OT-native family: it organizes systems into zones and conduits, defines security levels as targets rather than grades, and assigns distinct responsibilities to asset owners, system integrators, and product suppliers. NIST SP 800-82 provides practical guidance specific to operational technology and maps cleanly onto the Cybersecurity Framework's functions, which is useful when an OT program has to report alongside an enterprise program. ISO/IEC 27001 contributes the management-system discipline — documented scope, risk treatment, evidence, review.</p>
+          <p>Pick one framework as the spine of your course and reference the others. Teaching four frameworks in parallel produces students who can recite structure and cannot apply any of it. For most community college programs, IEC 62443 is the right spine — it is OT-native, employers recognize it, and its vocabulary of zones, conduits, and security levels gives students language that will still be useful in the capstone and in an interview.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>A program is a sequence: you cannot protect, monitor, or restore what you have never inventoried.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>IEC 62443 as the OT-native standard family, organized by zones and security levels.</li>
+            <li>NIST SP 800-82 as practical OT guidance, mapped to the Cybersecurity Framework.</li>
+            <li>Asset inventory and network visibility as the prerequisite to every other control.</li>
+            <li>Defense in depth: segmentation, access control, hardening, monitoring, physical security.</li>
+            <li>Backup and tested recovery of controller logic and configurations, not just servers.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Introduce the 62443 vocabulary now, even though the framework lesson is on Day 4. Students who spend the whole week saying "zone" and "conduit" will write capstone recommendations that map to something an employer recognizes, instead of inventing private terminology in the final hours.</p>
+        </aside>
       </div>
     </article>
-
-    <article class="outline-item">
-      <div class="outline-num" aria-hidden="true">10</div>
-      <div>
+    <article class="outline-item" id="s10">
+      <header class="outline-head">
+        <div class="outline-num" aria-hidden="true">10</div>
         <h3>Lesson recap and reflection</h3>
-        <p>Return to the opening claim and check whether students can now defend it in their own words. The reflection questions below work as an exit ticket, a discussion board prompt, or the first five minutes of Lesson 2.</p>
-        <div class="focus-label">Focus on</div>
-        <ul>
-          <li>Restating why consequence, not technology, separates OT security from IT security.</li>
-          <li>Naming ICS components and placing them on a Purdue drawing without notes.</li>
-          <li>Identifying at least three risk drivers in a described facility.</li>
-          <li>Previewing Lesson 2, where these principles become architecture decisions.</li>
-        </ul>
+      </header>
+      <div class="outline-body">
+        <div class="narrative">
+          <p>Return to where the lesson opened. A record breach is measured in records; a process compromise is measured in parts per million, in gallons, in degrees, in whether a valve closed when it was supposed to. Every distinctive feature of this field descends from that single fact — the inverted priority order, the twenty-year equipment, the refused patch, the layered architecture, the caution about scanning something that is currently controlling a pump.</p>
+          <p>Students should now be able to name the components of a control system and place them on a Purdue drawing without notes, explain to a skeptical IT peer why confidentiality ranks last at Clearwater, and identify several risk drivers in a facility they have only read about. If a student can do those three things, the foundation is sound and everything else in the course is elaboration.</p>
+          <p>Lesson 2 turns these principles into architecture decisions. Where exactly does the boundary go, what crosses it, and how do you defend a design choice to someone whose primary concern is that the plant keeps running? Bring the drawing from this lesson; it becomes the working document.</p>
+        </div>
+        <p class="key-idea"><span class="key-idea-label">Key idea</span>Consequence, not technology, is what separates OT security from IT security — everything else follows from it.</p>
+        <div class="focus-block">
+          <div class="focus-label">Learners should focus on</div>
+          <ul>
+            <li>Restating why consequence, not technology, distinguishes OT security from IT security.</li>
+            <li>Naming ICS components and placing them on a Purdue drawing without notes.</li>
+            <li>Identifying at least three risk drivers in a described facility.</li>
+            <li>Previewing Lesson 2, where these principles become architecture decisions.</li>
+          </ul>
+        </div>
+        <aside class="teach-note">
+          <span class="teach-label">Teaching note</span>
+          <p>Use the reflection questions below as an exit ticket rather than homework. Reading them at the end of the session tells you immediately which of the ten sections needs five more minutes at the start of Day 2 — and in a faculty workshop, that diagnostic habit is itself part of what you are modeling.</p>
+        </aside>
       </div>
     </article>
   </section>
