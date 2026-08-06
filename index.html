@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teaching Operational Technologies for Community College Faculty | Course Navigation</title>
+<title>Teaching Operational Technologies and Cybersecurity for Community College Faculty | Course Navigation</title>
 <style>
   :root {
     --bg: #f4f6f9;
@@ -209,17 +209,69 @@
     margin-bottom: 16px;
     max-width: 78ch;
   }
+  .safeguards-hint {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: -8px 0 14px;
+  }
   .safeguard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 14px;
   }
   .safeguard-item {
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    padding: 0;
+    perspective: 1200px;
+    height: 148px;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .safeguard-item.is-flipped .flip-card-inner { transform: rotateY(180deg); }
+  .flip-card-face {
+    position: absolute;
+    inset: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-left: 4px solid var(--accent);
     border-radius: 10px;
     padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  .flip-card-face:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .flip-card-front { display: flex; flex-direction: column; justify-content: space-between; }
+  .flip-card-back { transform: rotateY(180deg); overflow-y: auto; }
+  .flip-card-back::after {
+    content: '↺ Tap to flip back';
+    align-self: flex-start;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+  .flip-hint {
+    align-self: flex-start;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 8px;
   }
   .safeguard-item h4 { font-size: 0.84rem; font-weight: 700; margin-bottom: 4px; }
   .safeguard-item p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
@@ -370,6 +422,7 @@
     * { transition: none !important; }
     .card:hover { transform: none; }
     .card:hover .card-arrow { transform: none; }
+    .flip-card-inner { transition: none; }
   }
 </style>
 </head>
@@ -380,7 +433,7 @@
     <div class="header-brand">
       <div class="brand-icon">OT</div>
       <div class="brand-text">
-        <h1>Teaching Operational Technologies</h1>
+        <h1>Teaching Operational Technologies and Cybersecurity</h1>
         <p>Faculty Development Workshop — 12 Lessons / 5 Days</p>
       </div>
     </div>
@@ -413,39 +466,113 @@
       <span class="course-badge">Read first</span>
     </div>
     <p>Operational technology controls physical processes, so a mistake in an OT classroom can injure someone or stop a real plant. These rules apply to every lesson, lab, and student project in this course. Review them with your class before Lab 1 and restate them in your own syllabus.</p>
+    <p class="safeguards-hint">Tap or click a card to flip it and read the full guidance.</p>
     <div class="safeguard-grid">
-      <div class="safeguard-item">
-        <h4>Safety outranks the exercise</h4>
-        <p>No activity touches a live process, safety instrumented system, or energized panel. Physical rigs require lockout/tagout, PPE, and an instructor present.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Safety outranks the exercise</h4>
+            <p>Physical safety comes before every lesson objective.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>No activity touches a live process, safety instrumented system, or energized panel. Physical rigs require lockout/tagout, PPE, and an instructor present.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Simulation and isolated equipment only</h4>
-        <p>Labs run on simulators, virtual PLCs, and bench hardware the college owns. Nothing is aimed at campus building automation, a vendor system, or an employer's plant.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Simulation and isolated equipment only</h4>
+            <p>All hands-on work stays on college-owned, non-production gear.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Labs run on simulators, virtual PLCs, and bench hardware the college owns. Nothing is aimed at campus building automation, a vendor system, or an employer's plant.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Air-gapped lab segments</h4>
-        <p>Keep lab networks off the campus production network. Document the isolation before class and verify it at the start of every lab session.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Air-gapped lab segments</h4>
+            <p>Lab networks stay physically and logically separate from campus IT.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Keep lab networks off the campus production network. Document the isolation before class and verify it at the start of every lab session.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Defensive scope</h4>
-        <p>The course teaches architecture, detection, hardening, and response. It does not distribute working exploit code, live malware samples, or attack tooling.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Defensive scope</h4>
+            <p>This course builds defenders, not operators of offensive tools.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>The course teaches architecture, detection, hardening, and response. It does not distribute working exploit code, live malware samples, or attack tooling.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Incidents are case studies</h4>
-        <p>Real events are analyzed for cause, impact, and lesson learned — not reconstructed as a procedure a student could follow against a live target.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Incidents are case studies</h4>
+            <p>Real events are studied for lessons learned, not as a how-to.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Real events are analyzed for cause, impact, and lesson learned — not reconstructed as a procedure a student could follow against a live target.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Protect real-world data</h4>
-        <p>Vendor drawings, customer diagrams, employer network detail, and CUI stay out of student work. Synthesize or scrub before anything reaches a shared repository.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Protect real-world data</h4>
+            <p>No employer, vendor, or customer data ever leaves the classroom.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Vendor drawings, customer diagrams, employer network detail, and CUI stay out of student work. Synthesize or scrub before anything reaches a shared repository.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Faculty review AI-generated content</h4>
-        <p>Any generated lesson text, quiz item, or graphic gets subject-matter review and a source check before students see it. You own the accuracy.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Faculty review AI-generated content</h4>
+            <p>You own the accuracy of anything AI drafted for your class.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Any generated lesson text, quiz item, or graphic gets subject-matter review and a source check before students see it. You own the accuracy.</p>
+          </button>
+        </div>
       </div>
-      <div class="safeguard-item">
-        <h4>Accessible and equitable by default</h4>
-        <p>Materials meet WCAG 2.2 AA and work by keyboard. No lab depends on a paid license or vendor account a student cannot obtain.</p>
+
+      <div class="safeguard-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
+            <h4>Accessible and equitable by default</h4>
+            <p>Every material works for every student, on any device.</p>
+            <span class="flip-hint">Tap for details ↻</span>
+          </button>
+          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
+            <p>Materials meet WCAG 2.2 AA and work by keyboard. No lab depends on a paid license or vendor account a student cannot obtain.</p>
+          </button>
+        </div>
       </div>
+
     </div>
     <div class="safeguards-foot">
       <span>Every student signs the acceptable-use acknowledgment before the first hands-on lab.</span>
@@ -816,7 +943,7 @@
 </main>
 
 <footer>
-  Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; 12 Lessons / 5 Days &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; 12 Lessons / 5 Days &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
   Educational use only. All exercises are simulation-based and defensive in scope.
 </footer>
 
@@ -839,6 +966,17 @@
     try { saved = localStorage.getItem('otfac-theme'); } catch (e) { /* storage unavailable */ }
     applyTheme(saved === 'dark' ? 'dark' : 'light');
   })();
+
+  // Flip cards for the Safeguards & Responsible Use section
+  document.querySelectorAll('.safeguard-item[data-flip]').forEach(function (item) {
+    var faces = item.querySelectorAll('.flip-card-face');
+    item.addEventListener('click', function () {
+      var flipped = item.classList.toggle('is-flipped');
+      faces.forEach(function (face) {
+        face.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+      });
+    });
+  });
 </script>
 </body>
 </html>
