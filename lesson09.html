@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 9 · Governance, Risk &amp; Compliance for IT/OT — OT-101</title>
+<meta name="description" content="OT-101 Day 4 Lesson 9: Building a risk register and POA&amp;M across separately-governed IT and OT organizations, what audit evidence auditors actually check, and how NERC CIP and CMMC turn voluntary practice into mandatory budget for utilities and manufacturers.">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#f4f6f9;
+  --surface:#ffffff;
+  --surface-2:#eef1f6;
+  --text:#1a1e2e;
+  --muted:#5a6480;
+  --accent:#b45309;
+  --accent-2:#92400e;
+  --accent-soft:#fdf3e7;
+  --accent-line:#e7c9a2;
+  --header-bg:#1a1e2e;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#d1d9e6;
+  --table-head-bg:#1a1e2e;
+  --table-head-text:#ffffff;
+  --row-hover:#f7f2ea;
+  --ok-bg:#e8f5ec; --ok-text:#155724; --ok-line:#2e7d4f;
+  --no-bg:#fdeaea; --no-text:#7f1d1d; --no-line:#b91c1c;
+  --warn-bg:#fdf3e7; --warn-text:#7c3a06; --warn-line:#b45309;
+  --shadow:0 1px 2px rgba(26,30,46,.06), 0 6px 18px rgba(26,30,46,.07);
+  --radius:12px;
+  --radius-sm:8px;
+  --focus:#b45309;
+  --maxw:1240px;
+}
+html[data-theme="dark"]{
+  --bg:#0f1117;
+  --surface:#1c1f2e;
+  --surface-2:#161927;
+  --text:#e8ecf4;
+  --muted:#a8b2c8;
+  --accent:#f59e0b;
+  --accent-2:#fbbf24;
+  --accent-soft:#2a2313;
+  --accent-line:#7a5a1c;
+  --header-bg:#0a0c14;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#333a52;
+  --table-head-bg:#0a0c14;
+  --table-head-text:#ffffff;
+  --row-hover:#242840;
+  --ok-bg:#12281c; --ok-text:#9be6b4; --ok-line:#3fa76b;
+  --no-bg:#2d1414; --no-text:#ffb3b3; --no-line:#e05a5a;
+  --warn-bg:#2a2313; --warn-text:#fbd38d; --warn-line:#f59e0b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  --focus:#f59e0b;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:150px;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{line-height:1.25;font-weight:700;color:var(--text);}
+h2{font-size:1.6rem;margin:0 0 .35rem;}
+h3{font-size:1.18rem;margin:1.6rem 0 .5rem;}
+h4{font-size:1.02rem;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);}
+p{margin:0 0 1rem;}
+a{color:var(--accent);}
+a:hover{color:var(--accent-2);}
+code{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:4px;padding:.08em .35em;font-size:.9em;
+}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px;}
+
+/* ---------- Skip link ---------- */
+.skip-link{
+  position:absolute;left:8px;top:-60px;z-index:200;
+  background:var(--accent);color:#fff;font-weight:700;
+  padding:.6rem 1rem;border-radius:0 0 8px 8px;text-decoration:none;
+  transition:top .15s ease;
+}
+.skip-link:focus{top:0;color:#fff;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  font-size:.85rem;color:var(--muted);
+}
+.topbar-inner{
+  max-width:var(--maxw);margin:0 auto;padding:.5rem 1.25rem;
+  display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;align-items:center;justify-content:space-between;
+}
+.topbar a.home-link{font-weight:700;color:var(--accent);text-decoration:none;}
+.topbar a.home-link:hover{text-decoration:underline;}
+
+/* ---------- Header ---------- */
+.lesson-header{background:var(--header-bg);color:var(--header-text);}
+.lesson-header-inner{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 1.75rem;}
+.eyebrow{
+  font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-2);font-weight:700;margin:0 0 .6rem;
+}
+html[data-theme="light"] .eyebrow{color:#f0b360;}
+.lesson-header h1{font-size:2.3rem;margin:0 0 .5rem;color:var(--header-text);}
+.tagline{font-size:1.08rem;color:var(--header-muted);max-width:62ch;margin:0 0 1.1rem;}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.meta-chip{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);
+  color:#fff;border-radius:999px;padding:.28rem .8rem;font-size:.82rem;font-weight:600;
+}
+.header-tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{
+  font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent;
+  border-radius:999px;padding:.5rem 1.05rem;display:inline-flex;align-items:center;gap:.45rem;
+}
+.btn:hover{background:var(--accent-2);}
+html[data-theme="dark"] .btn{color:#1a1300;}
+html[data-theme="dark"] .btn:hover{background:var(--accent-2);}
+.btn-ghost{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;}
+html[data-theme="dark"] .btn-ghost{color:#fff;}
+
+/* ---------- Section nav ---------- */
+.section-nav{
+  position:sticky;top:0;z-index:60;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(26,30,46,.06);
+}
+.section-nav ul{
+  max-width:var(--maxw);margin:0 auto;padding:0 1.25rem;
+  list-style:none;display:flex;gap:.25rem;overflow-x:auto;
+}
+.section-nav a{
+  display:block;padding:.7rem .8rem;font-size:.83rem;font-weight:600;
+  color:var(--muted);text-decoration:none;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.section-nav a:hover{color:var(--accent);}
+.section-nav a[aria-current="true"]{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ---------- Layout ---------- */
+.layout{
+  max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 3rem;
+  display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static !important;}
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1.5rem 1.6rem;margin:0 0 1.6rem;
+}
+.section-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.section-icon{
+  flex:0 0 auto;width:42px;height:42px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  display:grid;place-items:center;
+}
+.section-icon svg{width:24px;height:24px;}
+.section-head .titles{flex:1 1 240px;min-width:0;}
+.time-pill{
+  flex:0 0 auto;font-size:.75rem;font-weight:700;color:var(--accent);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:999px;padding:.2rem .65rem;white-space:nowrap;
+}
+.sub{color:var(--muted);font-size:.92rem;margin:.15rem 0 0;}
+
+/* ---------- Part banners ---------- */
+.part-banner{
+  background:var(--header-bg);color:#fff;border-radius:var(--radius);
+  padding:1rem 1.4rem;margin:2.2rem 0 1.4rem;border-left:6px solid var(--accent);
+}
+.part-banner .p-label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:#f0b360;font-weight:700;}
+html[data-theme="dark"] .part-banner .p-label{color:var(--accent);}
+.part-banner h2{color:#fff;font-size:1.35rem;margin:.15rem 0 .2rem;}
+.part-banner p{margin:0;color:var(--header-muted);font-size:.95rem;}
+
+/* ---------- Callouts / analogy ---------- */
+.analogy-box{
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-left:5px solid var(--accent);border-radius:var(--radius-sm);
+  padding:1rem 1.15rem;margin:1.2rem 0;
+}
+.analogy-box .label{
+  display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--accent-2);margin-bottom:.4rem;
+}
+html[data-theme="dark"] .analogy-box .label{color:var(--accent);}
+.analogy-box p:last-child{margin-bottom:0;}
+.callout{
+  border:1px solid var(--border);border-left:5px solid var(--muted);
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  padding:.95rem 1.1rem;margin:1.2rem 0;font-size:.95rem;
+}
+.callout.safety{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:var(--warn-line);color:var(--warn-text);}
+.callout strong{color:inherit;}
+.safety-flag{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--warn-bg);color:var(--warn-text);
+  border:1px solid var(--warn-line);border-radius:999px;
+  padding:.25rem .8rem;font-size:.78rem;font-weight:700;margin-bottom:.9rem;
+}
+
+/* ---------- Lists ---------- */
+ul.tight,ol.tight{margin:0 0 1rem;padding-left:1.3rem;}
+ul.tight li,ol.tight li{margin-bottom:.4rem;}
+.lo-list{list-style:none;padding:0;margin:0;counter-reset:lo;}
+.lo-list li{
+  position:relative;padding-left:2.4rem;margin-bottom:.7rem;counter-increment:lo;
+}
+.lo-list li::before{
+  content:"LO" counter(lo);position:absolute;left:0;top:.1rem;
+  font-size:.68rem;font-weight:800;color:#fff;background:var(--accent);
+  border-radius:5px;padding:.15rem .35rem;letter-spacing:.02em;
+}
+html[data-theme="dark"] .lo-list li::before{color:#1a1300;}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto;margin:1.1rem 0 1.3rem;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem;background:var(--surface);}
+caption{caption-side:top;text-align:left;font-size:.88rem;color:var(--muted);padding:.7rem .9rem;font-style:italic;}
+th,td{border:1px solid var(--border);padding:.6rem .75rem;text-align:left;vertical-align:top;}
+thead th{background:var(--table-head-bg);color:var(--table-head-text);font-size:.84rem;letter-spacing:.02em;border-color:rgba(255,255,255,.22);}
+tbody tr:hover{background:var(--row-hover);}
+th[scope="row"]{background:var(--surface-2);font-weight:700;}
+
+/* ---------- Diagram frames ---------- */
+figure{margin:1.3rem 0;}
+.diagram-frame{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:1rem;
+}
+.diagram-frame svg{width:100%;height:auto;display:block;}
+figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
+
+/* ---------- Flip cards ---------- */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
+.flip-card{
+  perspective:1000px;background:none;border:0;padding:0;font:inherit;
+  text-align:left;cursor:pointer;min-height:180px;
+}
+.flip-inner{
+  position:relative;width:100%;min-height:180px;height:100%;
+  transition:transform .5s;transform-style:preserve-3d;
+}
+.flip-card[aria-pressed="true"] .flip-inner{transform:rotateY(180deg);}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:1rem;display:flex;flex-direction:column;justify-content:center;
+  background:var(--surface);box-shadow:var(--shadow);overflow:auto;
+}
+.flip-front{border-top:4px solid var(--accent);}
+.flip-front .term{font-weight:800;font-size:1.05rem;}
+.flip-front .hint{font-size:.78rem;color:var(--muted);margin-top:.5rem;}
+.flip-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent-line);font-size:.9rem;}
+
+/* ---------- Activity blocks ---------- */
+.activity-block{
+  border:2px solid var(--accent);border-radius:var(--radius);
+  overflow:hidden;margin:1.5rem 0;background:var(--surface);
+}
+.activity-header{
+  background:var(--accent);color:#fff;padding:.7rem 1.1rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+html[data-theme="dark"] .activity-header{color:#1a1300;}
+.activity-header h3{margin:0;font-size:1.05rem;color:inherit;}
+.activity-header .t{font-size:.8rem;font-weight:700;}
+.activity-body{padding:1.1rem 1.2rem;}
+.instructions{
+  background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:.85rem 1rem;margin:0 0 1rem;font-size:.93rem;
+}
+.ips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem;margin:1rem 0;}
+.ips div{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .85rem;background:var(--surface-2);font-size:.9rem;}
+.ips h4{margin:0 0 .3rem;font-size:.75rem;color:var(--accent);}
+
+/* ---------- Mapping exercise ---------- */
+.mapping-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+.mapping-table-wrap table{min-width:560px;}
+select{
+  font:inherit;font-size:.88rem;padding:.35rem .5rem;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--surface);color:var(--text);max-width:100%;
+}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .5rem;}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.btn-secondary:hover{background:var(--accent-soft);color:var(--accent-2);}
+html[data-theme="dark"] .btn-secondary{color:var(--accent);}
+.result-line{font-weight:700;font-size:.95rem;margin:.4rem 0 0;}
+tr.map-correct td{background:var(--ok-bg);}
+tr.map-wrong td{background:var(--no-bg);}
+.map-note{font-size:.8rem;display:block;margin-top:.3rem;}
+tr.map-correct .map-note{color:var(--ok-text);}
+tr.map-wrong .map-note{color:var(--no-text);}
+
+/* ---------- Simulation ---------- */
+.sim{
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface-2);padding:1.1rem 1.2rem;margin:1.3rem 0;
+}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.7rem;margin:.8rem 0;}
+.asset{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.65rem .8rem;
+}
+.asset .name{font-weight:700;font-size:.93rem;display:block;}
+.asset .desc{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem;}
+.asset label{font-size:.78rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem;}
+.sim-out{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:.9rem 1rem;margin-top:.9rem;font-size:.92rem;min-height:2.5rem;
+}
+.sim-out ul{margin:.4rem 0 .8rem;padding-left:1.2rem;}
+.finding{border-left:4px solid var(--no-line);background:var(--no-bg);color:var(--no-text);padding:.5rem .7rem;border-radius:6px;margin:.4rem 0;font-size:.88rem;}
+.finding.pass{border-left-color:var(--ok-line);background:var(--ok-bg);color:var(--ok-text);}
+.finding.warn{border-left-color:var(--warn-line);background:var(--warn-bg);color:var(--warn-text);}
+.conduit-item{font-family:"Cascadia Mono",Consolas,monospace;font-size:.85rem;}
+
+/* ---------- Quiz ---------- */
+.quiz-block{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:1.2rem 1.3rem;}
+.q{border-bottom:1px solid var(--border);padding:.9rem 0;}
+.q:last-of-type{border-bottom:0;}
+.q legend{font-weight:700;font-size:1rem;padding:0;margin-bottom:.5rem;}
+.q fieldset{border:0;margin:0;padding:0;}
+.q label{display:block;padding:.32rem .2rem .32rem 0;font-size:.95rem;cursor:pointer;}
+.q input[type="radio"]{margin-right:.5rem;accent-color:var(--accent);}
+.q-feedback{margin-top:.55rem;padding:.6rem .8rem;border-radius:6px;font-size:.9rem;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.correct{background:var(--ok-bg);color:var(--ok-text);border-left:4px solid var(--ok-line);}
+.q-feedback.incorrect{background:var(--no-bg);color:var(--no-text);border-left:4px solid var(--no-line);}
+.q-feedback.unanswered{background:var(--warn-bg);color:var(--warn-text);border-left:4px solid var(--warn-line);}
+.score{font-weight:800;font-size:1.05rem;margin-top:1rem;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:64px;display:flex;flex-direction:column;gap:1.1rem;}
+.side-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.1rem;
+}
+.side-card h2{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;}
+.sidebar-toc ul{list-style:none;margin:0;padding:0;font-size:.88rem;}
+.sidebar-toc li{margin-bottom:.4rem;}
+.sidebar-toc a{text-decoration:none;color:var(--text);}
+.sidebar-toc a:hover{color:var(--accent);text-decoration:underline;}
+.sidebar-toc .defn{display:block;color:var(--muted);font-size:.79rem;line-height:1.45;}
+.lo-check{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;margin-bottom:.55rem;}
+.lo-check input{margin-top:.25rem;accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
+.progress-bar{height:9px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin:.2rem 0 .6rem;}
+.progress-bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease;}
+.progress-text{font-size:.8rem;color:var(--muted);margin:0 0 .7rem;}
+.prevnext{display:flex;flex-direction:column;gap:.55rem;font-size:.85rem;}
+.prevnext a{
+  display:block;text-decoration:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.6rem .75rem;color:var(--text);background:var(--surface-2);
+}
+.prevnext a:hover{border-color:var(--accent);color:var(--accent);}
+.prevnext .dir{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:800;}
+
+/* ---------- Resource cards ---------- */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin:1rem 0;}
+.res{
+  border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:var(--radius-sm);padding:.8rem .9rem;background:var(--surface-2);font-size:.9rem;
+}
+.res a{font-weight:700;}
+.res .kind{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:.25rem;}
+
+/* ---------- Footer ---------- */
+.footer-nav{border-top:1px solid var(--border);background:var(--surface);}
+.footer-nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:1rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.9rem;
+}
+.footer-nav a{text-decoration:none;font-weight:700;}
+.footer-nav a:hover{text-decoration:underline;}
+footer.site{background:var(--header-bg);color:var(--header-muted);}
+footer.site .inner{max-width:var(--maxw);margin:0 auto;padding:1.6rem 1.25rem;font-size:.88rem;}
+footer.site strong{color:#fff;}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  .flip-inner{transition:none;}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  html[data-theme="dark"]{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  body{background:#fff !important;color:#000 !important;font-size:11.5pt;}
+  .topbar,.section-nav,.sidebar,.header-tools,.skip-link,.footer-nav{display:none !important;}
+  .layout{display:block;max-width:none;padding:0;}
+  .card,.quiz-block,.activity-block,.sim{box-shadow:none;border:1px solid #999;break-inside:avoid;}
+  .lesson-header{background:#fff !important;color:#000 !important;border-bottom:2px solid #000;}
+  .lesson-header h1,.tagline{color:#000 !important;}
+  .meta-chip{color:#000 !important;border-color:#000;}
+  .part-banner{background:#fff !important;color:#000 !important;border:1px solid #000;border-left:6px solid #000;}
+  .part-banner h2,.part-banner p,.part-banner .p-label{color:#000 !important;}
+  .activity-header{background:#eee !important;color:#000 !important;}
+  thead th{background:#ddd !important;color:#000 !important;}
+  .flip-inner{transform:none !important;}
+  .flip-face{position:static;transform:none !important;backface-visibility:visible;min-height:0;margin-bottom:.4rem;}
+  .flip-card{min-height:0;}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;}
+  footer.site{background:#fff !important;color:#000 !important;border-top:1px solid #000;}
+  footer.site strong{color:#000 !important;}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home-link" href="index.html">&larr; Course Home</a>
+    <span>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands</span>
+  </div>
+</div>
+
+<!-- ============================ HEADER ============================ -->
+<header class="lesson-header">
+  <div class="lesson-header-inner">
+    <p class="eyebrow">OT-101 &middot; Day 4 &middot; Lesson 9 &middot; 4 contact hours</p>
+    <h1>Governance, Risk &amp; Compliance for IT/OT</h1>
+    <p class="tagline">Two organizations, two executives, one shared plant. Learn to build a risk register and a POA&amp;M that survive an audit — and meet the regulation that quietly decides who gets the security budget.</p>
+    <div class="meta-row">
+      <span class="meta-chip">Level: Intermediate</span>
+      <span class="meta-chip">Strand: Governance</span>
+      <span class="meta-chip">Duration: 4 hours</span>
+      <span class="meta-chip">6 learning objectives</span>
+    </div>
+    <div class="header-tools">
+      <button type="button" class="btn btn-ghost" id="themeToggle" aria-pressed="false">
+        <span aria-hidden="true" id="themeIcon">&#9789;</span>
+        <span id="themeLabel">Switch to dark mode</span>
+      </button>
+      <button type="button" class="btn btn-ghost" id="printBtn">
+        <span aria-hidden="true">&#128424;</span> Print / Save as PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ SECTION NAV ============================ -->
+<nav class="section-nav" aria-label="Sections in this lesson">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#towers">1. Two Towers</a></li>
+    <li><a href="#register">2. Risk Register</a></li>
+    <li><a href="#poam">3. POA&amp;M</a></li>
+    <li><a href="#audit">4. Audit Evidence</a></li>
+    <li><a href="#cip">5. NERC CIP &amp; CMMC</a></li>
+    <li><a href="#compare">6. Side by Side</a></li>
+    <li><a href="#sim">7. Register Builder</a></li>
+    <li><a href="#mapping">8. Mapping Lab</a></li>
+    <li><a href="#charter">9. Governance Charter</a></li>
+    <li><a href="#review">10. Knowledge Check</a></li>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+
+<div class="layout">
+
+<!-- ============================ MAIN ============================ -->
+<main id="main">
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section id="overview" class="card" aria-labelledby="h-overview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5h16v14H4z"/><path d="M4 9h16M9 9v10"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-overview">Lesson Overview</h2>
+        <p class="sub">Orientation, anchoring analogy, and what you should be able to do by the end.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <p>Every faculty member who has toured a plant notices the same organizational oddity: the security team that manages the corporate network answers to the CIO, and the team that manages the control system down the hall answers to a plant manager or VP of Operations — and the two rarely share a budget line, a ticketing system, or a boss short of the CEO. That split is not a mistake. IT and OT optimize for different things — IT typically ranks confidentiality first, OT typically ranks safety and availability first — and a reporting structure that reflects that difference is doing its job. The problem shows up the moment a single risk, like an unpatched substation firewall, needs a decision that both towers have to sign off on, and neither one is quite sure whose ticket it is.</p>
+
+    <p>This lesson is about the paperwork that makes that decision possible anyway: the <strong>risk register</strong> that both towers can read, the <strong>POA&amp;M</strong> that tracks a finding until it is actually fixed, the <strong>audit evidence</strong> that proves the fix happened, and — because none of this pays for itself — the regulation, <strong>NERC CIP</strong>, that turns "should fix" into "must fix by this date or the organization is fined." By the end, you will have drafted a short charter that assigns ownership of each of these artifacts across an IT/OT boundary.</p>
+
+    <div class="analogy-box">
+      <span class="label">Anchoring analogy — two nations, one shared border</span>
+      <p>Picture two neighboring countries that share a single mountain pass. Each nation has its own government, its own laws, and its own army, and neither one answers to the other. But the pass itself — the border crossing — is a shared problem: if it is left unguarded, both nations are exposed. So the two governments sign a <strong>treaty</strong> (governance: who is responsible for what, and who has authority to act). They keep a joint <strong>watch log</strong> of known threats to the pass and how serious each one is (the risk register). When the watch log turns up a weak spot — a bridge that needs shoring up — they write a <strong>joint repair plan with a deadline</strong> (the POA&amp;M). And because treaties are worthless if nobody checks them, a neutral <strong>inspector</strong> periodically visits and asks for dated proof that the repair actually happened (the audit).</p>
+      <p>Now add one more fact: one of these two nations belongs to a mutual-defense alliance that requires it to maintain the pass to a specific standard, with real penalties for failing an inspection. That obligation is why <em>that nation's</em> defense budget for the pass is bigger than its neighbor's — not because its leaders care more, but because a treaty with teeth exists. That is exactly the relationship between a utility bound by <strong>NERC CIP</strong> and a manufacturer that has adopted a framework voluntarily. Hold onto this analogy; every section below is one part of the treaty.</p>
+    </div>
+
+    <h3>Learning objectives</h3>
+    <p>By the end of this 4-hour session, you will be able to:</p>
+    <ol class="lo-list">
+      <li><strong>Explain</strong> why IT and OT security functions in the same organization often report through different executives, and how that split affects decision rights over a shared risk.</li>
+      <li><strong>Identify</strong> the required fields of a risk register entry and construct one from a described asset and threat scenario.</li>
+      <li><strong>Differentiate</strong> a risk register from a POA&amp;M and describe how a finding moves from one artifact to the other.</li>
+      <li><strong>Compare</strong> audit evidence expectations under a voluntary framework against a mandatory regulation such as NERC CIP.</li>
+      <li><strong>Evaluate</strong> a completed risk register and POA&amp;M for completeness and defensibility, given the enforcement stakes NERC CIP attaches to certain findings.</li>
+      <li><strong>Design</strong> a one-page cross-organizational governance charter that assigns ownership of GRC deliverables between IT and OT stakeholders.</li>
+    </ol>
+
+    <div class="callout safety">
+      <strong>Safeguards &amp; Responsible Use.</strong> Nothing in this lesson touches live or production equipment, energized panels, or any real network. All hands-on work is browser-based simulation using fictional data. We study governance and defense, not offensive tooling. Real incidents and audits appear as case studies for analysis, never as step-by-step procedures. No vendor, employer, or customer data appears in any example — every organization, asset tag, and finding below is fictional.
+    </div>
+  </section>
+
+  <!-- ===================== PART A BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part A</span>
+    <h2>The GRC Artifacts — Governance, Risk, POA&amp;M, and Audit</h2>
+    <p>Roughly 2 hours of guided lecture, diagrams, and worked examples.</p>
+  </div>
+
+  <!-- ===================== 1. TWO TOWERS ===================== -->
+  <section id="towers" class="card" aria-labelledby="h-towers">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 21V9l4-4 4 4v12M12 21V5l4-2 4 2v16"/><path d="M4 21h16"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-towers">1. Two Towers: Governance When IT and OT Report Elsewhere</h2>
+        <p class="sub">The org-chart fact that drives every other decision in this lesson.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Governance</strong> is the set of decisions, policies, and assigned responsibilities that determine how an organization manages risk — who is allowed to accept a risk, who must approve an exception, and who is accountable when something goes wrong. In a plant or a utility, governance almost always splits along the same line: a <strong>CIO or CISO</strong> governs the business network, the ERP, email, and endpoint security, while a <strong>VP of Operations, plant manager, or director of engineering</strong> governs the control system — the PLCs, RTUs, protective relays, and the network that connects them. Each side has its own policies, its own change-control board, and its own tolerance for downtime, and neither reports to the other short of the CEO.</p>
+
+    <p>This is not dysfunction to be corrected. IT security policy is usually built around confidentiality first, because a leaked customer database is the worst plausible day. OT security policy is built around safety and availability first, because an unplanned trip on a transmission line or a stopped production line is the worst plausible day — and a control that protects confidentiality by locking an operator out of a screen during an emergency can itself cause harm. A single organization-wide policy that pretends these priorities are the same produces a document nobody on either side actually follows.</p>
+
+    <h3>Worked example — Ironwood Precision Manufacturing</h3>
+    <p><strong>Ironwood Precision Manufacturing</strong> (fictional) machines aerospace fasteners and holds a subcontract that requires it to protect federal contract information under CMMC. Its CIO owns the corporate domain, email security, and the ERP system that schedules orders. Its Director of Manufacturing Engineering owns the CNC line controllers, the plant floor network, and a small SCADA system that tracks tool wear. When an auditor flags an unpatched Windows box, the first governance question is not "how do we fix it" — it is "whose box is this, and who has authority to schedule the downtime to fix it?" That question has to be answered <em>before</em> the technical fix, or the finding sits open for months while two departments wait on each other.</p>
+
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 900 380" role="img" aria-labelledby="t-towers d-towers">
+          <title id="t-towers">Two governance towers meeting at a joint risk committee</title>
+          <desc id="d-towers">An org-chart diagram. At the top, a single box labelled Chief Executive Officer. Two lines descend to two towers. The left tower is labelled CIO, then IT Security / CISO, then IT Governance: corporate network, ERP, email, endpoint policy. The right tower is labelled VP of Operations or Plant Manager, then OT Engineering Lead, then OT Governance: control network, PLCs and RTUs, safety and change policy. A third box positioned between and below both towers is labelled Joint OT and IT Risk Committee, connected by dashed lines to both the IT Security box and the OT Engineering Lead box, representing the only place where a shared risk register and POA and M are jointly owned.</desc>
+          <g font-family="Segoe UI, sans-serif" font-size="12.5">
+            <rect x="360" y="14" width="180" height="46" rx="8" fill="var(--header-bg)" stroke="var(--border)"/>
+            <text x="450" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Chief Executive Officer</text>
+
+            <line x1="450" y1="60" x2="200" y2="100" stroke="var(--accent)" stroke-width="2.5"/>
+            <line x1="450" y1="60" x2="700" y2="100" stroke="var(--accent)" stroke-width="2.5"/>
+
+            <!-- Left tower: IT -->
+            <rect x="90" y="100" width="220" height="46" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="200" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">CIO</text>
+            <line x1="200" y1="146" x2="200" y2="168" stroke="var(--border)" stroke-width="2"/>
+            <rect x="90" y="168" width="220" height="46" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="200" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">IT Security / CISO</text>
+            <line x1="200" y1="214" x2="200" y2="236" stroke="var(--border)" stroke-width="2"/>
+            <rect x="70" y="236" width="260" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent-line)" stroke-width="1.5"/>
+            <text x="200" y="260" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--text)">IT Governance</text>
+            <text x="200" y="280" text-anchor="middle" font-size="11" fill="var(--muted)">Corporate network &middot; ERP &middot; email</text>
+            <text x="200" y="298" text-anchor="middle" font-size="11" fill="var(--muted)">Endpoint &amp; identity policy</text>
+
+            <!-- Right tower: OT -->
+            <rect x="590" y="100" width="240" height="46" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="710" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">VP Operations / Plant Manager</text>
+            <line x1="710" y1="146" x2="710" y2="168" stroke="var(--border)" stroke-width="2"/>
+            <rect x="600" y="168" width="220" height="46" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="710" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">OT Engineering Lead</text>
+            <line x1="710" y1="214" x2="710" y2="236" stroke="var(--border)" stroke-width="2"/>
+            <rect x="580" y="236" width="260" height="78" rx="8" fill="var(--accent-soft)" stroke="var(--accent-line)" stroke-width="1.5"/>
+            <text x="710" y="260" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--text)">OT Governance</text>
+            <text x="710" y="280" text-anchor="middle" font-size="11" fill="var(--muted)">Control network &middot; PLCs &amp; RTUs</text>
+            <text x="710" y="298" text-anchor="middle" font-size="11" fill="var(--muted)">Safety &amp; change policy</text>
+
+            <!-- Joint committee -->
+            <rect x="320" y="330" width="260" height="40" rx="20" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="450" y="355" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent-2)">Joint OT/IT Risk Committee</text>
+            <line x1="200" y1="214" x2="380" y2="335" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <line x1="710" y1="214" x2="520" y2="335" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 1. Two governance towers descend from a shared CEO but otherwise run independently, with different priorities and different change-control boards. The dashed lines show the one structure both towers usually build on purpose: a joint risk committee that owns a shared risk register and POA&amp;M, so a finding that spans the boundary — like Ironwood's unpatched box — has one place to be tracked instead of two mailboxes ignoring it.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> Students with a pure IT background often assume the fix is to merge the two security teams into one. In practice this is rare and usually wrong: OT change windows, safety sign-off, and vendor support contracts require domain expertise IT security staff don't have. The realistic fix — and the one worth teaching — is a <em>shared artifact and a standing meeting</em>, not a reorg.
+    </div>
+  </section>
+
+  <!-- ===================== 2. RISK REGISTER ===================== -->
+  <section id="register" class="card" aria-labelledby="h-register">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-register">2. Building the Risk Register</h2>
+        <p class="sub">The document both towers agree to read, even if they don't agree on much else.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>A <strong>risk register</strong> is a living inventory of identified risks, each scored for likelihood and impact, assigned an owner, and tracked to a treatment decision. It is not a list of vulnerabilities — a scanner produces those automatically. A risk register turns a vulnerability into a business decision by attaching consequence, ownership, and a plan. The starting input to any risk register is an <strong>asset inventory</strong>: you cannot score the risk to a device you have not written down.</p>
+
+    <p>A defensible risk register entry needs, at minimum: an asset, the threat and vulnerability being assessed, likelihood, impact, the resulting risk score, an assigned <strong>owner</strong> (a named role, not a department), a treatment decision (accept, mitigate, transfer, or avoid), and a status. Miss the owner field and the entry becomes exactly the kind of finding that sits open for a year because nobody's name is attached to it.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the watch log at the border pass</span>
+      <p>Recall the shared mountain pass. The watch log does not record every rock on the trail — it records the specific things that could let someone through undetected, how likely each one is given current conditions, how bad it would be if it happened, and which guard captain is responsible for watching it. A watch log with no assigned captain is not a watch log; it is a list someone will eventually stop reading.</p>
+    </div>
+
+    <h3>Worked example — Cascade Summit Electric, Substation 12</h3>
+    <p><strong>Cascade Summit Electric</strong> (fictional) operates a transmission substation. Its OT engineering lead and its IT security analyst jointly maintain one risk register for the site. A short excerpt:</p>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 1. Risk register excerpt, Cascade Summit Electric — Substation 12 (fictional).</caption>
+        <thead>
+          <tr><th scope="col">Asset</th><th scope="col">Threat / vulnerability</th><th scope="col">Likelihood</th><th scope="col">Impact</th><th scope="col">Owner</th><th scope="col">Treatment</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">RTU-22</th><td>DNP3 has no built-in authentication; unauthenticated write to breaker control point</td><td>Possible</td><td>Severe</td><td>OT Engineering Lead</td><td>Mitigate — add DNP3 Secure Authentication gateway; Q3</td></tr>
+          <tr><th scope="row">FW-ESP1</th><td>Firmware two releases behind; known CVE affecting VPN module</td><td>Likely</td><td>Major</td><td>IT Security Analyst</td><td>Mitigate — emergency change window this month</td></tr>
+          <tr><th scope="row">ENG-LAP-4</th><td>Engineering laptop used off-site for relay settings; local admin rights, no disk encryption</td><td>Possible</td><td>Major</td><td>OT Engineering Lead</td><td>Mitigate — encrypt, restrict local admin; Q2</td></tr>
+          <tr><th scope="row">HIST-CORP</th><td>Historian database on flat corporate network segment</td><td>Unlikely</td><td>Minor</td><td>IT Security Analyst</td><td>Accept — document rationale, review annually</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Notice that the owner column mixes titles from both towers on the same page. That is the entire point of a shared register: it is the one document where "whose risk is this" gets answered in writing, with a name, instead of argued about in a hallway.</p>
+
+    <div class="callout">
+      <strong>Assessment idea.</strong> Give students an asset inventory with brief descriptions and ask them to draft the missing risk register fields — threat, likelihood, impact, owner, treatment — for two or three assets. Grading a risk register is fast: every field either exists and is defensible, or it doesn't.
+    </div>
+  </section>
+
+  <!-- ===================== 3. POA&M ===================== -->
+  <section id="poam" class="card" aria-labelledby="h-poam">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-poam">3. POA&amp;M: From Finding to Fix</h2>
+        <p class="sub">The artifact that keeps a risk register entry from becoming a permanent footnote.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p>A <strong>POA&amp;M</strong> (Plan of Action &amp; Milestones) is a tracked remediation plan for a specific finding: what will be done, who will do it, what resources it needs, the target completion date, and the current status. Where a risk register entry says <em>this risk exists and here is how bad it is</em>, a POA&amp;M says <em>here is exactly how and when it stops being true</em>. Not every risk register entry needs a POA&amp;M — an accepted risk, like HIST-CORP above, does not — but every risk marked "mitigate" should generate one.</p>
+
+    <h3>Four artifacts, one lifecycle</h3>
+    <p>Students often blur these four documents together. Each one answers a different question, and each hands off to the next:</p>
+    <div class="flip-grid">
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Risk Register</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"what could go wrong, and how bad is it?"</em> A living inventory of scored risks with an owner and a treatment decision. Feeds a POA&amp;M whenever the decision is "mitigate."</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">POA&amp;M</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"how and when does this stop being true?"</em> Named steps, resources, a target date, and a status, tracked until closure. One risk register entry can spawn one POA&amp;M with several milestones.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Audit Evidence</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"prove it."</em> The dated ticket, screenshot, config diff, or signed record that shows a milestone actually closed — not just that someone said it did.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Governance</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"who is allowed to decide this?"</em> The policy and org structure that says who owns register entries, who approves an accepted risk, and who signs off a POA&amp;M extension.</span>
+        </span>
+      </button>
+    </div>
+    <p class="sub">Each card is a button: press <kbd>Enter</kbd> or <kbd>Space</kbd> to flip it. All four definitions also print in full.</p>
+
+    <h3>Worked example — turning the RTU-22 entry into a POA&amp;M</h3>
+    <p>The risk register entry for RTU-22 above ("mitigate — add DNP3 Secure Authentication gateway; Q3") becomes a tracked POA&amp;M with its own milestones:</p>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 2. POA&amp;M for Cascade Summit Electric risk register item RTU-22-01 (fictional).</caption>
+        <thead>
+          <tr><th scope="col">Milestone</th><th scope="col">Owner</th><th scope="col">Resources needed</th><th scope="col">Target date</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">M1 — Select gateway model, confirm DNP3-SA support</th><td>OT Engineering Lead</td><td>Vendor quote, 2 engineer-days</td><td>Week 2</td><td>Complete</td></tr>
+          <tr><th scope="row">M2 — Order &amp; receive hardware</th><td>OT Engineering Lead</td><td>Capital purchase order</td><td>Week 6</td><td>In progress</td></tr>
+          <tr><th scope="row">M3 — Install &amp; configure in maintenance window</th><td>OT Engineering Lead + IT Security Analyst</td><td>Scheduled outage, 4 hrs</td><td>Week 10</td><td>Not started</td></tr>
+          <tr><th scope="row">M4 — Validate &amp; close finding</th><td>IT Security Analyst</td><td>Test plan, sign-off</td><td>Week 11</td><td>Not started</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Why a POA&amp;M needs milestones, not just a due date.</strong> A single "fix it by Q3" line invites a status update of "on track" every month until it isn't. Named milestones with their own dates let anyone reviewing the register see exactly where a plan actually is, and give the OT engineering lead a defensible answer when a maintenance window slips for a legitimate safety reason.
+    </div>
+  </section>
+
+  <!-- ===================== 4. AUDIT EVIDENCE ===================== -->
+  <section id="audit" class="card" aria-labelledby="h-audit">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-audit">4. Audit Evidence: What Auditors Actually Want</h2>
+        <p class="sub">A policy that exists is not the same claim as a policy that was followed.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p>An <strong>audit</strong> is an independent examination of whether an organization's stated controls actually operated as claimed, over a specific period, with evidence to prove it. Students moving from IT into OT (or the reverse) are often surprised that auditors do not primarily read policy documents — they sample a handful of specific control instances and ask for dated proof. "Show me your patch management policy" is a five-minute conversation. "Show me the evidence that this specific patch decision for this specific asset in March was made and documented the way your policy says it should be" is the actual audit.</p>
+
+    <p>Good audit evidence shares four traits: it is <strong>dated</strong> (a screenshot with no timestamp proves nothing), it is <strong>attributable</strong> to a specific person or system, it is <strong>retained</strong> for the required period, and it <strong>matches the claim being made</strong> — a ticket showing a patch was <em>scheduled</em> is not evidence that it was <em>applied</em>.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the neutral inspector at the pass</span>
+      <p>The inspector visiting the border pass does not ask the guard captain "do you patrol regularly?" and accept "yes" as the answer. The inspector asks for the patrol log — dated entries, signed by the guard who actually walked the route, kept somewhere the guard captain cannot quietly edit after the fact. A verbal assurance and a patrol log are not the same evidence, even if both happen to be true.</p>
+    </div>
+
+    <h3>Worked example — the evidence that satisfies, and the evidence that doesn't</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Table 3. Contrasting weak and strong audit evidence for the same three claims (fictional).</caption>
+        <thead>
+          <tr><th scope="col">Claim being audited</th><th scope="col">Weak evidence</th><th scope="col">Strong evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Patch applied to RTU-22 gateway</th><td>Engineer says "yes, we did that in June"</td><td>Change ticket #4471, dated and closed, with before/after firmware version and the engineer's sign-off</td></tr>
+          <tr><th scope="row">Access review completed quarterly</th><td>A policy document stating reviews happen quarterly</td><td>Four dated review records for the year, each listing who was reviewed, by whom, and what changed</td></tr>
+          <tr><th scope="row">New hire trained before ESP access granted</th><td>A general training slide deck with no attendance record</td><td>A signed training completion record dated before the access-request ticket was approved</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> This is the section where students most often say "we already do this, we just don't write it down." That sentence is the whole lesson. From an auditor's chair, and often from a regulator's, an unrecorded control did not happen.
+    </div>
+  </section>
+
+  <!-- ===================== 5. NERC CIP & CMMC ===================== -->
+  <section id="cip" class="card" aria-labelledby="h-cip">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M12 3l8 4v6c0 4.4-3.4 7.4-8 8-4.6-.6-8-3.6-8-8V7z"/><path d="M12 8v4l3 2"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-cip">5. The Regulation That Drives Budget: NERC CIP and CMMC</h2>
+        <p class="sub">Why the utility's security budget looks nothing like the manufacturer's — for a reason worth teaching explicitly.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p>Every framework discussed elsewhere in this course — IEC 62443, NIST SP 800-82, NIST CSF, ISO/IEC 27001 — is <strong>voluntary</strong>. An organization adopts one because it decides to, and nobody outside the organization enforces it with a fine. <strong>NERC CIP</strong> (North American Electric Reliability Corporation Critical Infrastructure Protection standards) is different: it is a mandatory, enforceable set of reliability standards, developed by NERC and approved by the Federal Energy Regulatory Commission (FERC), that applies to owners and operators of the Bulk Electric System (BES). Non-compliance carries real financial penalties — historically up to roughly $1 million per violation per day — assessed after a Regional Entity audit. That single fact is why a utility's OT security budget exists at a scale a similarly sized manufacturer's rarely does: the utility has a treaty with teeth.</p>
+
+    <ul class="tight">
+      <li><strong>CIP-002</strong> — Identify and categorize BES Cyber Systems by impact (high, medium, low). This is the gate: everything else in the CIP standards only applies to systems this step identifies.</li>
+      <li><strong>CIP-004</strong> — Personnel &amp; training: background checks, cybersecurity training, and access revocation records for anyone with authorized access.</li>
+      <li><strong>CIP-005</strong> — Electronic Security Perimeter(s): every external routable connection into a BES Cyber System must cross a defined, monitored perimeter.</li>
+      <li><strong>CIP-007</strong> — System security management: patch evaluation on a fixed cadence, port/service management, malicious code prevention, and security event logging.</li>
+      <li><strong>CIP-010</strong> — Configuration change management and periodic vulnerability assessments, with a documented baseline for every in-scope system.</li>
+      <li><strong>CIP-013</strong> — Supply chain risk management: vendor security requirements written into procurement, including vulnerability disclosure obligations.</li>
+    </ul>
+
+    <p><strong>Ironwood Precision Manufacturing</strong>, from the worked example in section 1, faces a parallel but distinct obligation: as a subcontractor handling federal contract information, it is subject to <strong>CMMC</strong> (Cybersecurity Maturity Model Certification) requirements now codified at <strong>32 CFR Part 170</strong>. CMMC is not NERC CIP — it applies to a different sector, is assessed differently, and does not carry a per-day fine in the same way — but it plays the same governance role: it is the enforceable floor that turns "we should probably do this" into "we must do this to keep the contract." Manufacturers without a defense contract, by contrast, usually have no equivalent forcing function, which is exactly why their OT security programs often stay smaller regardless of actual risk.</p>
+
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 900 260" role="img" aria-labelledby="t-cip d-cip">
+          <title id="t-cip">The NERC CIP enforcement chain</title>
+          <desc id="d-cip">A vertical chain of four boxes from top to bottom: FERC, the federal regulator that approves standards and can approve penalties. NERC, the standards body that writes and enforces the CIP standards. Regional Entity, which performs audits and recommends penalties within its region. Registered Entity, the utility itself, which must comply and produce audit evidence. An arrow beside the chain is labelled increasing proximity to daily operations, decreasing distance from the fine.</desc>
+          <g font-family="Segoe UI, sans-serif">
+            <line x1="40" y1="30" x2="40" y2="230" stroke="currentColor" stroke-width="2" opacity=".4"/>
+            <polygon points="40,24 35,36 45,36" fill="currentColor" opacity=".4"/>
+            <text x="18" y="130" fill="currentColor" font-size="11.5" opacity=".75" transform="rotate(-90 18 130)" text-anchor="middle">Closer to the fine &#8594;</text>
+
+            <rect x="70" y="20" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="20" width="8" height="46" rx="4" fill="var(--accent)"/>
+            <text x="94" y="48" font-size="14" font-weight="700" fill="var(--text)">FERC — approves standards, can approve penalty assessments</text>
+
+            <rect x="70" y="76" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="76" width="8" height="46" rx="4" fill="var(--accent)"/>
+            <text x="94" y="104" font-size="14" font-weight="700" fill="var(--text)">NERC — writes and enforces the CIP standards</text>
+
+            <rect x="70" y="132" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="132" width="8" height="46" rx="4" fill="var(--accent-2)"/>
+            <text x="94" y="160" font-size="14" font-weight="700" fill="var(--text)">Regional Entity — audits and recommends penalties within its region</text>
+
+            <rect x="70" y="188" width="800" height="46" rx="8" fill="var(--warn-bg)" stroke="var(--warn-line)" stroke-width="2"/>
+            <text x="94" y="216" font-size="14" font-weight="700" fill="var(--warn-text)">Registered Entity (the utility) — complies, produces audit evidence, pays if it can't</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 2. The NERC CIP enforcement chain runs from FERC, which approves the standards, down through NERC and the Regional Entity that performs the actual audit, to the registered utility, which must produce the evidence discussed in Section 4 or face a penalty. No equivalent chain exists for a voluntary framework — there is no regional entity auditing IEC 62443 adoption.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> Students sometimes conclude that NERC CIP compliance equals security. It doesn't, any more than an ISO/IEC 27001 certificate does — CIP-002 categorization determines what is even in scope, and a poorly scoped BES Cyber System list can leave real risk outside the program entirely. CIP guarantees a budget and an audit trail. It does not guarantee good engineering.
+    </div>
+  </section>
+
+  <!-- ===================== 6. COMPARISON ===================== -->
+  <section id="compare" class="card" aria-labelledby="h-compare">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5h7v14H4zM13 5h7v14h-7z"/><path d="M7.5 9h0M16.5 9h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-compare">6. Side by Side: IT Governance vs. OT Governance</h2>
+        <p class="sub">Same organization, two different sets of defaults.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 4. IT governance and OT governance compared across the dimensions that shape a joint risk register.</caption>
+        <thead>
+          <tr><th scope="col">Dimension</th><th scope="col">IT governance</th><th scope="col">OT governance</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Typical executive owner</th><td>CIO / CISO</td><td>VP of Operations, plant manager, or director of engineering</td></tr>
+          <tr><th scope="row">Top priority (CIA vs. AIC)</th><td>Confidentiality, then integrity, then availability</td><td>Availability and safety, then integrity, then confidentiality</td></tr>
+          <tr><th scope="row">Patch cadence</th><td>Days to weeks, often automated</td><td>Scheduled maintenance windows; may be months, and safety-gated</td></tr>
+          <tr><th scope="row">Tolerance for unplanned downtime</th><td>Low, but usually recoverable within hours</td><td>Very low; can mean a safety event, not just an outage</td></tr>
+          <tr><th scope="row">Primary risk driver</th><td>Business risk, reputational risk, breach cost</td><td>Safety risk, reliability risk, and — where applicable — mandatory regulation</td></tr>
+          <tr><th scope="row">Common mandatory regulation</th><td>Sector-dependent (e.g., PCI DSS for payment data)</td><td>NERC CIP (bulk electric utilities); CMMC (defense manufacturing subcontractors)</td></tr>
+          <tr><th scope="row">Audit cadence</th><td>Often annual, sometimes continuous monitoring</td><td>Fixed by the regulation where one applies; otherwise self-scheduled</td></tr>
+          <tr><th scope="row">Where the two must meet</th><td colspan="2" style="text-align:center">A shared risk register, a joint POA&amp;M for cross-boundary findings, and a joint risk committee (Figure 1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Where they genuinely overlap</h3>
+    <p>Both towers need an asset inventory, a way to score risk, a way to track remediation to closure, and evidence they can hand an auditor. The <em>fields</em> on a risk register and a POA&amp;M are identical whether the asset is a laptop or a relay. What differs is who fills in the owner column, how fast the target date can realistically be, and whether a regulator is reading over anyone's shoulder.</p>
+  </section>
+
+  <!-- ===================== PART B BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part B</span>
+    <h2>Hands-On — Build, Map, and Assign Ownership</h2>
+    <p>Roughly 2 hours of simulation and applied design work. Everything below runs in your browser.</p>
+  </div>
+
+  <!-- ===================== 7. SIMULATION ===================== -->
+  <section id="sim" class="card" aria-labelledby="h-sim">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10v4M11 10v4M15 10v4"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-sim">7. Simulation: Risk Register Builder</h2>
+        <p class="sub">Score each asset for likelihood and impact, then let the builder derive priority and POA&amp;M urgency.</p>
+      </div>
+      <span class="time-pill">35 min</span>
+    </div>
+
+    <p class="safety-flag"><span aria-hidden="true">&#9888;</span> Simulation only — no live equipment, no network traffic, no real plant data.</p>
+
+    <p>This builder models six assets at the fictional <strong>Cascade Summit Electric, Substation 12</strong>. For each asset, choose a <strong>likelihood</strong> and an <strong>impact</strong> rating, then choose <strong>Evaluate my register</strong>. The tool computes a risk score, sorts the register by priority, and flags findings a real reviewer would raise — including which items NERC CIP's timelines would treat as urgent. There is more than one defensible scoring, and the findings are prompts for discussion, not a grade.</p>
+
+    <div class="sim">
+      <h3 style="margin-top:0">Substation 12 — asset risk scoring</h3>
+      <div class="sim-grid" id="simGrid"><!-- populated by script --></div>
+      <div class="btn-row">
+        <button type="button" class="btn" id="simRun">Evaluate my register</button>
+        <button type="button" class="btn btn-secondary" id="simReset">Reset builder</button>
+      </div>
+      <div class="sim-out" id="simOut" role="status" aria-live="polite">
+        <p style="margin:0;color:var(--muted)">Rate the likelihood and impact for each asset, then choose <strong>Evaluate my register</strong>. Results appear here.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Facilitator prompt.</strong> Run the builder twice. The first time, let participants score every asset the same way IT would score a laptop (likelihood of a generic attacker). The second time, ask them to specifically weigh what happens to the grid, not just the device, if each asset fails. The change in impact ratings — especially for RTU-22 and RELAY-87B — is the whole lesson about why OT risk scoring cannot borrow IT defaults unmodified.
+    </div>
+  </section>
+
+  <!-- ===================== 8. MAPPING LAB ===================== -->
+  <section id="mapping" class="card" aria-labelledby="h-mapping">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 7h6M14 7h6M4 12h6M14 12h6M4 17h6M14 17h6"/><path d="M10 7l4 5M10 17l4-5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-mapping">8. Mapping Lab: Evidence to CIP Standard</h2>
+        <p class="sub">Six pieces of audit evidence. Match each to the CIP standard it actually satisfies.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 8.1 — Evidence provenance matching</h3>
+        <span class="t">25 minutes &middot; pairs</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Instructions.</strong> Each row describes a real artifact an auditor might request. Choose the CIP standard that specific evidence is <em>collected to satisfy</em> — not merely one that sounds related. This mirrors the actual work of preparing for a Regional Entity audit: knowing exactly which binder each piece of evidence goes in.
+        </div>
+        <div class="ips">
+          <div><h4>Individual · 6 min</h4>Answer all six on your own without discussion.</div>
+          <div><h4>Pairs · 10 min</h4>Compare with a partner. Argue any row where you disagree before checking.</div>
+          <div><h4>Share · 9 min</h4>Report the row your pair argued longest about. That row is usually the most teachable.</div>
+        </div>
+
+        <div class="mapping-table-wrap">
+          <table>
+            <caption>Table 5. Match each audit evidence artifact to the CIP standard it is collected to satisfy.</caption>
+            <thead>
+              <tr><th scope="col" style="width:58%">Evidence artifact</th><th scope="col">CIP standard</th></tr>
+            </thead>
+            <tbody id="mapBody"><!-- populated by script --></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="mapCheck">Check my mapping</button>
+          <button type="button" class="btn btn-secondary" id="mapReset">Reset</button>
+        </div>
+        <p class="result-line" id="mapResult" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9. GOVERNANCE CHARTER ===================== -->
+  <section id="charter" class="card" aria-labelledby="h-charter">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 12h6M9 16h6"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-charter">9. Build a Cross-Org Governance Charter</h2>
+        <p class="sub">The deliverable that turns Figure 1's dashed lines into something that survives staff turnover.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>A <strong>governance charter</strong> is the short document that answers, in writing, the question this whole lesson keeps circling back to: when a risk crosses the IT/OT boundary, who decides what? Without one, every cross-boundary finding gets negotiated from scratch.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the treaty, finally written down</span>
+      <p>Everything in this lesson has been a piece of the treaty between the two nations sharing the mountain pass. The charter is the treaty itself, signed by both governments, stating plainly who patrols, who pays for repairs, how disputes get escalated, and what happens when the alliance's inspector comes calling.</p>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 9.1 — Draft a one-page IT/OT governance charter (assessment artifact)</h3>
+        <span class="t">30 minutes &middot; individual, then gallery walk</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Deliverable.</strong> One page, submitted as PDF or a single slide, written for a real IT security lead and OT engineering lead at a fictional organization of your choosing (utility, manufacturer, or another OT sector).
+        </div>
+        <p>Your charter must contain:</p>
+        <ol class="tight">
+          <li><strong>The two named roles</strong> who jointly own the shared risk register, and who has tie-breaking authority when they disagree on a score.</li>
+          <li><strong>The rule for who owns a POA&amp;M</strong> when a finding spans both networks — for example, the DMZ or historian replication path.</li>
+          <li><strong>The applicable mandatory regulation, if any</strong> (NERC CIP, CMMC, or "none identified") and the resulting minimum audit cadence.</li>
+          <li><strong>The escalation path</strong> for a POA&amp;M milestone that will miss its target date, including who can approve an extension.</li>
+          <li><strong>A meeting cadence</strong> for the joint risk committee and what artifact it reviews at each meeting.</li>
+        </ol>
+        <h4>Success criteria</h4>
+        <ul class="tight">
+          <li>A new hire on either team could read the charter and know exactly who to call about a specific finding.</li>
+          <li>The charter names roles, not just departments — "OT Engineering Lead," not "Operations."</li>
+          <li>The escalation path has an actual person with authority to approve an extension, not just a vague "leadership."</li>
+          <li>If you named a mandatory regulation, the audit cadence you wrote matches what that regulation actually requires.</li>
+        </ul>
+        <p><strong>Gallery walk.</strong> Post your charter. Read three others. On a sticky note, write the one clause you would add if this were your own program.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 10. REVIEW ===================== -->
+  <section id="review" class="card" aria-labelledby="h-review">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 113.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><path d="M12 17h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-review">10. Knowledge Check</h2>
+        <p class="sub">Five questions. Feedback explains the reasoning, not just the letter.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="quiz-block">
+      <form id="quizForm" novalidate>
+        <div class="q">
+          <fieldset>
+            <legend>1. An unpatched substation firewall is discovered during a joint review. The IT security analyst and the OT engineering lead disagree about who should own the finding. What does that disagreement actually indicate?</legend>
+            <label><input type="radio" name="q1" value="a"> The two security teams should be merged into one to prevent this.</label>
+            <label><input type="radio" name="q1" value="b"> The organization's governance charter has not clearly assigned ownership for cross-boundary risk register entries.</label>
+            <label><input type="radio" name="q1" value="c"> The finding should be closed as a false positive until one side concedes.</label>
+            <label><input type="radio" name="q1" value="d"> NERC CIP requires IT to own every finding involving a firewall.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q1"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>2. A risk register entry for a vulnerable RTU is marked "mitigate." What should happen next?</legend>
+            <label><input type="radio" name="q2" value="a"> Nothing further; the register entry itself is sufficient documentation.</label>
+            <label><input type="radio" name="q2" value="b"> The entry should be deleted from the register once a decision is made.</label>
+            <label><input type="radio" name="q2" value="c"> A POA&amp;M should be created with named milestones, an owner, and a target date, tracked until the risk is actually closed.</label>
+            <label><input type="radio" name="q2" value="d"> The asset should be removed from the asset inventory until it is fixed.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q2"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>3. During an audit, an engineer states that quarterly access reviews are always completed on schedule. What is the strongest evidence to support that claim?</legend>
+            <label><input type="radio" name="q3" value="a"> The written access-review policy, since it establishes the requirement.</label>
+            <label><input type="radio" name="q3" value="b"> The engineer's verbal confirmation, since they perform the reviews personally.</label>
+            <label><input type="radio" name="q3" value="c"> Four dated review records for the year, each listing who was reviewed, by whom, and what changed.</label>
+            <label><input type="radio" name="q3" value="d"> A calendar invite showing the review meeting is recurring.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q3"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>4. Why does a NERC-CIP-regulated utility typically have a larger OT security budget than a similarly sized manufacturer with no comparable regulation?</legend>
+            <label><input type="radio" name="q4" value="a"> Utilities always face objectively higher technical risk than manufacturers.</label>
+            <label><input type="radio" name="q4" value="b"> NERC CIP is a mandatory, enforceable regulation with real financial penalties, which creates budget justification that a voluntary framework does not.</label>
+            <label><input type="radio" name="q4" value="c"> IEC 62443 requires a larger budget than NIST CSF, and utilities use 62443.</label>
+            <label><input type="radio" name="q4" value="d"> Manufacturers are exempt from all cybersecurity regulation by federal law.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q4"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>5. A risk-scoring exercise rates a corporate historian and a protective relay with the same likelihood score, but the relay is rated far higher on impact. What is the most likely explanation for a defensible register?</legend>
+            <label><input type="radio" name="q5" value="a"> The scoring is inconsistent and should be corrected so both assets have equal impact.</label>
+            <label><input type="radio" name="q5" value="b"> Impact reflects the consequence of compromise for each specific asset; a relay's failure can affect grid reliability and safety, while a historian's failure mainly affects reporting.</label>
+            <label><input type="radio" name="q5" value="c"> Likelihood and impact must always be scored identically for assets on the same network.</label>
+            <label><input type="radio" name="q5" value="d"> Only NERC-CIP-in-scope assets are allowed to receive an impact score at all.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q5"></div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn" id="gradeBtn">Grade my quiz</button>
+          <button type="button" class="btn btn-secondary" id="quizReset">Clear answers</button>
+        </div>
+        <p class="score" id="scoreOut" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== RESOURCES ===================== -->
+  <section id="resources" class="card" aria-labelledby="h-res">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 18h16v3H6.5A2.5 2.5 0 014 18.5z"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-res">Further Reading &amp; Downloads</h2>
+        <p class="sub">Primary sources cited in this lesson. External links open in a new tab.</p>
+      </div>
+      <span class="time-pill">Reference</span>
+    </div>
+
+    <h3>Standards and framework pages</h3>
+    <div class="res-grid">
+      <div class="res">
+        <span class="kind">Performance goals</span>
+        <a href="https://www.cisa.gov/cross-sector-cybersecurity-performance-goals/cross-sector-cybersecurity-performance-goals" target="_blank" rel="noopener noreferrer">CISA Cross-Sector Cybersecurity Performance Goals</a>
+        <p style="margin:.4rem 0 0">Baseline practices useful as a plain-language starting point before introducing sector-specific mandates like NERC CIP.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Program page</span>
+        <a href="https://www.cisa.gov/topics/industrial-control-systems" target="_blank" rel="noopener noreferrer">CISA Industrial Control Systems (ICS)</a>
+        <p style="margin:.4rem 0 0">CISA's ICS security program page, including advisories relevant to the vendor and remote-access risks discussed in this lesson.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Glossary</span>
+        <a href="https://csrc.nist.gov/glossary" target="_blank" rel="noopener noreferrer">NIST Glossary</a>
+        <p style="margin:.4rem 0 0">Authoritative definitions for terms like risk, vulnerability, and control that students will hear used loosely elsewhere.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Standard</span>
+        <a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener noreferrer">ISO/IEC27001:2022</a>
+        <p style="margin:.4rem 0 0">Referenced in Section 6 as the voluntary-framework counterpoint to NERC CIP's mandatory model.</p>
+      </div>
+    </div>
+
+    <h3>Downloadable documents</h3>
+    <ul class="tight">
+      <li>&#128196; Download: <a href="NIST.SP.800-82r3.pdf" target="_blank" rel="noopener noreferrer">NIST SP 800-82 Rev. 3</a> — background on OT control tailoring referenced when discussing why OT risk scoring differs from IT defaults.</li>
+      <li>&#128196; Download: <a href="23_Lessons%20Learned_1211.pdf" target="_blank" rel="noopener noreferrer">CIP Reliability Audits Lesson Learned</a> — real (anonymized) findings from past CIP audits; a useful case-study companion to Section 4.</li>
+      <li>&#128196; Download: <a href="CFR-2025-title32-vol1-part170.pdf" target="_blank" rel="noopener noreferrer">CMMC CFR Part 170</a> — the codified CMMC rule referenced in Section 5 as the manufacturing-sector parallel to NERC CIP.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Draft status.</strong> This lesson page is a first AI-generated draft prepared for OT-101. It has not yet been reviewed by a human subject-matter expert. Verify every standard reference, CIP number, and technical claim against the primary sources above before using it with students.
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside class="sidebar" aria-label="Lesson tools and navigation">
+
+  <nav class="side-card sidebar-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On this page</h2>
+    <ul>
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#towers">1. Two Towers</a></li>
+      <li><a href="#register">2. Risk Register</a></li>
+      <li><a href="#poam">3. POA&amp;M</a></li>
+      <li><a href="#audit">4. Audit Evidence</a></li>
+      <li><a href="#cip">5. NERC CIP &amp; CMMC</a></li>
+      <li><a href="#compare">6. Side by Side</a></li>
+      <li><a href="#sim">7. Register Builder</a></li>
+      <li><a href="#mapping">8. Mapping Lab</a></li>
+      <li><a href="#charter">9. Governance Charter</a></li>
+      <li><a href="#review">10. Knowledge Check</a></li>
+      <li><a href="#resources">Further Reading</a></li>
+    </ul>
+  </nav>
+
+  <section class="side-card" aria-labelledby="lo-h">
+    <h2 id="lo-h">Objectives progress</h2>
+    <div class="progress-bar"><span id="loBar"></span></div>
+    <p class="progress-text" id="loText" role="status" aria-live="polite">0 of 6 objectives marked complete</p>
+    <div class="lo-check"><input type="checkbox" id="lo1" class="lo-box"><label for="lo1">Explain why IT and OT governance report through different executives</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo2" class="lo-box"><label for="lo2">Identify risk register fields and construct an entry</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo3" class="lo-box"><label for="lo3">Differentiate a risk register from a POA&amp;M</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo4" class="lo-box"><label for="lo4">Compare audit evidence under voluntary vs. mandatory regimes</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo5" class="lo-box"><label for="lo5">Evaluate a register/POA&amp;M for defensibility under CIP stakes</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo6" class="lo-box"><label for="lo6">Design a cross-org governance charter</label></div>
+  </section>
+
+  <nav class="side-card sidebar-toc" aria-labelledby="kt-h">
+    <h2 id="kt-h">Key terms</h2>
+    <ul>
+      <li><a href="#towers">Governance</a><span class="defn">Decisions, policy, and assigned responsibility that determine who manages a given risk.</span></li>
+      <li><a href="#register">Risk Register</a><span class="defn">Living inventory of scored risks with an owner and treatment decision.</span></li>
+      <li><a href="#poam">POA&amp;M</a><span class="defn">Plan of Action &amp; Milestones; tracks a finding to closure with named steps and dates.</span></li>
+      <li><a href="#audit">Audit</a><span class="defn">Independent check that stated controls actually operated, backed by dated evidence.</span></li>
+      <li><a href="#cip">NERC CIP</a><span class="defn">Mandatory, enforceable reliability standards for bulk electric system cyber assets.</span></li>
+      <li><a href="#cip">CMMC</a><span class="defn">Cybersecurity Maturity Model Certification; codified at 32 CFR Part 170 for defense subcontractors.</span></li>
+      <li><a href="#cip">BES Cyber System</a><span class="defn">A cyber asset categorized under CIP-002 as affecting the Bulk Electric System.</span></li>
+      <li><a href="#towers">Electronic Security Perimeter (ESP)</a><span class="defn">The defined, monitored boundary every external connection to a BES Cyber System must cross (CIP-005).</span></li>
+    </ul>
+  </nav>
+
+  <nav class="side-card" aria-labelledby="pn-h">
+    <h2 id="pn-h">Lesson navigation</h2>
+    <div class="prevnext">
+      <a href="lesson08.html"><span class="dir">&larr; Previous</span>Day 4 &middot; Lesson 8 — Frameworks for OT Security</a>
+      <a href="lesson10.html"><span class="dir">Next &rarr;</span>Day 5 &middot; Lesson 10 — Access Control &amp; Identity Management in OT</a>
+    </div>
+  </nav>
+
+</aside>
+</div>
+
+<!-- ============================ FOOTER NAV ============================ -->
+<nav class="footer-nav" aria-label="Previous and next lesson">
+  <div class="footer-nav-inner">
+    <a href="lesson08.html">&larr; Lesson 8 — Frameworks for OT Security</a>
+    <a href="index.html">Course Home</a>
+    <a href="lesson10.html">Lesson 10 — Access Control &amp; Identity Management &rarr;</a>
+  </div>
+</nav>
+
+<footer class="site">
+  <div class="inner">
+    <p><strong>OT-101 &middot; Teaching Operational Technologies and Cybersecurity for Community College Faculty</strong></p>
+    <p>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands &nbsp;|&nbsp; Day 4 &middot; Lesson 9 — Governance, Risk &amp; Compliance for IT/OT</p>
+    <p>All activities are simulation-only using fictional organizations and data. No live or production equipment, no offensive tooling, no vendor or customer data. First AI-generated draft — pending subject-matter expert review.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Theme toggle (light default, localStorage persisted) --------------- */
+  var root = document.documentElement;
+  var toggle = document.getElementById("themeToggle");
+  var icon = document.getElementById("themeIcon");
+  var label = document.getElementById("themeLabel");
+  var KEY = "ot101-theme";
+
+  function safeGet() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function safeSet(v) { try { localStorage.setItem(KEY, v); } catch (e) { /* storage unavailable */ } }
+
+  function applyTheme(mode) {
+    root.setAttribute("data-theme", mode);
+    var dark = mode === "dark";
+    toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    icon.innerHTML = dark ? "&#9728;" : "&#9789;";
+    label.textContent = dark ? "Switch to light mode" : "Switch to dark mode";
+  }
+  applyTheme(safeGet() === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(next);
+    safeSet(next);
+  });
+
+  /* ---------------- Print ---------------- */
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  /* ---------------- Scrollspy for section nav ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".section-nav a"));
+  var targets = navLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+
+  function setCurrent(id) {
+    navLinks.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+  }
+  if ("IntersectionObserver" in window && targets.length) {
+    var obs = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; })
+        .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+      if (visible.length) { setCurrent(visible[0].target.id); }
+    }, { rootMargin: "-140px 0px -60% 0px", threshold: 0 });
+    targets.forEach(function (t) { obs.observe(t); });
+  }
+
+  /* ---------------- Flip cards ---------------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".flip-card"), function (card) {
+    card.addEventListener("click", function () {
+      var on = card.getAttribute("aria-pressed") === "true";
+      card.setAttribute("aria-pressed", on ? "false" : "true");
+    });
+  });
+
+  /* ---------------- Objectives progress ---------------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".lo-box"));
+  var bar = document.getElementById("loBar");
+  var loText = document.getElementById("loText");
+  function updateLO() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    bar.style.width = (done / boxes.length * 100) + "%";
+    loText.textContent = done + " of " + boxes.length + " objectives marked complete";
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", updateLO); });
+  updateLO();
+
+  /* ---------------- Risk Register Builder simulation ---------------- */
+  var LIKELIHOOD = [
+    { v: "", n: "\u2014 choose \u2014", s: 0 },
+    { v: "rare", n: "1 \u2014 Rare", s: 1 },
+    { v: "unlikely", n: "2 \u2014 Unlikely", s: 2 },
+    { v: "possible", n: "3 \u2014 Possible", s: 3 },
+    { v: "likely", n: "4 \u2014 Likely", s: 4 },
+    { v: "certain", n: "5 \u2014 Almost certain", s: 5 }
+  ];
+  var IMPACT = [
+    { v: "", n: "\u2014 choose \u2014", s: 0 },
+    { v: "negligible", n: "1 \u2014 Negligible", s: 1 },
+    { v: "minor", n: "2 \u2014 Minor", s: 2 },
+    { v: "moderate", n: "3 \u2014 Moderate", s: 3 },
+    { v: "major", n: "4 \u2014 Major", s: 4 },
+    { v: "severe", n: "5 \u2014 Severe", s: 5 }
+  ];
+  var LMAP = {}; LIKELIHOOD.forEach(function (o) { LMAP[o.v] = o.s; });
+  var IMAP = {}; IMPACT.forEach(function (o) { IMAP[o.v] = o.s; });
+
+  var ASSETS2 = [
+    { id: "rtu", name: "RTU-22", desc: "Remote terminal unit; DNP3 control of substation breakers.", bes: true },
+    { id: "relay", name: "RELAY-87B", desc: "Digital protective relay; differential protection for the main bus.", bes: true },
+    { id: "fw", name: "FW-ESP1", desc: "Electronic Security Perimeter firewall; the substation's monitored external boundary.", bes: true },
+    { id: "hmi", name: "SCADA-HMI-12", desc: "Operator HMI for substation supervisory control.", bes: true },
+    { id: "eng", name: "ENG-LAP-4", desc: "Engineering laptop used off-site for relay settings; holds protection engineering software.", bes: false },
+    { id: "hist", name: "HIST-CORP", desc: "Corporate historian; receives replicated tag data on the business network.", bes: false }
+  ];
+
+  var simGrid2 = document.getElementById("simGrid");
+  var simOut2 = document.getElementById("simOut");
+
+  function optionHTML(list) {
+    return list.map(function (o) { return '<option value="' + o.v + '">' + o.n + "</option>"; }).join("");
+  }
+
+  function buildSim2() {
+    simGrid2.innerHTML = "";
+    ASSETS2.forEach(function (a) {
+      var wrap = document.createElement("div");
+      wrap.className = "asset";
+      var lid = "lk-" + a.id, iid = "im-" + a.id;
+      wrap.innerHTML =
+        '<span class="name">' + a.name + "</span>" +
+        '<span class="desc">' + a.desc + "</span>" +
+        '<label for="' + lid + '">Likelihood</label>' +
+        '<select id="' + lid + '" data-asset="' + a.id + '" data-kind="l">' + optionHTML(LIKELIHOOD) + "</select>" +
+        '<label for="' + iid + '" style="margin-top:.5rem">Impact</label>' +
+        '<select id="' + iid + '" data-asset="' + a.id + '" data-kind="i">' + optionHTML(IMPACT) + "</select>";
+      simGrid2.appendChild(wrap);
+    });
+  }
+  buildSim2();
+
+  function currentScores() {
+    var m = {};
+    ASSETS2.forEach(function (a) { m[a.id] = { l: "", i: "" }; });
+    Array.prototype.forEach.call(simGrid2.querySelectorAll("select"), function (s) {
+      var a = s.getAttribute("data-asset"), k = s.getAttribute("data-kind");
+      if (k === "l") { m[a].l = s.value; } else { m[a].i = s.value; }
+    });
+    return m;
+  }
+
+  function riskLabel(score) {
+    if (score >= 15) { return { name: "Critical", cls: "no" }; }
+    if (score >= 10) { return { name: "High", cls: "warn" }; }
+    if (score >= 5) { return { name: "Medium", cls: "warn" }; }
+    return { name: "Low", cls: "ok" };
+  }
+
+  function evaluateRegister() {
+    var m = currentScores();
+    var incomplete = ASSETS2.filter(function (a) { return !m[a.id].l || !m[a.id].i; });
+    var html = "";
+
+    if (incomplete.length) {
+      html += '<div class="finding warn"><strong>Incomplete.</strong> Rate both likelihood and impact for: ' +
+        incomplete.map(function (a) { return a.name; }).join("; ") + ".</div>";
+      simOut2.innerHTML = html;
+      return;
+    }
+
+    var rows = ASSETS2.map(function (a) {
+      var l = LMAP[m[a.id].l], i = IMAP[m[a.id].i], score = l * i;
+      return { a: a, l: l, i: i, score: score, risk: riskLabel(score) };
+    }).sort(function (x, y) { return y.score - x.score; });
+
+    html += "<h4 style='margin-top:0'>Scored register, highest priority first</h4>";
+    html += '<div class="table-wrap" style="margin:.5rem 0 1rem"><table style="min-width:0"><thead><tr>' +
+      "<th scope='col'>Asset</th><th scope='col'>Likelihood</th><th scope='col'>Impact</th><th scope='col'>Score</th><th scope='col'>Risk level</th>" +
+      "</tr></thead><tbody>";
+    rows.forEach(function (r) {
+      html += "<tr><th scope='row'>" + r.a.name + "</th><td>" + r.l + "</td><td>" + r.i + "</td><td>" + r.score + "</td><td>" + r.risk.name + "</td></tr>";
+    });
+    html += "</tbody></table></div>";
+
+    var findings = [];
+    var top = rows[0];
+
+    // 1. Top priority / POA&M urgency
+    if (top.score >= 10) {
+      var accel = top.a.bes ? "Because this is a BES Cyber System, treat this as a candidate for an accelerated POA&M milestone (weeks, not quarters) once it is confirmed in scope under CIP-002." :
+        "This asset is outside BES Cyber System scope, so a standard remediation timeline is defensible, but the risk still needs an owner and a POA&M.";
+      findings.push(["fail", "Top priority: " + top.a.name + " scored " + top.score + " (" + top.risk.name + "). " + accel]);
+    } else {
+      findings.push(["pass", "No asset scored above Medium. A register this clean is worth a second look \u2014 confirm the impact ratings reflect actual grid consequence, not just device value."]);
+    }
+
+    // 2. ESP firewall specific
+    var fwRow = rows.filter(function (r) { return r.a.id === "fw"; })[0];
+    if (fwRow.score >= 10) {
+      findings.push(["fail", "FW-ESP1 scored " + fwRow.score + " (" + fwRow.risk.name + "). Under CIP-005 this device is the substation's enforced Electronic Security Perimeter \u2014 a high-risk ESP device is a governance emergency, not a backlog item."]);
+    } else {
+      findings.push(["pass", "FW-ESP1 scored " + fwRow.score + " (" + fwRow.risk.name + "). The perimeter boundary is holding at an acceptable rating."]);
+    }
+
+    // 3. Engineering laptop under-rating check
+    var engRow = rows.filter(function (r) { return r.a.id === "eng"; })[0];
+    if (engRow.i <= 2) {
+      findings.push(["warn", "ENG-LAP-4's impact is rated " + engRow.i + " of 5. This laptop can change protective relay settings and travels off-site \u2014 many teams under-rate impact here because it \"looks like\" an IT asset."]);
+    } else {
+      findings.push(["pass", "ENG-LAP-4's impact rating of " + engRow.i + " reflects that it can alter protection settings, not just that it is a laptop."]);
+    }
+
+    // 4. Historian contrast
+    var histRow = rows.filter(function (r) { return r.a.id === "hist"; })[0];
+    if (histRow.score >= 10) {
+      findings.push(["warn", "HIST-CORP scored " + histRow.score + " (" + histRow.risk.name + "). Double-check: a historian failure usually affects reporting and visibility, not physical grid reliability. A high score here should be justified in writing, not assumed."]);
+    } else {
+      findings.push(["pass", "HIST-CORP scored " + histRow.score + " (" + histRow.risk.name + "), consistent with a business-network asset whose failure mainly affects reporting rather than grid reliability."]);
+    }
+
+    // 5. BES cyber systems overall spread
+    var besHigh = rows.filter(function (r) { return r.a.bes && r.score >= 10; }).length;
+    findings.push(["warn", besHigh + " of 4 BES Cyber Systems scored High or Critical. Under CIP-002/CIP-007, each one needs a named owner and a POA&M with a target date before this register would satisfy a Regional Entity reviewer."]);
+
+    html += "<h4>Findings</h4>";
+    findings.forEach(function (f) {
+      var cls = f[0] === "pass" ? "finding pass" : (f[0] === "warn" ? "finding warn" : "finding");
+      var tag = f[0] === "pass" ? "\u2713 " : (f[0] === "warn" ? "\u26A0 " : "\u2717 ");
+      html += '<div class="' + cls + '">' + tag + f[1] + "</div>";
+    });
+
+    html += '<p style="margin:.9rem 0 0;font-size:.85rem;color:var(--muted)">Simulation only. This builder applies simple teaching heuristics for likelihood &times; impact scoring and CIP-relevant urgency. A real risk register would also weigh existing compensating controls and document the scoring rationale for each field.</p>';
+    simOut2.innerHTML = html;
+  }
+
+  document.getElementById("simRun").addEventListener("click", evaluateRegister);
+  document.getElementById("simReset").addEventListener("click", function () {
+    Array.prototype.forEach.call(simGrid2.querySelectorAll("select"), function (s) { s.value = ""; });
+    simOut2.innerHTML = '<p style="margin:0;color:var(--muted)">Builder cleared. Rate the likelihood and impact for each asset, then choose <strong>Evaluate my register</strong>.</p>';
+  });
+
+  /* ---------------- Mapping lab ---------------- */
+  var MAP_OPTIONS = [
+    "CIP-002",
+    "CIP-004",
+    "CIP-005",
+    "CIP-007",
+    "CIP-010",
+    "CIP-013"
+  ];
+  var MAP_ROWS = [
+    {
+      text: "A signed record showing a new engineer's background check and cybersecurity training were completed before substation access was granted.",
+      answer: "CIP-004",
+      why: "Personnel risk assessment, training, and access authorization records are CIP-004's specific evidence family."
+    },
+    {
+      text: "A network diagram showing every external routable connection into the substation's monitored boundary, including the vendor remote-access path.",
+      answer: "CIP-005",
+      why: "Documenting and controlling every external connection across the Electronic Security Perimeter is exactly what CIP-005 requires evidence for."
+    },
+    {
+      text: "A ticket documenting that a patch evaluation was completed within the required window, with a filed mitigation plan for the patch that could not be applied.",
+      answer: "CIP-007",
+      why: "Patch management evaluation timelines and documented compensating measures are core CIP-007 system security management evidence."
+    },
+    {
+      text: "A change record capturing the before-and-after baseline configuration for a relay firmware update, with the required vulnerability assessment note attached.",
+      answer: "CIP-010",
+      why: "Baseline configuration records tied to a documented change, plus the periodic vulnerability assessment, are CIP-010 configuration change management evidence."
+    },
+    {
+      text: "A signed contract clause requiring the RTU vendor to disclose known vulnerabilities to the utility within a defined window.",
+      answer: "CIP-013",
+      why: "Vendor security obligations written into procurement are the supply chain risk management requirement introduced in CIP-013."
+    },
+    {
+      text: "A quarterly list of every cyber asset identified as part of the Bulk Electric System, ranked as high, medium, or low impact.",
+      answer: "CIP-002",
+      why: "Categorizing BES Cyber Systems by impact is the CIP-002 gate that determines which of the other standards even apply to a given asset."
+    }
+  ];
+
+  var mapBody = document.getElementById("mapBody");
+  var mapResult = document.getElementById("mapResult");
+
+  function buildMap() {
+    mapBody.innerHTML = "";
+    MAP_ROWS.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      var sid = "map-" + i;
+      var opts = ['<option value="">\u2014 select \u2014</option>'].concat(MAP_OPTIONS.map(function (o) {
+        return '<option value="' + o + '">' + o + "</option>";
+      })).join("");
+      tr.innerHTML =
+        "<td><label for='" + sid + "'>" + (i + 1) + ". " + r.text + "</label><span class='map-note'></span></td>" +
+        "<td><select id='" + sid + "' data-row='" + i + "'>" + opts + "</select></td>";
+      mapBody.appendChild(tr);
+    });
+    mapResult.textContent = "";
+  }
+  buildMap();
+
+  document.getElementById("mapCheck").addEventListener("click", function () {
+    var right = 0, blank = 0;
+    Array.prototype.forEach.call(mapBody.querySelectorAll("tr"), function (tr, i) {
+      var sel = tr.querySelector("select");
+      var note = tr.querySelector(".map-note");
+      tr.classList.remove("map-correct", "map-wrong");
+      if (!sel.value) {
+        blank++;
+        note.textContent = "Not answered yet.";
+        return;
+      }
+      if (sel.value === MAP_ROWS[i].answer) {
+        right++;
+        tr.classList.add("map-correct");
+        note.textContent = "Correct. " + MAP_ROWS[i].why;
+      } else {
+        tr.classList.add("map-wrong");
+        note.textContent = "Not quite \u2014 this belongs to " + MAP_ROWS[i].answer + ". " + MAP_ROWS[i].why;
+      }
+    });
+    mapResult.textContent = right + " of " + MAP_ROWS.length + " correct" + (blank ? " (" + blank + " left blank)." : ".");
+  });
+
+  document.getElementById("mapReset").addEventListener("click", function () {
+    buildMap();
+  });
+
+  /* ---------------- Quiz ---------------- */
+  var ANSWERS = {
+    q1: { correct: "b", why: {
+      b: "Correct. This exact disagreement is what a governance charter exists to prevent: it should name which role owns cross-boundary risk register entries before the disagreement happens, not during it.",
+      a: "Not correct. Merging the teams removes the domain expertise each side brings; the realistic fix is a shared artifact and clear ownership rules, not a reorg.",
+      c: "Not correct. Disagreement about ownership says nothing about whether the finding is real. Closing it to end an argument is exactly the failure mode a shared register prevents.",
+      d: "Not correct. NERC CIP does not assign internal ownership between IT and OT teams; that is an internal governance decision the organization must make itself."
+    }},
+    q2: { correct: "c", why: {
+      c: "Correct. A 'mitigate' decision should generate a POA&amp;M with named milestones, an owner, and a target date, tracked until the underlying risk is actually closed.",
+      a: "Not correct. The register entry records the decision, but tracking the work to closure is exactly what a POA&amp;M is for; without one, 'mitigate' risks becoming a permanent label with no action behind it.",
+      b: "Not correct. The risk register entry should remain until the risk is closed and verified; deleting it on a decision, rather than a verified fix, destroys the audit trail.",
+      d: "Not correct. Removing a vulnerable asset from the inventory does not remove the risk \u2014 it only removes visibility into it, which is worse."
+    }},
+    q3: { correct: "c", why: {
+      c: "Correct. Dated, attributable, retained records that match the specific claim being made are exactly what strong audit evidence looks like \u2014 auditors sample specific instances, not general assurances.",
+      a: "Not correct. A policy establishes the requirement but is not evidence the requirement was followed on any specific occasion.",
+      b: "Not correct. A verbal assurance from the person being audited is the weakest form of evidence precisely because it cannot be independently verified.",
+      d: "Not correct. A recurring calendar invite shows a meeting was scheduled, not that the review was actually performed or what it found."
+    }},
+    q4: { correct: "b", why: {
+      b: "Correct. NERC CIP's enforceability \u2014 real financial penalties following a Regional Entity audit \u2014 creates a budget justification that a voluntary framework, which carries no external penalty, cannot provide on its own.",
+      a: "Not correct. Objective technical risk varies by site and cannot be assumed higher for utilities in general; the budget difference is driven by regulatory enforceability, not an inherent risk gap.",
+      c: "Not correct. IEC 62443 and NIST CSF do not carry budget requirements of their own; adoption is voluntary regardless of which one an organization chooses.",
+      d: "Not correct. Manufacturers are not categorically exempt from cybersecurity regulation; some, like defense subcontractors under CMMC, face their own mandatory regime."
+    }},
+    q5: { correct: "b", why: {
+      b: "Correct. Impact should reflect the actual consequence of compromise for that specific asset. A relay failure can threaten grid reliability and safety; a historian failure mainly affects reporting \u2014 different consequences justify different impact scores even at equal likelihood.",
+      a: "Not correct. Forcing equal impact scores regardless of consequence is the mistake this lesson exists to correct \u2014 it erases exactly the distinction a defensible register needs to capture.",
+      c: "Not correct. Shared network membership does not imply shared consequence of compromise; this is the same 'group by topology, not by risk' error discussed with zones and conduits elsewhere in the course.",
+      d: "Not correct. Every asset in a risk register receives an impact score regardless of NERC CIP scope; CIP-002 categorization determines which regulatory obligations apply, not whether an asset can be risk-scored at all."
+    }}
+  };
+
+  document.getElementById("gradeBtn").addEventListener("click", function () {
+    var score = 0, unanswered = 0;
+    Object.keys(ANSWERS).forEach(function (q) {
+      var chosen = document.querySelector('input[name="' + q + '"]:checked');
+      var fb = document.getElementById("fb-" + q);
+      fb.className = "q-feedback show";
+      if (!chosen) {
+        unanswered++;
+        fb.classList.add("unanswered");
+        fb.textContent = "No answer selected. Choose an option and grade again.";
+        return;
+      }
+      if (chosen.value === ANSWERS[q].correct) {
+        score++;
+        fb.classList.add("correct");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      } else {
+        fb.classList.add("incorrect");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      }
+    });
+    var out = document.getElementById("scoreOut");
+    out.textContent = "Score: " + score + " of 5" +
+      (unanswered ? " \u00b7 " + unanswered + " question(s) not answered." : "") +
+      (score === 5 ? " \u2014 every item correct." : "");
+  });
+
+  document.getElementById("quizReset").addEventListener("click", function () {
+    document.getElementById("quizForm").reset();
+    Array.prototype.forEach.call(document.querySelectorAll(".q-feedback"), function (fb) {
+      fb.className = "q-feedback";
+      fb.textContent = "";
+    });
+    document.getElementById("scoreOut").textContent = "";
+  });
+
+})();
+</script>
+</body>
+</html>
