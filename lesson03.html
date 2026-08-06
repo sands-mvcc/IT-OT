@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3: OT Technologies &amp; Field Devices | Teaching Operational Technologies</title>
+<meta name="description" content="Day 1, Lesson 3 of the Teaching Operational Technologies faculty development workshop: a device-by-device tour of PLCs, RTUs, IEDs, HMIs, engineering workstations, historians, sensors, actuators, drives, and safety instrumented systems — what each one does, how it fails, and what it exposes on the network.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .topbar-inner {
+    max-width: 1280px; margin: 0 auto; padding: 9px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 28px 24px 22px;
+  }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav {
+    position: sticky; top: 0; z-index: 90;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a {
+    display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600;
+    color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px;
+  }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+
+  /* Sidebar: table of contents */
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  /* Sidebar: objectives progress */
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer;
+  }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  /* Sidebar: glossary */
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* Sidebar: prev/next */
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  /* ---------- Main content sections ---------- */
+  .part-banner {
+    background: var(--header-bg); color: var(--header-text);
+    padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800;
+    font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    margin: 40px 0 18px;
+  }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box {
+    background: var(--accent-light); border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0;
+  }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 20px; margin: 18px 0;
+  }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .safety-flag {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+    color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px;
+  }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  /* comparison table */
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  /* diagram wrap */
+  .diagram-wrap { overflow-x: auto; margin: 18px 0; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .diagram-caption { font-size: 0.82rem; color: var(--text-muted); margin: 10px 0 0; text-align: center; }
+
+  /* activity block */
+  .activity-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin: 18px 0;
+  }
+  .activity-head {
+    background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px;
+  }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .mapping-table-wrap { overflow-x: auto; }
+  table.mapping-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  table.mapping-table th, table.mapping-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.mapping-table thead th { background: var(--surface2); font-weight: 700; }
+  table.mapping-table select {
+    width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.86rem;
+  }
+  .map-row.correct td:first-child { border-left: 4px solid var(--ok); }
+  .map-row.incorrect td:first-child { border-left: 4px solid var(--bad); }
+  .mapping-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .mapping-result { font-size: 0.85rem; font-weight: 700; }
+
+  .btn {
+    background: var(--accent); color: var(--on-accent); border: none; cursor: pointer;
+    padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit;
+  }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+
+  /* simulation: device explorer */
+  .sim-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .sim-toggle {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 9px 14px; border-radius: 20px; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .sim-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .sim-readout {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.87rem; min-height: 3.5em;
+  }
+  .sim-readout strong { color: var(--accent2); }
+  [data-theme="dark"] .sim-readout strong { color: var(--accent); }
+  .device-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 0 0; margin-top: 10px; }
+  .device-row { display: flex; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .device-row:last-child { border-bottom: none; }
+  .device-row .dev-label { flex: 0 0 150px; font-weight: 700; color: var(--text-muted); }
+  .device-row .dev-val { flex: 1; }
+  .failure-panel { margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--bad-bg); color: var(--bad); font-size: 0.85rem; display: none; }
+  .failure-panel.show { display: block; }
+
+  /* quiz */
+  .quiz-block { display: flex; flex-direction: column; gap: 20px; }
+  .q-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .q-stem { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
+  .q-num { color: var(--accent); margin-right: 6px; }
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .q-feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.incorrect { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback.unanswered { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .quiz-score {
+    margin-top: 6px; background: var(--header-bg); color: var(--header-text);
+    border-radius: var(--radius-sm); padding: 16px 20px; font-weight: 700; display: none;
+    align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .quiz-score.show { display: flex; }
+  .quiz-score-big { font-size: 1.4rem; }
+
+  /* resource list */
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; font-size: 0.88rem;
+  }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note {
+    border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px;
+    margin: 16px 0; font-size: 0.85rem; color: var(--text-muted);
+  }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .icon-row { display: flex; gap: 18px; margin: 14px 0; flex-wrap: wrap; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); width: 88px; text-align: center; }
+
+  .lesson-nav-bottom {
+    display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap;
+  }
+  .nav-btn {
+    text-decoration: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text);
+    box-shadow: var(--shadow); font-size: 0.88rem;
+  }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer {
+    background: var(--header-bg); color: var(--header-text); opacity: 0.85;
+    text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6;
+  }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* PRINT */
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .q-card, .sim-readout, .diagram-wrap { box-shadow: none; border: 1px solid #999; }
+    footer { background: #ffffff; color: #000000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · Dept. of Engineering &amp; Technology · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Day 1 · Lesson 3 · 4 Contact Hours</span>
+    <h1>OT Technologies &amp; Field Devices</h1>
+    <p class="tagline">A device-by-device tour of what actually sits on a plant floor — what each device does, how it fails, and what it exposes on the network.</p>
+    <div class="meta-row">
+      <span class="meta-item">📊 Intermediate</span>
+      <span class="meta-item">⏱ 4 hours</span>
+      <span class="meta-item">🎯 5 objectives</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#s1" data-section="s1">PLC, RTU, IED</a>
+    <a href="#s2" data-section="s2">Sensors &amp; Actuators</a>
+    <a href="#s3" data-section="s3">HMI, EWS, Historian</a>
+    <a href="#s4" data-section="s4">Drives &amp; SIS</a>
+    <a href="#activity" data-section="activity">Activity</a>
+    <a href="#simulation" data-section="simulation">Simulation</a>
+    <a href="#review" data-section="review">Review</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <h2>Lesson Overview</h2>
+      <p>Lesson 2 gave you the vocabulary for how OT thinks about priorities and risk. This lesson gives you the cast of characters that vocabulary actually applies to. Every OT environment, whether it's a water treatment plant, a substation, or a bottling line, is built from a fairly small set of recurring device roles — something that senses the physical world, something that decides what to do about it, something that acts on that decision, something a person watches and steers from, and something that remembers what happened. Once faculty can name these roles on sight and reason about what each one exposes on the network, the rest of the course's security content has somewhere concrete to attach.</p>
+      <p>We'll move through the controllers first — <dfn id="def-plc-intro">PLC</dfn>, <dfn id="def-rtu-intro">RTU</dfn>, and IED — then the field devices that feed them and act on their decisions, then the systems people actually look at and log from — <dfn id="def-hmi-intro">HMI</dfn>, engineering workstation, and <dfn id="def-historian-intro">historian</dfn> — and finish with drives and the <dfn id="def-sis-intro">safety instrumented system</dfn>, which behaves differently from everything else on purpose.</p>
+      <div class="analogy-box">
+        <span class="analogy-label">Anchoring analogy</span>
+        <p>Think of a process as a body. Sensors are nerve endings — they feel temperature, pressure, and position and report it inward. Controllers (PLCs, RTUs, IEDs) are the spinal cord and brainstem — they take that sensory input and decide, often reflexively, what to do. Actuators are muscles — they carry out the decision by moving a valve, spinning a motor, or opening a breaker. HMIs and engineering workstations are the eyes and hands a person uses to watch and occasionally intervene. The historian is memory — a record of what the body has been doing. And the safety instrumented system is the withdrawal reflex: a separate, faster, more primitive pathway that pulls your hand off a hot stove without waiting for your brain to finish thinking about it.</p>
+      </div>
+      <h3 style="margin-top:22px;font-size:1.05rem;">Learning objectives</h3>
+      <p style="margin-bottom:6px;color:var(--text-muted);font-size:0.85rem;">By the end of this lesson, you will be able to:</p>
+      <ul class="lo-display">
+        <li>Explain the primary function of each core OT device type: PLC, RTU, IED, HMI, historian, and safety instrumented system.</li>
+        <li>Compare PLCs, RTUs, and IEDs in terms of typical deployment context and protocols.</li>
+        <li>Identify how sensors and actuators convert between the physical process and digital control signals.</li>
+        <li>Describe what each device type exposes on the network and the risk that exposure creates.</li>
+        <li>Evaluate the consequence of a single device's failure on process visibility, control, and safety.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="part-banner">Part A · Foundations Lecture</div>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section id="s1" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🧠</span>
+      <h2>The controllers: <dfn id="def-plc">PLC</dfn>, <dfn id="def-rtu">RTU</dfn>, and IED</h2>
+      <span class="module-time">≈ 45 min</span>
+    </div>
+    <p>A <dfn id="def-plc2">PLC</dfn> (programmable logic controller) is a solid-state, reprogrammable device that executes control logic against local inputs and outputs, typically within a single machine or process area, on a fixed scan cycle — read inputs, execute logic, write outputs, repeat, as covered in Lesson 2. PLCs are the workhorse of discrete manufacturing and are increasingly common in process industries too, usually speaking Modbus TCP, EtherNet/IP, or PROFINET to whatever else shares their network segment.</p>
+    <p>A <dfn id="def-rtu2">RTU</dfn> (remote terminal unit) is built for a different problem: monitoring and controlling equipment at a site that's geographically remote from the control center — a pipeline valve station, a water tower, a pump station forty miles from the nearest office. RTUs typically run on DNP3 or Modbus, often over cellular, licensed radio, or leased telephone circuits, and report back to a SCADA master at intervals rather than continuously, exactly as Lesson 1 described.</p>
+    <p>An <dfn id="def-ied">IED</dfn> (intelligent electronic device) is most often found in electrical power systems — a protective relay or smart meter monitoring one specific piece of equipment, such as a feeder breaker or a transformer. What sets an IED apart is speed and independence: when it detects a fault condition (an overcurrent, a short), it can trip a breaker within a few electrical cycles — well under a second — without waiting for a command from anywhere else. IEDs typically speak IEC 61850 or DNP3 on a substation LAN.</p>
+    <table class="compare-table">
+      <caption>PLC, RTU, and IED compared</caption>
+      <thead>
+        <tr><th scope="col">Characteristic</th><th scope="col">PLC</th><th scope="col">RTU</th><th scope="col">IED</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Typical setting</td><td>Single machine or process area</td><td>Geographically remote field site</td><td>Substation or electrical equipment</td></tr>
+        <tr><td>Control style</td><td>Continuous scan-cycle logic</td><td>Periodic polling and supervisory commands</td><td>Local protection logic, acts independently and fast</td></tr>
+        <tr><td>Typical protocol</td><td>Modbus TCP, EtherNet/IP, PROFINET</td><td>DNP3, Modbus (often over WAN links)</td><td>IEC 61850, DNP3</td></tr>
+        <tr><td>Example device</td><td>Controller on a bottling line</td><td>Controller at a remote pump station</td><td>Protective relay on a feeder breaker</td></tr>
+      </tbody>
+    </table>
+    <div class="icon-row" aria-hidden="true">
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <rect x="8" y="8" width="36" height="36" rx="4" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <circle cx="18" cy="20" r="2.5" fill="var(--accent)"/>
+          <circle cx="18" cy="30" r="2.5" fill="var(--accent)"/>
+          <line x1="24" y1="20" x2="38" y2="20" stroke="var(--accent)" stroke-width="2"/>
+          <line x1="24" y1="30" x2="38" y2="30" stroke="var(--accent)" stroke-width="2"/>
+        </svg>
+        PLC
+      </div>
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <rect x="10" y="14" width="32" height="24" rx="4" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <path d="M18 40 L14 46 M34 40 L38 46" stroke="var(--accent)" stroke-width="2"/>
+          <path d="M18 26 h4 l3 -8 l4 12 l3 -8 l4 4 h4" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+        </svg>
+        RTU
+      </div>
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <polygon points="26,6 44,16 44,36 26,46 8,36 8,16" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <path d="M26 16 L20 28 h8 l-6 12" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+        </svg>
+        IED
+      </div>
+    </div>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>Picture three kinds of specialists on a large campus. The PLC is the building supervisor who's physically present, running the elevators and lighting for one building, all day, without needing to check in. The RTU is the regional inspector who drives out to a distant satellite office once every few minutes, checks the gauges, and phones the numbers back to headquarters. The IED is the on-site safety officer at the chemical storage building, who pulls the fire alarm the instant sensors cross a threshold — without waiting for headquarters to approve it, because a few seconds of delay could be the difference that matters.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>At a distribution substation, an IED serving as a protective relay continuously monitors current on a feeder breaker. When a fault causes current to spike well beyond normal load, the IED's protection logic trips the breaker within a few cycles — a fraction of a second — isolating the fault before it can damage equipment further upstream. Meanwhile, an RTU at the same substation reports the breaker's status, voltage, and current readings back to the utility's control center every few seconds over a DNP3 link, so an operator sees that the trip happened — but by the time that report arrives, the IED has already done its job.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Students often want to collapse RTU and IED into "just another PLC." Push back gently: the distinguishing feature isn't the hardware, which can look similar — it's the job. An RTU's job is reporting and supervisory control across distance; an IED's job is fast, local protection of one specific asset. A PLC's job is continuous control of a local process. Same general category of device, three different missions.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2 ================= -->
+  <section id="s2" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🌡️</span>
+      <h2>Sensors and <dfn id="def-actuator">actuators</dfn>: where the network meets the physical world</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p>A sensor measures some property of the physical world — temperature, pressure, level, flow, position — and converts it into a signal a controller can read. Many legacy sensors use a 4–20 milliamp analog current loop, where 4 mA represents the low end of the measurement range and 20 mA represents the high end; a controller's analog input card reads that current and converts it back into an engineering value. Newer sensors may report digitally over protocols like HART or directly over an industrial Ethernet protocol, but the underlying job is identical: turn a physical quantity into something a PLC, RTU, or IED can act on.</p>
+    <p>An <dfn id="def-actuator2">actuator</dfn> is the mirror image: it converts a controller's electrical output signal back into physical action — opening or closing a valve, starting or stopping a motor, moving a damper. Where a sensor is an input device, an actuator is an output device, and the two together form the two ends of every control loop: measure something, decide something, do something.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>If the controller is the spinal cord in this lesson's body analogy, sensors are the sensory nerve endings and actuators are the muscles. A sensor doesn't decide anything — it just reports "this is what I'm feeling" the same way a nerve ending doesn't decide to move your hand, it just reports heat. An actuator doesn't decide anything either — it just does what it's told, the way a muscle fiber contracts because a nerve signal told it to, not because the muscle itself judged the situation.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A level sensor mounted on a tank reports a 4–20 mA signal to a PLC's analog input card: 4 mA means the tank is empty, 20 mA means it's full, and everything in between scales linearly. When the PLC's logic determines the level has crossed a high-level setpoint — say, the signal reads 17 mA, corresponding to roughly 81% full — it energizes a discrete output wired to a solenoid-operated drain valve. That valve is the actuator: it has no idea what "81% full" means: it simply opens because 24 volts appeared on its coil, exactly as commanded.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>If your institution has any decommissioned 4–20 mA loop hardware, or even a simple analog gauge, bringing it into class makes this abstraction land immediately for IT-background faculty who have never had a reason to think about how a physical measurement becomes a number.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3 ================= -->
+  <section id="s3" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🖥️</span>
+      <h2>Watching and remembering: <dfn id="def-hmi">HMI</dfn>, engineering workstation, and <dfn id="def-historian">historian</dfn></h2>
+      <span class="module-time">≈ 40 min</span>
+    </div>
+    <p>A <dfn id="def-hmi2">HMI</dfn> (human-machine interface) is the screen and software an operator uses to watch a process in real time and issue manual commands — open this valve, acknowledge this alarm, start this pump. Despite running specialized SCADA or HMI software, an HMI is almost always, underneath, a full general-purpose operating system — usually some version of Windows — which means it carries that operating system's entire attack surface in addition to whatever the HMI software itself exposes.</p>
+    <p>An engineering workstation is a different tool for a different job: a computer, often running vendor-specific programming software, used by engineers and technicians to write, upload, and modify the control logic running on PLCs, RTUs, and IEDs. Where an HMI lets an operator watch and nudge a running process, an engineering workstation can rewrite what the process does — which makes it one of the most sensitive machines in the entire environment, because it typically has direct, trusted write-access to every controller it manages.</p>
+    <p>A <dfn id="def-historian2">historian</dfn> is a time-series database that continuously logs process values — temperatures, flows, levels, alarms — for trending, troubleshooting, and regulatory reporting. A historian doesn't control anything; its job is memory, not action. But because historians are useful to people well beyond the control room — engineers building reports, managers reviewing production numbers — they're also one of the more common bridges between the OT network and business-facing systems.</p>
+    <table class="compare-table">
+      <caption>HMI, engineering workstation, and historian compared</caption>
+      <thead>
+        <tr><th scope="col">Characteristic</th><th scope="col">HMI</th><th scope="col">Engineering workstation</th><th scope="col">Historian</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Primary purpose</td><td>Real-time monitoring and manual operator control</td><td>Programming and configuring controllers</td><td>Long-term logging of process data</td></tr>
+        <tr><td>Typical platform</td><td>Windows, running vendor SCADA/HMI software</td><td>Windows, running vendor programming software</td><td>Windows or Linux server, often SQL-based</td></tr>
+        <tr><td>Risk if compromised</td><td>Operator loses accurate visibility and control</td><td>Attacker gains the ability to rewrite control logic</td><td>Data integrity loss, or a pivot point toward business systems</td></tr>
+      </tbody>
+    </table>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>An HMI is a car's dashboard — you watch it and steer with it right now, in real time. An engineering workstation is the mechanic's diagnostic laptop that reprograms the engine control unit — far more powerful, and something you'd never hand to just anyone. A historian is the trip computer's logged history — useful for understanding what happened last week, but it doesn't steer the car and never did.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>At a packaging plant, an operator's HMI screen shows a live trend of line speed and a red "Emergency Stop" button. Twice a year, an engineer connects a laptop running the PLC vendor's programming software — the engineering workstation, even though it's just a laptop for this purpose — to update the recipe logic for a new product size. Meanwhile, a historian server has been logging line speed, downtime events, and reject counts every few seconds for the past three years, data the plant's quality team pulls into a monthly report with no involvement from anyone on the plant floor that day.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4 ================= -->
+  <section id="s4" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🛑</span>
+      <h2>Moving metal and guarding life: drives and the <dfn id="def-sis">safety instrumented system</dfn></h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p>A variable frequency drive (VFD), often just called a drive, is a device that controls a motor's speed by varying the frequency and voltage of the power supplied to it, rather than running the motor at one fixed speed. Drives are a common type of actuator in their own right — a PLC sends a speed command, and the drive translates that into the electrical waveform an induction motor actually needs to spin at that speed. When a drive fails, the motor it controls typically either stops (a safe default in most designs) or, in rarer and more concerning failure modes, runs at an uncommanded speed.</p>
+    <p>A <dfn id="def-sis2">safety instrumented system</dfn> (SIS) is fundamentally different from every device covered so far, and Lesson 2 already told you why: it sits above the CIA triad and outside the basic process control system entirely. A SIS has its own sensors, its own logic solver, and its own final elements (like a dedicated shutdown valve), and it's designed and certified so that its ability to detect a hazardous condition and force the process into a safe state never depends on whether the PLC, HMI, or any network between them is working correctly.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>A SIS is a smoke detector wired directly to a sprinkler system and the fire department — not to the thermostat. It doesn't care whether the thermostat's programming is correct, whether its Wi-Fi is working, or whether someone is in the middle of updating its firmware. It has one job, its own sensor, and its own independent path to action, precisely so that whatever else is going wrong with the "normal" control system doesn't stop it from doing that one job.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A boiler's basic PLC control loop manages normal operation — adjusting fuel flow to hold a target pressure using its own pressure sensor and control valve. A separate SIS, with its own independent pressure transmitter and its own dedicated shutdown valve, watches for a pressure excursion far beyond the PLC's normal operating range. If that threshold is crossed — whether because of a process upset, a failed PLC, or a cyberattack that has compromised the basic control system — the SIS trips the shutdown valve and de-energizes the fuel supply on its own, using logic and wiring that never passes through the PLC at all.</p>
+    </div>
+
+    <h3 style="margin-top:30px;font-size:1.1rem;">Putting the loop together</h3>
+    <p>Every device covered in this lesson fits into one picture: field devices sense and act, controllers decide, and supervisory systems let people watch, program, and remember — with the safety instrumented system running alongside as a deliberately separate, independent path.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 640 340" role="img" aria-labelledby="loopTitle loopDesc" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+        <title id="loopTitle">The control loop and the independent safety path</title>
+        <desc id="loopDesc">A sensor feeds a controller (PLC, RTU, or IED), which drives an actuator — the basic control loop. The HMI, engineering workstation, and historian sit above the controller for supervision, programming, and logging. A separate safety instrumented system runs its own sensor and final element in a fully independent path, bypassing the controller entirely.</desc>
+        <!-- Supervisory row -->
+        <rect x="30" y="16" width="150" height="46" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="105" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">HMI</text>
+        <rect x="200" y="16" width="150" height="46" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="275" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Engineering workstation</text>
+        <rect x="370" y="16" width="150" height="46" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="445" y="43" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Historian</text>
+        <line x1="105" y1="62" x2="105" y2="100" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="275" y1="62" x2="275" y2="100" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="445" y1="62" x2="445" y2="100" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="105" y1="100" x2="445" y2="100" stroke="var(--border)" stroke-width="2"></line>
+        <!-- Controller -->
+        <rect x="200" y="100" width="150" height="50" rx="6" fill="var(--accent)"></rect>
+        <text x="275" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="var(--on-accent)">PLC / RTU / IED</text>
+        <!-- Sensor / actuator -->
+        <line x1="275" y1="150" x2="275" y2="180" stroke="var(--border)" stroke-width="2"></line>
+        <rect x="150" y="180" width="120" height="44" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="210" y="206" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Sensor</text>
+        <rect x="280" y="180" width="120" height="44" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="340" y="206" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Actuator</text>
+        <line x1="210" y1="180" x2="210" y2="150" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="210" y1="150" x2="200" y2="150" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="340" y1="180" x2="340" y2="150" stroke="var(--border)" stroke-width="2"></line>
+        <line x1="340" y1="150" x2="350" y2="150" stroke="var(--border)" stroke-width="2"></line>
+        <text x="270" y="245" text-anchor="middle" font-size="11" fill="var(--text-muted)">Basic process control loop</text>
+        <!-- SIS independent path -->
+        <rect x="460" y="180" width="150" height="44" rx="6" fill="var(--bad-bg)" stroke="var(--bad)" stroke-dasharray="5 3"></rect>
+        <text x="535" y="200" text-anchor="middle" font-size="11" font-weight="700" fill="var(--bad)">SIS sensor</text>
+        <text x="535" y="214" text-anchor="middle" font-size="9" fill="var(--bad)">(independent)</text>
+        <rect x="460" y="240" width="150" height="44" rx="6" fill="var(--bad-bg)" stroke="var(--bad)" stroke-dasharray="5 3"></rect>
+        <text x="535" y="260" text-anchor="middle" font-size="11" font-weight="700" fill="var(--bad)">SIS final element</text>
+        <text x="535" y="274" text-anchor="middle" font-size="9" fill="var(--bad)">(e.g., shutdown valve)</text>
+        <line x1="535" y1="224" x2="535" y2="240" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3"></line>
+        <text x="535" y="300" text-anchor="middle" font-size="10" font-weight="700" fill="var(--bad)">Independent safety path — bypasses the controller entirely</text>
+      </svg>
+      <p class="diagram-caption">Diagram: the HMI, engineering workstation, and historian sit above the controller for supervision, programming, and logging; the controller connects a sensor to an actuator in the basic control loop. The safety instrumented system, shown at right in red, runs its own sensor and final element in a fully independent path that never passes through the controller.</p>
+    </div>
+  </section>
+
+  <div class="part-banner">Part B · Applied Practice</div>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section id="activity" class="module">
+    <div class="activity-block">
+      <div class="activity-head">
+        <span aria-hidden="true">🧩</span>
+        <h3>Activity: Match the Device to What It Exposes</h3>
+        <span class="activity-structure">Individual, then pair-share</span>
+        <span class="activity-time">≈ 25 min</span>
+      </div>
+      <div class="activity-body">
+        <p class="activity-instructions"><strong>Individual (12 min):</strong> For each device, select what it most typically exposes on the network. <strong>Pair-share (13 min):</strong> Compare your answers with a neighbor and discuss why the exposure differs so much from one device to the next.</p>
+        <div class="mapping-table-wrap">
+          <table class="mapping-table" id="mappingTable">
+            <thead>
+              <tr><th scope="col">Device</th><th scope="col">What it typically exposes on the network</th></tr>
+            </thead>
+            <tbody>
+              <tr class="map-row" data-answer="plc">
+                <td>PLC</td>
+                <td>
+                  <select aria-label="Network exposure for PLC">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="rtu">
+                <td>RTU</td>
+                <td>
+                  <select aria-label="Network exposure for RTU">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="ied">
+                <td>IED</td>
+                <td>
+                  <select aria-label="Network exposure for IED">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="hmi">
+                <td>HMI</td>
+                <td>
+                  <select aria-label="Network exposure for HMI">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="ews">
+                <td>Engineering workstation</td>
+                <td>
+                  <select aria-label="Network exposure for engineering workstation">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="hist">
+                <td>Historian</td>
+                <td>
+                  <select aria-label="Network exposure for historian">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="sis">
+                <td>Safety instrumented system</td>
+                <td>
+                  <select aria-label="Network exposure for safety instrumented system">
+                    <option value="">— Select —</option>
+                    <option value="plc">Modbus TCP or EtherNet/IP, reachable to any device on the plant subnet</option>
+                    <option value="rtu">DNP3/Modbus over a remote WAN link, often cellular or radio</option>
+                    <option value="ied">IEC 61850/DNP3 protection and metering data on a substation LAN</option>
+                    <option value="hmi">A full Windows OS attack surface (RDP, file shares, USB) in addition to control software</option>
+                    <option value="ews">Vendor programming software with direct write-access to every controller it manages</option>
+                    <option value="hist">A SQL/OPC interface often bridged toward business reporting systems</option>
+                    <option value="sis">Ideally nothing routable — an isolated, independent safety network</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mapping-actions">
+          <button class="btn" id="checkMapping">Check My Mapping</button>
+          <button class="btn secondary" id="resetMapping">Reset</button>
+          <span class="mapping-result" id="mappingResult" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIMULATION ================= -->
+  <section id="simulation" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔍</span>
+      <h2>Simulation: Device Explorer — PLC, RTU, IED, HMI</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <span class="safety-flag">⚠ Simulation only — no live equipment or network</span>
+    <p>Select a device below to see its role, its typical network exposure, and — using the <strong>Simulate a Failure</strong> button — what happens if that specific device stops working correctly. Nothing here touches a real device, network, or protocol; it's a model built to compare consequences across device types.</p>
+    <div class="activity-block">
+      <div class="activity-body">
+        <div class="sim-controls" role="group" aria-label="Select a device">
+          <button type="button" class="sim-toggle" data-device="plc" aria-pressed="false">PLC</button>
+          <button type="button" class="sim-toggle" data-device="rtu" aria-pressed="false">RTU</button>
+          <button type="button" class="sim-toggle" data-device="ied" aria-pressed="false">IED</button>
+          <button type="button" class="sim-toggle" data-device="hmi" aria-pressed="false">HMI</button>
+        </div>
+        <div class="sim-readout" id="simReadout" aria-live="polite">
+          <strong>Select a device above</strong> to see its role and network exposure, then try simulating a failure.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section id="review" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">✅</span>
+      <h2>Review &amp; Knowledge Check</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <p>Five questions covering the lesson's key distinctions. Answer each, then select <strong>Grade My Quiz</strong> to see your score and an explanation for every item.</p>
+    <div class="quiz-block" id="quizBlock">
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q1.</span>Which device is built to protect a specific piece of electrical equipment and can act within a few cycles without waiting for a remote command?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q1" value="a"> HMI</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="b"> Historian</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="c"> IED</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="d"> Engineering workstation</label></li>
+        </ul>
+        <div class="q-feedback" id="fb1"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q2.</span>An RTU at a remote pump station goes offline. What is the most likely immediate consequence?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q2" value="a"> The pump station immediately loses all power</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="b"> The SCADA master loses visibility and remote control of that site, though local automatic control likely continues</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="c"> Every other RTU on the network will also fail</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="d"> The historian will stop logging data from every other site</label></li>
+        </ul>
+        <div class="q-feedback" id="fb2"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q3.</span>What is the main security concern with an HMI compared to a PLC?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q3" value="a"> HMIs never run any recognizable operating system</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="b"> HMIs typically run on a full Windows OS, adding a large attack surface beyond the control software itself</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="c"> HMIs cannot be patched under any circumstances</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="d"> HMIs communicate exclusively over encrypted channels by default</label></li>
+        </ul>
+        <div class="q-feedback" id="fb3"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q4.</span>Why is a safety instrumented system (SIS) typically kept functionally independent from the basic process control system?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q4" value="a"> So it can share the PLC's sensors and save money</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="b"> So its ability to act on a hazardous condition doesn't depend on the health or configuration of the everyday control system</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="c"> Because SIS devices cannot use electrical signals</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="d"> Because IEC 61850 requires it to run on the same network as the HMI</label></li>
+        </ul>
+        <div class="q-feedback" id="fb4"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q5.</span>A tank level sensor sends a signal to a PLC, and the PLC opens a drain valve when the level is too high. Which device is functioning as the actuator in this scenario?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q5" value="a"> The tank</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="b"> The level sensor</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="c"> The drain valve</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="d"> The PLC</label></li>
+        </ul>
+        <div class="q-feedback" id="fb5"></div>
+      </div>
+
+    </div>
+    <div class="mapping-actions">
+      <button class="btn" id="gradeQuiz">Grade My Quiz</button>
+      <button class="btn secondary" id="resetQuiz">Reset Quiz</button>
+    </div>
+    <div class="quiz-score" id="quizScore">
+      <span class="quiz-score-big" id="quizScoreBig">0 / 5</span>
+      <span id="quizScoreText"></span>
+    </div>
+
+    <div class="teach-note" style="margin-top:26px;">
+      <span class="teach-label">Suggested assessment artifact</span>
+      <p>Have each faculty member sketch the control loop for one real or hypothetical process at their home institution — a building's HVAC system, a lab fume hood, a campus water feature — labeling the sensor, the controller type (PLC, RTU, or IED), the actuator, and whichever supervisory system (HMI, historian) applies. A one-sentence note on what that controller's failure would mean for the process is enough to confirm the device vocabulary transferred before Lesson 4 builds on it.</p>
+    </div>
+  </section>
+
+  <!-- ================= FURTHER READING ================= -->
+  <section id="further-reading" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📚</span>
+      <h2>Further Reading</h2>
+    </div>
+    <ul class="resource-list">
+      <li><a href="https://sands-mvcc.github.io/ot/sensors.html" target="_blank" rel="noopener noreferrer">Sensors Reference (course site)</a> — a companion reference page with additional detail on common OT sensor types and signal formats.</li>
+      <li><a href="https://sands-mvcc.github.io/ot/actuators.html" target="_blank" rel="noopener noreferrer">Actuators Reference (course site)</a> — a companion reference page covering common OT actuator types, from solenoid valves to variable frequency drives.</li>
+    </ul>
+  </section>
+
+  <nav class="lesson-nav-bottom" aria-label="Lesson navigation">
+    <a class="nav-btn" href="lesson02.html">← Lesson 2: IT/OT Security Principles</a>
+    <a class="nav-btn" href="lesson04.html">Lesson 4: IT Protocols Inside OT Networks →</a>
+  </nav>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Lesson tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#s1">1. PLC, RTU, and IED</a></li>
+      <li><a href="#s2">2. Sensors &amp; Actuators</a></li>
+      <li><a href="#s3">3. HMI, Engineering Workstation, Historian</a></li>
+      <li><a href="#s4">4. Drives &amp; Safety Instrumented System</a></li>
+      <li><a href="#activity">Activity: Matching Exercise</a></li>
+      <li><a href="#simulation">Simulation: Device Explorer</a></li>
+      <li><a href="#review">Review &amp; Knowledge Check</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Objectives Progress</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 5 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Learning objectives checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Explain each core OT device's function</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Compare PLC, RTU, and IED deployment context</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Identify how sensors and actuators convert signals</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Describe each device's network exposure</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Evaluate the consequence of device failure</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Key Terms</div>
+    <ul class="glossary-list">
+      <li><a href="#s1"><span class="glossary-term">PLC</span></a><span class="glossary-def">Programmable logic controller — executes control logic for local inputs and outputs on a fixed scan cycle, typically within a single machine or process area.</span></li>
+      <li><a href="#s1"><span class="glossary-term">RTU</span></a><span class="glossary-def">Remote terminal unit — monitors and controls equipment at a geographically remote site, reporting back to a SCADA master at intervals.</span></li>
+      <li><a href="#s3"><span class="glossary-term">HMI</span></a><span class="glossary-def">Human-machine interface — the screen and software an operator uses to monitor a process and issue manual commands, usually running on a full Windows OS.</span></li>
+      <li><a href="#s3"><span class="glossary-term">Historian</span></a><span class="glossary-def">A time-series database that logs process values over time for trending, troubleshooting, and regulatory reporting.</span></li>
+      <li><a href="#s4"><span class="glossary-term">SIS</span></a><span class="glossary-def">Safety instrumented system — an independent layer of sensors, logic, and final elements that forces a process into a safe state, regardless of the basic control system's health.</span></li>
+      <li><a href="#s2"><span class="glossary-term">Actuator</span></a><span class="glossary-def">A device that converts a controller's electrical output signal into physical action — opening a valve, starting a motor, moving a damper.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Lesson Navigation</div>
+    <div class="prevnext-links">
+      <a href="lesson02.html">← Previous: Lesson 2 — IT/OT Security Principles</a>
+      <a href="lesson04.html">Next: Lesson 4 — IT Protocols Inside OT Networks →</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+<footer>
+  Lesson 3 · Day 1 · OT Technologies &amp; Field Devices<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-assisted first draft. A human subject-matter expert should review it for technical accuracy before use with students. Educational use only — all activities are simulation-based and defensive in scope.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME (light default, dark only if previously chosen) ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- OBJECTIVES PROGRESS TRACKER ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+  }
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- MAPPING ACTIVITY ---------------- */
+  var mappingRows = Array.prototype.slice.call(document.querySelectorAll('#mappingTable .map-row'));
+  var mappingResult = document.getElementById('mappingResult');
+
+  document.getElementById('checkMapping').addEventListener('click', function () {
+    var correctCount = 0;
+    var totalAnswered = 0;
+    mappingRows.forEach(function (row) {
+      var select = row.querySelector('select');
+      var correctVal = row.getAttribute('data-answer');
+      row.classList.remove('correct', 'incorrect');
+      if (!select.value) return;
+      totalAnswered++;
+      if (select.value === correctVal) {
+        row.classList.add('correct');
+        correctCount++;
+      } else {
+        row.classList.add('incorrect');
+      }
+    });
+    mappingResult.textContent = correctCount + ' of ' + mappingRows.length + ' correct'
+      + (totalAnswered < mappingRows.length ? ' (some rows left unanswered)' : '');
+  });
+
+  document.getElementById('resetMapping').addEventListener('click', function () {
+    mappingRows.forEach(function (row) {
+      row.querySelector('select').value = '';
+      row.classList.remove('correct', 'incorrect');
+    });
+    mappingResult.textContent = '';
+  });
+
+  /* ---------------- SIMULATION: DEVICE EXPLORER ---------------- */
+  var deviceData = {
+    plc: {
+      name: 'PLC — Programmable Logic Controller',
+      role: 'Executes control logic for local inputs and outputs, typically within a single machine or process area, on a fixed scan cycle.',
+      exposure: 'Modbus TCP, EtherNet/IP, or PROFINET; often reachable by any device sharing the same network segment.',
+      failure: 'If a PLC crashes or is forced into a fault state, the specific control loop it manages stops. Outputs typically move to a pre-configured safe state, but the process it was running halts until a technician intervenes.'
+    },
+    rtu: {
+      name: 'RTU — Remote Terminal Unit',
+      role: 'Polls and controls equipment at a geographically remote site, and reports data back to a central SCADA master at intervals.',
+      exposure: 'DNP3 or Modbus, often carried over cellular, licensed radio, or leased telephone lines — sometimes still using default credentials.',
+      failure: 'If an RTU goes offline, the SCADA master loses visibility and remote control at that one site. This is a real operational problem, but usually not an immediate safety event, since the site typically continues running under local automatic control.'
+    },
+    ied: {
+      name: 'IED — Intelligent Electronic Device',
+      role: 'Monitors and protects a specific piece of electrical equipment — a breaker, transformer, or feeder — and can act within a few electrical cycles without waiting for a remote command.',
+      exposure: 'IEC 61850 or DNP3 on the substation LAN, often with tight timing requirements that make inserting security controls harder without careful engineering review.',
+      failure: 'If an IED\'s protection function fails silently, the equipment it protects may go unprotected: a fault that should have tripped a breaker in milliseconds might instead be allowed to escalate, with real physical and safety consequences.'
+    },
+    hmi: {
+      name: 'HMI — Human-Machine Interface',
+      role: 'Presents live process data to an operator and provides a way to issue manual commands, typically running on a full Windows operating system.',
+      exposure: 'Vendor SCADA/HMI software plus the entire underlying Windows attack surface — RDP, file shares, removable media, and whatever else that OS install exposes.',
+      failure: 'If an HMI fails or is compromised, operators typically lose visibility and manual control — but well-designed control loops keep running on the PLC, RTU, or IED underneath, at least for a while, because those controllers don\'t depend on the HMI to keep functioning.'
+    }
+  };
+  var simReadout = document.getElementById('simReadout');
+  var simButtons = Array.prototype.slice.call(document.querySelectorAll('.sim-toggle[data-device]'));
+  var currentDevice = null;
+
+  function renderDevice(key) {
+    var d = deviceData[key];
+    simReadout.innerHTML =
+      '<strong>' + d.name + '</strong>' +
+      '<div class="device-card">' +
+        '<div class="device-row"><span class="dev-label">Role</span><span class="dev-val">' + d.role + '</span></div>' +
+        '<div class="device-row"><span class="dev-label">Network exposure</span><span class="dev-val">' + d.exposure + '</span></div>' +
+      '</div>' +
+      '<div style="margin-top:12px;">' +
+        '<button type="button" class="btn secondary" id="failureBtn">⚠ Simulate a Failure</button>' +
+      '</div>' +
+      '<div class="failure-panel" id="failurePanel" aria-live="polite"></div>';
+    document.getElementById('failureBtn').addEventListener('click', function () {
+      var panel = document.getElementById('failurePanel');
+      panel.textContent = d.failure;
+      panel.classList.add('show');
+    });
+  }
+
+  simButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-device');
+      currentDevice = key;
+      simButtons.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      renderDevice(key);
+    });
+  });
+
+  /* ---------------- QUIZ ---------------- */
+  var quizCards = Array.prototype.slice.call(document.querySelectorAll('#quizBlock .q-card'));
+  var quizFeedback = {
+    1: { correct: "Correct. An IED runs local protection logic and can trip a breaker within a few cycles, without waiting for a remote command — that speed and independence is what defines it.", incorrect: "Not quite. HMIs, historians, and engineering workstations don't run fast, local protection logic — that's specifically the IED's job." },
+    2: { correct: "Correct. The SCADA master loses visibility and remote control of that one site, but local automatic control at the site typically continues on its own.", incorrect: "Not quite. An RTU going offline is a visibility and remote-control problem at that one site — it doesn't cut power, cascade to other RTUs, or stop the historian from logging other sites." },
+    3: { correct: "Correct. An HMI typically runs on a full Windows OS, which adds a large attack surface (RDP, file shares, USB ports) beyond whatever the HMI software itself exposes.", incorrect: "Not quite. HMIs do run recognizable operating systems, can be patched, and don't communicate exclusively over encrypted channels by default — the real concern is the OS attack surface underneath the HMI software." },
+    4: { correct: "Correct. A SIS is kept independent so its ability to detect a hazard and act never depends on the health, configuration, or compromise of the everyday control system.", incorrect: "Not quite. The independence isn't about signal type or a specific standard's network requirement — it's so the SIS can act correctly no matter what state the basic control system is in." },
+    5: { correct: "Correct. The drain valve is the actuator — it converts the PLC's electrical output signal into physical action.", incorrect: "Not quite. The tank isn't a device in the loop, the level sensor is the input device, and the PLC is the controller — the valve is the actuator, since it's the device that acts on the physical world." }
+  };
+
+  document.getElementById('gradeQuiz').addEventListener('click', function () {
+    var correctCount = 0;
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      var name = 'q' + qNum;
+      var selected = card.querySelector('input[name="' + name + '"]:checked');
+      var fb = document.getElementById('fb' + qNum);
+      var correctVal = card.getAttribute('data-answer');
+      fb.className = 'q-feedback show';
+      if (!selected) {
+        fb.classList.add('unanswered');
+        fb.textContent = 'Not answered — select an option above, then grade again.';
+        return;
+      }
+      if (selected.value === correctVal) {
+        fb.classList.add('correct');
+        fb.textContent = '✓ Correct — ' + quizFeedback[qNum].correct;
+        correctCount++;
+      } else {
+        fb.classList.add('incorrect');
+        fb.textContent = '✗ Not quite — ' + quizFeedback[qNum].incorrect;
+      }
+    });
+    var scoreBox = document.getElementById('quizScore');
+    var scoreBig = document.getElementById('quizScoreBig');
+    var scoreText = document.getElementById('quizScoreText');
+    scoreBox.classList.add('show');
+    scoreBig.textContent = correctCount + ' / ' + quizCards.length;
+    scoreText.textContent = correctCount === quizCards.length
+      ? 'All five — you are ready for Lesson 4.'
+      : (correctCount >= 3 ? 'Solid grasp — review the items you missed before Lesson 4.' : 'Worth a re-read of the sections above before moving on.');
+  });
+
+  document.getElementById('resetQuiz').addEventListener('click', function () {
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      card.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      var fb = document.getElementById('fb' + qNum);
+      fb.className = 'q-feedback';
+      fb.textContent = '';
+    });
+    document.getElementById('quizScore').classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
