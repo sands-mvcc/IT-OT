@@ -513,10 +513,22 @@
     </div>
   </section>
 
-  <!-- STEP 2: CONTENT TYPES -->
+  <!-- STEP 2: EXPERT PERSONAS -->
+  <section class="tool-card" aria-labelledby="persona-h">
+    <div class="tool-card-head">
+      <h2 id="persona-h"><span class="step-num">2</span> Expert Personas</h2>
+      <span class="hint">Choose which expert perspective(s) the AI should apply while generating this lesson</span>
+    </div>
+    <div class="tool-card-body">
+      <div class="select-all-row"><button type="button" class="link-btn" onclick="toggleAll('persona')">Select / deselect all</button></div>
+      <div class="chip-grid" id="personaGrid" role="group" aria-label="Expert personas to apply"></div>
+    </div>
+  </section>
+
+  <!-- STEP 3: CONTENT TYPES -->
   <section class="tool-card" aria-labelledby="content-h">
     <div class="tool-card-head">
-      <h2 id="content-h"><span class="step-num">2</span> Content to Generate</h2>
+      <h2 id="content-h"><span class="step-num">3</span> Content to Generate</h2>
       <span class="hint">Choose everything this lesson page should include</span>
     </div>
     <div class="tool-card-body">
@@ -525,10 +537,10 @@
     </div>
   </section>
 
-  <!-- STEP 3: ACCESSIBILITY -->
+  <!-- STEP 4: ACCESSIBILITY -->
   <section class="tool-card" aria-labelledby="ada-h">
     <div class="tool-card-head">
-      <h2 id="ada-h"><span class="step-num">3</span> Accessibility (ADA / WCAG) Requirements</h2>
+      <h2 id="ada-h"><span class="step-num">4</span> Accessibility (ADA / WCAG) Requirements</h2>
       <span class="hint">Matches the course's "Accessible and equitable by default" safeguard</span>
     </div>
     <div class="tool-card-body">
@@ -537,10 +549,10 @@
     </div>
   </section>
 
-  <!-- STEP 4: COLOR SCHEME -->
+  <!-- STEP 5: COLOR SCHEME -->
   <section class="tool-card" aria-labelledby="color-h">
     <div class="tool-card-head">
-      <h2 id="color-h"><span class="step-num">4</span> Color Scheme</h2>
+      <h2 id="color-h"><span class="step-num">5</span> Color Scheme</h2>
       <span class="hint">Sets the design tokens the generated lesson page will use</span>
     </div>
     <div class="tool-card-body">
@@ -557,10 +569,10 @@
     </div>
   </section>
 
-  <!-- STEP 5: REQUIRED FEATURES -->
+  <!-- STEP 6: REQUIRED FEATURES -->
   <section class="tool-card" aria-labelledby="features-h">
     <div class="tool-card-head">
-      <h2 id="features-h"><span class="step-num">5</span> Page Features &amp; Lesson Details</h2>
+      <h2 id="features-h"><span class="step-num">6</span> Page Features &amp; Lesson Details</h2>
     </div>
     <div class="tool-card-body">
       <label class="field-label">Required on every generated lesson page</label>
@@ -748,6 +760,20 @@ const LESSONS = [
 ];
 
 /* ============================================================
+   EXPERT PERSONAS
+============================================================ */
+const PERSONAS = [
+  { id: 'sme-ot', label: 'SME in Operational Technology Cybersecurity', desc: 'Technical accuracy for ICS/SCADA/PLC concepts, protocols, and standards.', checked: true,
+    guidance: "A subject-matter expert in operational technology (OT) and industrial control systems cybersecurity, with hands-on knowledge of PLCs, DCS, SCADA, RTUs, HMIs, industrial protocols (Modbus, DNP3, EtherNet/IP, PROFINET, BACnet/IP, OPC UA), the Purdue model, IEC 62443, NIST SP 800-82, and real-world ICS incident response. Responsible for technical accuracy throughout: correct terminology, realistic device and protocol behavior, defensible security guidance, and alignment with how these systems actually behave in the field — not textbook oversimplification." },
+  { id: 'instructional-designer', label: 'Expert Instructional Designer', desc: "Learning objectives, scaffolding, activities, and assessment aligned to sound pedagogy.", checked: true,
+    guidance: "An expert instructional designer skilled in backward design, Bloom's taxonomy, adult learning theory, and formative assessment, designing specifically for community college faculty as the learner audience. Responsible for the pedagogy: objectives that are measurable and appropriately scaffolded, activities that build toward those objectives, pacing that matches the stated contact hours, and assessments (quiz, artifact) that validly measure what was actually taught." },
+  { id: 'graphics-designer', label: 'Expert Graphics Designer', desc: 'Clear, accessible diagrams, illustrations, and visual hierarchy.', checked: true,
+    guidance: "An expert graphic designer specializing in technical and instructional visuals — diagrams, iconography, infographics, and concept maps — who designs for clarity at a glance, a coherent visual hierarchy, and accessible color and contrast in both light and dark themes. Responsible for how every diagram, illustration, and comparison visual is composed, labeled, and captioned — not merely that one exists." },
+  { id: 'web-developer', label: 'Expert Webpage Developer', desc: 'Clean, semantic, accessible, and dependency-free front-end implementation.', checked: true,
+    guidance: "An expert front-end web developer fluent in semantic HTML5, modern CSS, and vanilla JavaScript, with strong WCAG 2.2 implementation experience and a habit of writing clean, dependency-free, maintainable code. Responsible for how the page is actually built: correct landmark structure, working interactive components (quiz grading, flip cards, theme toggle, print button, mapping exercises, simulations), responsive layout, and code that runs correctly with no external dependencies and no console errors." }
+];
+
+/* ============================================================
    CONTENT TYPES
 ============================================================ */
 const CONTENT_TYPES = [
@@ -851,7 +877,7 @@ function setLessonMode(mode) {
 }
 
 /* ============================================================
-   RENDER: content type & ADA chip grids
+   RENDER: persona, content type & ADA chip grids
 ============================================================ */
 function renderChipGrid(containerId, items, groupName) {
   const container = document.getElementById(containerId);
@@ -863,6 +889,7 @@ function renderChipGrid(containerId, items, groupName) {
     </label>
   `).join('');
 }
+renderChipGrid('personaGrid', PERSONAS, 'persona');
 renderChipGrid('contentGrid', CONTENT_TYPES, 'content');
 renderChipGrid('adaGrid', ADA_ITEMS, 'ada');
 
@@ -956,6 +983,7 @@ function parseMediaLines(id) {
 
 function generatePrompt() {
   const lesson = getSelectedLessonInfo();
+  const personaIds = getChecked('persona');
   const contentIds = getChecked('content');
   const adaIds = getChecked('ada');
   const tokens = getColorTokens();
@@ -1015,7 +1043,12 @@ function generatePrompt() {
     ? `Save the output as **${lesson.file}**, matching the filename already linked from the course launch page (index.html).`
     : `Propose an appropriate lessonNN.html filename consistent with the course's existing numbering (lesson01.html – lesson12.html).`;
 
-  const prompt = `You are building one lesson page for a faculty development workshop: "Teaching Operational Technologies and Cybersecurity for Community College Faculty" (course code ${courseCode}, ${institution}, instructor ${instructorName}). The course launch page lives at index.html (https://sands-mvcc.github.io/ot/) and already links to this lesson.
+  const selectedPersonas = PERSONAS.filter(p => personaIds.includes(p.id));
+  const roleIntro = selectedPersonas.length
+    ? `Act as a collaborative team combining these expert perspectives, and apply each one where it is relevant rather than favoring just one:\n\n${selectedPersonas.map((p, i) => `${i + 1}. **${p.label}** — ${p.guidance}`).join('\n\n')}\n\nUsing that combined expertise, y`
+    : `Acting as an experienced OT curriculum developer, y`;
+
+  const prompt = `${roleIntro}ou are building one lesson page for a faculty development workshop: "Teaching Operational Technologies and Cybersecurity for Community College Faculty" (course code ${courseCode}, ${institution}, instructor ${instructorName}). The course launch page lives at index.html (https://sands-mvcc.github.io/ot/) and already links to this lesson.
 
 ============================================================
 LESSON TO BUILD
