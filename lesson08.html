@@ -253,16 +253,20 @@ figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
 /* ---------- Flip cards ---------- */
 .flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
 .flip-card{
-  perspective:1000px;background:none;border:0;padding:0;font:inherit;
-  text-align:left;cursor:pointer;min-height:180px;
+  display:block;width:100%;height:16rem;
+  perspective:1200px;background:none;border:0;padding:0;font:inherit;
+  color:inherit;text-align:left;cursor:pointer;
 }
 .flip-inner{
-  position:relative;width:100%;min-height:180px;height:100%;
-  transition:transform .5s;transform-style:preserve-3d;
+  display:block;position:relative;width:100%;height:100%;
+  transition:transform .55s ease;
+  transform-style:preserve-3d;
+  transform:rotateY(0deg);
 }
 .flip-card[aria-pressed="true"] .flip-inner{transform:rotateY(180deg);}
 .flip-face{
-  position:absolute;inset:0;backface-visibility:hidden;
+  position:absolute;top:0;right:0;bottom:0;left:0;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
   border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:1rem;display:flex;flex-direction:column;justify-content:center;
   background:var(--surface);box-shadow:var(--shadow);overflow:auto;
@@ -418,9 +422,13 @@ footer.site strong{color:#fff;}
   .part-banner h2,.part-banner p,.part-banner .p-label{color:#000 !important;}
   .activity-header{background:#eee !important;color:#000 !important;}
   thead th{background:#ddd !important;color:#000 !important;}
-  .flip-inner{transform:none !important;}
-  .flip-face{position:static;transform:none !important;backface-visibility:visible;min-height:0;margin-bottom:.4rem;}
-  .flip-card{min-height:0;}
+  .flip-card{height:auto !important;perspective:none;}
+  .flip-inner{height:auto !important;transform:none !important;transform-style:flat;}
+  .flip-face{
+    position:static;transform:none !important;
+    backface-visibility:visible;-webkit-backface-visibility:visible;
+    box-shadow:none;margin-bottom:.4rem;
+  }
   a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;}
   footer.site{background:#fff !important;color:#000 !important;border-top:1px solid #000;}
   footer.site strong{color:#000 !important;}
