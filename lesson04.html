@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4: IT Protocols Inside OT Networks | Teaching Operational Technologies</title>
+<meta name="description" content="Day 2, Lesson 4 of the Teaching Operational Technologies faculty development workshop: Ethernet, TCP/IP, VLANs, DHCP, DNS, and NTP as they actually appear in control networks — including why static addressing and local time sources are still common, and what breaks when they are configured like an office LAN.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .topbar-inner {
+    max-width: 1280px; margin: 0 auto; padding: 9px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 28px 24px 22px;
+  }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav {
+    position: sticky; top: 0; z-index: 90;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a {
+    display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600;
+    color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px;
+  }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+
+  /* Sidebar: table of contents */
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  /* Sidebar: objectives progress */
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer;
+  }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  /* Sidebar: glossary */
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* Sidebar: prev/next */
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  /* ---------- Main content sections ---------- */
+  .part-banner {
+    background: var(--header-bg); color: var(--header-text);
+    padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800;
+    font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    margin: 40px 0 18px;
+  }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box {
+    background: var(--accent-light); border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0;
+  }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 20px; margin: 18px 0;
+  }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .safety-flag {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+    color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px;
+  }
+  .safety-flag.lesson-top { font-size: 0.8rem; padding: 7px 14px; margin: 0 0 18px; }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  /* comparison table */
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  /* diagram wrap */
+  .diagram-wrap { overflow-x: auto; margin: 18px 0; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .diagram-caption { font-size: 0.82rem; color: var(--text-muted); margin: 10px 0 0; text-align: center; }
+
+  /* activity block */
+  .activity-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin: 18px 0;
+  }
+  .activity-head {
+    background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px;
+  }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .mapping-table-wrap { overflow-x: auto; }
+  table.mapping-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  table.mapping-table th, table.mapping-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.mapping-table thead th { background: var(--surface2); font-weight: 700; }
+  table.mapping-table select {
+    width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.86rem;
+  }
+  .map-row.correct td:first-child { border-left: 4px solid var(--ok); }
+  .map-row.incorrect td:first-child { border-left: 4px solid var(--bad); }
+  .mapping-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .mapping-result { font-size: 0.85rem; font-weight: 700; }
+
+  .btn {
+    background: var(--accent); color: var(--on-accent); border: none; cursor: pointer;
+    padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit;
+  }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+
+  /* simulation: network config explorer */
+  .sim-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .sim-toggle {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 9px 14px; border-radius: 20px; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .sim-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .sim-readout {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.87rem; min-height: 3.5em;
+  }
+  .sim-readout strong { color: var(--accent2); }
+  [data-theme="dark"] .sim-readout strong { color: var(--accent); }
+  .device-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 0 0; margin-top: 10px; }
+  .device-row { display: flex; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .device-row:last-child { border-bottom: none; }
+  .device-row .dev-label { flex: 0 0 150px; font-weight: 700; color: var(--text-muted); }
+  .device-row .dev-val { flex: 1; }
+  .failure-panel { margin-top: 12px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--bad-bg); color: var(--bad); font-size: 0.85rem; display: none; }
+  .failure-panel.show { display: block; }
+
+  /* quiz */
+  .quiz-block { display: flex; flex-direction: column; gap: 20px; }
+  .q-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .q-stem { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
+  .q-num { color: var(--accent); margin-right: 6px; }
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .q-feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.incorrect { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback.unanswered { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .quiz-score {
+    margin-top: 6px; background: var(--header-bg); color: var(--header-text);
+    border-radius: var(--radius-sm); padding: 16px 20px; font-weight: 700; display: none;
+    align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .quiz-score.show { display: flex; }
+  .quiz-score-big { font-size: 1.4rem; }
+
+  /* resource list */
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; font-size: 0.88rem;
+  }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note {
+    border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px;
+    margin: 16px 0; font-size: 0.85rem; color: var(--text-muted);
+  }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .icon-row { display: flex; gap: 18px; margin: 14px 0; flex-wrap: wrap; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); width: 88px; text-align: center; }
+
+  .lesson-nav-bottom {
+    display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap;
+  }
+  .nav-btn {
+    text-decoration: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text);
+    box-shadow: var(--shadow); font-size: 0.88rem;
+  }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer {
+    background: var(--header-bg); color: var(--header-text); opacity: 0.85;
+    text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6;
+  }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* PRINT */
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .q-card, .sim-readout, .diagram-wrap { box-shadow: none; border: 1px solid #999; }
+    footer { background: #ffffff; color: #000000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · NCyTE · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Day 2 · Lesson 4 · 4 Contact Hours</span>
+    <h1>IT Protocols Inside OT Networks</h1>
+    <p class="tagline">Ethernet, TCP/IP, VLANs, DHCP, DNS, and NTP look familiar from any office network — until you see how differently they're configured, and why, on a plant floor.</p>
+    <div class="meta-row">
+      <span class="meta-item">📊 Intermediate</span>
+      <span class="meta-item">⏱ 4 hours</span>
+      <span class="meta-item">🎯 5 objectives</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#s1" data-section="s1">Ethernet &amp; TCP/IP</a>
+    <a href="#s2" data-section="s2">VLANs &amp; Segmentation</a>
+    <a href="#s3" data-section="s3">DHCP &amp; DNS</a>
+    <a href="#s4" data-section="s4">NTP &amp; Time Sync</a>
+    <a href="#activity" data-section="activity">Activity</a>
+    <a href="#simulation" data-section="simulation">Simulation</a>
+    <a href="#review" data-section="review">Review</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <h2>Lesson Overview</h2>
+      <p>Lesson 3 gave you the device roles that populate an OT network. This lesson gives you the plumbing those devices actually run on — and it will feel deceptively familiar. Ethernet, TCP/IP, VLANs, DHCP, DNS, and NTP are the exact same protocols your students already manage on the campus IT network. That familiarity is useful, and it's also a trap: the protocols are identical, but the configuration choices around them are frequently the opposite of what an IT background trains someone to expect. An office network wants automatic, convenient, internet-connected defaults. A control network often wants predictable, static, self-contained ones — and faculty who don't understand why will "fix" an OT network into a less reliable state, with the best of intentions.</p>
+      <p>We'll work through the shared foundation of Ethernet and <dfn id="def-tcpip-intro">TCP/IP</dfn> first, then the two tools OT uses to carve one physical network into separated zones — <dfn id="def-vlan-intro">VLAN</dfn> and <dfn id="def-segmentation-intro">segmentation</dfn> — then the addressing and naming services that most often get "office-configured" by mistake — <dfn id="def-dhcp-intro">DHCP</dfn> and <dfn id="def-dns-intro">DNS</dfn> — and finish with the service most people forget matters at all until an incident investigation falls apart because of it: <dfn id="def-ntp-intro">NTP</dfn>.</p>
+      <div class="analogy-box">
+        <span class="analogy-label">Anchoring analogy</span>
+        <p>Think of these protocols as the plumbing and electrical code inside two very different buildings. A hotel (the office network) is built for constant turnover: guests come and go, so rooms get reassigned on the fly, the front desk looks up which room you're in on request, and the clocks on the wall just sync to whatever the internet says the time is. A hospital's operating wing (the control network) is built for the opposite: the same room is always the same room, staff don't want to look anything up mid-procedure because a directory server might be down, and every clock on every monitor in that wing is synced to one trusted source, because if two machines disagree about the time by even a few seconds, nobody can reconstruct what happened during a code. Same underlying plumbing — very different reasons for how it's configured.</p>
+      </div>
+      <h3 style="margin-top:22px;font-size:1.05rem;">Learning objectives</h3>
+      <p style="margin-bottom:6px;color:var(--text-muted);font-size:0.85rem;">By the end of this lesson, you will be able to:</p>
+      <ul class="lo-display">
+        <li>Explain why familiar IT protocols such as Ethernet and TCP/IP appear in OT networks yet are frequently configured differently than on a typical office LAN.</li>
+        <li>Identify how VLANs implement network segmentation and align with Purdue-model zone boundaries on shared switching hardware.</li>
+        <li>Compare static IP addressing with DHCP-based addressing in a control-network context, including the operational tradeoffs each creates.</li>
+        <li>Describe why OT networks commonly rely on local, GPS-disciplined time sources for NTP synchronization instead of internet time servers.</li>
+        <li>Evaluate a described network configuration and identify which OT-appropriate practice — static addressing, VLAN segmentation, or local time sync — it is missing.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="part-banner">Part A · Foundations Lecture</div>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section id="s1" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔌</span>
+      <h2>The shared foundation: Ethernet and <dfn id="def-tcpip">TCP/IP</dfn></h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p>Underneath almost every modern control network, including the industrial protocols covered in Lesson 5, sits the same Ethernet and <dfn id="def-tcpip2">TCP/IP</dfn> stack that carries email and web traffic on any office network. This convergence is exactly what Lesson 1 described: OT abandoned proprietary serial links and adopted commodity Ethernet hardware because it was cheaper, faster, and easier to find replacement parts for. The addressing rules, the framing, the routing logic — all of it is the same TCP/IP your students already teach in a networking course.</p>
+    <p>What's different is what's connected to it and how forgiving that traffic is expected to be. An office workstation that receives a malformed or unexpected packet typically drops it and moves on without anyone noticing. Many field devices — PLCs and RTUs built with limited processing headroom and firmware that hasn't been updated in years — handle the same situation far less gracefully: a burst of unexpected broadcast traffic, a port scan, or even a legitimate but unfamiliar packet type can occasionally cause a controller to stall, or in rarer documented cases, fault outright. This is one reason OT network engineers configure switches to restrict what can reach a given device far more tightly than a typical office switch would.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>Think of TCP/IP as the postal system: the addressing scheme, the routing between post offices, and the basic idea of an envelope with a destination are identical whether the letter is going to a downtown office tower or a rural farmhouse. What differs is how the recipient handles an unexpected piece of mail. The office tower has a mail room staffed to sort and discard junk mail without disruption. The rural farmhouse might have one elderly resident who opens every single envelope personally and can be genuinely thrown off by something odd showing up unannounced. Same postal system, very different tolerance for surprise.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>At a wastewater treatment plant, the plant-floor switch stack carries the exact same 802.3 Ethernet frames and IPv4 addressing as the administration building's network two hundred feet away. But the plant-floor switches are configured with strict port security (only one known device's MAC address may connect to each port), broadcast storm control, and no uplink to the internet at all — while the administration building's switches allow any laptop to join, run DHCP, and reach the internet freely. Same protocol stack, deliberately different tolerances.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>This is a good moment to remind students that "it's just TCP/IP" is true and also somewhat beside the point. The protocol being familiar is exactly why IT staff are tempted to manage an OT switch the way they'd manage an office switch — and that temptation is the whole reason this lesson exists.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2 ================= -->
+  <section id="s2" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🧱</span>
+      <h2><dfn id="def-vlan">VLAN</dfn>s and <dfn id="def-segmentation">segmentation</dfn>: separating zones without new cable</h2>
+      <span class="module-time">≈ 45 min</span>
+    </div>
+    <p>A <dfn id="def-vlan2">VLAN</dfn> (virtual local area network) logically divides one physical switch, or a stack of switches, into multiple separate broadcast domains — groups of ports that can talk to each other freely but cannot reach ports in a different VLAN without passing through a router or firewall. The key word is <em>logically</em>: the plant-floor HMI and the front-office accounting PC can be plugged into the same physical switch cabinet and still be completely unable to reach each other on the network, because they've been assigned to different VLANs.</p>
+    <p><dfn id="def-segmentation2">Segmentation</dfn> is the broader security goal that VLANs are one common tool for achieving: dividing a network into isolated zones connected only through governed conduits, so that a fault or compromise in one zone doesn't automatically reach another. This is the zones-and-conduits vocabulary from Lesson 2's Purdue model discussion made concrete — a VLAN boundary is frequently how a Purdue level boundary is actually implemented on real switching hardware, alongside firewalls and routers that control what's allowed to cross between VLANs.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 640 260" role="img" aria-labelledby="vlanTitle vlanDesc" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+        <title id="vlanTitle">One physical switch stack carrying three separate VLANs</title>
+        <desc id="vlanDesc">A single physical switch stack is divided into three VLANs: an enterprise VLAN carrying office PCs and printers, a DMZ VLAN carrying the historian and a jump host, and a plant VLAN carrying the HMI and PLCs. A firewall sits between the VLANs and permits only specific, defined traffic to cross between them. Devices within the same VLAN can reach each other directly; devices in different VLANs cannot, even though they share the same physical wiring and switch hardware.</desc>
+        <rect x="20" y="20" width="600" height="40" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="320" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">One physical switch stack (shared hardware, shared cabling)</text>
+        <rect x="40" y="90" width="160" height="130" rx="8" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="120" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-muted)">VLAN 10 — Enterprise</text>
+        <rect x="58" y="130" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="85" y="149" text-anchor="middle" font-size="9" fill="var(--text)">Office PC</text>
+        <rect x="128" y="130" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="155" y="149" text-anchor="middle" font-size="9" fill="var(--text)">Printer</text>
+        <text x="120" y="200" text-anchor="middle" font-size="9" fill="var(--text-muted)">Free to reach the internet</text>
+        <rect x="242" y="90" width="156" height="130" rx="8" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="5 3"></rect>
+        <text x="320" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent2)">VLAN 20 — DMZ</text>
+        <rect x="258" y="130" width="60" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="288" y="149" text-anchor="middle" font-size="9" fill="var(--text)">Historian</text>
+        <rect x="326" y="130" width="60" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="356" y="149" text-anchor="middle" font-size="9" fill="var(--text)">Jump host</text>
+        <text x="320" y="200" text-anchor="middle" font-size="9" fill="var(--accent2)">Only defined traffic passes each way</text>
+        <rect x="440" y="90" width="160" height="130" rx="8" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="520" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ok)">VLAN 30 — Plant floor</text>
+        <rect x="458" y="130" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="485" y="149" text-anchor="middle" font-size="9" fill="var(--text)">HMI</text>
+        <rect x="528" y="130" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="555" y="149" text-anchor="middle" font-size="9" fill="var(--text)">PLC</text>
+        <text x="520" y="200" text-anchor="middle" font-size="9" fill="var(--ok)">No internet path, no printer path</text>
+        <line x1="200" y1="155" x2="242" y2="155" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 3"></line>
+        <text x="221" y="172" text-anchor="middle" font-size="8" fill="var(--bad)">✕ direct</text>
+        <line x1="398" y1="155" x2="440" y2="155" stroke="var(--bad)" stroke-width="2" stroke-dasharray="3 3"></line>
+        <text x="419" y="172" text-anchor="middle" font-size="8" fill="var(--bad)">✕ direct</text>
+      </svg>
+      <p class="diagram-caption">Diagram: three VLANs share one physical switch stack. Enterprise, DMZ, and plant-floor devices are logically separated even though they share the same cables and hardware; a firewall between VLANs, not the switch itself, decides what traffic — if any — is allowed to cross.</p>
+    </div>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>VLANs are like painting different colored lines down the hallways of one office building instead of building separate hallways. Everyone still walks on the same physical floor, but staff have been told — and the building's access-control system enforces — that people on the blue-line path can't wander onto the red-line path without going through a specific checkpoint. You didn't pour new concrete; you changed the rules about who can walk where on the concrete you already had.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A bottling plant's core switch has 48 physical ports. Ports 1–16 are assigned to VLAN 10 (front-office PCs and a shared printer), ports 17–32 to VLAN 20 (the historian and a remote-access jump host), and ports 33–48 to VLAN 30 (three PLCs and two HMIs on the line). A single trunk port on that same switch carries all three VLANs, tagged, up to a firewall, which is configured to allow the historian to pull read-only data from the PLCs' VLAN, but blocks the front-office VLAN from reaching the plant-floor VLAN entirely — even though, physically, all of it is one switch and one building.</p>
+    </div>
+    <table class="compare-table">
+      <caption>What a VLAN boundary does and doesn't provide on its own</caption>
+      <thead>
+        <tr><th scope="col">Question</th><th scope="col">Answer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Does a VLAN require new cabling?</td><td>No — it's a logical grouping configured on existing switches</td></tr>
+        <tr><td>Can devices in different VLANs reach each other by default?</td><td>No, not without a router or firewall configured to permit it</td></tr>
+        <tr><td>Does a VLAN alone enforce security policy?</td><td>No — the firewall or router sitting between VLANs is what actually allows or blocks traffic</td></tr>
+        <tr><td>Can a misconfigured trunk port undermine a VLAN boundary?</td><td>Yes — trunk and native VLAN misconfiguration is a well-documented way segmentation quietly fails</td></tr>
+      </tbody>
+    </table>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Students sometimes assume a VLAN is itself a firewall. It isn't — a VLAN only defines who's in the same broadcast domain. Whatever sits at the boundary between VLANs (a firewall, a Layer 3 switch with access control lists) is what actually enforces the zone-and-conduit policy Lesson 2 introduced. Worth stating explicitly and revisiting.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3 ================= -->
+  <section id="s3" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📶</span>
+      <h2><dfn id="def-dhcp">DHCP</dfn> and <dfn id="def-dns">DNS</dfn>: why "automatic" is often the wrong default</h2>
+      <span class="module-time">≈ 45 min</span>
+    </div>
+    <p><dfn id="def-dhcp2">DHCP</dfn> (Dynamic Host Configuration Protocol) automatically hands a connecting device an IP address, a subnet mask, a default gateway, and often a DNS server address, so nobody has to configure any of it by hand. It's the reason a laptop or phone just works the instant it joins any office or home network. In OT, DHCP is frequently disabled in favor of static addressing — every device is configured, by hand, with a permanent IP address that never changes — precisely because "it just works automatically" is not actually the priority; "it comes back exactly the way it was" is. A PLC that loses power in a plant-wide outage needs to reappear at the same address every technician's documentation, every HMI configuration, and every firewall rule already expects, without depending on a DHCP server being reachable — or even powered on — during that restart.</p>
+    <p><dfn id="def-dns2">DNS</dfn> (Domain Name System) resolves a human-readable hostname like <code>historian01</code> into the IP address a device actually needs to connect to. It's essential on the open internet, where sites change IP addresses constantly. In a control network, the set of devices that need to talk to each other is small, known, and stable — so many OT environments skip DNS for critical control paths entirely, using static <code>hosts</code> files or hard-coded IP addresses instead. The logic is the same as with DHCP: a name-resolution service is one more thing that can fail, and a failure in DNS shouldn't be able to stop an HMI from reaching a PLC it's talked to the exact same way for the last five years.</p>
+    <table class="compare-table">
+      <caption>Typical enterprise IT default versus common OT-network practice</caption>
+      <thead>
+        <tr><th scope="col">Service</th><th scope="col">Typical office/enterprise default</th><th scope="col">Common OT practice</th><th scope="col">Why the difference matters</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DHCP</td><td>Enabled everywhere; devices get an address automatically</td><td>Often disabled; devices use permanent static addresses</td><td>A restart after a power event shouldn't depend on a DHCP server being available, and every address stays predictable for documentation and firewall rules</td></tr>
+        <tr><td>DNS</td><td>Used for nearly everything, including internal hostnames</td><td>Often replaced by static hosts files or hard-coded IPs for control paths</td><td>A DNS outage shouldn't be able to stop time-sensitive communication between devices that never change anyway</td></tr>
+        <tr><td>VLAN / segmentation</td><td>Used mainly for guest Wi-Fi or department separation</td><td>Used to enforce Purdue-model zone boundaries between IT and OT</td><td>Limits how far a compromise or fault on one device can spread</td></tr>
+        <tr><td>NTP</td><td>Points at internet time servers (e.g. a public NTP pool)</td><td>Points at a local, GPS-disciplined clock</td><td>Accurate time sync shouldn't depend on an internet path that OT networks often don't have at all</td></tr>
+      </tbody>
+    </table>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>DHCP is a hotel room key: convenient, temporary, and reissued to whoever needs it next — exactly right for a building full of strangers passing through. Static addressing is the key to your own house: the same key opens the same lock every single day for years, and you'd be furious if it suddenly stopped working because "the front desk" was closed. DNS is a phone book for a city of thousands of businesses you've never called before; a hard-coded IP address is the landline number for your one sibling, memorized since childhood, that you'll never need a phone book to dial.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A maintenance technician at a food-processing plant adds a new unmanaged switch to expand a spare port, and — without realizing it — the switch has DHCP server functionality enabled out of the box. Within minutes, several PLCs and the plant's HMI, all normally configured with static addresses, begin logging address conflicts as the rogue DHCP server hands out addresses that collide with ones already statically assigned. Communication between the HMI and multiple controllers drops intermittently for the rest of the shift, and it takes an engineer over an hour to trace the cause back to one small unmanaged switch that was never supposed to run DHCP at all.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>The rogue-DHCP-server scenario above is a documented, recurring real-world failure mode, not a hypothetical — it's worth having students say out loud why a static-only OT network is more vulnerable to this specific mistake than a DHCP-based one would be (a static device has no mechanism to reject a bad address offer, because it never asks for one in the first place — the conflict comes from the rogue server assigning an address that collides with what's already configured).</p>
+    </div>
+  </section>
+
+  <div class="part-banner">Part B · Applied Practice</div>
+
+  <!-- ================= MODULE 4 ================= -->
+  <section id="s4" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">⏱️</span>
+      <h2><dfn id="def-ntp">NTP</dfn> and time synchronization: the service nobody notices until it's wrong</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p><dfn id="def-ntp2">NTP</dfn> (Network Time Protocol) keeps every device's clock synchronized to a common time source, typically to within milliseconds. On an office network, that source is almost always somewhere on the internet — a public NTP pool, or a time service baked into the operating system. In a control network, that same internet path frequently doesn't exist, and even where it does, OT time sync is commonly pointed instead at a local, GPS-disciplined clock: a small appliance that receives an extremely precise time signal from GPS satellites and distributes it to every device on the plant network, with no dependency on any external network path at all.</p>
+    <p>Accurate, consistent time matters far more in OT than the everyday case of "the clock on my laptop is a few seconds off" suggests. Protective relays (the IEDs from Lesson 3) need synchronized time to sequence-of-events records that determine, down to the millisecond, which device tripped first during a fault — the entire point of that record is figuring out cause and effect. And during any incident investigation, whether it's a physical fault or a cybersecurity event, alarm and log timestamps from every device involved need to agree, or reconstructing what actually happened in what order becomes difficult or impossible.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 640 240" role="img" aria-labelledby="ntpTitle ntpDesc" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+        <title id="ntpTitle">Two time-synchronization hierarchies: internet-sourced versus locally-sourced</title>
+        <desc id="ntpDesc">In a typical office network, every device synchronizes its clock to a public internet NTP server reached over the internet. In a typical OT network, a local GPS-disciplined clock appliance receives a time signal directly from GPS satellites and distributes synchronized time to every plant-floor device, with no internet connection required at any point in the chain.</desc>
+        <text x="150" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Office network — internet-sourced</text>
+        <rect x="110" y="40" width="80" height="34" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="150" y="61" text-anchor="middle" font-size="9" fill="var(--text)">Internet NTP pool</text>
+        <line x1="150" y1="74" x2="150" y2="100" stroke="var(--border)" stroke-width="2"></line>
+        <text x="165" y="90" font-size="8" fill="var(--text-muted)">internet</text>
+        <rect x="70" y="100" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="97" y="119" text-anchor="middle" font-size="8" fill="var(--text)">PC 1</text>
+        <rect x="132" y="100" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="160" y="119" text-anchor="middle" font-size="8" fill="var(--text)">PC 2</text>
+        <line x1="97" y1="100" x2="150" y2="74" stroke="var(--border)" stroke-width="1.5"></line>
+        <line x1="160" y1="100" x2="150" y2="74" stroke="var(--border)" stroke-width="1.5"></line>
+        <text x="150" y="150" text-anchor="middle" font-size="9" fill="var(--text-muted)">Accuracy depends on an internet path being up</text>
+
+        <text x="490" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ok)">Plant network — locally sourced</text>
+        <text x="490" y="42" text-anchor="middle" font-size="14" fill="var(--ok)">🛰</text>
+        <line x1="490" y1="50" x2="490" y2="70" stroke="var(--ok)" stroke-width="2" stroke-dasharray="3 2"></line>
+        <text x="503" y="62" font-size="8" fill="var(--text-muted)">GPS signal</text>
+        <rect x="450" y="70" width="80" height="30" rx="6" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="490" y="89" text-anchor="middle" font-size="9" fill="var(--text)">GPS clock appliance</text>
+        <line x1="490" y1="100" x2="490" y2="126" stroke="var(--ok)" stroke-width="2"></line>
+        <rect x="410" y="126" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="437" y="145" text-anchor="middle" font-size="8" fill="var(--text)">PLC</text>
+        <rect x="472" y="126" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="499" y="145" text-anchor="middle" font-size="8" fill="var(--text)">IED</text>
+        <rect x="534" y="126" width="55" height="30" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="561" y="145" text-anchor="middle" font-size="8" fill="var(--text)">HMI</text>
+        <line x1="437" y1="126" x2="490" y2="100" stroke="var(--border)" stroke-width="1.5"></line>
+        <line x1="499" y1="126" x2="490" y2="100" stroke="var(--border)" stroke-width="1.5"></line>
+        <line x1="561" y1="126" x2="490" y2="100" stroke="var(--border)" stroke-width="1.5"></line>
+        <text x="490" y="180" text-anchor="middle" font-size="9" fill="var(--ok)">No internet connection required anywhere in the chain</text>
+      </svg>
+      <p class="diagram-caption">Diagram: an office network's clocks trace back to an internet NTP pool; a plant network's clocks trace back to a local, GPS-disciplined appliance that needs no internet connection at all. The GPS path keeps time sync working even on an isolated OT network.</p>
+    </div>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>Picture an orchestra. If every musician quietly checked their own personal watch to decide when to come in, small drifts in each watch would gradually pull the whole piece out of sync — a few seconds here and there, and nobody could reconstruct afterward who actually came in early. A conductor solves this by giving everyone one shared, visible beat to follow. A GPS-disciplined clock is that conductor for a control network: every device follows the same beat, so afterward, if something went wrong, you can trust the timeline you reconstruct from everyone's logs.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>During a fault investigation at a substation, engineers pull sequence-of-events logs from three protective relays to determine which breaker tripped first. Two of the relays are synced to the substation's GPS clock and agree to within a few milliseconds. The third relay, installed by a different contractor and left on its factory default time source, is off by almost four minutes — making it look, on paper, as though it tripped well before the fault even occurred. The investigation has to discard that relay's timeline entirely and rebuild the sequence from the two correctly synced devices, adding hours to a report that a correctly configured NTP source would have prevented.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>NTP is easy to skip in a syllabus because it feels minor compared to segmentation or patching. Resist that — ask students to imagine trying to write an incident report where every device disagrees about what time it is, and the stakes usually land immediately.</p>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section id="activity" class="module">
+    <div class="activity-block">
+      <div class="activity-head">
+        <span aria-hidden="true">🧩</span>
+        <h3>Activity: Match the Protocol to the OT-Appropriate Practice</h3>
+        <span class="activity-structure">Individual, then pair-share</span>
+        <span class="activity-time">≈ 25 min</span>
+      </div>
+      <div class="activity-body">
+        <p class="activity-instructions"><strong>Individual (12 min):</strong> For each protocol or service, select the description that best matches how it is commonly configured in an OT network. <strong>Pair-share (13 min):</strong> Compare answers with a neighbor and discuss any you disagreed on — several descriptions can sound plausible for more than one row, but each has one best fit.</p>
+        <div class="mapping-table-wrap">
+          <table class="mapping-table" id="mappingTable">
+            <thead>
+              <tr><th scope="col">Protocol or service</th><th scope="col">Common OT-appropriate practice</th></tr>
+            </thead>
+            <tbody>
+              <tr class="map-row" data-answer="a">
+                <td>Ethernet / TCP/IP</td>
+                <td>
+                  <select aria-label="OT practice for Ethernet and TCP/IP">
+                    <option value="">— Select —</option>
+                    <option value="a">Runs the same addressing and framing rules as an office LAN, but switches are configured to restrict what unfamiliar traffic can reach fragile end devices</option>
+                    <option value="b">Used to logically separate zones on shared switching hardware, often aligned to Purdue model levels</option>
+                    <option value="c">Frequently disabled in favor of static addressing, so a device returning from a reboot always has the same, predictable address</option>
+                    <option value="d">Often replaced by static hosts files or hard-coded IP addresses for critical control paths</option>
+                    <option value="e">Commonly synchronized to a local, GPS-disciplined clock rather than an internet time server</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="b">
+                <td>VLAN / Segmentation</td>
+                <td>
+                  <select aria-label="OT practice for VLAN and segmentation">
+                    <option value="">— Select —</option>
+                    <option value="a">Runs the same addressing and framing rules as an office LAN, but switches are configured to restrict what unfamiliar traffic can reach fragile end devices</option>
+                    <option value="b">Used to logically separate zones on shared switching hardware, often aligned to Purdue model levels</option>
+                    <option value="c">Frequently disabled in favor of static addressing, so a device returning from a reboot always has the same, predictable address</option>
+                    <option value="d">Often replaced by static hosts files or hard-coded IP addresses for critical control paths</option>
+                    <option value="e">Commonly synchronized to a local, GPS-disciplined clock rather than an internet time server</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="c">
+                <td>DHCP</td>
+                <td>
+                  <select aria-label="OT practice for DHCP">
+                    <option value="">— Select —</option>
+                    <option value="a">Runs the same addressing and framing rules as an office LAN, but switches are configured to restrict what unfamiliar traffic can reach fragile end devices</option>
+                    <option value="b">Used to logically separate zones on shared switching hardware, often aligned to Purdue model levels</option>
+                    <option value="c">Frequently disabled in favor of static addressing, so a device returning from a reboot always has the same, predictable address</option>
+                    <option value="d">Often replaced by static hosts files or hard-coded IP addresses for critical control paths</option>
+                    <option value="e">Commonly synchronized to a local, GPS-disciplined clock rather than an internet time server</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="d">
+                <td>DNS</td>
+                <td>
+                  <select aria-label="OT practice for DNS">
+                    <option value="">— Select —</option>
+                    <option value="a">Runs the same addressing and framing rules as an office LAN, but switches are configured to restrict what unfamiliar traffic can reach fragile end devices</option>
+                    <option value="b">Used to logically separate zones on shared switching hardware, often aligned to Purdue model levels</option>
+                    <option value="c">Frequently disabled in favor of static addressing, so a device returning from a reboot always has the same, predictable address</option>
+                    <option value="d">Often replaced by static hosts files or hard-coded IP addresses for critical control paths</option>
+                    <option value="e">Commonly synchronized to a local, GPS-disciplined clock rather than an internet time server</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="e">
+                <td>NTP</td>
+                <td>
+                  <select aria-label="OT practice for NTP">
+                    <option value="">— Select —</option>
+                    <option value="a">Runs the same addressing and framing rules as an office LAN, but switches are configured to restrict what unfamiliar traffic can reach fragile end devices</option>
+                    <option value="b">Used to logically separate zones on shared switching hardware, often aligned to Purdue model levels</option>
+                    <option value="c">Frequently disabled in favor of static addressing, so a device returning from a reboot always has the same, predictable address</option>
+                    <option value="d">Often replaced by static hosts files or hard-coded IP addresses for critical control paths</option>
+                    <option value="e">Commonly synchronized to a local, GPS-disciplined clock rather than an internet time server</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mapping-actions">
+          <button class="btn" id="checkMapping">Check My Mapping</button>
+          <button class="btn secondary" id="resetMapping">Reset</button>
+          <span class="mapping-result" id="mappingResult" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIMULATION ================= -->
+  <section id="simulation" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🖧</span>
+      <h2>Simulation: Network Config Explorer</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <span class="safety-flag">⚠ Simulation only — no live equipment or network</span>
+    <p>Select a service below to see its role and its typical OT-appropriate configuration, then use <strong>Simulate an Office-Style Misconfiguration</strong> to see what happens if that service is left configured the way it would be on a typical office LAN instead. Nothing here touches a real device, network, or protocol; it's a model built to compare consequences across configuration choices.</p>
+    <div class="activity-block">
+      <div class="activity-body">
+        <div class="sim-controls" role="group" aria-label="Select a service">
+          <button type="button" class="sim-toggle" data-service="dhcp" aria-pressed="false">DHCP</button>
+          <button type="button" class="sim-toggle" data-service="dns" aria-pressed="false">DNS</button>
+          <button type="button" class="sim-toggle" data-service="vlan" aria-pressed="false">VLAN</button>
+          <button type="button" class="sim-toggle" data-service="ntp" aria-pressed="false">NTP</button>
+        </div>
+        <div class="sim-readout" id="simReadout" aria-live="polite">
+          <strong>Select a service above</strong> to see its role and typical OT-appropriate configuration, then try simulating an office-style misconfiguration.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section id="review" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">✅</span>
+      <h2>Review &amp; Knowledge Check</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <p>Five questions covering the lesson's key distinctions. Answer each, then select <strong>Grade My Quiz</strong> to see your score and an explanation for every item.</p>
+    <div class="quiz-block" id="quizBlock">
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q1.</span>Why is static IP addressing common for OT devices instead of DHCP?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q1" value="a"> Static addressing uses less network bandwidth than DHCP</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="b"> It ensures a device returns to the exact same address after a reboot or power loss, without depending on a DHCP server being available</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="c"> DHCP is not compatible with Ethernet hardware</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="d"> Static addressing automatically encrypts network traffic</label></li>
+        </ul>
+        <div class="q-feedback" id="fb1"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q2.</span>A control network relies on DNS to resolve hostnames the same way an office network does. What operational problem can this create?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q2" value="a"> DNS queries will corrupt PLC firmware</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="b"> DNS cannot function on a wired network</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="c"> A DNS outage can stop critical control communication even though every device and cable is still fully functional</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="d"> DNS automatically disables VLAN boundaries</label></li>
+        </ul>
+        <div class="q-feedback" id="fb2"></div>
+      </div>
+
+      <div class="q-card" data-answer="a">
+        <div class="q-stem"><span class="q-num">Q3.</span>Why do OT networks commonly synchronize NTP to a local, GPS-disciplined clock instead of an internet time server?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q3" value="a"> Accurate time sync shouldn't depend on an internet path the OT network may not even have, and it needs to be reliable enough to correlate events during an investigation</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="b"> GPS clocks are required by every industrial protocol</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="c"> Internet time servers are always less accurate than GPS</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="d"> NTP cannot run over Ethernet at all</label></li>
+        </ul>
+        <div class="q-feedback" id="fb3"></div>
+      </div>
+
+      <div class="q-card" data-answer="d">
+        <div class="q-stem"><span class="q-num">Q4.</span>What is the primary purpose of a VLAN in OT network design?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q4" value="a"> To increase the physical bandwidth available to every connected device</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="b"> To automatically assign IP addresses to new devices</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="c"> To replace the need for a firewall entirely</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="d"> To logically separate devices into different zones on shared switching hardware, without requiring new cabling</label></li>
+        </ul>
+        <div class="q-feedback" id="fb4"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q5.</span>A new engineer configures a plant-floor PLC exactly like an office workstation — DHCP-assigned address, hostname lookups via DNS, and internet-based NTP. What is the most likely operational risk?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q5" value="a"> The PLC will run its control logic faster</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="b"> The PLC's address, name resolution, and time sync all become dependent on services and network paths the plant floor may not reliably have, breaking configured communication after any outage or restart</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="c"> The PLC will automatically join the correct VLAN</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="d"> There is no meaningful operational risk, since the protocols are identical to an office network</label></li>
+        </ul>
+        <div class="q-feedback" id="fb5"></div>
+      </div>
+
+    </div>
+    <div class="mapping-actions">
+      <button class="btn" id="gradeQuiz">Grade My Quiz</button>
+      <button class="btn secondary" id="resetQuiz">Reset Quiz</button>
+    </div>
+    <div class="quiz-score" id="quizScore">
+      <span class="quiz-score-big" id="quizScoreBig">0 / 5</span>
+      <span id="quizScoreText"></span>
+    </div>
+
+    <div class="teach-note" style="margin-top:26px;">
+      <span class="teach-label">Suggested assessment artifact</span>
+      <p>Have each faculty member take a simple network scenario they define themselves — a building automation network, a lab's isolated bench setup, or a hypothetical small plant — and produce a one-page written configuration recommendation covering all four services from this lesson: whether DHCP or static addressing is appropriate and why, how they would use VLANs to separate at least two zones, whether DNS or static hosts files fit their control paths, and where their NTP source should point. A short rationale sentence per service is enough to confirm the "automatic isn't always better" reasoning transferred before Lesson 5 introduces the industrial protocols that ride on top of this network foundation.</p>
+    </div>
+  </section>
+
+  <!-- ================= FURTHER READING ================= -->
+  <section id="further-reading" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📚</span>
+      <h2>Further Reading</h2>
+    </div>
+    <ul class="resource-list">
+      <li>📄 Download: <a href="network-protocols-cheatsheet.pdf" target="_blank" rel="noopener noreferrer">IT Protocols in OT Networks — Quick Reference (PDF)</a> — a printable one-page comparison of IT-default versus OT-appropriate configuration for Ethernet/TCP-IP, VLANs, DHCP, DNS, and NTP, suitable for classroom handout.</li>
+      <li><a href="https://csrc.nist.gov/pubs/sp/800/82/r3/final" target="_blank" rel="noopener noreferrer">NIST SP 800-82 Rev. 3: Guide to Operational Technology (OT) Security</a> — the standard federal reference for OT network architectures and controls, including segmentation and addressing guidance relevant to this lesson.</li>
+      <li><a href="https://www.cisa.gov/resources-tools/resources/foundations-ot-cybersecurity-asset-inventory-guidance-owners-and-operators" target="_blank" rel="noopener noreferrer">Foundations of OT Cybersecurity: Asset Inventory Guidance for Owners and Operators (CISA)</a> — practical grounding for knowing what's actually connected to the network before configuring it.</li>
+    </ul>
+  </section>
+
+  <nav class="lesson-nav-bottom" aria-label="Lesson navigation">
+    <a class="nav-btn" href="lesson03.html">← Lesson 3: OT Technologies &amp; Field Devices</a>
+    <a class="nav-btn" href="lesson05.html">Lesson 5: Industrial Communication Protocols →</a>
+  </nav>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Lesson tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#s1">1. Ethernet &amp; TCP/IP</a></li>
+      <li><a href="#s2">2. VLANs &amp; Segmentation</a></li>
+      <li><a href="#s3">3. DHCP &amp; DNS</a></li>
+      <li><a href="#s4">4. NTP &amp; Time Synchronization</a></li>
+      <li><a href="#activity">Activity: Matching Exercise</a></li>
+      <li><a href="#simulation">Simulation: Network Config Explorer</a></li>
+      <li><a href="#review">Review &amp; Knowledge Check</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Objectives Progress</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 5 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Learning objectives checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Explain why IT protocols are configured differently in OT</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Identify how VLANs implement segmentation and Purdue zones</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Compare static addressing with DHCP in OT context</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Describe why local time sources are used for NTP</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Evaluate a network config for missing OT practices</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Key Terms</div>
+    <ul class="glossary-list">
+      <li><a href="#s2"><span class="glossary-term">VLAN</span></a><span class="glossary-def">Virtual local area network — logically separates devices into different broadcast domains on the same physical switching hardware, commonly aligned to Purdue model zones.</span></li>
+      <li><a href="#s2"><span class="glossary-term">Segmentation</span></a><span class="glossary-def">Dividing a network into isolated zones connected only through governed conduits, so a fault or compromise in one zone doesn't automatically reach another.</span></li>
+      <li><a href="#s3"><span class="glossary-term">DHCP</span></a><span class="glossary-def">Dynamic Host Configuration Protocol — automatically assigns IP addresses to connecting devices; commonly disabled in OT in favor of static addressing.</span></li>
+      <li><a href="#s3"><span class="glossary-term">DNS</span></a><span class="glossary-def">Domain Name System — resolves hostnames to IP addresses; often replaced in OT by static hosts files or hard-coded IPs for critical control paths.</span></li>
+      <li><a href="#s4"><span class="glossary-term">NTP</span></a><span class="glossary-def">Network Time Protocol — synchronizes device clocks; OT networks commonly point NTP at a local, GPS-disciplined source rather than an internet time server.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Lesson Navigation</div>
+    <div class="prevnext-links">
+      <a href="lesson03.html">← Previous: Lesson 3 — OT Technologies &amp; Field Devices</a>
+      <a href="lesson05.html">Next: Lesson 5 — Industrial Communication Protocols →</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+<footer>
+  Lesson 4 · Day 2 · IT Protocols Inside OT Networks<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-assisted first draft. A human subject-matter expert should review it for technical accuracy before use with students. Educational use only — all activities are simulation-based and defensive in scope.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME (light default, dark only if previously chosen) ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- OBJECTIVES PROGRESS TRACKER ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+  }
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- MAPPING ACTIVITY ---------------- */
+  var mappingRows = Array.prototype.slice.call(document.querySelectorAll('#mappingTable .map-row'));
+  var mappingResult = document.getElementById('mappingResult');
+
+  document.getElementById('checkMapping').addEventListener('click', function () {
+    var correctCount = 0;
+    var totalAnswered = 0;
+    mappingRows.forEach(function (row) {
+      var select = row.querySelector('select');
+      var correctVal = row.getAttribute('data-answer');
+      row.classList.remove('correct', 'incorrect');
+      if (!select.value) return;
+      totalAnswered++;
+      if (select.value === correctVal) {
+        row.classList.add('correct');
+        correctCount++;
+      } else {
+        row.classList.add('incorrect');
+      }
+    });
+    mappingResult.textContent = correctCount + ' of ' + mappingRows.length + ' correct'
+      + (totalAnswered < mappingRows.length ? ' (some rows left unanswered)' : '');
+  });
+
+  document.getElementById('resetMapping').addEventListener('click', function () {
+    mappingRows.forEach(function (row) {
+      row.querySelector('select').value = '';
+      row.classList.remove('correct', 'incorrect');
+    });
+    mappingResult.textContent = '';
+  });
+
+  /* ---------------- SIMULATION: NETWORK CONFIG EXPLORER ---------------- */
+  var serviceData = {
+    dhcp: {
+      name: 'DHCP — Dynamic Host Configuration Protocol',
+      role: 'Automatically assigns IP addresses, subnet masks, and gateways to devices when they connect.',
+      otPractice: 'Frequently disabled on control-network segments; devices are configured with permanent static addresses instead, so they always return to the same address a technician, HMI, or firewall rule already expects.',
+      failure: 'If a plant-floor device is left DHCP-configured and a maintenance technician plugs in a new switch with an unnoticed DHCP server enabled, address conflicts and lease collisions can disrupt communication across multiple devices at once — a documented, recurring real-world failure mode, not a hypothetical one.'
+    },
+    dns: {
+      name: 'DNS — Domain Name System',
+      role: 'Resolves human-readable hostnames into the IP addresses devices actually need to connect to.',
+      otPractice: 'Often skipped for critical control paths in favor of static hosts files or hard-coded IP addresses, since the set of devices that need to talk to each other is small, known, and stable.',
+      failure: 'If an HMI depends on DNS to reach a historian by hostname and the DNS server goes down, the connection fails even though every device, cable, and switch involved is working perfectly — a purely avoidable outage for a network that rarely changes.'
+    },
+    vlan: {
+      name: 'VLAN — Virtual LAN / Segmentation',
+      role: 'Logically separates devices into different broadcast domains on shared physical switching hardware.',
+      otPractice: 'Used to enforce Purdue-model zone boundaries — plant floor, DMZ, enterprise — without requiring separate physical cabling, with a firewall or router controlling what, if anything, may cross between VLANs.',
+      failure: 'If VLAN boundaries are configured like a typical office network — one flat VLAN for convenience, or a misconfigured trunk port carrying the wrong native VLAN — a compromised office device could reach plant-floor controllers directly, with no boundary in between.'
+    },
+    ntp: {
+      name: 'NTP — Network Time Protocol',
+      role: 'Synchronizes every device\'s clock to a common, accurate time source.',
+      otPractice: 'Commonly points at a local, GPS-disciplined clock appliance rather than an internet NTP server, so accurate time sync doesn\'t depend on an internet path the plant network may not even have.',
+      failure: 'If OT devices are left pointed at an internet time server that the plant network can\'t actually reach, or at no reliable source at all, clocks drift apart — and during an incident investigation, mismatched timestamps can make it impossible to reconstruct the true order in which events occurred.'
+    }
+  };
+  var simReadout = document.getElementById('simReadout');
+  var simButtons = Array.prototype.slice.call(document.querySelectorAll('.sim-toggle[data-service]'));
+
+  function renderService(key) {
+    var d = serviceData[key];
+    simReadout.innerHTML =
+      '<strong>' + d.name + '</strong>' +
+      '<div class="device-card">' +
+        '<div class="device-row"><span class="dev-label">Role</span><span class="dev-val">' + d.role + '</span></div>' +
+        '<div class="device-row"><span class="dev-label">OT-appropriate practice</span><span class="dev-val">' + d.otPractice + '</span></div>' +
+      '</div>' +
+      '<div style="margin-top:12px;">' +
+        '<button type="button" class="btn secondary" id="failureBtn">⚠ Simulate an Office-Style Misconfiguration</button>' +
+      '</div>' +
+      '<div class="failure-panel" id="failurePanel" aria-live="polite"></div>';
+    document.getElementById('failureBtn').addEventListener('click', function () {
+      var panel = document.getElementById('failurePanel');
+      panel.textContent = d.failure;
+      panel.classList.add('show');
+    });
+  }
+
+  simButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-service');
+      simButtons.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      renderService(key);
+    });
+  });
+
+  /* ---------------- QUIZ ---------------- */
+  var quizCards = Array.prototype.slice.call(document.querySelectorAll('#quizBlock .q-card'));
+  var quizFeedback = {
+    1: { correct: "Correct. Static addressing guarantees a device returns to the same address after a reboot or power loss, without depending on a DHCP server being reachable during that restart.", incorrect: "Not quite. The reason isn't bandwidth, compatibility, or encryption — it's predictability: a static address is always the same address, restart after restart." },
+    2: { correct: "Correct. A DNS outage can silently break communication between devices that are otherwise completely healthy and correctly cabled — that's exactly why many OT control paths avoid depending on DNS at all.", incorrect: "Not quite. DNS doesn't damage firmware, require wireless networking, or interact with VLAN configuration — the real risk is a name-resolution failure stopping otherwise-healthy communication." },
+    3: { correct: "Correct. A local GPS-disciplined clock keeps accurate time sync working even without an internet connection, and it's the reliability that matters for reconstructing events after an incident.", incorrect: "Not quite. No industrial protocol requires a GPS clock, and internet time servers aren't inherently less accurate — the real reason is independence from an internet path the plant network may not have." },
+    4: { correct: "Correct. A VLAN's job is logical separation of devices on shared switching hardware — no new cabling required — typically paired with a firewall to enforce what, if anything, crosses the boundary.", incorrect: "Not quite. VLANs don't increase bandwidth, assign IP addresses, or replace a firewall — they define which devices share a broadcast domain in the first place." },
+    5: { correct: "Correct. Office-style DHCP, DNS, and internet NTP all introduce dependencies on services and network paths the plant floor may not reliably have, which can break configured communication after any outage or restart.", incorrect: "Not quite. The protocols being identical to an office network is exactly the trap — the risk comes from the configuration choices, not the protocol itself, and 'faster logic' or 'automatic VLAN join' aren't things DHCP/DNS/NTP configuration affects." }
+  };
+
+  document.getElementById('gradeQuiz').addEventListener('click', function () {
+    var correctCount = 0;
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      var name = 'q' + qNum;
+      var selected = card.querySelector('input[name="' + name + '"]:checked');
+      var fb = document.getElementById('fb' + qNum);
+      var correctVal = card.getAttribute('data-answer');
+      fb.className = 'q-feedback show';
+      if (!selected) {
+        fb.classList.add('unanswered');
+        fb.textContent = 'Not answered — select an option above, then grade again.';
+        return;
+      }
+      if (selected.value === correctVal) {
+        fb.classList.add('correct');
+        fb.textContent = '✓ Correct — ' + quizFeedback[qNum].correct;
+        correctCount++;
+      } else {
+        fb.classList.add('incorrect');
+        fb.textContent = '✗ Not quite — ' + quizFeedback[qNum].incorrect;
+      }
+    });
+    var scoreBox = document.getElementById('quizScore');
+    var scoreBig = document.getElementById('quizScoreBig');
+    var scoreText = document.getElementById('quizScoreText');
+    scoreBox.classList.add('show');
+    scoreBig.textContent = correctCount + ' / ' + quizCards.length;
+    scoreText.textContent = correctCount === quizCards.length
+      ? 'All five — you are ready for Lesson 5.'
+      : (correctCount >= 3 ? 'Solid grasp — review the items you missed before Lesson 5.' : 'Worth a re-read of the sections above before moving on.');
+  });
+
+  document.getElementById('resetQuiz').addEventListener('click', function () {
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      card.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      var fb = document.getElementById('fb' + qNum);
+      fb.className = 'q-feedback';
+      fb.textContent = '';
+    });
+    document.getElementById('quizScore').classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
