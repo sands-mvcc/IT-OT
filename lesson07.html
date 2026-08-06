@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7: Vulnerabilities &amp; Countermeasures | Teaching Operational Technologies</title>
+<meta name="description" content="Day 3, Lesson 7 of the Teaching Operational Technologies faculty development workshop: legacy firmware, flat networks, default credentials, and the patch window that never opens — then the countermeasures that work anyway: segmentation, conduits, allowlisting, jump hosts, backups, and compensating controls.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .topbar-inner {
+    max-width: 1280px; margin: 0 auto; padding: 9px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 28px 24px 22px;
+  }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav {
+    position: sticky; top: 0; z-index: 90;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a {
+    display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600;
+    color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px;
+  }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+
+  /* Sidebar: table of contents */
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  /* Sidebar: objectives progress */
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer;
+  }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  /* Sidebar: glossary */
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* Sidebar: prev/next */
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  /* ---------- Main content sections ---------- */
+  .part-banner {
+    background: var(--header-bg); color: var(--header-text);
+    padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800;
+    font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    margin: 40px 0 18px;
+  }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box {
+    background: var(--accent-light); border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0;
+  }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 20px; margin: 18px 0;
+  }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .safety-flag {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+    color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px;
+  }
+  .safety-flag.lesson-top { font-size: 0.8rem; padding: 7px 14px; margin: 0 0 18px; }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  /* comparison table */
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  /* diagram wrap */
+  .diagram-wrap { overflow-x: auto; margin: 18px 0; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .diagram-caption { font-size: 0.82rem; color: var(--text-muted); margin: 10px 0 0; text-align: center; }
+
+  /* activity block */
+  .activity-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin: 18px 0;
+  }
+  .activity-head {
+    background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px;
+  }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .mapping-table-wrap { overflow-x: auto; }
+  table.mapping-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  table.mapping-table th, table.mapping-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.mapping-table thead th { background: var(--surface2); font-weight: 700; }
+  table.mapping-table select {
+    width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.86rem;
+  }
+  .map-row.correct td:first-child { border-left: 4px solid var(--ok); }
+  .map-row.incorrect td:first-child { border-left: 4px solid var(--bad); }
+  .mapping-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .mapping-result { font-size: 0.85rem; font-weight: 700; }
+
+  .btn {
+    background: var(--accent); color: var(--on-accent); border: none; cursor: pointer;
+    padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit;
+  }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+
+  /* simulation */
+  .sim-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .sim-toggle {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 9px 14px; border-radius: 20px; font-size: 0.83rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .sim-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .sim-readout {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.87rem; min-height: 3.5em;
+  }
+  .sim-readout strong { color: var(--accent2); }
+  [data-theme="dark"] .sim-readout strong { color: var(--accent); }
+  .advisory-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 0 0; margin-top: 10px; }
+  .advisory-row { display: flex; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .advisory-row:last-child { border-bottom: none; }
+  .advisory-row .adv-label { flex: 0 0 150px; font-weight: 700; color: var(--text-muted); }
+  .advisory-row .adv-val { flex: 1; }
+  .cvss-badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; }
+  .cvss-badge.high { background: var(--bad-bg); color: var(--bad); }
+  .cvss-badge.medium { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .cvss-badge.low { background: var(--ok-bg); color: var(--ok); }
+
+  /* quiz */
+  .quiz-block { display: flex; flex-direction: column; gap: 20px; }
+  .q-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .q-stem { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
+  .q-num { color: var(--accent); margin-right: 6px; }
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .q-feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.incorrect { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback.unanswered { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .quiz-score {
+    margin-top: 6px; background: var(--header-bg); color: var(--header-text);
+    border-radius: var(--radius-sm); padding: 16px 20px; font-weight: 700; display: none;
+    align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .quiz-score.show { display: flex; }
+  .quiz-score-big { font-size: 1.4rem; }
+
+  /* resource list */
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; font-size: 0.88rem;
+  }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note {
+    border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px;
+    margin: 16px 0; font-size: 0.85rem; color: var(--text-muted);
+  }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .icon-row { display: flex; gap: 18px; margin: 14px 0; flex-wrap: wrap; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); width: 88px; text-align: center; }
+
+  .lesson-nav-bottom {
+    display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap;
+  }
+  .nav-btn {
+    text-decoration: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text);
+    box-shadow: var(--shadow); font-size: 0.88rem;
+  }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer {
+    background: var(--header-bg); color: var(--header-text); opacity: 0.85;
+    text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6;
+  }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* PRINT */
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .q-card, .sim-readout, .diagram-wrap { box-shadow: none; border: 1px solid #999; }
+    footer { background: #ffffff; color: #000000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · NCyTE · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Day 3 · Lesson 7 · 4 Contact Hours</span>
+    <h1>Vulnerabilities &amp; Countermeasures</h1>
+    <p class="tagline">Legacy firmware, flat networks, and default credentials never really go away — but segmentation, allowlisting, and compensating controls work anyway.</p>
+    <div class="meta-row">
+      <span class="meta-item">📊 Intermediate</span>
+      <span class="meta-item">⏱ 4 hours</span>
+      <span class="meta-item">🎯 5 objectives</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#s1" data-section="s1">Persistent Vulnerabilities</a>
+    <a href="#s2" data-section="s2">CVEs &amp; Advisories</a>
+    <a href="#s3" data-section="s3">The Patch Window</a>
+    <a href="#s4" data-section="s4">Countermeasures</a>
+    <a href="#activity" data-section="activity">Activity</a>
+    <a href="#simulation" data-section="simulation">Simulation</a>
+    <a href="#review" data-section="review">Review</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <span class="safety-flag lesson-top">⚠ No live exploitation — this lesson is defense-only; all incidents are discussed as retrospective case studies, not step-by-step procedures</span>
+      <h2>Lesson Overview</h2>
+      <p>If you spend enough time reading real ICS incident reports, a pattern shows up so often it stops feeling like news: the vulnerability that let the attacker in wasn't exotic. It was a default password nobody changed, a flat network with no internal boundaries, or firmware from a decade ago running a service it never needed in the first place. None of these are secrets. Vendors publish advisories about them. Standards bodies write whole frameworks around fixing them. And yet they persist — not because defenders don't know better, but because the fix that works instantly on a laptop can take months of planning on a plant floor, for reasons Lesson 2 already laid out: safety, uptime, and equipment that's older than some of the people maintaining it.</p>
+      <p>This lesson takes that tension seriously instead of wishing it away. You'll learn to read the two documents that formalize a known flaw — the <dfn id="def-cve-intro">CVE</dfn> and the <dfn id="def-advisory-intro">ICS Advisory</dfn> — and then build a toolkit of countermeasures that don't require a patch to work: <dfn id="def-hardening-intro">hardening</dfn>, <dfn id="def-allowlisting-intro">allowlisting</dfn>, segmentation, jump hosts, tested backups, and the umbrella concept that ties them together when a real fix isn't available yet — the <dfn id="def-compcontrol-intro">compensating control</dfn>.</p>
+      <div class="analogy-box">
+        <span class="analogy-label">Anchoring analogy</span>
+        <p>Think of an old apartment building that can't legally be forced to install a modern sprinkler system overnight — the building predates the code, and retrofitting is a multi-year capital project. The fire marshal doesn't shrug and walk away. They require compensating measures right now: fire extinguishers on every floor, clear exits, working smoke detectors, and a standing inspection schedule — all while the real fix gets funded and scheduled. OT security runs on the same logic. A control you can put in place this week, even an imperfect one, is worth more than a perfect patch you can't apply until next year.</p>
+      </div>
+      <h3 style="margin-top:22px;font-size:1.05rem;">Learning objectives</h3>
+      <p style="margin-bottom:6px;color:var(--text-muted);font-size:0.85rem;">By the end of this lesson, you will be able to:</p>
+      <ul class="lo-display">
+        <li>Explain why legacy firmware, flat networks, and default credentials remain common vulnerabilities in OT environments.</li>
+        <li>Identify the parts of a CVE identifier and an ICS advisory, and locate authoritative sources for each.</li>
+        <li>Compare hardening, allowlisting, and network segmentation as countermeasure strategies.</li>
+        <li>Describe why the patch window so rarely opens in OT, and how compensating controls fill that gap.</li>
+        <li>Evaluate a simple network scenario and recommend appropriate countermeasures using zones, conduits, and jump hosts.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="part-banner">Part A · Foundations Lecture</div>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section id="s1" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🕳️</span>
+      <h2>The usual suspects: legacy firmware, flat networks, default credentials</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p>Three vulnerability categories show up in ICS incident reports so consistently that they've become almost boring to security researchers — which is exactly why they're dangerous to everyone else. Legacy firmware means a device is running software that hasn't been meaningfully updated in years, often because the manufacturer stopped supporting it or because updating it requires re-certifying the whole line, as Lesson 2 covered. A flat network means there is no internal segmentation — every device on the plant floor can, in principle, reach every other device, so a single compromised workstation has a direct path to a safety-critical controller. Default credentials means a device is still using the username and password it shipped with, often published in the vendor's own installation manual, which means "guessing" the password is really just reading the manual.</p>
+    <table class="compare-table">
+      <caption>Why these categories persist in OT even though IT solved versions of them years ago</caption>
+      <thead>
+        <tr><th scope="col">Category</th><th scope="col">Why it persists in OT</th><th scope="col">How IT typically already addressed it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Legacy firmware</td><td>Updating may require re-certifying safety functions and validating an entire production line — a months-long, capital-intensive process</td><td>Automated update pipelines, tested in staging, deployed within days</td></tr>
+        <tr><td>Flat networks</td><td>Many plants were built before Ethernet reached the floor; segmentation was never designed in, and retrofitting means downtime</td><td>VLANs, internal firewalls, and zero-trust segmentation are standard on modern corporate networks</td></tr>
+        <tr><td>Default credentials</td><td>Changing a password on a controller may require a maintenance window, vendor coordination, or re-testing an interlock</td><td>Forced credential rotation and MFA enforced automatically at first login</td></tr>
+      </tbody>
+    </table>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>A flat OT network with default credentials everywhere is like an old apartment building where every unit uses the same master key, and that key is taped to the lobby directory "for maintenance convenience." Nobody built it that way on purpose — it's what happens when a building goes up before anyone thought hard about who might walk in the front door uninvited. The fix isn't necessarily new locks on day one; it's deciding which doors actually need to stay open to each other and closing the rest.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A regional water authority's remote lift station uses an RTU that shipped in 2011 with a default administrator account (username: <code>admin</code>, password printed in the installation guide) and a firmware version the vendor stopped patching in 2017. The RTU sits on the same subnet as the pump-station HMI, the SCADA master's polling interface, and — because a contractor once needed to check on it remotely — a modem line that was never fully decommissioned. Any one of these three facts, on its own, would be a manageable finding on an audit. Together, they describe a device that's reachable, guessable, and directly connected to everything else on the segment — which is exactly the combination that turns a routine advisory into an urgent one.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Faculty sometimes assume these findings mean "the plant is negligent." Reframe it early: almost none of this was a deliberate decision by anyone still working there. It's the accumulated result of equipment installed under different assumptions, by different people, at different times — which is exactly why fixing it is an asset-inventory and prioritization problem, not a blame exercise.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2 ================= -->
+  <section id="s2" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🏷️</span>
+      <h2>Reading the paperwork: <dfn id="def-cve">CVE</dfn>s and <dfn id="def-advisory">ICS Advisories</dfn></h2>
+      <span class="module-time">≈ 40 min</span>
+    </div>
+    <p>A <dfn id="def-cve2">CVE</dfn> (Common Vulnerabilities and Exposures) entry is a globally unique identifier — formatted <code>CVE-YYYY-NNNNN</code> — assigned to one specific, publicly disclosed vulnerability in a piece of software or firmware. A CVE entry is deliberately narrow: it names the flaw, gives it a severity score under the Common Vulnerability Scoring System (CVSS, typically 0–10), and links to technical references, but it usually says little about which real-world products are affected, whether it's exploitable in practice, or what to actually do about it in an industrial setting.</p>
+    <p>That's the gap an <dfn id="def-advisory2">ICS advisory</dfn> fills. In the United States, CISA publishes ICS advisories that translate one or more CVEs into operational context: which vendor, which product line, which firmware versions are affected, how difficult the flaw is to exploit, and — critically — what mitigations are recommended right now, whether or not a patch exists yet. An advisory is written for the person who has to decide what to do Monday morning, not for the researcher who found the flaw.</p>
+    <table class="compare-table">
+      <caption>CVE entries versus ICS advisories</caption>
+      <thead>
+        <tr><th scope="col">Characteristic</th><th scope="col">CVE entry</th><th scope="col">ICS advisory</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Scope</td><td>One specific technical flaw</td><td>One or more CVEs, translated into product and deployment context</td></tr>
+        <tr><td>Audience</td><td>Security researchers, tool vendors</td><td>Asset owners, operators, plant engineers</td></tr>
+        <tr><td>Typical content</td><td>Description, CVSS score, technical references</td><td>Affected vendor/product/versions, exploitability, recommended mitigations</td></tr>
+        <tr><td>Assumes a patch exists?</td><td>No — the CVE is published regardless</td><td>No — advisories are often published with only interim mitigations, before any patch</td></tr>
+      </tbody>
+    </table>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>A CVE is like a recall notice filed against a specific part number — precise, technical, and the same for every car that uses that part. An ICS advisory is closer to the letter your specific dealership sends you: it tells you whether your exact vehicle is affected, what to do if a replacement part isn't in stock yet, and how urgent the situation really is. You could, in theory, work from the part-number recall alone — but almost nobody does, because the dealership's letter is what turns "there's a recall out there somewhere" into "here's what I do about my car this week."</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example (illustrative)</span>
+      <p>Suppose a CVE is published describing an authentication-bypass flaw in a family of industrial HMI web interfaces, scored 8.6 on the CVSS scale (High). On its own, that entry tells an engineer almost nothing about whether their specific plant is exposed. A follow-up ICS advisory adds the missing context: it names the exact vendor and product line, lists the affected firmware version range, notes that the flaw is remotely exploitable without authentication, states that no patch is currently available, and recommends interim mitigations — restrict network access to the HMI's management interface, disable the web interface if it isn't required, and monitor for anomalous login attempts. That last paragraph is the part that actually changes what happens at the plant this week.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Show a live CISA ICS advisory in class if internet access allows — the format is consistent enough (vendor, affected products, vulnerability overview, mitigations, background) that walking through one real example teaches the pattern faster than describing it. If you do this, stick to reading and discussion; this course does not ask students to reproduce or test any of the described vulnerabilities.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3 ================= -->
+  <section id="s3" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🚪</span>
+      <h2>The patch window that never opens</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p>Even when a patch exists, applying it in OT is rarely as simple as clicking "update." A patch has to be validated against the specific combination of hardware, firmware, and application software running at that site — and in many cases, that validation is the vendor's job, not the plant's, because only the vendor can certify that the patched firmware still meets the safety and performance specifications the equipment was purchased under. If the vendor is slow, defunct, or has already declared the product end-of-life, there may be no validated patch coming at all — not next week, not ever.</p>
+    <p>This is the "patch window that never opens": a gap between when a vulnerability is disclosed and when a validated fix can actually be installed, that in OT commonly runs from months to indefinitely, compared to days or weeks in a typical IT environment. A <dfn id="def-compcontrol">compensating control</dfn> is the term IEC 62443 and NIST SP 800-82 use for exactly this situation: an alternative safeguard — not the intended fix — that reduces the risk of an unpatched vulnerability to an acceptable level until a real fix can be applied, or indefinitely if no fix is coming.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 620 200" role="img" aria-labelledby="patchWindowTitle patchWindowDesc" style="width:100%;max-width:620px;display:block;margin:0 auto;">
+        <title id="patchWindowTitle">Timeline comparing an IT patch window with an OT patch window</title>
+        <desc id="patchWindowDesc">In IT, a vulnerability is disclosed and a patch is typically applied within about two weeks. In OT, the same disclosure is followed by a long gap — often many months — covered by a compensating control, before a validated patch is eventually applied, if one arrives at all.</desc>
+        <text x="10" y="24" font-size="12" font-weight="700" fill="var(--text)">Typical IT timeline</text>
+        <line x1="10" x2="610" y1="42" y2="42" stroke="var(--border)" stroke-width="2"></line>
+        <circle cx="30" cy="42" r="6" fill="var(--bad)"></circle>
+        <text x="30" y="62" text-anchor="middle" font-size="10" fill="var(--text-muted)">Disclosed</text>
+        <circle cx="150" cy="42" r="6" fill="var(--ok)"></circle>
+        <text x="150" y="62" text-anchor="middle" font-size="10" fill="var(--text-muted)">Patched (~2 wks)</text>
+        <text x="10" y="104" font-size="12" font-weight="700" fill="var(--text)">Typical OT timeline</text>
+        <line x1="10" x2="610" y1="122" y2="122" stroke="var(--border)" stroke-width="2"></line>
+        <circle cx="30" cy="122" r="6" fill="var(--bad)"></circle>
+        <text x="30" y="142" text-anchor="middle" font-size="10" fill="var(--text-muted)">Disclosed</text>
+        <rect x="40" y="112" width="480" height="20" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="4 3"></rect>
+        <text x="280" y="126" text-anchor="middle" font-size="10" font-weight="700" fill="var(--accent2)">Gap covered by a compensating control — months, or indefinite</text>
+        <circle cx="560" cy="122" r="6" fill="var(--ok)"></circle>
+        <text x="560" y="142" text-anchor="middle" font-size="10" fill="var(--text-muted)">Validated patch, if it arrives</text>
+        <text x="10" y="178" font-size="11" fill="var(--text-muted)">The compensating control is what keeps risk manageable during the gap — it is not optional, and it is not the same thing as "doing nothing until the patch arrives."</text>
+      </svg>
+      <p class="diagram-caption">Diagram: an IT patch timeline typically closes within about two weeks of disclosure. The equivalent OT timeline has a long, often indefinite gap between disclosure and a validated patch — a gap that a compensating control is meant to actively cover, not passively wait out.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A CISA ICS advisory names a high-severity remote-code-execution flaw in an HMI product still running at a food-processing plant. The vendor confirms a validated patch is roughly eight months away, tied to a larger firmware release cycle. Rather than accept eight months of unmitigated exposure, the plant applies compensating controls the same week: the HMI's network segment is isolated behind a firewall rule permitting only the specific ports the SCADA master needs, remote access is removed entirely pending the patch, and the segment is added to a monitoring dashboard that alerts on any new connection attempt. None of this fixes the underlying flaw — but it closes the practical paths an attacker would need to reach it.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>This is a natural moment to loop back to Lesson 2's determinism and lifecycle content — the patch window problem is the direct, practical consequence of the priorities and constraints that lesson established. Students who understood Lesson 2 should be able to predict this module's conclusion before you state it.</p>
+    </div>
+  </section>
+
+  <div class="part-banner">Part B · Applied Practice</div>
+
+  <!-- ================= MODULE 4 ================= -->
+  <section id="s4" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🛡️</span>
+      <h2>Countermeasures that work anyway</h2>
+      <span class="module-time">≈ 55 min</span>
+    </div>
+    <p><dfn id="def-hardening">Hardening</dfn> means reducing an asset's attack surface by removing unnecessary services, disabling unused ports and accounts, and changing default settings — turning off everything the device doesn't actually need to do its job. <dfn id="def-allowlisting">Allowlisting</dfn> (also called whitelisting) flips the usual antivirus logic: instead of blocking a list of known-bad software, it permits only a defined list of known-good, approved software or executables to run at all — a strong fit for OT endpoints that run the same small set of applications for years at a time. Network segmentation, covered as zones and conduits in Lesson 2, groups assets by trust level and routes any traffic between groups through a governed conduit rather than a direct path. A jump host is a single, tightly monitored system that all remote access must pass through — no vendor or engineer connects directly to a controller; they connect to the jump host, which connects onward, with every session logged. And tested, offline backups — verified to actually restore, not just verified to exist — are the countermeasure that matters most after a compensating control has already failed, because they're what turns a ransomware event from "the plant closes" into "the plant reloads from Tuesday's backup and keeps running."</p>
+    <div class="icon-row" aria-hidden="true">
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <path d="M26 6 L44 14 V26 C44 36 36 44 26 46 C16 44 8 36 8 26 V14 Z" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <path d="M18 26 L24 32 L36 18" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        </svg>
+        Hardening
+      </div>
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <rect x="8" y="10" width="36" height="32" rx="3" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="8" y1="20" x2="44" y2="20" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="16" cy="30" r="2.5" fill="var(--ok)"/>
+          <line x1="22" y1="30" x2="38" y2="30" stroke="var(--ok)" stroke-width="2"/>
+          <circle cx="16" cy="37" r="2.5" fill="var(--bad)"/>
+          <line x1="22" y1="37" x2="38" y2="37" stroke="var(--bad)" stroke-width="2" stroke-dasharray="2 2"/>
+        </svg>
+        Allowlisting
+      </div>
+      <div class="icon-item">
+        <svg width="52" height="52" viewBox="0 0 52 52" focusable="false">
+          <rect x="12" y="8" width="28" height="36" rx="4" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+          <circle cx="26" cy="24" r="7" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <rect x="23" y="30" width="6" height="10" fill="var(--accent)"/>
+        </svg>
+        Offline backup vault
+      </div>
+    </div>
+    <table class="compare-table">
+      <caption>What each countermeasure does — and doesn't — cover</caption>
+      <thead>
+        <tr><th scope="col">Countermeasure</th><th scope="col">What it does</th><th scope="col">What it doesn't do</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Hardening</td><td>Shrinks the attack surface of a single device</td><td>Doesn't stop lateral movement once the network itself is compromised</td></tr>
+        <tr><td>Allowlisting</td><td>Blocks unapproved software from executing at all, including most malware</td><td>Requires disciplined maintenance of the approved list — a stale list becomes friction, not security</td></tr>
+        <tr><td>Segmentation (zones &amp; conduits)</td><td>Limits how far a compromise on one device can spread</td><td>Doesn't fix the vulnerability itself — a segmented device is still vulnerable, just harder to reach</td></tr>
+        <tr><td>Jump host</td><td>Centralizes and logs all remote access, closing direct paths in</td><td>Only as strong as the jump host's own hardening and monitoring</td></tr>
+        <tr><td>Tested offline backups</td><td>Guarantees recovery is possible after a destructive event</td><td>Doesn't prevent the event — it's a recovery control, not a preventive one</td></tr>
+      </tbody>
+    </table>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>No single countermeasure here is meant to be "the" fix, the way a patch is. They're closer to the different layers of a home's security — a good lock (hardening), a rule that only pre-approved keys work at all (allowlisting), interior doors that don't all open into every room (segmentation), a single monitored front entrance instead of five unwatched ones (a jump host), and insurance plus a copy of your important documents somewhere else entirely (backups). None of them alone would satisfy an insurance inspector, but together they cover for each other's blind spots — which is the entire idea behind defense in depth.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A dairy processing plant can't immediately patch a legacy PLC's firmware, so it layers four countermeasures instead: the PLC's unused web-configuration service is disabled and its default password changed (hardening); the engineering workstation used to program it is locked to run only a signed, approved list of applications (allowlisting); the PLC's segment is isolated behind a firewall that only allows the specific Modbus TCP conversation it needs with the SCADA master (segmentation); and any vendor support session goes through a jump host that records the full session for later review. No single layer here would have been sufficient on its own — together, they substantially close the gap the unpatched firmware leaves open.</p>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 640 300" role="img" aria-labelledby="beforeAfterTitle beforeAfterDesc" style="width:100%;max-width:640px;display:block;margin:0 auto;">
+        <title id="beforeAfterTitle">A flat network before countermeasures compared with a segmented network after countermeasures</title>
+        <desc id="beforeAfterDesc">Before: an office PC, engineering workstation, HMI, and PLC all share one flat network with no boundaries and default credentials. After: the same devices are split into an enterprise zone and a plant zone, connected only through a jump host acting as a conduit, with hardening and allowlisting applied to individual devices and an offline backup vault attached to the plant zone.</desc>
+        <text x="150" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--bad)">Before: flat network</text>
+        <line x1="30" y1="46" x2="270" y2="46" stroke="var(--border)" stroke-width="3"></line>
+        <rect x="30" y="60" width="60" height="34" rx="4" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="60" y="81" text-anchor="middle" font-size="9" fill="var(--text)">Office PC</text>
+        <rect x="100" y="60" width="60" height="34" rx="4" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="130" y="81" text-anchor="middle" font-size="9" fill="var(--text)">Eng WS</text>
+        <rect x="170" y="60" width="60" height="34" rx="4" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="200" y="81" text-anchor="middle" font-size="9" fill="var(--text)">HMI</text>
+        <rect x="240" y="60" width="60" height="34" rx="4" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="270" y="81" text-anchor="middle" font-size="9" fill="var(--text)">PLC/RTU</text>
+        <text x="130" y="108" text-anchor="middle" font-size="9" fill="var(--bad)">default creds</text>
+        <text x="200" y="122" text-anchor="middle" font-size="9" fill="var(--bad)">unsupported OS</text>
+        <text x="150" y="140" text-anchor="middle" font-size="10" fill="var(--text-muted)">Any device can reach any other device</text>
+
+        <text x="490" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ok)">After: segmented network</text>
+        <rect x="360" y="40" width="80" height="46" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="400" y="66" text-anchor="middle" font-size="9" fill="var(--text)">Office PC</text>
+        <text x="400" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="var(--text-muted)">Enterprise zone</text>
+        <rect x="460" y="40" width="40" height="46" rx="6" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="5 3"></rect>
+        <text x="480" y="66" text-anchor="middle" font-size="8" font-weight="700" fill="var(--accent2)">Jump host</text>
+        <rect x="520" y="40" width="100" height="46" rx="6" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="570" y="60" text-anchor="middle" font-size="9" fill="var(--text)">Eng WS</text>
+        <text x="570" y="72" text-anchor="middle" font-size="8" fill="var(--ok)">allowlisted</text>
+        <text x="570" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="var(--text-muted)">Plant zone</text>
+        <rect x="520" y="96" width="48" height="40" rx="6" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="544" y="118" text-anchor="middle" font-size="8" fill="var(--text)">HMI</text>
+        <rect x="574" y="96" width="46" height="40" rx="6" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="597" y="112" text-anchor="middle" font-size="8" fill="var(--text)">PLC</text>
+        <text x="597" y="124" text-anchor="middle" font-size="7" fill="var(--ok)">hardened</text>
+        <rect x="360" y="140" width="60" height="34" rx="5" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="390" y="161" text-anchor="middle" font-size="8" fill="var(--text)">Offline backup vault</text>
+        <line x1="420" y1="157" x2="520" y2="120" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+        <text x="490" y="188" text-anchor="middle" font-size="9" fill="var(--text-muted)">Zones connect only through the jump host conduit</text>
+      </svg>
+      <p class="diagram-caption">Diagram: before, four devices share one flat network with no internal boundaries and known weaknesses (default credentials, an unsupported OS). After, the same devices are split into an enterprise zone and a plant zone that can only reach each other through a monitored jump host; individual devices are hardened or allowlisted, and an offline backup vault is attached to the plant zone as a recovery control.</p>
+    </div>
+  </section>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section id="activity" class="module">
+    <div class="activity-block">
+      <div class="activity-head">
+        <span aria-hidden="true">🧩</span>
+        <h3>Activity: Match the Weakness to the Countermeasure</h3>
+        <span class="activity-structure">Individual, then pair-share</span>
+        <span class="activity-time">≈ 25 min</span>
+      </div>
+      <div class="activity-body">
+        <p class="activity-instructions"><strong>Individual (12 min):</strong> For each described weakness, select the countermeasure that most directly addresses it. <strong>Pair-share (13 min):</strong> Compare your answers with a neighbor and discuss any disagreements — more than one countermeasure can sound plausible, but one is usually the best fit.</p>
+        <div class="mapping-table-wrap">
+          <table class="mapping-table" id="mappingTable">
+            <thead>
+              <tr><th scope="col">Weakness or scenario</th><th scope="col">Best-matching countermeasure</th></tr>
+            </thead>
+            <tbody>
+              <tr class="map-row" data-answer="cred">
+                <td>An RTU still uses the vendor's default administrator credentials</td>
+                <td>
+                  <select aria-label="Countermeasure for default administrator credentials">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="allow">
+                <td>An engineering workstation will run any executable a USB drive brings in</td>
+                <td>
+                  <select aria-label="Countermeasure for unrestricted executable execution">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="seg">
+                <td>A compromised office printer could currently reach any PLC on the plant floor</td>
+                <td>
+                  <select aria-label="Countermeasure for a flat network reachability problem">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="jump">
+                <td>A vendor needs periodic remote access to a controller for diagnostics</td>
+                <td>
+                  <select aria-label="Countermeasure for vendor remote access">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="backup">
+                <td>Ransomware could encrypt the historian server with no verified way to recover it</td>
+                <td>
+                  <select aria-label="Countermeasure for ransomware recovery">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="comp">
+                <td>A new ICS advisory names a high-severity flaw in an installed PLC model, with no vendor patch yet available</td>
+                <td>
+                  <select aria-label="Countermeasure for an unpatched advisory finding">
+                    <option value="">— Select —</option>
+                    <option value="cred">Credential hardening (change defaults, disable unused accounts)</option>
+                    <option value="allow">Application allowlisting</option>
+                    <option value="seg">Network segmentation (zones &amp; conduits)</option>
+                    <option value="jump">Jump host with logged, time-boxed access</option>
+                    <option value="backup">Tested offline backups / recovery plan</option>
+                    <option value="comp">Compensating control (interim mitigation without a patch)</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mapping-actions">
+          <button class="btn" id="checkMapping">Check My Mapping</button>
+          <button class="btn secondary" id="resetMapping">Reset</button>
+          <span class="mapping-result" id="mappingResult" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIMULATION ================= -->
+  <section id="simulation" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📋</span>
+      <h2>Simulation: Read the ICS Advisory</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <span class="safety-flag">⚠ Simulation only — fictional example advisories, for teaching format only, no live equipment or network</span>
+    <p>Select one of the four fictional advisory scenarios below to practice reading an ICS advisory's structure: affected product, CVE reference, severity, exploitability, and recommended mitigation. These are illustrative examples built to teach the format, not reproductions of any real published advisory.</p>
+    <div class="activity-block">
+      <div class="activity-body">
+        <div class="sim-controls" role="group" aria-label="Select a fictional advisory scenario">
+          <button type="button" class="sim-toggle" data-advisory="webauth" aria-pressed="false">Advisory 1: HMI web login bypass</button>
+          <button type="button" class="sim-toggle" data-advisory="hardcoded" aria-pressed="false">Advisory 2: RTU hardcoded credential</button>
+          <button type="button" class="sim-toggle" data-advisory="dos" aria-pressed="false">Advisory 3: PLC network stack denial-of-service</button>
+          <button type="button" class="sim-toggle" data-advisory="overflow" aria-pressed="false">Advisory 4: Historian buffer overflow</button>
+        </div>
+        <div class="sim-readout" id="simReadout" aria-live="polite">
+          <strong>Select an advisory above</strong> to see a fictional example laid out in the standard advisory format.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section id="review" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">✅</span>
+      <h2>Review &amp; Knowledge Check</h2>
+      <span class="module-time">≈ 25 min</span>
+    </div>
+    <p>Five questions covering the lesson's key distinctions. Answer each, then select <strong>Grade My Quiz</strong> to see your score and an explanation for every item.</p>
+    <div class="quiz-block" id="quizBlock">
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q1.</span>What is a CVE?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q1" value="a"> A vendor's internal bug-tracking number</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="b"> A globally unique identifier assigned to a specific, publicly disclosed vulnerability</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="c"> A type of firewall rule used in industrial DMZs</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="d"> An IEC 62443 certification level</label></li>
+        </ul>
+        <div class="q-feedback" id="fb1"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q2.</span>How does a CISA ICS advisory differ from the underlying CVE(s) it references?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q2" value="a"> An advisory is just a marketing summary of a company's product line</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="b"> An advisory replaces the CVE with a new, unrelated numbering system</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="c"> An advisory adds product-specific context — affected models/versions, exploitability, and recommended mitigations — that a bare CVE entry doesn't include</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="d"> An advisory is only published after a patch already exists</label></li>
+        </ul>
+        <div class="q-feedback" id="fb2"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q3.</span>A plant cannot install a vendor patch because the HMI's operating system is no longer supported, but a new ICS advisory names a high-severity vulnerability in it. What is the most defensible next step?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q3" value="a"> Ignore the advisory since no patch is available</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="b"> Wait for the vendor to resume support before doing anything</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="c"> Apply a compensating control — such as segmentation, monitoring, or restricted access — while the underlying vulnerability remains unpatched</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="d"> Permanently disconnect the HMI, halting production</label></li>
+        </ul>
+        <div class="q-feedback" id="fb3"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q4.</span>Which countermeasure most directly reduces the risk of a compromised office PC reaching every PLC on a flat plant network?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q4" value="a"> Application allowlisting on the PLC itself</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="b"> Changing the default credentials on the PLC</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="c"> Network segmentation into zones connected only through governed conduits</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="d"> Publishing an ICS advisory about the PLC</label></li>
+        </ul>
+        <div class="q-feedback" id="fb4"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q5.</span>What does "hardening" mean in the context of an OT asset?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q5" value="a"> Physically reinforcing the equipment's enclosure against tampering</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="b"> Reducing the asset's attack surface by removing unnecessary services, changing default settings, and disabling unused accounts or ports</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="c"> Encrypting all traffic to and from the device</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="d"> Replacing the device with a newer model</label></li>
+        </ul>
+        <div class="q-feedback" id="fb5"></div>
+      </div>
+
+    </div>
+    <div class="mapping-actions">
+      <button class="btn" id="gradeQuiz">Grade My Quiz</button>
+      <button class="btn secondary" id="resetQuiz">Reset Quiz</button>
+    </div>
+    <div class="quiz-score" id="quizScore">
+      <span class="quiz-score-big" id="quizScoreBig">0 / 5</span>
+      <span id="quizScoreText"></span>
+    </div>
+
+    <div class="teach-note" style="margin-top:26px;">
+      <span class="teach-label">Suggested assessment artifact</span>
+      <p>Have each faculty member choose one real or fictional device from their home institution (a building automation controller, a lab instrument, an access-control panel) and write a one-paragraph "mini advisory" for a hypothetical vulnerability in it: affected device, a plausible impact, and at least two compensating controls that don't require a patch. This is a low-stakes way to confirm the CVE/advisory distinction and the countermeasure vocabulary transferred before Lesson 8's frameworks discussion builds on it.</p>
+    </div>
+  </section>
+
+  <!-- ================= FURTHER READING ================= -->
+  <section id="further-reading" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📚</span>
+      <h2>Further Reading</h2>
+    </div>
+    <ul class="resource-list">
+      <li>📄 Download: <a href="ics-vulnerabilities.pdf" target="_blank" rel="noopener noreferrer">ICS Vulnerabilities Reference Sheet (PDF)</a> — a printable summary of the vulnerability categories and countermeasures covered in this lesson, suitable for classroom handout.</li>
+      <li><a href="https://www.sans.org/blog/risk-based-vulnerability-management-and-patching-industrial-systems" target="_blank" rel="noopener noreferrer">Risk-Based Vulnerability Management and Patching for Industrial Systems (SANS)</a> — a practitioner-level treatment of the patch-window problem and how to prioritize remediation when patching everything immediately isn't realistic.</li>
+      <li><a href="https://www.cisa.gov/news-events/news?f%5B0%5D=article_topic%3A79" target="_blank" rel="noopener noreferrer">CISA ICS Advisories and News</a> — the ongoing feed of real ICS advisories; a good source for current examples once students are comfortable with the fictional ones in this lesson's simulation.</li>
+    </ul>
+  </section>
+
+  <nav class="lesson-nav-bottom" aria-label="Lesson navigation">
+    <a class="nav-btn" href="lesson06.html">← Lesson 6: The OT Threat Landscape</a>
+    <a class="nav-btn" href="lesson08.html">Lesson 8: Frameworks for OT Security →</a>
+  </nav>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Lesson tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#s1">1. Persistent Vulnerabilities</a></li>
+      <li><a href="#s2">2. CVEs &amp; ICS Advisories</a></li>
+      <li><a href="#s3">3. The Patch Window</a></li>
+      <li><a href="#s4">4. Countermeasures</a></li>
+      <li><a href="#activity">Activity: Matching Exercise</a></li>
+      <li><a href="#simulation">Simulation: Read the Advisory</a></li>
+      <li><a href="#review">Review &amp; Knowledge Check</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Objectives Progress</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 5 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Learning objectives checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Explain why persistent vulnerabilities remain in OT</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Identify parts of a CVE and an ICS advisory</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Compare hardening, allowlisting, and segmentation</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Describe the patch window and compensating controls</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Evaluate a scenario and recommend countermeasures</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Key Terms</div>
+    <ul class="glossary-list">
+      <li><a href="#s2"><span class="glossary-term">ICS Advisory</span></a><span class="glossary-def">A vendor- and product-specific bulletin, commonly issued by CISA, that translates one or more CVEs into affected products, exploitability, and recommended mitigations.</span></li>
+      <li><a href="#s2"><span class="glossary-term">CVE</span></a><span class="glossary-def">Common Vulnerabilities and Exposures — a globally unique identifier assigned to one specific, publicly disclosed vulnerability.</span></li>
+      <li><a href="#s4"><span class="glossary-term">Hardening</span></a><span class="glossary-def">Reducing an asset's attack surface by removing unnecessary services, changing default settings, and disabling unused accounts or ports.</span></li>
+      <li><a href="#s4"><span class="glossary-term">Allowlisting</span></a><span class="glossary-def">Permitting only a defined list of approved software to run, rather than trying to block a list of known-bad software.</span></li>
+      <li><a href="#s3"><span class="glossary-term">Compensating Control</span></a><span class="glossary-def">An alternative safeguard that reduces risk from an unpatched vulnerability to an acceptable level until — or in place of — a real fix.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Lesson Navigation</div>
+    <div class="prevnext-links">
+      <a href="lesson06.html">← Previous: Lesson 6 — The OT Threat Landscape</a>
+      <a href="lesson08.html">Next: Lesson 8 — Frameworks for OT Security →</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+<footer>
+  Lesson 7 · Day 3 · Vulnerabilities &amp; Countermeasures<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-assisted first draft. A human subject-matter expert should review it for technical accuracy before use with students. Educational use only — all activities are simulation-based and defensive in scope. No live exploitation is performed or taught in this course.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME (light default, dark only if previously chosen) ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- OBJECTIVES PROGRESS TRACKER ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+  }
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- MAPPING ACTIVITY ---------------- */
+  var mappingRows = Array.prototype.slice.call(document.querySelectorAll('#mappingTable .map-row'));
+  var mappingResult = document.getElementById('mappingResult');
+
+  document.getElementById('checkMapping').addEventListener('click', function () {
+    var correctCount = 0;
+    var totalAnswered = 0;
+    mappingRows.forEach(function (row) {
+      var select = row.querySelector('select');
+      var correctVal = row.getAttribute('data-answer');
+      row.classList.remove('correct', 'incorrect');
+      if (!select.value) return;
+      totalAnswered++;
+      if (select.value === correctVal) {
+        row.classList.add('correct');
+        correctCount++;
+      } else {
+        row.classList.add('incorrect');
+      }
+    });
+    mappingResult.textContent = correctCount + ' of ' + mappingRows.length + ' correct'
+      + (totalAnswered < mappingRows.length ? ' (some rows left unanswered)' : '');
+  });
+
+  document.getElementById('resetMapping').addEventListener('click', function () {
+    mappingRows.forEach(function (row) {
+      row.querySelector('select').value = '';
+      row.classList.remove('correct', 'incorrect');
+    });
+    mappingResult.textContent = '';
+  });
+
+  /* ---------------- SIMULATION: READ THE ICS ADVISORY ---------------- */
+  var advisoryData = {
+    webauth: {
+      vendor: 'Fictional Example — "Vendor A" HMI-2000 Series',
+      cve: 'CVE-20XX-EXAMPLE-1 (illustrative only)',
+      cvss: '8.6 — High',
+      cvssClass: 'high',
+      exploit: 'Remotely exploitable, low attack complexity, no authentication required',
+      mitigation: 'Restrict network access to the HMI management interface; disable the web interface if not required; monitor for anomalous login attempts. No patch currently available.'
+    },
+    hardcoded: {
+      vendor: 'Fictional Example — "Vendor B" RTU-450',
+      cve: 'CVE-20XX-EXAMPLE-2 (illustrative only)',
+      cvss: '9.1 — Critical',
+      cvssClass: 'high',
+      exploit: 'Remotely exploitable using a hardcoded credential embedded in firmware; no user interaction required',
+      mitigation: 'Isolate affected RTUs behind a firewall permitting only required protocols; disable remote administration where possible; validated firmware update expected in a future release.'
+    },
+    dos: {
+      vendor: 'Fictional Example — "Vendor C" PLC-Series 700',
+      cve: 'CVE-20XX-EXAMPLE-3 (illustrative only)',
+      cvss: '6.5 — Medium',
+      cvssClass: 'medium',
+      exploit: 'Network-accessible; a malformed packet can cause the controller\'s network stack to stop responding, requiring a manual restart',
+      mitigation: 'Deploy network monitoring to detect malformed traffic; segment the affected controllers from general network traffic; vendor patch available — schedule installation at next planned outage.'
+    },
+    overflow: {
+      vendor: 'Fictional Example — "Vendor D" Historian Suite 12',
+      cve: 'CVE-20XX-EXAMPLE-4 (illustrative only)',
+      cvss: '7.8 — High',
+      cvssClass: 'high',
+      exploit: 'Locally exploitable buffer overflow; requires network access to the historian\'s data-ingest service',
+      mitigation: 'Restrict data-ingest service access to known, authorized sources only; apply the vendor\'s validated patch, available now for supported versions.'
+    }
+  };
+  var simReadout = document.getElementById('simReadout');
+  var simButtons = Array.prototype.slice.call(document.querySelectorAll('.sim-toggle[data-advisory]'));
+
+  simButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-advisory');
+      simButtons.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      var d = advisoryData[key];
+      simReadout.innerHTML =
+        '<strong>Fictional example advisory</strong> — format only, not a real published advisory.' +
+        '<div class="advisory-card">' +
+          '<div class="advisory-row"><span class="adv-label">Affected product</span><span class="adv-val">' + d.vendor + '</span></div>' +
+          '<div class="advisory-row"><span class="adv-label">Reference</span><span class="adv-val">' + d.cve + '</span></div>' +
+          '<div class="advisory-row"><span class="adv-label">Severity (CVSS)</span><span class="adv-val"><span class="cvss-badge ' + d.cvssClass + '">' + d.cvss + '</span></span></div>' +
+          '<div class="advisory-row"><span class="adv-label">Exploitability</span><span class="adv-val">' + d.exploit + '</span></div>' +
+          '<div class="advisory-row"><span class="adv-label">Recommended mitigation</span><span class="adv-val">' + d.mitigation + '</span></div>' +
+        '</div>';
+    });
+  });
+
+  /* ---------------- QUIZ ---------------- */
+  var quizCards = Array.prototype.slice.call(document.querySelectorAll('#quizBlock .q-card'));
+  var quizFeedback = {
+    1: { correct: "Correct. A CVE is a globally unique identifier for one specific, publicly disclosed vulnerability — technical and product-agnostic by design.", incorrect: "Not quite. A CVE is a globally unique identifier for a specific, publicly disclosed vulnerability, not a vendor bug number, a firewall rule type, or a certification level." },
+    2: { correct: "Correct. An ICS advisory takes the technical CVE entry and adds the operational context — affected products, exploitability, and recommended mitigations — that a plant engineer actually needs.", incorrect: "Not quite. An advisory doesn't replace the CVE or require a patch to exist — it adds product-specific context and mitigation guidance on top of the CVE." },
+    3: { correct: "Correct. A compensating control reduces risk from an unpatched vulnerability to an acceptable level when the intended fix isn't available yet — doing nothing and shutting everything down are both worse options than an interim mitigation.", incorrect: "Not quite. Ignoring the advisory or simply waiting leaves the vulnerability fully exposed, and a full shutdown is rarely necessary — a compensating control is the standard, defensible middle path." },
+    4: { correct: "Correct. Segmentation limits how far a compromise on one device can spread — exactly the flat-network problem described here.", incorrect: "Not quite. Allowlisting and credential hardening protect individual devices, but the reachability problem across a flat network is solved by segmentation into zones and conduits." },
+    5: { correct: "Correct. Hardening reduces an asset's attack surface — removing unnecessary services, changing default settings, and disabling unused accounts or ports.", incorrect: "Not quite. Hardening is about reducing what a device exposes and how it's configured, not physical reinforcement, encryption, or replacement." }
+  };
+
+  document.getElementById('gradeQuiz').addEventListener('click', function () {
+    var correctCount = 0;
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      var name = 'q' + qNum;
+      var selected = card.querySelector('input[name="' + name + '"]:checked');
+      var fb = document.getElementById('fb' + qNum);
+      var correctVal = card.getAttribute('data-answer');
+      fb.className = 'q-feedback show';
+      if (!selected) {
+        fb.classList.add('unanswered');
+        fb.textContent = 'Not answered — select an option above, then grade again.';
+        return;
+      }
+      if (selected.value === correctVal) {
+        fb.classList.add('correct');
+        fb.textContent = '✓ Correct — ' + quizFeedback[qNum].correct;
+        correctCount++;
+      } else {
+        fb.classList.add('incorrect');
+        fb.textContent = '✗ Not quite — ' + quizFeedback[qNum].incorrect;
+      }
+    });
+    var scoreBox = document.getElementById('quizScore');
+    var scoreBig = document.getElementById('quizScoreBig');
+    var scoreText = document.getElementById('quizScoreText');
+    scoreBox.classList.add('show');
+    scoreBig.textContent = correctCount + ' / ' + quizCards.length;
+    scoreText.textContent = correctCount === quizCards.length
+      ? 'All five — you are ready for Lesson 8.'
+      : (correctCount >= 3 ? 'Solid grasp — review the items you missed before Lesson 8.' : 'Worth a re-read of the sections above before moving on.');
+  });
+
+  document.getElementById('resetQuiz').addEventListener('click', function () {
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      card.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      var fb = document.getElementById('fb' + qNum);
+      fb.className = 'q-feedback';
+      fb.textContent = '';
+    });
+    document.getElementById('quizScore').classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
