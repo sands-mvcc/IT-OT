@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITRE ATT&amp;CK for ICS — Student Guide | Teaching Operational Technologies</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --surface: #ffffff; --surface2: #f0f4ff; --border: #d1d9e6;
+    --text: #1a1e2e; --text-muted: #5a6480; --accent: #b45309; --accent2: #92400e; --on-accent: #ffffff;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10); --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e; --header-text: #ffffff; --card-hover: #f3f0e8;
+    --tag-gov: #6a1b9a; --tag-gov-bg: #f3e5f5;
+    --tag-proto: #1565c0; --tag-proto-bg: #e3f0fd;
+    --tag-idm: #00695c; --tag-idm-bg: #e0f2f1;
+    --tag-threat: #c0392b; --tag-threat-bg: #fdecea;
+    --tag-safety: #b45309; --tag-safety-bg: #fdf3e3;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117; --surface: #1c1f2e; --surface2: #252840; --border: #2e3352;
+    --text: #e8ecf4; --text-muted: #8a92b2; --accent: #f59e0b; --accent2: #fbbf24; --on-accent: #17130a;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40); --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14; --header-text: #e8ecf4; --card-hover: #232636;
+    --tag-gov: #ce93d8; --tag-gov-bg: #1f0d2a;
+    --tag-proto: #90caf9; --tag-proto-bg: #0d1f35;
+    --tag-idm: #80cbc4; --tag-idm-bg: #0d2520;
+    --tag-threat: #ef9a9a; --tag-threat-bg: #2a1010;
+    --tag-safety: #fbbf24; --tag-safety-bg: #2a1c05;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .skip-link { position: absolute; left: -999px; top: auto; }
+  .skip-link:focus { position: fixed; left: 12px; top: 12px; z-index: 400; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; }
+
+  /* HEADER */
+  header { background: var(--header-bg); color: var(--header-text); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .header-inner { max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .icon-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); color: var(--header-text); cursor: pointer; width: 38px; height: 38px; border-radius: 10px; font-size: 1.05rem; display: none; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+  .icon-btn:hover { background: rgba(255,255,255,0.22); }
+  .brand-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--on-accent); flex-shrink: 0; letter-spacing: -1px; }
+  .brand-text h1 { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+  .brand-text p { font-size: 0.74rem; opacity: 0.65; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .back-pill, .theme-toggle { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); color: var(--header-text); cursor: pointer; padding: 7px 13px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; white-space: nowrap; }
+  .back-pill:hover, .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #1a1e2e 0%, #22304a 60%, #6a1b9a33 100%); color: #fff; padding: 30px 24px; }
+  .hero-inner { max-width: 1180px; margin: 0 auto; }
+  .hero-tag { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .hero h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; line-height: 1.25; }
+  .hero p { opacity: 0.82; font-size: 0.92rem; max-width: 74ch; line-height: 1.55; }
+
+  /* PAGE SHELL: sidebar + main */
+  .page-shell { max-width: 1180px; margin: 0 auto; padding: 26px 24px 64px; display: grid; grid-template-columns: 250px 1fr; gap: 30px; align-items: start; }
+  .toc-sidebar { position: sticky; top: 82px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); max-height: calc(100vh - 100px); overflow-y: auto; }
+  .toc-sidebar h5 { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 14px 0 6px; }
+  .toc-sidebar h5:first-child { margin-top: 0; }
+  .toc-sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .toc-sidebar a { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-decoration: none; padding: 6px 8px; border-radius: 6px; }
+  .toc-sidebar a:hover { background: var(--surface2); color: var(--text); }
+  .toc-overlay { display: none; }
+
+  main.content { min-width: 0; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--tag-gov); text-decoration: none; margin-bottom: 18px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .page-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .ctrl-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.78rem; font-weight: 700; padding: 7px 12px; border-radius: 20px; cursor: pointer; }
+  .ctrl-btn:hover { background: var(--surface2); }
+
+  /* QUICK FACTS */
+  .quickfacts { background: var(--surface); border: 2px solid var(--tag-gov); border-radius: 14px; padding: 18px 20px; margin-bottom: 32px; box-shadow: var(--shadow); }
+  .quickfacts h4 { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tag-gov); margin-bottom: 12px; }
+  .fact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .fact-tile { background: var(--surface2); border-radius: 10px; padding: 10px 12px; }
+  .fact-tile .fact-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 4px; }
+  .fact-tile .fact-value { font-size: 0.86rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+
+  /* NUMBERED SECTIONS */
+  section.numsec { margin-bottom: 44px; padding-top: 8px; scroll-margin-top: 88px; }
+  .numsec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .numsec-num { font-size: 0.78rem; font-weight: 800; color: var(--on-accent); background: var(--accent); border-radius: 8px; padding: 3px 9px; flex-shrink: 0; }
+  .numsec-head h3 { font-size: 1.2rem; font-weight: 800; }
+  .numsec > p { font-size: 0.92rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 14px; max-width: 82ch; }
+  .numsec h4.sub-head { font-size: 0.95rem; font-weight: 800; margin: 20px 0 10px; color: var(--text); }
+
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 8px 0 4px; }
+  .concept-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--tag-gov); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .concept-item h4 { font-size: 0.86rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .concept-item p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0; }
+
+  /* NUMBERED ORDERED LIST (how to use this guide) */
+  .howto-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+  .howto-list li { display: flex; gap: 12px; }
+  .howto-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--tag-gov-bg); color: var(--tag-gov); font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; }
+  .howto-list p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; }
+  .howto-list strong { color: var(--text); }
+
+  /* COMPARISON TABLE */
+  .cmp-table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-size: 0.84rem; }
+  .cmp-table th, .cmp-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; line-height: 1.5; }
+  .cmp-table th { background: var(--surface2); font-weight: 800; color: var(--text); }
+  .cmp-table td.attr { font-weight: 700; color: var(--tag-gov); white-space: nowrap; }
+  .cmp-table td { color: var(--text-muted); }
+  .table-scroll { overflow-x: auto; border-radius: 10px; }
+
+  /* PHASE CARDS (kill-chain groupings) */
+  .stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 14px 0 6px; }
+  .stage-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+  .stage-band { padding: 10px 16px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .stage-card.access .stage-band { background: var(--tag-proto-bg); color: var(--tag-proto); }
+  .stage-card.aware  .stage-band { background: var(--tag-idm-bg); color: var(--tag-idm); }
+  .stage-card.impactphase .stage-band { background: var(--tag-threat-bg); color: var(--tag-threat); }
+  .stage-card h5 { padding: 12px 16px 0; font-size: 0.94rem; font-weight: 800; }
+  .stage-card .stage-body { padding: 8px 16px 16px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+  .tactic-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .stage-card.access .tactic-chip { color: var(--tag-proto); background: var(--tag-proto-bg); }
+  .stage-card.aware .tactic-chip { color: var(--tag-idm); background: var(--tag-idm-bg); }
+  .stage-card.impactphase .tactic-chip { color: var(--tag-threat); background: var(--tag-threat-bg); }
+  .tactic-chip { font-size: 0.7rem; font-weight: 700; border-radius: 20px; padding: 4px 10px; }
+
+  /* SUBSECTION ACCORDIONS */
+  .sub-card { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: var(--surface); }
+  .sub-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface2); border: none; text-align: left; padding: 12px 14px; cursor: pointer; font-family: inherit; color: var(--text); }
+  .sub-toggle:hover { background: var(--card-hover); }
+  .sub-toggle-left { display: flex; align-items: center; gap: 10px; }
+  .sub-caret { color: var(--tag-gov); font-size: 0.85rem; flex-shrink: 0; width: 1em; display: inline-block; }
+  .sub-title { font-weight: 700; font-size: 0.86rem; }
+  .sub-chip { font-size: 0.66rem; font-weight: 700; color: var(--tag-gov); background: var(--tag-gov-bg); border-radius: 10px; padding: 2px 8px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; white-space: nowrap; }
+  .sub-chip.access { color: var(--tag-proto); background: var(--tag-proto-bg); }
+  .sub-chip.aware { color: var(--tag-idm); background: var(--tag-idm-bg); }
+  .sub-chip.impactphase { color: var(--tag-threat); background: var(--tag-threat-bg); }
+  .sub-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .sub-body.open { max-height: 1400px; }
+  .sub-body-inner { padding: 4px 16px 16px; font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
+  .sub-body-inner strong { color: var(--text); }
+  .sub-body-inner ul { margin: 6px 0 0 18px; }
+  .sub-body-inner li { margin-bottom: 4px; }
+  .case-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+  .case-meta span { font-size: 0.68rem; font-weight: 700; color: var(--tag-gov); background: var(--tag-gov-bg); border-radius: 10px; padding: 2px 8px; }
+
+  .teaching-note { background: var(--surface2); border: 2px solid var(--accent); border-radius: 14px; padding: 18px 20px; margin-top: 6px; }
+  .teaching-note h4 { font-size: 0.95rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+  .teaching-note p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px; }
+  .safety-flag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; }
+
+  .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 8px; }
+  .exercise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .exercise-card h5 { font-size: 0.88rem; font-weight: 800; margin-bottom: 6px; color: var(--tag-gov); }
+  .exercise-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+
+  .reading-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .reading-list a { font-size: 0.88rem; font-weight: 600; color: var(--tag-gov); text-decoration: none; }
+  .reading-list a:hover { text-decoration: underline; }
+  .reading-list span { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+  .disclaimer { font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 14px; line-height: 1.6; }
+
+  footer { text-align: center; padding: 20px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border); line-height: 1.6; }
+
+  @media (max-width: 880px) {
+    .icon-btn { display: flex; }
+    .page-shell { grid-template-columns: 1fr; padding: 22px 16px 48px; }
+    .toc-sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 78vw; max-width: 320px; z-index: 300; border-radius: 0; transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: var(--shadow-hover); }
+    .toc-sidebar.open { transform: translateX(0); }
+    .toc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 250; }
+    .toc-overlay.open { display: block; }
+    .hero { padding: 24px 16px; }
+    .header-inner { padding: 14px 16px; }
+  }
+  @media print {
+    header, .toc-sidebar, .toc-overlay, .page-controls, .back-link { display: none !important; }
+    .page-shell { grid-template-columns: 1fr; padding: 0 12px; }
+    .sub-body { max-height: none !important; }
+    .hero { background: none; color: var(--text); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <button class="icon-btn" id="tocToggleBtn" aria-expanded="false" aria-controls="tocSidebar" aria-label="Toggle table of contents">☰</button>
+      <div class="brand-icon">OT</div>
+      <div class="brand-text">
+        <h1>Teaching Operational Technologies</h1>
+        <p>Core Frameworks — Student Guide</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="printBtn" onclick="window.print()" aria-label="Print or save as PDF" style="display:flex;">🖨️</button>
+      <a class="back-pill" href="index.html">← Course Navigation</a>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+    </div>
+  </div>
+</header>
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Threat Intelligence · Knowledge Base</span>
+    <h2>MITRE ATT&amp;CK for ICS</h2>
+    <p>A student's walk-through of the knowledge base that catalogs how real adversaries have actually attacked control systems — its tactics, its case studies, and how it's used defensively without ever touching attack tooling.</p>
+  </div>
+</div>
+
+<div class="toc-overlay" id="tocOverlay"></div>
+<div class="page-shell">
+  <nav class="toc-sidebar" id="tocSidebar" aria-label="Page contents">
+    <h5>Orientation</h5>
+    <ul>
+      <li><a href="#sec-01">01 · Foundations</a></li>
+      <li><a href="#sec-02">02 · How to Use This Guide</a></li>
+      <li><a href="#sec-03">03 · Positioning</a></li>
+    </ul>
+    <h5>The Knowledge Base</h5>
+    <ul>
+      <li><a href="#sec-04">04 · The Matrix — Tactics &amp; Techniques</a></li>
+      <li><a href="#sec-05">05 · Case Studies — Groups &amp; Software</a></li>
+      <li><a href="#sec-06">06 · Related Resources</a></li>
+      <li><a href="#sec-07">07 · Defensive Applications</a></li>
+    </ul>
+    <h5>Reference</h5>
+    <ul>
+      <li><a href="#sec-08">08 · Classroom Uses</a></li>
+      <li><a href="#sec-09">09 · Sources &amp; Further Reading</a></li>
+    </ul>
+  </nav>
+
+  <main class="content" id="main-content">
+    <a class="back-link" href="index.html">← Back to Course Navigation</a>
+
+    <div class="page-controls">
+      <button class="ctrl-btn" id="expandAllBtn">▾ Expand all sections</button>
+      <button class="ctrl-btn" id="collapseAllBtn">▸ Collapse all</button>
+    </div>
+
+    <div class="quickfacts">
+      <h4>Quick Facts</h4>
+      <div class="fact-grid">
+        <div class="fact-tile"><div class="fact-label">Type</div><div class="fact-value">Threat-intelligence knowledge base</div></div>
+        <div class="fact-tile"><div class="fact-label">Maintained By</div><div class="fact-value">MITRE Corporation</div></div>
+        <div class="fact-tile"><div class="fact-label">Structure</div><div class="fact-value">12 tactics, dozens of techniques</div></div>
+        <div class="fact-tile"><div class="fact-label">Companion To</div><div class="fact-value">Enterprise ATT&amp;CK (the IT-side matrix)</div></div>
+        <div class="fact-tile"><div class="fact-label">Built From</div><div class="fact-value">Documented real-world ICS incidents</div></div>
+        <div class="fact-tile"><div class="fact-label">Primary Use</div><div class="fact-value">Threat intel, detection engineering, red/blue exercises</div></div>
+      </div>
+    </div>
+
+    <!-- 01 FOUNDATIONS -->
+    <section class="numsec" id="sec-01">
+      <div class="numsec-head"><span class="numsec-num">01</span><h3>Foundations</h3></div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f1-1"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">What it is</span></span><span class="sub-chip">Definition</span></button>
+        <div class="sub-body" id="f1-1" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>ATT&amp;CK for ICS is a knowledge base — not a standard, not a piece of software, and not something an organization certifies against. It catalogs the tactics (the "why") and techniques (the "how") that adversaries have actually used against industrial control systems, with every entry traced back to a documented incident, vendor advisory, or research report. It is the ICS-specific sibling of MITRE's flagship Enterprise ATT&amp;CK matrix.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f1-2"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Why it was created</span></span><span class="sub-chip">Origin</span></button>
+        <div class="sub-body" id="f1-2" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>Enterprise ATT&amp;CK, released in 2015, modeled adversary behavior on IT networks — but it had no vocabulary for a technique like reprogramming a safety controller's logic or spoofing a sensor reading back to an HMI. MITRE released ATT&amp;CK for ICS as its own matrix in 2020 specifically to capture behaviors unique to control systems: manipulating physical processes, disabling safety functions, and interacting with industrial protocols that IT-focused security tooling doesn't parse.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f1-3"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Who it's for</span></span><span class="sub-chip">Scope</span></button>
+        <div class="sub-body" id="f1-3" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>Threat intelligence analysts writing and reading incident reports, SOC and detection engineers scoping alert coverage, red/blue/purple teams designing exercises, and asset owners doing gap analysis. Unlike IEC 62443 or NIST SP 800-82, nobody "implements" ATT&amp;CK for ICS directly — it's a reference lens applied to something else you're already doing.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f1-4"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Descriptive, not prescriptive</span></span><span class="sub-chip">Distinction</span></button>
+        <div class="sub-body" id="f1-4" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>This is the single most important distinction to establish before teaching any other content on this page. IEC 62443 and NIST SP 800-82 tell you what to build. NERC CIP-008 tells you what you're legally required to do. ATT&amp;CK for ICS does neither — it only documents what has actually happened. It answers "what has been done to systems like this, and how would you detect it," not "what should you do."</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 HOW TO USE THIS GUIDE -->
+    <section class="numsec" id="sec-02">
+      <div class="numsec-head"><span class="numsec-num">02</span><h3>How to Use This Guide</h3></div>
+      <ol class="howto-list">
+        <li><span class="howto-num">1</span><p><strong>Skim the Quick Facts panel first.</strong> The single most important fact there is the first one — this is a knowledge base, not a standard. Everything else follows from that.</p></li>
+        <li><span class="howto-num">2</span><p><strong>Read Section 03 before the matrix itself.</strong> Knowing how ATT&amp;CK for ICS differs from IEC 62443, SP 800-82, and CIP-008 makes the tactic list in Section 04 much easier to place.</p></li>
+        <li><span class="howto-num">3</span><p><strong>Work through Section 04's three phase cards in order</strong> — Access &amp; Foothold → Situational Awareness → Physical Impact. They group the 12 tactics into the same "IT compromise leads to OT impact" story your students already know from Lessons 6–7.</p></li>
+        <li><span class="howto-num">4</span><p><strong>Section 05 is where the matrix becomes concrete.</strong> Five real incidents, each mapped to the tactics they demonstrate — this is the material built for case-study teaching under the course's defensive-scope safeguard.</p></li>
+        <li><span class="howto-num">5</span><p><strong>If you're prepping to teach, start at Section 08.</strong> The four exercises there are built to reuse the case studies in Section 05 without requiring any attack tooling.</p></li>
+      </ol>
+    </section>
+
+    <!-- 03 POSITIONING -->
+    <section class="numsec" id="sec-03">
+      <div class="numsec-head"><span class="numsec-num">03</span><h3>Positioning: ATT&amp;CK for ICS vs. the Other Core Frameworks</h3></div>
+      <p>IEC 62443 and NIST SP 800-82 tell you how to design and manage a secure system. NERC CIP-008 tells you what you must legally report once something goes wrong. ATT&amp;CK for ICS answers a third, different question: <em>what has actually been done to systems like this, and how would you know?</em></p>
+      <div class="table-scroll">
+        <table class="cmp-table">
+          <thead><tr><th>Attribute</th><th>MITRE ATT&amp;CK for ICS</th><th>IEC 62443 / SP 800-82 / CIP-008</th></tr></thead>
+          <tbody>
+            <tr><td class="attr">Type</td><td>Threat-intelligence knowledge base, descriptive</td><td>Design standard, risk-management guide, or compliance mandate — all prescriptive</td></tr>
+            <tr><td class="attr">Origin / Authority</td><td>MITRE Corporation, a federally funded R&amp;D center</td><td>ISA/IEC standards body, NIST (U.S. federal), NERC (the ERO, under FERC)</td></tr>
+            <tr><td class="attr">Primary Question</td><td>"What has been done to systems like this, and how would you detect it?"</td><td>"How should this be designed/managed?" or "What must you legally report?"</td></tr>
+            <tr><td class="attr">Enforcement</td><td>None — there is nothing to certify or audit against</td><td>Certification (62443), federal adoption (800-82), or legal penalty (CIP-008)</td></tr>
+            <tr><td class="attr">Typical Pairing</td><td>Supplies the "how would an attacker do this" lens applied on top of the other three</td><td>Supply the design, the risk process, or the reporting obligation that ATT&amp;CK for ICS findings feed into</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 THE MATRIX -->
+    <section class="numsec" id="sec-04">
+      <div class="numsec-head"><span class="numsec-num">04</span><h3>The Matrix — Tactics &amp; Techniques</h3></div>
+      <p>Twelve tactics span the ICS attack lifecycle. Grouping them into three phases tells the same story Lessons 6–7 already teach: an intrusion typically starts on the IT side, moves through the network to build situational awareness, and only becomes an OT incident once it reaches physical impact. <strong>MITRE periodically revises the technique list</strong> — treat the examples below as representative, and check the live matrix (linked in Section 09) for the current, complete set before quoting exact counts to students.</p>
+      <div class="stage-grid">
+        <div class="stage-card access">
+          <div class="stage-band"><span>Phase 1</span><span>Get In</span></div>
+          <h5>Access &amp; Foothold</h5>
+          <div class="stage-body">
+            The adversary gets into the environment and establishes a durable presence.
+            <div class="tactic-strip">
+              <span class="tactic-chip">Initial Access</span><span class="tactic-chip">Execution</span><span class="tactic-chip">Persistence</span><span class="tactic-chip">Privilege Escalation</span><span class="tactic-chip">Evasion</span>
+            </div>
+          </div>
+        </div>
+        <div class="stage-card aware">
+          <div class="stage-band"><span>Phase 2</span><span>Get Around</span></div>
+          <h5>Situational Awareness &amp; Movement</h5>
+          <div class="stage-body">
+            The adversary learns the environment, moves through it, and stages a way to control it remotely.
+            <div class="tactic-strip">
+              <span class="tactic-chip">Discovery</span><span class="tactic-chip">Lateral Movement</span><span class="tactic-chip">Collection</span><span class="tactic-chip">Command and Control</span>
+            </div>
+          </div>
+        </div>
+        <div class="stage-card impactphase">
+          <div class="stage-band"><span>Phase 3</span><span>Cause Impact</span></div>
+          <h5>Physical Impact</h5>
+          <div class="stage-body">
+            The adversary blocks the operator's ability to respond and manipulates or damages the physical process.
+            <div class="tactic-strip">
+              <span class="tactic-chip">Inhibit Response Function</span><span class="tactic-chip">Impair Process Control</span><span class="tactic-chip">Impact</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="sub-head">Phase 1 — Access &amp; Foothold</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-1"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Initial Access</span></span><span class="sub-chip access">Access</span></button>
+        <div class="sub-body" id="f4-1" aria-hidden="true" inert><div class="sub-body-inner"><p>How the adversary first gets a foothold in the ICS environment.</p><ul><li><strong>Exploit Public-Facing Application</strong> — an internet-exposed HMI or engineering portal</li><li><strong>Remote Services</strong> — VPN or remote-access paths originally set up for vendors or engineers</li><li><strong>Supply Chain Compromise</strong> — tainted vendor software or hardware</li><li><strong>Transient Cyber Asset</strong> — a laptop or USB device temporarily connected to the control network</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-2"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Execution</span></span><span class="sub-chip access">Access</span></button>
+        <div class="sub-body" id="f4-2" aria-hidden="true" inert><div class="sub-body-inner"><p>Running adversary-controlled code once inside.</p><ul><li><strong>Command-Line Interface</strong> and <strong>Graphical User Interface</strong> — using the system's own native tools</li><li><strong>Scripting</strong> — automating actions across multiple devices</li><li><strong>User Execution</strong> — tricking an operator or engineer into running something</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-3"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Persistence</span></span><span class="sub-chip access">Access</span></button>
+        <div class="sub-body" id="f4-3" aria-hidden="true" inert><div class="sub-body-inner"><p>Staying present across restarts and maintenance cycles.</p><ul><li><strong>Modify Program</strong> — altering PLC/controller logic itself</li><li><strong>Module Firmware</strong> — reflashing a device's firmware</li><li><strong>Project File Infection</strong> — embedding malicious logic in an engineering project file so it reinfects the target the next time it's deployed</li><li><strong>Valid Accounts</strong> — using legitimate, often shared or default, credentials</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-4"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Privilege Escalation</span></span><span class="sub-chip access">Access</span></button>
+        <div class="sub-body" id="f4-4" aria-hidden="true" inert><div class="sub-body-inner"><p>Gaining a higher level of control than the initial foothold provided.</p><ul><li><strong>Exploitation for Privilege Escalation</strong> — using a software flaw to gain elevated rights</li><li><strong>Hooking</strong> — intercepting and altering how a legitimate process behaves to gain its level of access</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-5"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Evasion</span></span><span class="sub-chip access">Access</span></button>
+        <div class="sub-body" id="f4-5" aria-hidden="true" inert><div class="sub-body-inner"><p>Avoiding detection while doing all of the above.</p><ul><li><strong>Change Operating Mode</strong> — flipping a controller into program/maintenance mode to make changes without triggering run-time alarms</li><li><strong>Indicator Removal on Host</strong> and <strong>Masquerading</strong> — hiding evidence and disguising activity as legitimate</li><li><strong>Spoof Reporting Message</strong> — feeding operators falsified "everything is normal" readings</li></ul></div></div>
+      </div>
+
+      <h4 class="sub-head">Phase 2 — Situational Awareness &amp; Movement</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-6"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Discovery</span></span><span class="sub-chip aware">Awareness</span></button>
+        <div class="sub-body" id="f4-6" aria-hidden="true" inert><div class="sub-body-inner"><p>Mapping the environment before acting further.</p><ul><li><strong>Network Connection Enumeration</strong> and <strong>Remote System Discovery</strong> — finding other reachable devices</li><li><strong>Network Sniffing</strong> and <strong>Wireless Sniffing</strong> — passively capturing traffic to learn protocols and addressing in use</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-7"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Lateral Movement</span></span><span class="sub-chip aware">Awareness</span></button>
+        <div class="sub-body" id="f4-7" aria-hidden="true" inert><div class="sub-body-inner"><p>Moving from the initial foothold toward systems that actually control the process.</p><ul><li><strong>Default Credentials</strong> — vendor-set passwords that were never changed</li><li><strong>Exploitation of Remote Services</strong> and <strong>Remote Services</strong> — riding legitimate access paths deeper into the network</li><li><strong>Valid Accounts</strong> — reusing credentials harvested earlier</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-8"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Collection</span></span><span class="sub-chip aware">Awareness</span></button>
+        <div class="sub-body" id="f4-8" aria-hidden="true" inert><div class="sub-body-inner"><p>Gathering the process information needed to act on the target effectively.</p><ul><li><strong>Point &amp; Tag Identification</strong> — learning which tag or point in the control logic corresponds to which physical device</li><li><strong>Monitor Process State</strong> and <strong>Detect Operating Mode</strong> — watching how the process actually behaves before touching it</li><li><strong>Screen Capture</strong> and <strong>I/O Image</strong> — capturing HMI displays or the controller's current input/output state</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-9"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Command and Control</span></span><span class="sub-chip aware">Awareness</span></button>
+        <div class="sub-body" id="f4-9" aria-hidden="true" inert><div class="sub-body-inner"><p>Maintaining a remote channel to direct the intrusion.</p><ul><li><strong>Commonly Used Port</strong> and <strong>Standard Application Layer Protocol</strong> — blending C2 traffic in with normal-looking network activity</li><li><strong>Connection Proxy</strong> — routing commands through an intermediate hop to obscure the true source</li></ul></div></div>
+      </div>
+
+      <h4 class="sub-head">Phase 3 — Physical Impact</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-10"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Inhibit Response Function</span></span><span class="sub-chip impactphase">Impact</span></button>
+        <div class="sub-body" id="f4-10" aria-hidden="true" inert><div class="sub-body-inner"><p>Blocking the operator or the safety system from responding while the real attack happens.</p><ul><li><strong>Alarm Suppression</strong> and <strong>Modify Alarm Settings</strong> — silencing the warnings that would trigger a response</li><li><strong>Block Command Message</strong> / <strong>Block Reporting Message</strong> — preventing control commands or status reports from arriving</li><li><strong>Denial of Service</strong> and <strong>Device Restart/Shutdown</strong> — disabling protection relays or field devices outright</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-11"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Impair Process Control</span></span><span class="sub-chip impactphase">Impact</span></button>
+        <div class="sub-body" id="f4-11" aria-hidden="true" inert><div class="sub-body-inner"><p>Directly manipulating the process itself.</p><ul><li><strong>Modify Parameter</strong> — changing a setpoint, threshold, or control variable</li><li><strong>Unauthorized Command Message</strong> — sending a command the legitimate operator never issued</li><li><strong>Brute Force I/O</strong> and <strong>Spoof Reporting Message</strong> — forcing outputs directly or masking the resulting readings</li></ul></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f4-12"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Impact</span></span><span class="sub-chip impactphase">Impact</span></button>
+        <div class="sub-body" id="f4-12" aria-hidden="true" inert><div class="sub-body-inner"><p>The consequence the entire chain was built toward.</p><ul><li><strong>Loss of Control</strong> / <strong>Loss of View</strong> / <strong>Denial of View</strong> — the operator can no longer act on, or even see, the true process state</li><li><strong>Manipulation of Control</strong> / <strong>Manipulation of View</strong> — the operator acts on falsified information</li><li><strong>Loss of Safety</strong> — a safety system is disabled or defeated (the technique TRITON/TRISIS essentially defines — see Section 05)</li><li><strong>Damage to Property</strong> and <strong>Loss of Productivity and Revenue</strong> — the physical and financial consequences</li></ul></div></div>
+      </div>
+    </section>
+
+    <!-- 05 CASE STUDIES -->
+    <section class="numsec" id="sec-05">
+      <div class="numsec-head"><span class="numsec-num">05</span><h3>Case Studies — Groups &amp; Software</h3></div>
+      <p>ATT&amp;CK for ICS names the threat "Groups" and "Software" behind documented campaigns and links each to the tactics/techniques they used. These five are the incidents most commonly taught and referenced across the field — every one is analyzed here strictly as a case study, consistent with this course's defensive-scope safeguard.</p>
+
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f5-1"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Stuxnet (2010)</span></span><span class="sub-chip">Impair Process Control · Impact</span></button>
+        <div class="sub-body" id="f5-1" aria-hidden="true" inert><div class="sub-body-inner">
+          <div class="case-meta"><span>Target: Iranian uranium enrichment centrifuges</span><span>Predates ATT&amp;CK Group naming</span></div>
+          <p>Malware spread via removable media and network shares, then specifically reprogrammed Siemens S7-300 PLC logic controlling centrifuge speeds — while feeding falsified "normal" readings back to operators. It is the canonical teaching example of <strong>Project File Infection</strong>, <strong>Modify Program</strong>, <strong>Spoof Reporting Message</strong>, and ultimately <strong>Impair Process Control</strong> leading to physical <strong>Damage to Property</strong>.</p>
+        </div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f5-2"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">BlackEnergy2 / Sandworm Team (2015)</span></span><span class="sub-chip">Inhibit Response Function</span></button>
+        <div class="sub-body" id="f5-2" aria-hidden="true" inert><div class="sub-body-inner">
+          <div class="case-meta"><span>Target: three Ukrainian regional power distributors</span><span>~230,000 customers affected</span></div>
+          <p>Spearphishing gave IT access; the adversary then rode existing remote-access paths into the OT network and used the SCADA HMI to open breakers directly, cutting power. A KillDisk wiper and a firmware attack on serial-to-Ethernet converters slowed the utilities' ability to restore service — a direct demonstration of <strong>Inhibit Response Function</strong> layered on top of <strong>Impair Process Control</strong>.</p>
+        </div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f5-3"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Industroyer / CRASHOVERRIDE (2016)</span></span><span class="sub-chip">Command and Control</span></button>
+        <div class="sub-body" id="f5-3" aria-hidden="true" inert><div class="sub-body-inner">
+          <div class="case-meta"><span>Target: a Kyiv transmission substation</span><span>Attributed to Sandworm / ELECTRUM</span></div>
+          <p>The first malware built with modular payloads that speak substation automation protocols (IEC 101, IEC 104, IEC 61850, OPC) directly — letting it open breakers programmatically rather than through a hijacked HMI. It also included a denial-of-service module targeting a known flaw in Siemens SIPROTEC protection relays. A strong example of <strong>Standard Application Layer Protocol</strong> C2 combined with protocol-native <strong>Unauthorized Command Message</strong> techniques.</p>
+        </div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f5-4"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">TRITON / TRISIS (2017)</span></span><span class="sub-chip">Loss of Safety</span></button>
+        <div class="sub-body" id="f5-4" aria-hidden="true" inert><div class="sub-body-inner">
+          <div class="case-meta"><span>Target: a Saudi petrochemical plant</span><span>Attributed to TEMP.Veles / XENOTIME</span></div>
+          <p>The adversary reached the engineering workstation for a Schneider Electric Triconex Safety Instrumented System (SIS) and reprogrammed its logic — the first publicly documented malware built to specifically target a safety system rather than just the process it protects. A bug in the malware likely caused some controllers to fail safely, which is probably what prevented a larger physical incident. This is the case study that most concretely defines <strong>Loss of Safety</strong> as a technique.</p>
+        </div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="f5-5"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">INCONTROLLER / PIPEDREAM (2022)</span></span><span class="sub-chip">Discovery · Multiple</span></button>
+        <div class="sub-body" id="f5-5" aria-hidden="true" inert><div class="sub-body-inner">
+          <div class="case-meta"><span>Attributed to CHERNOVITE</span><span>Discovered before deployment</span></div>
+          <p>A modular ICS attack toolkit found and analyzed before it was used against a live target — built to scan for and manipulate specific PLCs and industrial software from multiple vendors (including Schneider Electric and Omron) across several protocols. It's the broadest, most automated ICS attack tool publicly documented to date, and a good teaching example of how attack tooling is trending toward reusable, protocol-aware modules rather than one-off custom malware like Stuxnet.</p>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- 06 RELATED RESOURCES -->
+    <section class="numsec" id="sec-06">
+      <div class="numsec-head"><span class="numsec-num">06</span><h3>Related Resources</h3></div>
+      <p>ATT&amp;CK for ICS is one piece of a small ecosystem of MITRE knowledge bases and tools that are usually referenced alongside it.</p>
+      <div class="table-scroll">
+        <table class="cmp-table">
+          <thead><tr><th>Resource</th><th>Focus</th><th>How It Complements ATT&amp;CK for ICS</th></tr></thead>
+          <tbody>
+            <tr><td class="attr">Enterprise ATT&amp;CK</td><td>IT-side adversary tactics/techniques</td><td>Models the initial compromise before an intrusion ever reaches the OT network — analysts chain Enterprise → ICS across one incident</td></tr>
+            <tr><td class="attr">ATT&amp;CK Navigator</td><td>Visualization tool</td><td>Overlays detection coverage, or a specific incident's techniques, onto the matrix as a heat map</td></tr>
+            <tr><td class="attr">MITRE D3FEND</td><td>Defensive technique knowledge base</td><td>Maps countermeasures to ATT&amp;CK techniques — the "what do I do about this" companion to ATT&amp;CK's "what did they do"</td></tr>
+            <tr><td class="attr">MITRE Engage</td><td>Adversary engagement &amp; deception</td><td>Frames deception and denial operations against the same technique vocabulary</td></tr>
+            <tr><td class="attr">CISA ICS Advisories</td><td>Vulnerability &amp; incident advisories</td><td>Primary source material that feeds new ATT&amp;CK for ICS groups, software, and techniques over time</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 07 DEFENSIVE APPLICATIONS -->
+    <section class="numsec" id="sec-07">
+      <div class="numsec-head"><span class="numsec-num">07</span><h3>Defensive Applications</h3></div>
+      <p>There is nothing to audit or certify against here — the value of ATT&amp;CK for ICS is entirely in how defenders use it as a shared reference lens.</p>
+      <div class="concept-grid">
+        <div class="concept-item"><h4>Threat Intelligence Structuring</h4><p>Gives incident reports and vendor advisories a shared vocabulary, so "what happened" in one report means the same thing in the next.</p></div>
+        <div class="concept-item"><h4>Detection Engineering &amp; Coverage Mapping</h4><p>Mapping existing SOC/SIEM alert rules to specific techniques reveals exactly which tactics have zero detection coverage.</p></div>
+        <div class="concept-item"><h4>Red/Blue/Purple Team Exercises</h4><p>Scopes adversary emulation and tabletop exercises around documented technique sets — without requiring anyone to write or run exploit code.</p></div>
+        <div class="concept-item"><h4>Gap Analysis &amp; Leadership Reporting</h4><p>Translates "which techniques could hurt us, and are we covered" into a business-risk conversation leadership can act on.</p></div>
+      </div>
+      <div class="teaching-note">
+        <h4>📖 Teaching Note</h4>
+        <p><strong>Anchor lesson:</strong> Lesson 6 (Threat Landscape) and Lesson 7 (Vulnerabilities &amp; Countermeasures). Have students map a Lesson 7 countermeasure to each tactic in Section 04 that it would have interrupted, using one of the Section 05 case studies as the scenario.</p>
+        <span class="safety-flag">⚠ Case study analysis and detection mapping only — no attack tooling or live targeting</span>
+      </div>
+    </section>
+
+    <!-- 08 CLASSROOM USES -->
+    <section class="numsec" id="sec-08">
+      <div class="numsec-head"><span class="numsec-num">08</span><h3>Classroom Uses</h3></div>
+      <div class="exercise-grid">
+        <div class="exercise-card"><h5>Incident Mapping Exercise</h5><p>Pick one case study from Section 05 and map its known stages onto the 12 tactics in Section 04, phase by phase.</p></div>
+        <div class="exercise-card"><h5>Detection Gap Analysis</h5><p>Give students a fictional list of eight SOC alert rules. They map each to a technique, then identify which of the 12 tactics have zero coverage.</p></div>
+        <div class="exercise-card"><h5>Purple Team Tabletop</h5><p>Instructor narrates a documented technique sequence from Section 05 as "red." Students playing "blue" decide what alert or control would have caught each step — narration only, no tooling executed.</p></div>
+        <div class="exercise-card"><h5>Cross-Framework Reporting Bridge</h5><p>Take the same mapped incident to the NERC CIP-008 page: at which technique does it become a "Reportable Cyber Security Incident," and what would the Attachment 1 notification say?</p></div>
+      </div>
+      <span class="safety-flag" style="margin-top:14px; display:inline-flex;">⚠ Case study analysis only — no attack tooling, exploit code, or live targeting</span>
+    </section>
+
+    <!-- 09 SOURCES -->
+    <section class="numsec" id="sec-09">
+      <div class="numsec-head"><span class="numsec-num">09</span><h3>Sources &amp; Further Reading</h3></div>
+      <ul class="reading-list">
+        <li><a href="https://attack.mitre.org/matrices/ics/" target="_blank" rel="noopener">MITRE ATT&amp;CK for ICS Matrix<span>The full, current matrix of tactics and techniques with linked incident references</span></a></li>
+        <li><a href="https://attack.mitre.org/tactics/ics/" target="_blank" rel="noopener">ATT&amp;CK for ICS Tactics<span>Detailed descriptions of each of the twelve ICS tactics</span></a></li>
+        <li><a href="https://mitre-attack.github.io/attack-navigator/" target="_blank" rel="noopener">ATT&amp;CK Navigator<span>The visualization tool for building coverage heat maps against the matrix</span></a></li>
+        <li><a href="https://www.cisa.gov/topics/industrial-control-systems" target="_blank" rel="noopener">CISA Industrial Control Systems<span>Advisories and case-study source material referenced throughout the ATT&amp;CK for ICS knowledge base</span></a></li>
+      </ul>
+      <p class="disclaimer">This page is a teaching summary of a publicly maintained knowledge base, not a reproduction of MITRE's technique text or an exhaustive listing. MITRE periodically adds, retires, and renumbers techniques — verify current tactic and technique details against the live matrix before presenting exact counts or IDs to students, per this course's own Safeguards policy on faculty review of generated content.</p>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
+  Educational use only. Framework analysis is defensive and standards-based in scope.
+</footer>
+<script>
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+    try { localStorage.setItem('otfac-theme', theme); } catch (e) {}
+  }
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('otfac-theme'); } catch (e) {}
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  // Mobile TOC drawer
+  var tocBtn = document.getElementById('tocToggleBtn');
+  var toc = document.getElementById('tocSidebar');
+  var overlay = document.getElementById('tocOverlay');
+  function closeToc() {
+    toc.classList.remove('open');
+    overlay.classList.remove('open');
+    tocBtn.setAttribute('aria-expanded', 'false');
+  }
+  tocBtn.addEventListener('click', function () {
+    var isOpen = toc.classList.contains('open');
+    if (isOpen) { closeToc(); } else {
+      toc.classList.add('open');
+      overlay.classList.add('open');
+      tocBtn.setAttribute('aria-expanded', 'true');
+    }
+  });
+  overlay.addEventListener('click', closeToc);
+  toc.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeToc); });
+
+  // Subsection accordions (event delegation)
+  function setSub(btn, expand) {
+    var card = btn.closest('.sub-card');
+    var body = card.querySelector('.sub-body');
+    var caret = btn.querySelector('.sub-caret');
+    btn.setAttribute('aria-expanded', String(expand));
+    body.setAttribute('aria-hidden', String(!expand));
+    if (expand) {
+      body.classList.add('open');
+      body.removeAttribute('inert');
+      if (caret) caret.textContent = '▾';
+    } else {
+      body.classList.remove('open');
+      body.setAttribute('inert', '');
+      if (caret) caret.textContent = '▸';
+    }
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.sub-toggle');
+    if (!btn) return;
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    setSub(btn, !expanded);
+  });
+  document.getElementById('expandAllBtn').addEventListener('click', function () {
+    document.querySelectorAll('.sub-toggle').forEach(function (btn) { setSub(btn, true); });
+  });
+  document.getElementById('collapseAllBtn').addEventListener('click', function () {
+    document.querySelectorAll('.sub-toggle').forEach(function (btn) { setSub(btn, false); });
+  });
+</script>
+</body>
+</html>
