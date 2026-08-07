@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6: The OT Threat Landscape | Teaching Operational Technologies</title>
+<meta name="description" content="Day 3, Lesson 6 of the Teaching Operational Technologies faculty development workshop: threat actors and their motivations, ransomware crossing from the business network into production, insider and contractor risk, and supply chain compromise — taught through documented incidents read as case studies.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 9px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header { background: var(--header-bg); color: var(--header-text); padding: 28px 24px 22px; }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 14px; max-width: 44rem; }
+  .safety-flag {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+    color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px;
+  }
+  .safety-flag.lesson-top { font-size: 0.8rem; padding: 7px 14px; margin: 0 0 18px; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav { position: sticky; top: 0; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); overflow-x: auto; white-space: nowrap; }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a { display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin: 0 0 12px; }
+
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer; }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  /* ---------- Main content sections ---------- */
+  .part-banner { background: var(--header-bg); color: var(--header-text); padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; margin: 40px 0 18px; }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box { background: var(--accent-light); border-left: 4px solid var(--accent); border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0; }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0; }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .case-study { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0; box-shadow: var(--shadow); }
+  [data-theme="dark"] .case-study { border-left-color: var(--accent); }
+  .case-study-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .case-study-label { color: var(--accent); }
+  .case-study p:last-child { margin-bottom: 0; }
+  .case-study-meta { font-size: 0.76rem; color: var(--text-muted); margin: 6px 0 10px; font-style: italic; }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  /* comparison table */
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.86rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  /* diagram wrap */
+  .diagram-wrap { overflow-x: auto; margin: 18px 0; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .diagram-caption { font-size: 0.82rem; color: var(--text-muted); margin: 10px 0 0; text-align: center; }
+
+  /* threat actor grid (concept-map style) */
+  .protocol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 6px 0 4px; }
+  .protocol-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 0.83rem; }
+  .protocol-card h4 { margin: 0 0 4px; font-size: 0.95rem; color: var(--accent2); display: flex; align-items: center; gap: 6px; }
+  [data-theme="dark"] .protocol-card h4 { color: var(--accent); }
+  .protocol-card .domain-tag { display: inline-block; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px; }
+  .protocol-card p { margin: 0; color: var(--text-muted); }
+
+  /* threat/countermeasure flip cards */
+  .tc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 14px 0 4px; }
+  .tc-item { background: transparent; border: none; padding: 0; perspective: 1200px; height: 190px; }
+  .tc-item .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1); transform-style: preserve-3d; }
+  .tc-item.is-flipped .flip-card-inner { transform: rotateY(180deg); }
+  .tc-face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; background: var(--surface2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; cursor: pointer; text-align: left; font-family: inherit; color: var(--text); }
+  .tc-face:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .tc-front { justify-content: space-between; }
+  .tc-back { transform: rotateY(180deg); overflow-y: auto; }
+  .tc-back::after { content: '↺ Tap to flip back'; align-self: flex-start; font-size: 0.66rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-top: auto; padding-top: 8px; }
+  .tc-tag { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent2); margin-bottom: 6px; display: block; }
+  [data-theme="dark"] .tc-tag { color: var(--accent); }
+  .tc-item h4 { font-size: 0.9rem; margin: 0 0 4px; }
+  .tc-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; line-height: 1.45; }
+  .tc-hint { font-size: 0.66rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 8px; align-self: flex-start; }
+
+  /* activity block */
+  .activity-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin: 18px 0; }
+  .activity-head { background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px; }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .mapping-table-wrap { overflow-x: auto; }
+  table.mapping-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  table.mapping-table th, table.mapping-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.mapping-table thead th { background: var(--surface2); font-weight: 700; }
+  table.mapping-table select { width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.86rem; }
+  .map-row.correct td:first-child { border-left: 4px solid var(--ok); }
+  .map-row.incorrect td:first-child { border-left: 4px solid var(--bad); }
+  .mapping-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .mapping-result { font-size: 0.85rem; font-weight: 700; }
+
+  .btn { background: var(--accent); color: var(--on-accent); border: none; cursor: pointer; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit; }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* attack path simulator */
+  .sim-zone-wrap { overflow-x: auto; }
+  .zone-rect { transition: stroke 0.3s, stroke-width 0.3s; }
+  .zone-rect.active { stroke: var(--accent); stroke-width: 4; }
+  .zone-label.active-label { fill: var(--accent2); font-weight: 800; }
+  [data-theme="dark"] .zone-label.active-label { fill: var(--accent); }
+  .plant-status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+  .status-tile { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--surface2); }
+  .status-tile .status-label { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .status-tile .status-value { font-size: 0.92rem; font-weight: 700; }
+  .status-tile.ok .status-value { color: var(--ok); }
+  .status-tile.warn .status-value { color: var(--tag-safety); }
+  .status-tile.bad .status-value { color: var(--bad); }
+  .sim-stage-label { font-size: 0.78rem; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  [data-theme="dark"] .sim-stage-label { color: var(--accent); }
+  .sim-narrative { font-size: 0.9rem; margin: 10px 0 16px; }
+  .sim-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .sim-progress-dots { display: flex; gap: 6px; margin: 0 6px; align-items: center; }
+  .sim-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); display: inline-block; }
+  .sim-dot.done { background: var(--accent); }
+  .sim-stage-count { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+
+  /* quiz */
+  .quiz-block { display: flex; flex-direction: column; gap: 20px; }
+  .q-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .q-stem { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
+  .q-num { color: var(--accent); margin-right: 6px; }
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .q-feedback { margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; display: none; }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.incorrect { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback.unanswered { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .quiz-score { margin-top: 6px; background: var(--header-bg); color: var(--header-text); border-radius: var(--radius-sm); padding: 16px 20px; font-weight: 700; display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .quiz-score.show { display: flex; }
+  .quiz-score-big { font-size: 1.4rem; }
+
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.88rem; }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note { border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin: 16px 0; font-size: 0.85rem; color: var(--text-muted); }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .icon-row { display: flex; gap: 18px; margin: 14px 0; flex-wrap: wrap; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); width: 88px; text-align: center; }
+
+  .lesson-nav-bottom { display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap; }
+  .nav-btn { text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text); box-shadow: var(--shadow); font-size: 0.88rem; }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer { background: var(--header-bg); color: var(--header-text); opacity: 0.85; text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6; }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* PRINT */
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .case-study, .q-card, .diagram-wrap, .protocol-card, .tc-face { box-shadow: none; border: 1px solid #999; }
+    .tc-item { height: auto; }
+    .tc-item .flip-card-inner { transform: none !important; }
+    .tc-back { position: static; transform: none; margin-top: 8px; }
+    .tc-back::after { content: ''; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · Dept. of Engineering &amp; Technology · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Day 3 · Lesson 6 · 4 Contact Hours</span>
+    <h1>The OT Threat Landscape</h1>
+    <p class="tagline">Who attacks industrial systems and why, how ransomware crosses from the business network into production, and what documented insider, contractor, and supply-chain incidents teach us about where trust gets misplaced.</p>
+    <span class="safety-flag lesson-top">⚠ Case study analysis only</span>
+    <div class="meta-row">
+      <span class="meta-item">📊 Intermediate</span>
+      <span class="meta-item">⏱ 4 hours</span>
+      <span class="meta-item">🎯 6 objectives</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#s1" data-section="s1">Threat Actors</a>
+    <a href="#s2" data-section="s2">Ransomware &amp; OT</a>
+    <a href="#s3" data-section="s3">Insider &amp; Contractor Risk</a>
+    <a href="#s4" data-section="s4">Supply Chain</a>
+    <a href="#compare" data-section="compare">Comparison</a>
+    <a href="#countermeasures" data-section="countermeasures">Countermeasures</a>
+    <a href="#activity" data-section="activity">Activity</a>
+    <a href="#simulation" data-section="simulation">Simulation</a>
+    <a href="#review" data-section="review">Review</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <h2>Lesson Overview</h2>
+      <p>For decades, the people who ran industrial plants and the people who ran cybersecurity programs worked in different worlds. Plant engineers worried about corrosion, vibration, and pressure limits. Security teams worried about stolen credit card numbers and leaked emails. That changed in 2010, when researchers discovered a piece of malware, later named Stuxnet, that had been quietly spinning uranium enrichment centrifuges at Iran's Natanz facility past their designed limits — using entirely legitimate industrial control commands — until the equipment tore itself apart. Stuxnet did not steal data. It did not encrypt files for ransom. It reached across the air gap that everyone assumed protected the plant, through an infected USB drive and manipulated engineering project files, and it caused physical, mechanical damage to spinning machinery by lying to the operators watching the control room screens. Security leaders who had spent their careers thinking about confidentiality and data loss suddenly had to reckon with a new category of consequence: malware that breaks things, hurts people, and stops production — not as a side effect, but as the entire point. Every case study in this lesson descends from that same realization.</p>
+      <div class="analogy-box">
+        <span class="analogy-label">Anchoring analogy</span>
+        <p>Think of a manufacturing plant's defenses like a hospital. The front lobby (the business network) has a receptionist, a badge reader, and cameras — reasonable but not extreme security, because the lobby itself isn't where the danger is. The operating rooms (the control systems that actually run pumps, valves, and centrifuges) are supposed to be a different world entirely, with restricted access and constant monitoring, because a mistake there can hurt a patient, not just embarrass the front office. Before Stuxnet, most industrial security thinking assumed a locked door between the lobby and the operating room was permanent and sufficient. This lesson is about the incidents that proved intruders can walk through that door — sometimes by breaking it down, sometimes because an employee, contractor, or trusted vendor leaves it propped open — and about what shows up on the operating table when they do.</p>
+      </div>
+      <h3 style="margin-top:22px;font-size:1.05rem;">Learning objectives</h3>
+      <p style="margin-bottom:6px;color:var(--text-muted);font-size:0.85rem;">By the end of this lesson, you will be able to:</p>
+      <ul class="lo-display">
+        <li>Explain how the discovery of Stuxnet changed how security leaders assess risk to physical, safety-critical systems.</li>
+        <li>Identify the primary categories of OT threat actors and the motivations that distinguish them.</li>
+        <li>Describe the typical path ransomware takes from a business-network infection to an operational shutdown.</li>
+        <li>Compare insider risk and third-party/contractor risk as distinct categories of OT threat.</li>
+        <li>Evaluate a supply-chain compromise case study to identify where trust was misplaced and what controls could have limited its impact.</li>
+        <li>Analyze a simulated attack-path scenario to explain how each stage of intrusion increases operational risk.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="part-banner">Part A · Threat Landscape Lecture</div>
+
+  <!-- ================= MODULE 1: THREAT ACTORS ================= -->
+  <section id="s1" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🎭</span>
+      <h2>Threat Actors and Their Motivations</h2>
+      <span class="module-time">≈ 50 min</span>
+    </div>
+    <p>A <dfn id="def-threat-actor">threat actor</dfn> is any individual or group whose actions, intentional or not, could cause harm to an information or control system. In OT security, it is worth resisting the instinct to picture a single archetype — a hooded figure at a keyboard — because the actors who actually show up in ICS incident reports have sharply different resources, patience, and goals, and those differences change what a defender should watch for. Nation-states bring years of patience and custom-built tools aimed at strategic disruption or espionage. Cybercriminal ransomware groups want a fast payout and usually don't care whether their victim happens to run a chemical plant or a law firm. Hacktivists want an audience and a headline. Insiders and contractors don't need to break in at all — they already have a badge, a password, or a maintenance contract. Understanding which category you're facing changes everything about how you defend against it.</p>
+    <div class="diagram-wrap">
+      <div class="protocol-grid">
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">🏛️</span> Nation-State</h4>
+          <span class="domain-tag">Motivation: strategic advantage</span>
+          <p>Well-funded, patient, and willing to spend years inside a network before acting. Often after espionage or the ability to disrupt an adversary's infrastructure during a future crisis.</p>
+        </div>
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">💰</span> Cybercriminal / Ransomware Group</h4>
+          <span class="domain-tag">Motivation: financial extortion</span>
+          <p>Runs ransomware as a business. Usually targets the business network first; an OT shutdown is often collateral damage rather than the direct goal.</p>
+        </div>
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">📢</span> Hacktivist</h4>
+          <span class="domain-tag">Motivation: ideology / attention</span>
+          <p>Wants a visible statement, not stealth. Frequently targets internet-exposed HMIs found through public search tools rather than sophisticated intrusion.</p>
+        </div>
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">🕵️</span> Malicious Insider</h4>
+          <span class="domain-tag">Motivation: revenge / financial gain</span>
+          <p>Already holds legitimate credentials and process knowledge. Does not need to breach a perimeter that a badge already opens.</p>
+        </div>
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">🧑‍💻</span> Negligent Insider</h4>
+          <span class="domain-tag">Motivation: none — unintentional</span>
+          <p>Clicks the phishing link, reuses a password, or plugs in an unverified USB drive. The most common opening move in documented ransomware cases.</p>
+        </div>
+        <div class="protocol-card">
+          <h4><span aria-hidden="true">🔧</span> Third-Party / Contractor</h4>
+          <span class="domain-tag">Motivation: varies — often unwitting</span>
+          <p>Holds trusted remote-access credentials to do legitimate maintenance work. An attacker who compromises the contractor inherits that trust.</p>
+        </div>
+      </div>
+      <p class="diagram-caption">Concept map: six categories of OT threat actor, grouped by motivation. The dividing line that matters most for defense is not "outsider versus insider" but "does this actor need to defeat the perimeter, or does the perimeter already trust them?"</p>
+    </div>
+    <div class="case-study">
+      <span class="case-study-label">Case study — Ukraine power grid, 2015 and 2016</span>
+      <p class="case-study-meta">Nation-state · attributed to the group known as Sandworm</p>
+      <p>In December 2015, attackers used spear-phishing to gain a foothold on the corporate network of several Ukrainian regional power distribution companies, then used stolen VPN credentials to reach the SCADA network and remotely open breakers at dozens of substations — cutting power to roughly 230,000 customers. Operators had to travel to substations and close breakers manually to restore service. A year later, a follow-up incident used purpose-built malware known publicly as Industroyer/CrashOverride, which understood the specific industrial protocols the Ukrainian grid used well enough to issue commands directly to substation equipment. Both incidents are widely read as demonstrations of patient, well-resourced, nation-state capability aimed squarely at causing physical disruption to critical infrastructure — not at stealing data.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>A useful in-class prompt: ask faculty which threat-actor category their own institution's building-automation or lab equipment is most exposed to. Most community colleges are unlikely nation-state targets, but hacktivists scanning for exposed HMIs, and contractors with standing remote-access credentials, are realistic concerns for almost any campus.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2: RANSOMWARE CROSSING IT/OT ================= -->
+  <section id="s2" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔒</span>
+      <h2><dfn id="def-ransomware">Ransomware</dfn> Crossing from the Business Network into Production</h2>
+      <span class="module-time">≈ 55 min</span>
+    </div>
+    <p>Ransomware is malware that encrypts an organization's files and demands payment for the decryption key, and it is today the single most common way an OT environment ends up affected by a cyber incident. The important pattern to teach — because it surprises IT-background students — is that ransomware usually does not need to touch a single PLC to shut down production. In the majority of documented cases, ransomware infects business-network systems: email servers, file shares, engineering workstations, the historian database that stores years of process data. The plant then shuts down not because the controllers were attacked, but because operators can no longer safely bill customers, track inventory, dispatch, or trust the systems that support safe operation — so it shuts down as a precaution. This is exactly what happened to Colonial Pipeline.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 700 280" role="img" aria-labelledby="attackPathTitle attackPathDesc" style="width:100%;max-width:700px;display:block;margin:0 auto;">
+        <title id="attackPathTitle">Typical ransomware attack path from the business network into production, mapped to Purdue model levels</title>
+        <desc id="attackPathDesc">A ransomware attack path usually begins with a phishing email reaching a laptop in the Enterprise IT zone at Purdue levels four and five. From there the attacker moves laterally within IT, then reaches a poorly segmented system in the demilitarized zone that bridges IT and OT, such as a historian mirror. From the DMZ the impact spreads into the Supervisory and Control zone at levels two and three, affecting engineering workstations and HMI servers. The Field and Process zone at levels zero and one, containing PLCs and physical equipment, is often never directly touched — but production stops anyway because operators can no longer safely see or manage the process.</desc>
+        <rect x="20" y="20" width="660" height="50" rx="8" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="350" y="41" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Enterprise IT — Levels 4–5</text>
+        <text x="350" y="58" text-anchor="middle" font-size="10" fill="var(--text-muted)">Phishing email lands on a business-network laptop; attacker moves laterally</text>
+        <rect x="20" y="90" width="660" height="50" rx="8" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="5 3"></rect>
+        <text x="350" y="111" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent2)">DMZ — Level 3.5</text>
+        <text x="350" y="128" text-anchor="middle" font-size="10" fill="var(--text-muted)">A poorly segmented bridge system (e.g. a historian mirror) crosses from IT into OT</text>
+        <rect x="20" y="160" width="660" height="50" rx="8" fill="var(--surface2)" stroke="var(--text-muted)"></rect>
+        <text x="350" y="181" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Supervisory &amp; Control — Levels 2–3</text>
+        <text x="350" y="198" text-anchor="middle" font-size="10" fill="var(--text-muted)">Engineering workstations and HMI servers are impacted; operators lose visibility</text>
+        <rect x="20" y="230" width="660" height="42" rx="8" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="350" y="251" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ok)">Field &amp; Process — Levels 0–1</text>
+        <text x="350" y="266" text-anchor="middle" font-size="10" fill="var(--text-muted)">PLCs and physical equipment are frequently never directly touched — but production stops anyway</text>
+        <line x1="350" y1="70" x2="350" y2="90" stroke="var(--accent2)" stroke-width="2" marker-end="url(#arrowOT6)"></line>
+        <line x1="350" y1="140" x2="350" y2="160" stroke="var(--accent2)" stroke-width="2" marker-end="url(#arrowOT6)"></line>
+        <line x1="350" y1="210" x2="350" y2="230" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrowOT6b)"></line>
+        <defs>
+          <marker id="arrowOT6" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent2)"></path></marker>
+          <marker id="arrowOT6b" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--text-muted)"></path></marker>
+        </defs>
+      </svg>
+      <p class="diagram-caption">Diagram: the typical ransomware attack path runs top to bottom through Purdue model zones. The dashed arrow into the Field &amp; Process zone is intentionally different — that boundary is often never crossed at all, yet the plant still stops.</p>
+    </div>
+    <div class="case-study">
+      <span class="case-study-label">Case study — Colonial Pipeline, May 2021</span>
+      <p class="case-study-meta">Cybercriminal ransomware group (DarkSide)</p>
+      <p>Attackers gained access to Colonial Pipeline's IT network using a compromised VPN password for an account that was no longer supposed to be active, and deployed ransomware against business systems, including the billing and accounting infrastructure the company used to measure and invoice fuel deliveries. The pipeline's operational technology — the pumps and valves that actually move fuel — was not reported as directly compromised. Colonial nonetheless proactively shut down the entire pipeline for several days, because it could not confidently bill customers for product it could not verify was reaching them, and because the company could not be certain the ransomware had not spread further. The shutdown, not the malware itself, caused regional fuel shortages and price spikes. This is the pattern worth emphasizing: the operational impact came from a business decision made in response to uncertainty, not from a direct attack on control equipment.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>Compare that to Norsk Hydro, a Norwegian aluminum producer hit by LockerGoga ransomware in March 2019. There, the ransomware spread further into plant-adjacent systems, forcing several smelting facilities to switch from automated to manual operation — workers manually adjusting settings that computers normally controlled — while IT teams rebuilt systems from backups. Production continued at reduced capacity rather than stopping entirely, illustrating that the same threat category, ransomware, can produce a spectrum of outcomes from full shutdown to degraded manual operation, depending on how thoroughly OT-adjacent systems were segmented from the business network before the incident.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3: INSIDER & CONTRACTOR RISK ================= -->
+  <section id="s3" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🪪</span>
+      <h2><dfn id="def-insider-risk">Insider Risk</dfn> and Contractor Access</h2>
+      <span class="module-time">≈ 50 min</span>
+    </div>
+    <p>Insider risk is the possibility that someone who already holds legitimate access — an employee, a former employee whose access was never revoked, or a contractor — uses that access to cause harm, whether deliberately or by mistake. It deserves its own category separate from the outsider threats above because the defensive playbook is different: firewalls and intrusion detection assume the attacker starts outside the perimeter, but an insider's access is often the perimeter. The closely related category of contractor and third-party risk covers a specific and very common variation: a vendor, integrator, or maintenance provider is given standing remote access to support equipment, and that access — or the contractor's own systems — becomes the path an attacker uses, whether or not the contractor did anything wrong themselves.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>Think of insider and contractor risk as the difference between a burglar picking your front-door lock and a burglar walking in through a door held open by someone who was handed a key years ago and never asked to give it back. The house's defenses — the lock itself — worked exactly as designed in both cases. The failure that let the second burglar in was never rescinding trust that no longer needed to exist.</p>
+    </div>
+    <div class="case-study">
+      <span class="case-study-label">Case study — Maroochy Shire wastewater system, Australia, 2000</span>
+      <p class="case-study-meta">Malicious insider (former contractor)</p>
+      <p>Vitek Boden had worked for the company that installed the SCADA radio-control system for a wastewater network in Queensland, Australia. After a falling-out related to a job application he did not get, he used a laptop and radio transmitter — equipment and knowledge he retained from his prior contractor role — to issue unauthorized commands to the sewage system's pumping stations over a period of weeks, causing an estimated one million liters of raw sewage to spill into local waterways and parks. No network was "hacked" in the sense of exploiting a software vulnerability; Boden used legitimate radio protocol knowledge and equipment access that should have been revoked when his contractor relationship ended. It remains one of the most cited examples of insider risk in ICS security precisely because the technical barrier to the attack was so low — the failure was entirely in access management, not in any missing security patch.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example — contractor access as an attack path</span>
+      <p>Third-party risk does not always require a malicious contractor. In the well-documented 2013 breach of Target Corporation's payment systems, attackers first compromised the network credentials of a small HVAC and refrigeration contractor that had remote access to Target's systems for billing and project-management purposes. That contractor never intended harm — its credentials were simply stolen through a separate phishing incident and then used as a stepping stone into Target's broader network. The lesson for OT programs is the same one Colonial Pipeline and Maroochy Shire teach from different angles: any standing remote-access relationship, once granted, is only as secure as the weakest link in the chain of everyone who holds a credential to use it, and it should be reviewed, time-boxed, and revoked the moment it is no longer needed.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Ask faculty to consider their own campus: does the elevator maintenance company, the HVAC contractor, or the building-automation integrator hold standing remote-access credentials to campus systems? Most people can name at least one such relationship without having to research it, which is itself the point.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4: SUPPLY CHAIN COMPROMISE ================= -->
+  <section id="s4" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📦</span>
+      <h2><dfn id="def-supply-chain">Supply Chain</dfn> Compromise</h2>
+      <span class="module-time">≈ 45 min</span>
+    </div>
+    <p>A supply chain compromise happens when an attacker doesn't attack the final target directly, but instead compromises something the target already trusts and voluntarily installs — a vendor's software update, a hardware component, or an engineering file passed between organizations — and rides that trust straight through defenses that would have stopped a direct attack. This is what made Stuxnet, discussed in the lesson overview, so effective: rather than attacking Natanz's network from the internet, it spread through infected USB drives and Siemens engineering project files that technicians trusted and used routinely, eventually reaching air-gapped systems that had no direct network connection to anything.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 680 220" role="img" aria-labelledby="scTitle scDesc" style="width:100%;max-width:680px;display:block;margin:0 auto;">
+        <title id="scTitle">Supply chain trust chain and where it can be broken</title>
+        <desc id="scDesc">A trusted vendor builds and signs a software update. That update passes through a distribution or update server to the customer's network, where it is installed because the customer trusts the vendor. If an attacker compromises the vendor's build process or update server instead of the customer directly, every customer who installs the update also installs the attacker's code, inheriting the same trust the customer placed in the vendor.</desc>
+        <rect x="20" y="80" width="140" height="60" rx="8" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="90" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text)">Trusted Vendor</text>
+        <text x="90" y="122" text-anchor="middle" font-size="9" fill="var(--text-muted)">Builds &amp; signs update</text>
+        <rect x="270" y="30" width="140" height="60" rx="8" fill="var(--bad-bg)" stroke="var(--bad)" stroke-dasharray="5 3"></rect>
+        <text x="340" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="var(--bad)">Compromise Point</text>
+        <text x="340" y="72" text-anchor="middle" font-size="9" fill="var(--text-muted)">Attacker inserts code here</text>
+        <rect x="270" y="130" width="140" height="60" rx="8" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="340" y="155" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text)">Update/Distribution</text>
+        <text x="340" y="172" text-anchor="middle" font-size="9" fill="var(--text-muted)">Signed package delivered</text>
+        <rect x="520" y="80" width="140" height="60" rx="8" fill="var(--ok-bg)" stroke="var(--ok)"></rect>
+        <text x="590" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ok)">Customer Network</text>
+        <text x="590" y="122" text-anchor="middle" font-size="9" fill="var(--text-muted)">Installs because it trusts the vendor</text>
+        <line x1="160" y1="105" x2="330" y2="130" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrowSC1)"></line>
+        <line x1="410" y1="160" x2="520" y2="115" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrowSC1)"></line>
+        <line x1="340" y1="90" x2="340" y2="130" stroke="var(--bad)" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrowSC2)"></line>
+        <defs>
+          <marker id="arrowSC1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--text-muted)"></path></marker>
+          <marker id="arrowSC2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--bad)"></path></marker>
+        </defs>
+      </svg>
+      <p class="diagram-caption">Diagram: a supply-chain compromise inserts malicious code at the vendor or distribution stage, upstream of the customer. Every customer who installs the trusted update inherits the compromise without ever being directly attacked themselves.</p>
+    </div>
+    <div class="case-study">
+      <span class="case-study-label">Case study — SolarWinds Orion, discovered December 2020</span>
+      <p class="case-study-meta">Nation-state–attributed supply chain compromise</p>
+      <p>Attackers compromised the build environment for SolarWinds' Orion network-management software and inserted malicious code into legitimate, digitally signed software updates. Roughly 18,000 organizations downloaded the compromised update, including U.S. federal agencies and numerous private-sector companies, some with ties to critical infrastructure and industrial operations. Because the update was signed by SolarWinds and delivered through SolarWinds' own official update mechanism, it passed directly through defenses — antivirus, application allowlisting, change-control review — that were designed to catch unauthorized software, precisely because from the customer's point of view, nothing unauthorized had happened. This case is frequently taught alongside Stuxnet's USB-and-engineering-file vector because both demonstrate the same underlying principle: supply chain attacks succeed by exploiting trust relationships that conventional perimeter defenses are not designed to question.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>A good discussion question: if your program's PLC training lab downloads firmware or project files from a manufacturer's website, what verifies that the file actually came from that manufacturer unmodified? Most students have never been asked to verify a checksum or signature on an industrial software download — this is often the first time the idea comes up.</p>
+    </div>
+  </section>
+
+  <!-- ================= COMPARISON TABLE ================= -->
+  <section id="compare" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📋</span>
+      <h2>Threat Actors Side by Side</h2>
+      <span class="module-time">≈ 15 min</span>
+    </div>
+    <p>The table below summarizes the six threat-actor categories covered in this lesson, so you can compare motivation, typical capability, and how each one usually reaches an OT environment in one place.</p>
+    <table class="compare-table">
+      <caption>Comparing OT threat-actor categories by motivation, capability, and typical path to impact</caption>
+      <thead>
+        <tr><th scope="col">Actor type</th><th scope="col">Primary motivation</th><th scope="col">Typical capability &amp; resources</th><th scope="col">How it usually reaches OT</th><th scope="col">Documented example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nation-state</td><td>Strategic/geopolitical advantage, disruption, or espionage</td><td>Well-funded, highly patient, custom tools, deep protocol knowledge</td><td>Long-term espionage; can escalate to direct control-command manipulation</td><td>Ukraine power grid attacks, 2015–2016</td></tr>
+        <tr><td>Cybercriminal / ransomware group</td><td>Financial extortion</td><td>Commodity ransomware, access brokers, moderate technical sophistication, high volume</td><td>Usually starts in IT via phishing or exposed remote access; OT impact is often a precautionary shutdown rather than the direct target</td><td>Colonial Pipeline, 2021</td></tr>
+        <tr><td>Hacktivist</td><td>Ideological or political statement</td><td>Variable skill; often opportunistic, using public search tools to find exposed devices</td><td>Direct manipulation of internet-exposed, poorly secured HMIs</td><td>Exposed water-utility HMI manipulation incidents, 2023–2024</td></tr>
+        <tr><td>Malicious insider</td><td>Revenge, financial gain, grievance</td><td>Legitimate credentials and system/process knowledge; no perimeter to breach</td><td>Direct, authorized-looking access to control systems</td><td>Maroochy Shire wastewater sabotage, 2000</td></tr>
+        <tr><td>Negligent insider</td><td>None — unintentional</td><td>Normal user access, misused by mistake rather than malice</td><td>Opens the door via a phishing click, weak password, or policy shortcut</td><td>The most common initial foothold across documented ransomware cases generally</td></tr>
+        <tr><td>Third-party / contractor</td><td>Varies — the contractor itself may be an unwitting victim</td><td>Legitimate, standing remote-access credentials trusted by the target organization</td><td>Vendor VPN or remote-support access becomes the attacker's entry point</td><td>Target Corporation breach via HVAC vendor credentials, 2013</td></tr>
+      </tbody>
+    </table>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Notice that only two of the six rows describe an actor who set out specifically to damage industrial equipment (nation-state and malicious insider). The other four reached OT as a side effect of a broader compromise — which is exactly why "we're not an interesting target" is not a defensible security posture for any organization running industrial systems.</p>
+    </div>
+  </section>
+
+  <!-- ================= COUNTERMEASURES (flip cards) ================= -->
+  <section id="countermeasures" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🛡️</span>
+      <h2>Threats and Countermeasures at a Glance</h2>
+      <span class="module-time">≈ 20 min</span>
+    </div>
+    <p>Every incident in this lesson maps to a control that could have reduced its likelihood or its blast radius. None of these are exotic — most trace directly back to IEC 62443 zone-and-conduit segmentation, NIST SP 800-82 guidance, and the widely referenced SANS ICS "5 Critical Controls" (linked in Further Reading, and available as a downloadable PDF below). Tap or click each card to see the matching countermeasure.</p>
+    <p class="safety-flag" style="margin-top:2px;">⚠ Reference material only — no configuration should be applied to live or production systems in this exercise</p>
+    <div class="tc-grid" id="tcGrid">
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>Phishing-initiated ransomware reaching business IT</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Network segmentation into zones and conduits per IEC 62443, so a business-network compromise has no direct path to supervisory or control systems. Pair with user security-awareness training and email filtering.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>Stale or over-trusted remote-access credentials</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Multi-factor authentication, a monitored jump host that all vendor and remote sessions must pass through, and scheduled access reviews that revoke credentials the moment a contract or job role ends.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>A malicious insider using legitimate credentials</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Least-privilege, role-based access control so no single account can reach every system; change-control logging that records who issued which command, from where, and when.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>Compromised vendor or contractor remote access</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Time-boxed access windows granted only for the duration of the specific job, dedicated vendor accounts (never shared logins), and session recording so activity can be reviewed after the fact.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>Compromised firmware or software update (supply chain)</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Vendor risk assessment before onboarding, verification of digital signatures and checksums on every update, and validating patches in an isolated test environment before deploying to production.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>No visibility into lateral movement across the network</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>An accurate, current OT asset inventory and OT-aware network monitoring — the first two of the SANS ICS 5 Critical Controls — so unusual traffic between zones is detected quickly rather than discovered after the fact.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>No tested recovery path after an incident</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Offline, regularly tested backups — verified to actually restore, not just verified to exist — plus an incident response plan that explicitly covers OT systems, not just IT.</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="tc-item" data-flip>
+        <div class="flip-card-inner">
+          <button type="button" class="tc-face tc-front" aria-expanded="false">
+            <div><span class="tc-tag">Threat</span><h4>A flat network with no zoning between IT and OT</h4></div>
+            <span class="tc-hint">Tap for the countermeasure ↻</span>
+          </button>
+          <button type="button" class="tc-face tc-back" aria-expanded="false">
+            <span class="tc-tag">Countermeasure</span>
+            <p>Purdue-model segmentation with a governed DMZ between the enterprise and control networks, so a single compromised system cannot reach every other system by default.</p>
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <p style="margin-top:16px;"><a href="5-critical-controls.pdf" target="_blank" rel="noopener noreferrer">📄 Download: The Five Critical Controls for World-Class OT Cybersecurity</a></p>
+  </section>
+
+  <div class="part-banner">Part B · Applied Lab</div>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section id="activity" class="module">
+    <div class="activity-block">
+      <div class="activity-head">
+        <span aria-hidden="true">🧩</span>
+        <h3>Activity: Match the Case Study to Its Threat Category</h3>
+        <span class="activity-structure">Individual, then pair-share</span>
+        <span class="activity-time">≈ 20 min</span>
+      </div>
+      <div class="activity-body">
+        <p class="activity-instructions"><strong>Individual (10 min):</strong> For each documented case study, select the threat-actor category it best illustrates. <strong>Pair-share (10 min):</strong> Compare answers with a neighbor — some cases have secondary elements of more than one category, but each has one best fit as discussed in this lesson. This is case-study analysis only; no activity in this exercise involves reproducing, simulating, or executing any part of the attacks described.</p>
+        <div class="mapping-table-wrap">
+          <table class="mapping-table" id="mappingTable">
+            <thead>
+              <tr><th scope="col">Case study</th><th scope="col">Best-fit threat category</th></tr>
+            </thead>
+            <tbody>
+              <tr class="map-row" data-answer="a">
+                <td>Ukraine power grid attacks (2015–2016)</td>
+                <td>
+                  <select aria-label="Threat category for Ukraine power grid attacks">
+                    <option value="">— Select —</option>
+                    <option value="a">Nation-state — patient, well-resourced, aimed at strategic disruption</option>
+                    <option value="b">Cybercriminal ransomware — financially motivated, OT impact is collateral</option>
+                    <option value="c">Malicious insider — used legitimate access after it should have been revoked</option>
+                    <option value="d">Supply chain compromise — malicious code delivered through a trusted update</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="b">
+                <td>Colonial Pipeline (2021)</td>
+                <td>
+                  <select aria-label="Threat category for Colonial Pipeline">
+                    <option value="">— Select —</option>
+                    <option value="a">Nation-state — patient, well-resourced, aimed at strategic disruption</option>
+                    <option value="b">Cybercriminal ransomware — financially motivated, OT impact is collateral</option>
+                    <option value="c">Malicious insider — used legitimate access after it should have been revoked</option>
+                    <option value="d">Supply chain compromise — malicious code delivered through a trusted update</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="c">
+                <td>Maroochy Shire wastewater sabotage (2000)</td>
+                <td>
+                  <select aria-label="Threat category for Maroochy Shire">
+                    <option value="">— Select —</option>
+                    <option value="a">Nation-state — patient, well-resourced, aimed at strategic disruption</option>
+                    <option value="b">Cybercriminal ransomware — financially motivated, OT impact is collateral</option>
+                    <option value="c">Malicious insider — used legitimate access after it should have been revoked</option>
+                    <option value="d">Supply chain compromise — malicious code delivered through a trusted update</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="d">
+                <td>SolarWinds Orion compromise (2020)</td>
+                <td>
+                  <select aria-label="Threat category for SolarWinds">
+                    <option value="">— Select —</option>
+                    <option value="a">Nation-state — patient, well-resourced, aimed at strategic disruption</option>
+                    <option value="b">Cybercriminal ransomware — financially motivated, OT impact is collateral</option>
+                    <option value="c">Malicious insider — used legitimate access after it should have been revoked</option>
+                    <option value="d">Supply chain compromise — malicious code delivered through a trusted update</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mapping-actions">
+          <button class="btn" id="checkMapping">Check My Mapping</button>
+          <button class="btn secondary" id="resetMapping">Reset</button>
+          <span class="mapping-result" id="mappingResult" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIMULATION: ATTACK PATH ================= -->
+  <section id="simulation" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🖥️</span>
+      <h2><dfn id="def-attack-path">Attack Path</dfn> Simulator: From Inbox to Outage</h2>
+      <span class="module-time">≈ 25 min</span>
+    </div>
+    <p>An attack path is the sequence of systems and trust relationships an intruder moves through to get from an initial foothold to a meaningful impact. The simulation below walks through six stages of a composite ransomware scenario modeled on the Colonial Pipeline pattern described earlier in this lesson — where the controllers themselves are never directly touched, but production stops anyway. Step through each stage to see which network zone is affected and how the plant's operating status changes as a result.</p>
+    <span class="safety-flag">⚠ Simulation only — no live equipment. This is a scripted narrative walkthrough with no real network activity, exploit code, or attack tooling.</span>
+    <div class="diagram-wrap">
+      <div class="sim-zone-wrap">
+        <svg viewBox="0 0 700 220" role="img" aria-labelledby="simZoneTitle" id="zoneDiagram" style="width:100%;max-width:700px;display:block;margin:0 auto;">
+          <title id="simZoneTitle">Network zone diagram showing which zone is currently affected in the simulation</title>
+          <rect class="zone-rect" id="zoneIT" x="20" y="20" width="660" height="42" rx="8" fill="var(--surface2)" stroke="var(--border)" stroke-width="2"></rect>
+          <text class="zone-label" id="zoneITLabel" x="350" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Enterprise IT — Levels 4–5</text>
+          <rect class="zone-rect" id="zoneDMZ" x="20" y="72" width="660" height="42" rx="8" fill="var(--surface2)" stroke="var(--border)" stroke-width="2"></rect>
+          <text class="zone-label" id="zoneDMZLabel" x="350" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">DMZ — Level 3.5</text>
+          <rect class="zone-rect" id="zoneSup" x="20" y="124" width="660" height="42" rx="8" fill="var(--surface2)" stroke="var(--border)" stroke-width="2"></rect>
+          <text class="zone-label" id="zoneSupLabel" x="350" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Supervisory &amp; Control — Levels 2–3</text>
+          <rect class="zone-rect" id="zoneField" x="20" y="176" width="660" height="30" rx="8" fill="var(--ok-bg)" stroke="var(--ok)" stroke-width="2"></rect>
+          <text class="zone-label" id="zoneFieldLabel" x="350" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ok)">Field &amp; Process — Levels 0–1 (PLCs, physical equipment)</text>
+        </svg>
+      </div>
+      <p class="diagram-caption" id="simZoneCaption">Stage 1 of 6 — the highlighted zone below shows where the incident currently stands.</p>
+    </div>
+    <div class="sim-stage-label" id="simStageLabel">Stage 1 of 6 — Initial Compromise</div>
+    <p class="sim-narrative" id="simNarrative" aria-live="polite">A phishing email delivers a ransomware dropper to an employee's laptop on the business network. Nothing in the plant has changed yet — production is running normally, and the historian and HMI are both healthy.</p>
+    <div class="plant-status-grid" id="plantStatusGrid" aria-label="Simulated plant status indicators">
+      <div class="status-tile ok" id="statusProduction"><span class="status-label">Production</span><span class="status-value">Running</span></div>
+      <div class="status-tile ok" id="statusHistorian"><span class="status-label">Historian</span><span class="status-value">Reachable</span></div>
+      <div class="status-tile ok" id="statusHMI"><span class="status-label">HMI / SCADA</span><span class="status-value">Normal</span></div>
+      <div class="status-tile ok" id="statusPLC"><span class="status-label">Field Controllers</span><span class="status-value">Unaffected</span></div>
+    </div>
+    <div class="sim-controls">
+      <button class="btn secondary" id="simPrev">← Previous Stage</button>
+      <button class="btn" id="simNext">Next Stage →</button>
+      <span class="sim-progress-dots" id="simDots" aria-hidden="true"></span>
+      <span class="sim-stage-count" id="simStageCount">Stage 1 of 6</span>
+      <button class="btn secondary" id="simReset">Reset Simulation</button>
+    </div>
+    <div class="teach-note" style="margin-top:18px;">
+      <span class="teach-label">Debrief prompt</span>
+      <p>At which stage would earlier detection have made the biggest difference to the outcome? Most incident responders would say Stage 2 or 3 — before the compromise crosses the DMZ — which is exactly why the "no visibility into lateral movement" countermeasure card above exists.</p>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section id="review" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">✅</span>
+      <h2>Review &amp; Knowledge Check</h2>
+      <span class="module-time">≈ 15 min</span>
+    </div>
+    <div class="quiz-block" id="quizBlock">
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q1.</span>Why did the discovery of Stuxnet change how security leaders assessed risk to industrial systems?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q1" value="a"> It was the first malware ever discovered on a Windows computer</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="b"> It proved malware could cause real physical damage to equipment by issuing legitimate-looking control commands, not just steal or encrypt data</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="c"> It was the first attack to demand a ransom payment</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="d"> It proved air-gapped networks could never be reached by any means</label></li>
+        </ul>
+        <div class="q-feedback" id="fb1"></div>
+      </div>
+
+      <div class="q-card" data-answer="a">
+        <div class="q-stem"><span class="q-num">Q2.</span>In most documented ransomware incidents that affect industrial operations, what is the typical path to impact?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q2" value="a"> The attacker compromises the business IT network first, and production stops as a precaution even though controllers were never directly touched</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="b"> The attacker exploits a firmware vulnerability directly in a PLC on the control network</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="c"> A malicious insider is always the source of the initial infection</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="d"> The attacker starts with direct physical access to the control room</label></li>
+        </ul>
+        <div class="q-feedback" id="fb2"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q3.</span>What is the key distinction between insider risk and third-party/contractor risk as categories?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q3" value="a"> Insider risk only applies to IT staff; contractor risk only applies to engineers</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="b"> Contractor risk always involves malicious intent, while insider risk never does</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="c"> Insider risk involves an organization's own personnel who already hold legitimate access; contractor risk involves an external party whose legitimate access or systems are compromised or misused</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="d"> There is no meaningful distinction between the two categories</label></li>
+        </ul>
+        <div class="q-feedback" id="fb3"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q4.</span>What made the Maroochy Shire wastewater attack possible?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q4" value="a"> A previously unknown software vulnerability in the SCADA vendor's product</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="b"> A former contractor retained knowledge of, and equipment access to, the SCADA radio-control system after his access should have been revoked</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="c"> A nation-state actor infiltrated the utility's corporate network</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="d"> A phishing email compromised an employee's email account</label></li>
+        </ul>
+        <div class="q-feedback" id="fb4"></div>
+      </div>
+
+      <div class="q-card" data-answer="a">
+        <div class="q-stem"><span class="q-num">Q5.</span>What defines a supply-chain compromise, as illustrated by the SolarWinds Orion incident?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q5" value="a"> An attacker compromises a trusted vendor's build process or update mechanism, so victims unknowingly install malicious code as part of a legitimate, signed update</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="b"> An attacker exploits a misconfigured firewall rule at the victim's network perimeter</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="c"> An attacker brute-forces weak passwords on internet-facing remote-access portals</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="d"> An attacker physically steals hardware from a vendor's warehouse</label></li>
+        </ul>
+        <div class="q-feedback" id="fb5"></div>
+      </div>
+
+    </div>
+    <div class="mapping-actions">
+      <button class="btn" id="gradeQuiz">Grade My Quiz</button>
+      <button class="btn secondary" id="resetQuiz">Reset Quiz</button>
+    </div>
+    <div class="quiz-score" id="quizScore">
+      <span class="quiz-score-big" id="quizScoreBig">0 / 5</span>
+      <span id="quizScoreText"></span>
+    </div>
+
+    <div class="teach-note" style="margin-top:26px;">
+      <span class="teach-label">Suggested assessment artifact</span>
+      <p>Have each faculty member choose one case study from this lesson other than Stuxnet or Colonial Pipeline, and produce a half-page "threat brief" identifying: the threat-actor category it best represents, the specific trust relationship or access control failure that made it possible, and one countermeasure from this lesson's threat/countermeasure flip cards that would most directly have reduced its impact. This mirrors the comparison table's structure and confirms the threat-category-to-countermeasure connection transferred before Lesson 7's vulnerabilities and countermeasures discussion.</p>
+    </div>
+  </section>
+
+  <!-- ================= FURTHER READING ================= -->
+  <section id="further-reading" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📚</span>
+      <h2>Further Reading</h2>
+    </div>
+    <ul class="resource-list">
+      <li><a href="https://www.ssh.com/academy/operational-technology/ics-ot-security-current-threats-and-solutions" target="_blank" rel="noopener noreferrer">ICS/OT Security: Current Threats and Solutions</a> — an accessible overview of the threat categories and defensive approaches covered in this lesson.</li>
+      <li><a href="https://www.sans.org/white-papers/state-of-ics-ot-security-2025" target="_blank" rel="noopener noreferrer">SANS: State of ICS/OT Security 2025</a> — survey-based industry data on the threats OT organizations report facing today.</li>
+      <li><a href="https://www.sans.org/blog/ics-ot-network-visibility-start-protecting-top-targeted-most-critical-assets-first" target="_blank" rel="noopener noreferrer">SANS: ICS/OT Network Visibility — Protecting Your Most Critical Assets First</a> — practical guidance on the visibility countermeasure discussed in this lesson.</li>
+      <li><a href="https://d2hie3dpn9wvbb.cloudfront.net/ThreatActors/ThreatActors.html" target="_blank" rel="noopener noreferrer">Threat Actors</a> — a supplementary reference on threat-actor categories and motivations.</li>
+      <li><a href="https://d2hie3dpn9wvbb.cloudfront.net/stuxnet/stuxnet.html" target="_blank" rel="noopener noreferrer">Stuxnet</a> — a supplementary deep-dive reference on the incident that opened this lesson.</li>
+      <li><a href="5-critical-controls.pdf" target="_blank" rel="noopener noreferrer">📄 Download: The Five Critical Controls for World-Class OT Cybersecurity</a> — the countermeasure framework referenced throughout this lesson's flip-card section.</li>
+    </ul>
+  </section>
+
+  <nav class="lesson-nav-bottom" aria-label="Lesson navigation">
+    <a class="nav-btn" href="lesson05.html">← Lesson 5: Industrial Communication Protocols</a>
+    <a class="nav-btn" href="lesson07.html">Lesson 7: Vulnerabilities &amp; Countermeasures →</a>
+  </nav>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Lesson tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#s1">1. Threat Actors &amp; Motivations</a></li>
+      <li><a href="#s2">2. Ransomware &amp; OT</a></li>
+      <li><a href="#s3">3. Insider &amp; Contractor Risk</a></li>
+      <li><a href="#s4">4. Supply Chain Compromise</a></li>
+      <li><a href="#compare">Side-by-Side Comparison</a></li>
+      <li><a href="#countermeasures">Threats &amp; Countermeasures</a></li>
+      <li><a href="#activity">Activity: Matching Exercise</a></li>
+      <li><a href="#simulation">Simulation: Attack Path</a></li>
+      <li><a href="#review">Review &amp; Knowledge Check</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Objectives Progress</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 6 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Learning objectives checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Explain how Stuxnet changed OT risk thinking</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Identify OT threat-actor categories and motivations</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Describe ransomware's path from IT into production</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Compare insider risk and contractor risk</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Evaluate a supply-chain compromise case study</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo6"><label for="lo6">Analyze a simulated attack-path scenario</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Key Terms</div>
+    <ul class="glossary-list">
+      <li><a href="#s1"><span class="glossary-term">Threat Actor</span></a><span class="glossary-def">Any individual or group whose actions, intentional or not, could cause harm to an information or control system.</span></li>
+      <li><a href="#s2"><span class="glossary-term">Ransomware</span></a><span class="glossary-def">Malware that encrypts an organization's files and demands payment for the decryption key; the most common way OT is affected by cyber incidents today.</span></li>
+      <li><a href="#s3"><span class="glossary-term">Insider Risk</span></a><span class="glossary-def">The possibility that someone who already holds legitimate access uses it to cause harm, deliberately or by mistake.</span></li>
+      <li><a href="#s4"><span class="glossary-term">Supply Chain</span></a><span class="glossary-def">The network of vendors, software updates, and components an organization trusts and installs; a compromise here rides that trust past normal defenses.</span></li>
+      <li><a href="#simulation"><span class="glossary-term">Attack Path</span></a><span class="glossary-def">The sequence of systems and trust relationships an intruder moves through to get from an initial foothold to a meaningful impact.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Lesson Navigation</div>
+    <div class="prevnext-links">
+      <a href="lesson05.html">← Previous: Lesson 5 — Industrial Communication Protocols</a>
+      <a href="lesson07.html">Next: Lesson 7 — Vulnerabilities &amp; Countermeasures →</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+<footer>
+  Lesson 6 · Day 3 · The OT Threat Landscape<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Dept. of Engineering &amp; Technology &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-generated first draft. A human subject-matter expert should review it for technical accuracy before use with students. Educational use only — all activities are case-study analysis or client-side simulation; no activity touches live equipment, executes exploit code, or attacks a real system.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME (light default, dark only if previously chosen) ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- OBJECTIVES PROGRESS TRACKER ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+  }
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- THREAT / COUNTERMEASURE FLIP CARDS ---------------- */
+  document.querySelectorAll('.tc-item[data-flip]').forEach(function (item) {
+    var faces = item.querySelectorAll('.tc-face');
+    item.addEventListener('click', function () {
+      var flipped = item.classList.toggle('is-flipped');
+      faces.forEach(function (face) {
+        face.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+      });
+    });
+  });
+
+  /* ---------------- MAPPING ACTIVITY ---------------- */
+  var mappingRows = Array.prototype.slice.call(document.querySelectorAll('#mappingTable .map-row'));
+  var mappingResult = document.getElementById('mappingResult');
+
+  document.getElementById('checkMapping').addEventListener('click', function () {
+    var correctCount = 0;
+    var totalAnswered = 0;
+    mappingRows.forEach(function (row) {
+      var select = row.querySelector('select');
+      var correctVal = row.getAttribute('data-answer');
+      row.classList.remove('correct', 'incorrect');
+      if (!select.value) return;
+      totalAnswered++;
+      if (select.value === correctVal) {
+        row.classList.add('correct');
+        correctCount++;
+      } else {
+        row.classList.add('incorrect');
+      }
+    });
+    mappingResult.textContent = correctCount + ' of ' + mappingRows.length + ' correct'
+      + (totalAnswered < mappingRows.length ? ' (some rows left unanswered)' : '');
+  });
+
+  document.getElementById('resetMapping').addEventListener('click', function () {
+    mappingRows.forEach(function (row) {
+      row.querySelector('select').value = '';
+      row.classList.remove('correct', 'incorrect');
+    });
+    mappingResult.textContent = '';
+  });
+
+  /* ---------------- SIMULATION: ATTACK PATH ---------------- */
+  var simStages = [
+    {
+      label: 'Stage 1 of 6 — Initial Compromise',
+      zone: 'zoneIT',
+      caption: 'Stage 1 of 6 — the Enterprise IT zone is where the incident begins.',
+      narrative: 'A phishing email delivers a ransomware dropper to an employee\u2019s laptop on the business network. Nothing in the plant has changed yet \u2014 production is running normally, and the historian and HMI are both healthy.',
+      status: { production: ['Running', 'ok'], historian: ['Reachable', 'ok'], hmi: ['Normal', 'ok'], plc: ['Unaffected', 'ok'] }
+    },
+    {
+      label: 'Stage 2 of 6 — Lateral Movement',
+      zone: 'zoneIT',
+      caption: 'Stage 2 of 6 — still contained to Enterprise IT, but spreading within it.',
+      narrative: 'Using credentials harvested from the first compromised laptop, the attacker moves across the business network \u2014 file servers, email, and directory services. The IT security team notices unusual authentication activity but has not yet traced its source.',
+      status: { production: ['Running', 'ok'], historian: ['Reachable', 'ok'], hmi: ['Normal', 'ok'], plc: ['Unaffected', 'ok'] }
+    },
+    {
+      label: 'Stage 3 of 6 — DMZ Breach',
+      zone: 'zoneDMZ',
+      caption: 'Stage 3 of 6 — the compromise crosses into the DMZ that bridges IT and OT.',
+      narrative: 'The attacker reaches a poorly segmented system in the DMZ \u2014 in this scenario, a historian mirror server that has broader network trust than it should. This is the boundary earlier detection would most likely have stopped the incident at.',
+      status: { production: ['Running', 'ok'], historian: ['Degraded', 'warn'], hmi: ['Normal', 'ok'], plc: ['Unaffected', 'ok'] }
+    },
+    {
+      label: 'Stage 4 of 6 — Supervisory Zone Impacted',
+      zone: 'zoneSup',
+      caption: 'Stage 4 of 6 — engineering workstations and HMI servers are affected.',
+      narrative: 'Ransomware encrypts files on engineering workstations and an HMI server in the supervisory zone. Operators can no longer trust what their screens are showing them, even though nothing has reached the controllers themselves yet.',
+      status: { production: ['Running', 'warn'], historian: ['Lost', 'bad'], hmi: ['Locked', 'bad'], plc: ['Unaffected', 'ok'] }
+    },
+    {
+      label: 'Stage 5 of 6 — Precautionary Shutdown',
+      zone: 'zoneField',
+      caption: 'Stage 5 of 6 — the Field & Process zone is shown as unaffected \u2014 the shutdown is a business decision, not a technical one.',
+      narrative: 'Unable to safely monitor or account for the process, plant leadership makes the call to shut down production as a precaution \u2014 mirroring the real Colonial Pipeline decision. Note the field controllers were never directly compromised; the shutdown is a risk decision made under uncertainty.',
+      status: { production: ['Stopped (precaution)', 'bad'], historian: ['Lost', 'bad'], hmi: ['Locked', 'bad'], plc: ['Unaffected', 'ok'] }
+    },
+    {
+      label: 'Stage 6 of 6 — Recovery',
+      zone: 'zoneSup',
+      caption: 'Stage 6 of 6 — recovery focuses on the Supervisory zone before restart.',
+      narrative: 'Incident responders isolate the affected zones, restore engineering workstations and the HMI server from tested offline backups, and verify that control logic on the field controllers was never altered before authorizing a restart.',
+      status: { production: ['Restarting', 'warn'], historian: ['Restored', 'ok'], hmi: ['Restored', 'ok'], plc: ['Unaffected', 'ok'] }
+    }
+  ];
+
+  var simIndex = 0;
+  var zoneIds = ['zoneIT', 'zoneDMZ', 'zoneSup', 'zoneField'];
+  var simStageLabel = document.getElementById('simStageLabel');
+  var simNarrative = document.getElementById('simNarrative');
+  var simZoneCaption = document.getElementById('simZoneCaption');
+  var simStageCount = document.getElementById('simStageCount');
+  var simDots = document.getElementById('simDots');
+  var simPrev = document.getElementById('simPrev');
+  var simNext = document.getElementById('simNext');
+  var simReset = document.getElementById('simReset');
+
+  var statusTiles = {
+    production: document.getElementById('statusProduction'),
+    historian: document.getElementById('statusHistorian'),
+    hmi: document.getElementById('statusHMI'),
+    plc: document.getElementById('statusPLC')
+  };
+
+  // Build progress dots
+  simStages.forEach(function (s, i) {
+    var dot = document.createElement('span');
+    dot.className = 'sim-dot';
+    dot.id = 'simDot' + i;
+    simDots.appendChild(dot);
+  });
+
+  function setStatusTile(tile, text, cls) {
+    tile.classList.remove('ok', 'warn', 'bad');
+    tile.classList.add(cls);
+    tile.querySelector('.status-value').textContent = text;
+  }
+
+  function renderSimStage() {
+    var stage = simStages[simIndex];
+    simStageLabel.textContent = stage.label;
+    simNarrative.textContent = stage.narrative;
+    simZoneCaption.textContent = stage.caption;
+    simStageCount.textContent = 'Stage ' + (simIndex + 1) + ' of ' + simStages.length;
+
+    zoneIds.forEach(function (id) {
+      var rect = document.getElementById(id);
+      var label = document.getElementById(id + 'Label');
+      var active = (id === stage.zone);
+      rect.classList.toggle('active', active);
+      if (label) label.classList.toggle('active-label', active);
+    });
+
+    setStatusTile(statusTiles.production, stage.status.production[0], stage.status.production[1]);
+    setStatusTile(statusTiles.historian, stage.status.historian[0], stage.status.historian[1]);
+    setStatusTile(statusTiles.hmi, stage.status.hmi[0], stage.status.hmi[1]);
+    setStatusTile(statusTiles.plc, stage.status.plc[0], stage.status.plc[1]);
+
+    simStages.forEach(function (s, i) {
+      document.getElementById('simDot' + i).classList.toggle('done', i <= simIndex);
+    });
+
+    simPrev.disabled = (simIndex === 0);
+    simNext.disabled = (simIndex === simStages.length - 1);
+    simNext.textContent = (simIndex === simStages.length - 1) ? 'End of Scenario' : 'Next Stage →';
+  }
+
+  simNext.addEventListener('click', function () {
+    if (simIndex < simStages.length - 1) { simIndex++; renderSimStage(); }
+  });
+  simPrev.addEventListener('click', function () {
+    if (simIndex > 0) { simIndex--; renderSimStage(); }
+  });
+  simReset.addEventListener('click', function () {
+    simIndex = 0;
+    renderSimStage();
+  });
+
+  renderSimStage();
+
+  /* ---------------- QUIZ ---------------- */
+  var quizCards = Array.prototype.slice.call(document.querySelectorAll('#quizBlock .q-card'));
+  var quizFeedback = {
+    1: { correct: "Correct. Stuxnet demonstrated that malware could issue legitimate-looking industrial control commands to cause real mechanical damage \u2014 a fundamentally different consequence than the data theft or encryption most security programs were built around.", incorrect: "Not quite. Stuxnet wasn't the first malware on Windows, the first ransomware, or proof that air gaps are unreachable \u2014 in fact it proved the opposite about air gaps. Its significance was in causing physical damage through legitimate control commands." },
+    2: { correct: "Correct. In cases like Colonial Pipeline, the initial compromise happened on the business IT network, and the operational shutdown followed as a precautionary business decision rather than a direct attack on control equipment.", incorrect: "Not quite. Direct PLC firmware exploitation, a malicious insider, and physical control-room access are all possible attack paths, but none of them describes the typical, most commonly documented pattern covered in this lesson." },
+    3: { correct: "Correct. Insider risk is about an organization's own personnel who already hold legitimate access; contractor risk is about an external party's legitimate access, or the contractor's own systems, being compromised or misused \u2014 the contractor need not be malicious at all.", incorrect: "Not quite. Neither category is limited to a specific job title, and contractor-related incidents (like the Target/HVAC-vendor case) frequently involve no malicious intent from the contractor at all \u2014 that's what distinguishes the two categories." },
+    4: { correct: "Correct. Vitek Boden was a former contractor who retained equipment and radio-protocol knowledge from his prior role and used it to issue unauthorized commands after his relationship with the utility ended \u2014 an access-management failure, not a software vulnerability.", incorrect: "Not quite. The Maroochy Shire incident involved no software vulnerability, no nation-state actor, and no phishing email \u2014 it was a former contractor misusing retained access and equipment knowledge." },
+    5: { correct: "Correct. A supply-chain compromise inserts malicious code upstream, at a trusted vendor's build or distribution process, so that customers install it unknowingly as part of a legitimate, signed update \u2014 exactly what happened with SolarWinds Orion.", incorrect: "Not quite. Firewall misconfigurations, password brute-forcing, and physical theft describe other attack categories \u2014 the defining feature of a supply-chain compromise is inserting malicious code into something the victim already trusts and installs voluntarily." }
+  };
+
+  document.getElementById('gradeQuiz').addEventListener('click', function () {
+    var correctCount = 0;
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      var name = 'q' + qNum;
+      var selected = card.querySelector('input[name="' + name + '"]:checked');
+      var fb = document.getElementById('fb' + qNum);
+      var correctVal = card.getAttribute('data-answer');
+      fb.className = 'q-feedback show';
+      if (!selected) {
+        fb.classList.add('unanswered');
+        fb.textContent = 'Not answered — select an option above, then grade again.';
+        return;
+      }
+      if (selected.value === correctVal) {
+        fb.classList.add('correct');
+        fb.textContent = '✓ Correct — ' + quizFeedback[qNum].correct;
+        correctCount++;
+      } else {
+        fb.classList.add('incorrect');
+        fb.textContent = '✗ Not quite — ' + quizFeedback[qNum].incorrect;
+      }
+    });
+    var scoreBox = document.getElementById('quizScore');
+    var scoreBig = document.getElementById('quizScoreBig');
+    var scoreText = document.getElementById('quizScoreText');
+    scoreBox.classList.add('show');
+    scoreBig.textContent = correctCount + ' / ' + quizCards.length;
+    scoreText.textContent = correctCount === quizCards.length
+      ? 'All five — you are ready for Lesson 7.'
+      : (correctCount >= 3 ? 'Solid grasp — review the items you missed before Lesson 7.' : 'Worth a re-read of the sections above before moving on.');
+  });
+
+  document.getElementById('resetQuiz').addEventListener('click', function () {
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      card.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      var fb = document.getElementById('fb' + qNum);
+      fb.className = 'q-feedback';
+      fb.textContent = '';
+    });
+    document.getElementById('quizScore').classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
