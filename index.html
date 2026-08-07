@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teaching Operational Technologies and Cybersecurity for Community College Faculty | Course Navigation</title>
+<title>Teaching Operational Technologies for Community College Faculty | Course Navigation</title>
 <style>
   :root {
     --bg: #f4f6f9;
@@ -91,7 +92,6 @@
     outline: 3px solid var(--accent);
     outline-offset: 3px;
   }
-
   /* HEADER */
   header {
     background: var(--header-bg);
@@ -155,7 +155,6 @@
     transition: background 0.2s;
   }
   .theme-toggle:hover { background: rgba(255,255,255,0.22); }
-
   /* HERO STRIP */
   .hero {
     background: linear-gradient(135deg, #1a1e2e 0%, #22304a 60%, #b4530933 100%);
@@ -176,7 +175,6 @@
     font-weight: 500;
   }
   .strand-pill span { font-weight: 800; margin-left: 4px; }
-
   /* MAIN CONTENT */
   main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px; }
   .section-label {
@@ -189,7 +187,6 @@
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
   }
-
   /* SAFEGUARDS PANEL */
   .safeguards {
     background: var(--surface);
@@ -209,69 +206,17 @@
     margin-bottom: 16px;
     max-width: 78ch;
   }
-  .safeguards-hint {
-    font-size: 0.74rem;
-    color: var(--text-muted);
-    font-style: italic;
-    margin: -8px 0 14px;
-  }
   .safeguard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 14px;
   }
   .safeguard-item {
-    background: transparent;
-    border: none;
-    border-radius: 10px;
-    padding: 0;
-    perspective: 1200px;
-    height: 148px;
-  }
-  .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
-    transform-style: preserve-3d;
-  }
-  .safeguard-item.is-flipped .flip-card-inner { transform: rotateY(180deg); }
-  .flip-card-face {
-    position: absolute;
-    inset: 0;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-left: 4px solid var(--accent);
     border-radius: 10px;
     padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-  }
-  .flip-card-face:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .flip-card-front { display: flex; flex-direction: column; justify-content: space-between; }
-  .flip-card-back { transform: rotateY(180deg); overflow-y: auto; }
-  .flip-card-back::after {
-    content: '↺ Tap to flip back';
-    align-self: flex-start;
-    font-size: 0.66rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin-top: auto;
-    padding-top: 8px;
-  }
-  .flip-hint {
-    align-self: flex-start;
-    font-size: 0.66rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin-top: 8px;
   }
   .safeguard-item h4 { font-size: 0.84rem; font-weight: 700; margin-bottom: 4px; }
   .safeguard-item p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
@@ -288,7 +233,6 @@
   }
   .safeguards-foot a { color: var(--accent); font-weight: 700; text-decoration: none; }
   .safeguards-foot a:hover { text-decoration: underline; }
-
   /* CARD GRID */
   .card-grid {
     display: grid;
@@ -320,7 +264,6 @@
   .card.strand-lab    .card-accent-bar { background: var(--tag-lab); }
   .card.strand-tools  .card-accent-bar { background: var(--tag-tools); }
   .card.strand-special .card-accent-bar { background: linear-gradient(90deg, var(--accent), var(--tag-proto)); }
-
   .card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
   .card-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .lesson-num {
@@ -351,7 +294,6 @@
   .tag-lab     { color: var(--tag-lab);    background: var(--tag-lab-bg); }
   .tag-tools   { color: var(--tag-tools);  background: var(--tag-tools-bg); }
   .tag-special { color: var(--accent);     background: var(--accent-light); }
-
   .card-title { font-size: 1.02rem; font-weight: 700; line-height: 1.3; color: var(--text); }
   .card-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; flex: 1; }
   .safety-flag {
@@ -381,7 +323,6 @@
   .card-terms strong { color: var(--text); font-weight: 600; }
   .card-arrow { font-size: 1rem; color: var(--text-muted); transition: transform 0.2s; }
   .card:hover .card-arrow { transform: translateX(4px); }
-
   /* SPECIAL / LAB / TOOLS GRIDS */
   .special-grid, .lab-grid, .tools-grid {
     display: grid;
@@ -395,11 +336,84 @@
   .card.lab-card .card-title { color: var(--tag-lab); }
   .card.tools-card { border: 2px solid var(--tag-tools); }
   .card.tools-card .card-title { color: var(--tag-tools); }
-
   /* PROGRESS BAR (decorative) */
   .progress-strip { display: flex; gap: 4px; margin-bottom: 28px; align-items: center; }
   .progress-block { height: 6px; border-radius: 3px; flex: 1; }
-
+  /* FRAMEWORKS ACCORDION */
+  .framework-accordion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tag-gov);
+    border-radius: 14px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .framework-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface2);
+    border: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    font-family: inherit;
+    color: var(--text);
+    text-align: left;
+  }
+  .framework-toggle:hover { background: var(--card-hover); }
+  .framework-toggle-left { display: flex; align-items: center; gap: 12px; }
+  .toggle-caret {
+    font-size: 0.9rem;
+    color: var(--tag-gov);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 1em;
+    display: inline-block;
+  }
+  .framework-toggle-title { font-size: 1.02rem; font-weight: 800; }
+  .framework-toggle-title .subtitle {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: normal;
+    margin-top: 2px;
+  }
+  .toggle-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: var(--tag-gov);
+    background: var(--tag-gov-bg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .framework-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .framework-content.open { max-height: 2400px; }
+  .framework-content-inner { padding: 4px 22px 22px; }
+  .framework-intro {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    max-width: 84ch;
+    margin: 14px 0 18px;
+  }
+  .framework-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
   /* FOOTER */
   footer {
     text-align: center;
@@ -410,30 +424,28 @@
     margin-top: 8px;
     line-height: 1.6;
   }
-
   @media (max-width: 520px) {
     .header-inner { padding: 14px 16px; }
     .brand-text h1 { font-size: 1rem; }
     .hero h2 { font-size: 1.3rem; }
     main { padding: 24px 16px 40px; }
     .card-footer { flex-direction: column; align-items: flex-start; }
+    .framework-toggle { padding: 16px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
     .card:hover { transform: none; }
     .card:hover .card-arrow { transform: none; }
-    .flip-card-inner { transition: none; }
   }
 </style>
 </head>
 <body>
-
 <header>
   <div class="header-inner">
     <div class="header-brand">
       <div class="brand-icon">OT</div>
       <div class="brand-text">
-        <h1>Teaching Operational Technologies and Cybersecurity</h1>
+        <h1>Teaching Operational Technologies</h1>
         <p>Faculty Development Workshop — 12 Lessons / 5 Days</p>
       </div>
     </div>
@@ -443,7 +455,6 @@
     </div>
   </div>
 </header>
-
 <div class="hero">
   <h2>Course Navigation</h2>
   <p>A faculty development workshop for community college instructors who need to teach operational technology and IT/OT security. Select a lesson below. Each lesson pairs the technical content with the teaching moves, lab design, and assessment ideas you need to run it in your own classroom.</p>
@@ -456,9 +467,7 @@
     <div class="strand-pill">Operations &amp; Capstone <span>2</span></div>
   </div>
 </div>
-
 <main>
-
   <!-- SAFEGUARDS -->
   <section class="safeguards" aria-labelledby="safeguards-title">
     <div class="safeguards-head">
@@ -466,122 +475,46 @@
       <span class="course-badge">Read first</span>
     </div>
     <p>Operational technology controls physical processes, so a mistake in an OT classroom can injure someone or stop a real plant. These rules apply to every lesson, lab, and student project in this course. Review them with your class before Lab 1 and restate them in your own syllabus.</p>
-    <p class="safeguards-hint">Tap or click a card to flip it and read the full guidance.</p>
     <div class="safeguard-grid">
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Safety outranks the exercise</h4>
-            <p>Physical safety comes before every lesson objective.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>No activity touches a live process, safety instrumented system, or energized panel. Physical rigs require lockout/tagout, PPE, and an instructor present.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Safety outranks the exercise</h4>
+        <p>No activity touches a live process, safety instrumented system, or energized panel. Physical rigs require lockout/tagout, PPE, and an instructor present.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Simulation and isolated equipment only</h4>
-            <p>All hands-on work stays on college-owned, non-production gear.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Labs run on simulators, virtual PLCs, and bench hardware the college owns. Nothing is aimed at campus building automation, a vendor system, or an employer's plant.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Simulation and isolated equipment only</h4>
+        <p>Labs run on simulators, virtual PLCs, and bench hardware the college owns. Nothing is aimed at campus building automation, a vendor system, or an employer's plant.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Air-gapped lab segments</h4>
-            <p>Lab networks stay physically and logically separate from campus IT.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Keep lab networks off the campus production network. Document the isolation before class and verify it at the start of every lab session.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Air-gapped lab segments</h4>
+        <p>Keep lab networks off the campus production network. Document the isolation before class and verify it at the start of every lab session.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Defensive scope</h4>
-            <p>This course builds defenders, not operators of offensive tools.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>The course teaches architecture, detection, hardening, and response. It does not distribute working exploit code, live malware samples, or attack tooling.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Defensive scope</h4>
+        <p>The course teaches architecture, detection, hardening, and response. It does not distribute working exploit code, live malware samples, or attack tooling.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Incidents are case studies</h4>
-            <p>Real events are studied for lessons learned, not as a how-to.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Real events are analyzed for cause, impact, and lesson learned — not reconstructed as a procedure a student could follow against a live target.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Incidents are case studies</h4>
+        <p>Real events are analyzed for cause, impact, and lesson learned — not reconstructed as a procedure a student could follow against a live target.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Protect real-world data</h4>
-            <p>No employer, vendor, or customer data ever leaves the classroom.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Vendor drawings, customer diagrams, employer network detail, and CUI stay out of student work. Synthesize or scrub before anything reaches a shared repository.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Protect real-world data</h4>
+        <p>Vendor drawings, customer diagrams, employer network detail, and CUI stay out of student work. Synthesize or scrub before anything reaches a shared repository.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Faculty review AI-generated content</h4>
-            <p>You own the accuracy of anything AI drafted for your class.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Any generated lesson text, quiz item, or graphic gets subject-matter review and a source check before students see it. You own the accuracy.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Faculty review AI-generated content</h4>
+        <p>Any generated lesson text, quiz item, or graphic gets subject-matter review and a source check before students see it. You own the accuracy.</p>
       </div>
-
-      <div class="safeguard-item" data-flip>
-        <div class="flip-card-inner">
-          <button type="button" class="flip-card-face flip-card-front" aria-expanded="false">
-            <h4>Accessible and equitable by default</h4>
-            <p>Every material works for every student, on any device.</p>
-            <span class="flip-hint">Tap for details ↻</span>
-          </button>
-          <button type="button" class="flip-card-face flip-card-back" aria-expanded="false">
-            <p>Materials meet WCAG 2.2 AA and work by keyboard. No lab depends on a paid license or vendor account a student cannot obtain.</p>
-          </button>
-        </div>
+      <div class="safeguard-item">
+        <h4>Accessible and equitable by default</h4>
+        <p>Materials meet WCAG 2.2 AA and work by keyboard. No lab depends on a paid license or vendor account a student cannot obtain.</p>
       </div>
-
     </div>
     <div class="safeguards-foot">
       <span>Every student signs the acceptable-use acknowledgment before the first hands-on lab.</span>
       <a href="safeguards.html">Read the full policy →</a>
     </div>
   </section>
-
   <div class="section-label">📚 Course Lessons — 12 Lessons / 5 Days</div>
-
   <!-- Strand color strip -->
   <div class="progress-strip" aria-hidden="true">
     <div class="progress-block" style="background:var(--tag-found);"></div>
@@ -597,9 +530,7 @@
     <div class="progress-block" style="background:var(--tag-ops);"></div>
     <div class="progress-block" style="background:var(--accent);"></div>
   </div>
-
   <div class="card-grid">
-
     <!-- Lesson 1 -->
     <a class="card strand-found" href="lesson01.html">
       <div class="card-accent-bar"></div>
@@ -616,7 +547,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 2 -->
     <a class="card strand-found" href="lesson02.html">
       <div class="card-accent-bar"></div>
@@ -633,7 +563,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 3 -->
     <a class="card strand-found" href="lesson03.html">
       <div class="card-accent-bar"></div>
@@ -650,7 +579,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 4 -->
     <a class="card strand-proto" href="lesson04.html">
       <div class="card-accent-bar"></div>
@@ -667,7 +595,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 5 -->
     <a class="card strand-proto" href="lesson05.html">
       <div class="card-accent-bar"></div>
@@ -684,7 +611,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 6 -->
     <a class="card strand-threat" href="lesson06.html">
       <div class="card-accent-bar"></div>
@@ -702,7 +628,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 7 -->
     <a class="card strand-threat" href="lesson07.html">
       <div class="card-accent-bar"></div>
@@ -720,7 +645,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 8 -->
     <a class="card strand-gov" href="lesson08.html">
       <div class="card-accent-bar"></div>
@@ -737,7 +661,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 9 -->
     <a class="card strand-gov" href="lesson09.html">
       <div class="card-accent-bar"></div>
@@ -754,7 +677,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 10 -->
     <a class="card strand-idm" href="lesson10.html">
       <div class="card-accent-bar"></div>
@@ -771,7 +693,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 11 -->
     <a class="card strand-ops" href="lesson11.html">
       <div class="card-accent-bar"></div>
@@ -788,7 +709,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <!-- Lesson 12 -->
     <a class="card strand-special" href="lesson12.html">
       <div class="card-accent-bar"></div>
@@ -805,13 +725,95 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
   </div>
 
+  <!-- CORE FRAMEWORKS (ACCORDION) -->
+  <section class="framework-accordion" aria-labelledby="frameworks-title">
+    <button class="framework-toggle" id="frameworksToggle" aria-expanded="false" aria-controls="frameworksContent" onclick="toggleFrameworks()">
+      <span class="framework-toggle-left">
+        <span class="toggle-caret" id="frameworksCaret" aria-hidden="true">▸</span>
+        <span class="framework-toggle-title" id="frameworks-title">🗺️ Core Frameworks — Explore the Standards
+          <span class="subtitle">The four reference frameworks used throughout Lessons 8 &amp; 9 — click to expand</span>
+        </span>
+      </span>
+      <span class="toggle-badge" id="frameworksBadge">4 Frameworks · Collapsed</span>
+    </button>
+    <div class="framework-content" id="frameworksContent" aria-hidden="true" inert>
+      <div class="framework-content-inner">
+        <p class="framework-intro">These are the four frameworks students need fluency in to work an OT security role: a design-time standard for building secure control systems, a U.S. government guide for managing OT risk end to end, a threat-intelligence knowledge base for understanding how ICS incidents actually unfold, and a mandatory compliance standard from a specific regulated sector. Each card opens a dedicated page with the concepts, structure, and classroom framing for that framework.</p>
+        <div class="framework-grid">
+          <!-- ISA/IEC 62443 -->
+          <a class="card strand-gov" href="iec62443.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Design Standard</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">ISA/IEC 62443 — Industrial Automation &amp; Control Systems Security</div>
+              <div class="card-desc">The zones-and-conduits standard family for IACS: security levels 0–4, seven foundational requirements, and lifecycle guidance split across policy (2-x), system (3-x), and component (4-x) parts.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> Zones &amp; Conduits, Security Levels, ISASecure</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- NIST SP 800-82 -->
+          <a class="card strand-gov" href="nist80082.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">U.S. Federal Guide</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">NIST SP 800-82 Rev. 3 — Guide to OT Security</div>
+              <div class="card-desc">The 2023 rewrite that widens ICS guidance to all of OT, tailors SP 800-53 controls into OT-specific overlays, and aligns OT risk management with the NIST Cybersecurity Framework.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> OT Overlays, NIST CSF, Risk Management</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- MITRE ATT&CK for ICS -->
+          <a class="card strand-gov" href="attack-ics.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Threat Intel</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">MITRE ATT&amp;CK for ICS</div>
+              <div class="card-desc">A knowledge base of real-world adversary tactics and techniques against control systems — from Initial Access to Impair Process Control — built from documented incidents like Stuxnet, Industroyer, and TRITON.</div>
+              <span class="safety-flag">⚠ Case study analysis only</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> Tactics, Techniques, Detection Engineering</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- NERC CIP-008 -->
+          <a class="card strand-gov" href="nerc-cip008.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Sector Compliance</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">NERC CIP-008 — Incident Reporting &amp; Response Planning</div>
+              <div class="card-desc">The mandatory, enforceable standard requiring Bulk Electric System operators to plan, test, and report cyber security incidents — including attempts — to the E-ISAC and DHS/CISA.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> BES Cyber Systems, IR Plan, E-ISAC Reporting</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="section-label">🎓 Faculty Resources</div>
-
   <div class="special-grid">
-
     <a class="card special-card strand-special" href="safeguards.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -827,7 +829,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <a class="card special-card strand-special" href="teaching-guide.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -843,7 +844,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <a class="card special-card strand-special" href="assessments.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -859,13 +859,9 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
   </div>
-
   <div class="section-label">🔬 Lab Activities</div>
-
   <div class="lab-grid">
-
     <a class="card lab-card strand-lab" href="labs.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -882,7 +878,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <a class="card lab-card strand-lab" href="simulators.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -899,13 +894,9 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
   </div>
-
   <div class="section-label">🛠️ Content Development Tools</div>
-
   <div class="tools-grid">
-
     <a class="card tools-card strand-tools" href="gen-graphics.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -921,7 +912,6 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
     <a class="card tools-card strand-tools" href="gen-content.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -937,16 +927,12 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
-
   </div>
-
 </main>
-
 <footer>
-  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; 12 Lessons / 5 Days &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
+  Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; 12 Lessons / 5 Days &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
   Educational use only. All exercises are simulation-based and defensive in scope.
 </footer>
-
 <script>
   // Light is default — only apply dark if previously saved
   function applyTheme(theme) {
@@ -955,28 +941,38 @@
     btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
     try { localStorage.setItem('otfac-theme', theme); } catch (e) { /* storage unavailable */ }
   }
-
   function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme');
     applyTheme(current === 'dark' ? 'light' : 'dark');
   }
-
   (function () {
     var saved = null;
     try { saved = localStorage.getItem('otfac-theme'); } catch (e) { /* storage unavailable */ }
     applyTheme(saved === 'dark' ? 'dark' : 'light');
   })();
 
-  // Flip cards for the Safeguards & Responsible Use section
-  document.querySelectorAll('.safeguard-item[data-flip]').forEach(function (item) {
-    var faces = item.querySelectorAll('.flip-card-face');
-    item.addEventListener('click', function () {
-      var flipped = item.classList.toggle('is-flipped');
-      faces.forEach(function (face) {
-        face.setAttribute('aria-expanded', flipped ? 'true' : 'false');
-      });
-    });
-  });
+  // Core Frameworks accordion — default contracted
+  function toggleFrameworks() {
+    var btn = document.getElementById('frameworksToggle');
+    var content = document.getElementById('frameworksContent');
+    var caret = document.getElementById('frameworksCaret');
+    var badge = document.getElementById('frameworksBadge');
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    var next = !expanded;
+    btn.setAttribute('aria-expanded', String(next));
+    content.setAttribute('aria-hidden', String(!next));
+    if (next) {
+      content.classList.add('open');
+      content.removeAttribute('inert');
+      caret.textContent = '▾';
+      badge.textContent = '4 Frameworks · Expanded';
+    } else {
+      content.classList.remove('open');
+      content.setAttribute('inert', '');
+      caret.textContent = '▸';
+      badge.textContent = '4 Frameworks · Collapsed';
+    }
+  }
 </script>
 </body>
 </html>
