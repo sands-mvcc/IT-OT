@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 10 · Access Control &amp; Identity Management in OT — OT-101</title>
+<meta name="description" content="OT-101 Day 5 Lesson 10: Roles for operators, engineers, and vendors; the shared-console problem; privileged access, jump hosts, and remote vendor sessions; where MFA is safe on a control network; and identity lifecycle in a plant.">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#f4f6f9;
+  --surface:#ffffff;
+  --surface-2:#eef1f6;
+  --text:#1a1e2e;
+  --muted:#5a6480;
+  --accent:#b45309;
+  --accent-2:#92400e;
+  --accent-soft:#fdf3e7;
+  --accent-line:#e7c9a2;
+  --header-bg:#1a1e2e;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#d1d9e6;
+  --table-head-bg:#1a1e2e;
+  --table-head-text:#ffffff;
+  --row-hover:#f7f2ea;
+  --ok-bg:#e8f5ec; --ok-text:#155724; --ok-line:#2e7d4f;
+  --no-bg:#fdeaea; --no-text:#7f1d1d; --no-line:#b91c1c;
+  --warn-bg:#fdf3e7; --warn-text:#7c3a06; --warn-line:#b45309;
+  --shadow:0 1px 2px rgba(26,30,46,.06), 0 6px 18px rgba(26,30,46,.07);
+  --radius:12px;
+  --radius-sm:8px;
+  --focus:#b45309;
+  --maxw:1240px;
+}
+html[data-theme="dark"]{
+  --bg:#0f1117;
+  --surface:#1c1f2e;
+  --surface-2:#161927;
+  --text:#e8ecf4;
+  --muted:#a8b2c8;
+  --accent:#f59e0b;
+  --accent-2:#fbbf24;
+  --accent-soft:#2a2313;
+  --accent-line:#7a5a1c;
+  --header-bg:#0a0c14;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#333a52;
+  --table-head-bg:#0a0c14;
+  --table-head-text:#ffffff;
+  --row-hover:#242840;
+  --ok-bg:#12281c; --ok-text:#9be6b4; --ok-line:#3fa76b;
+  --no-bg:#2d1414; --no-text:#ffb3b3; --no-line:#e05a5a;
+  --warn-bg:#2a2313; --warn-text:#fbd38d; --warn-line:#f59e0b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  --focus:#f59e0b;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:150px;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{line-height:1.25;font-weight:700;color:var(--text);}
+h2{font-size:1.6rem;margin:0 0 .35rem;}
+h3{font-size:1.18rem;margin:1.6rem 0 .5rem;}
+h4{font-size:1.02rem;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);}
+p{margin:0 0 1rem;}
+a{color:var(--accent);}
+a:hover{color:var(--accent-2);}
+code{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:4px;padding:.08em .35em;font-size:.9em;
+}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px;}
+
+/* ---------- Skip link ---------- */
+.skip-link{
+  position:absolute;left:8px;top:-60px;z-index:200;
+  background:var(--accent);color:#fff;font-weight:700;
+  padding:.6rem 1rem;border-radius:0 0 8px 8px;text-decoration:none;
+  transition:top .15s ease;
+}
+.skip-link:focus{top:0;color:#fff;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  font-size:.85rem;color:var(--muted);
+}
+.topbar-inner{
+  max-width:var(--maxw);margin:0 auto;padding:.5rem 1.25rem;
+  display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;align-items:center;justify-content:space-between;
+}
+.topbar a.home-link{font-weight:700;color:var(--accent);text-decoration:none;}
+.topbar a.home-link:hover{text-decoration:underline;}
+
+/* ---------- Header ---------- */
+.lesson-header{background:var(--header-bg);color:var(--header-text);}
+.lesson-header-inner{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 1.75rem;}
+.eyebrow{
+  font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-2);font-weight:700;margin:0 0 .6rem;
+}
+html[data-theme="light"] .eyebrow{color:#f0b360;}
+.lesson-header h1{font-size:2.3rem;margin:0 0 .5rem;color:var(--header-text);}
+.tagline{font-size:1.08rem;color:var(--header-muted);max-width:62ch;margin:0 0 1.1rem;}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.meta-chip{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);
+  color:#fff;border-radius:999px;padding:.28rem .8rem;font-size:.82rem;font-weight:600;
+}
+.header-tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{
+  font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent;
+  border-radius:999px;padding:.5rem 1.05rem;display:inline-flex;align-items:center;gap:.45rem;
+}
+.btn:hover{background:var(--accent-2);}
+html[data-theme="dark"] .btn{color:#1a1300;}
+html[data-theme="dark"] .btn:hover{background:var(--accent-2);}
+.btn-ghost{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;}
+html[data-theme="dark"] .btn-ghost{color:#fff;}
+
+/* ---------- Section nav ---------- */
+.section-nav{
+  position:sticky;top:0;z-index:60;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(26,30,46,.06);
+}
+.section-nav ul{
+  max-width:var(--maxw);margin:0 auto;padding:0 1.25rem;
+  list-style:none;display:flex;gap:.25rem;overflow-x:auto;
+}
+.section-nav a{
+  display:block;padding:.7rem .8rem;font-size:.83rem;font-weight:600;
+  color:var(--muted);text-decoration:none;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.section-nav a:hover{color:var(--accent);}
+.section-nav a[aria-current="true"]{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ---------- Layout ---------- */
+.layout{
+  max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 3rem;
+  display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static !important;}
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1.5rem 1.6rem;margin:0 0 1.6rem;
+}
+.section-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.section-icon{
+  flex:0 0 auto;width:42px;height:42px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  display:grid;place-items:center;
+}
+.section-icon svg{width:24px;height:24px;}
+.section-head .titles{flex:1 1 240px;min-width:0;}
+.time-pill{
+  flex:0 0 auto;font-size:.75rem;font-weight:700;color:var(--accent);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:999px;padding:.2rem .65rem;white-space:nowrap;
+}
+.sub{color:var(--muted);font-size:.92rem;margin:.15rem 0 0;}
+
+/* ---------- Part banners ---------- */
+.part-banner{
+  background:var(--header-bg);color:#fff;border-radius:var(--radius);
+  padding:1rem 1.4rem;margin:2.2rem 0 1.4rem;border-left:6px solid var(--accent);
+}
+.part-banner .p-label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:#f0b360;font-weight:700;}
+html[data-theme="dark"] .part-banner .p-label{color:var(--accent);}
+.part-banner h2{color:#fff;font-size:1.35rem;margin:.15rem 0 .2rem;}
+.part-banner p{margin:0;color:var(--header-muted);font-size:.95rem;}
+
+/* ---------- Callouts / analogy ---------- */
+.analogy-box{
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-left:5px solid var(--accent);border-radius:var(--radius-sm);
+  padding:1rem 1.15rem;margin:1.2rem 0;
+}
+.analogy-box .label{
+  display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--accent-2);margin-bottom:.4rem;
+}
+html[data-theme="dark"] .analogy-box .label{color:var(--accent);}
+.analogy-box p:last-child{margin-bottom:0;}
+.callout{
+  border:1px solid var(--border);border-left:5px solid var(--muted);
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  padding:.95rem 1.1rem;margin:1.2rem 0;font-size:.95rem;
+}
+.callout.safety{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:var(--warn-line);color:var(--warn-text);}
+.callout strong{color:inherit;}
+.safety-flag{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--warn-bg);color:var(--warn-text);
+  border:1px solid var(--warn-line);border-radius:999px;
+  padding:.25rem .8rem;font-size:.78rem;font-weight:700;margin-bottom:.9rem;
+}
+
+/* ---------- Lists ---------- */
+ul.tight,ol.tight{margin:0 0 1rem;padding-left:1.3rem;}
+ul.tight li,ol.tight li{margin-bottom:.4rem;}
+.lo-list{list-style:none;padding:0;margin:0;counter-reset:lo;}
+.lo-list li{
+  position:relative;padding-left:2.4rem;margin-bottom:.7rem;counter-increment:lo;
+}
+.lo-list li::before{
+  content:"LO" counter(lo);position:absolute;left:0;top:.1rem;
+  font-size:.68rem;font-weight:800;color:#fff;background:var(--accent);
+  border-radius:5px;padding:.15rem .35rem;letter-spacing:.02em;
+}
+html[data-theme="dark"] .lo-list li::before{color:#1a1300;}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto;margin:1.1rem 0 1.3rem;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem;background:var(--surface);}
+caption{caption-side:top;text-align:left;font-size:.88rem;color:var(--muted);padding:.7rem .9rem;font-style:italic;}
+th,td{border:1px solid var(--border);padding:.6rem .75rem;text-align:left;vertical-align:top;}
+thead th{background:var(--table-head-bg);color:var(--table-head-text);font-size:.84rem;letter-spacing:.02em;border-color:rgba(255,255,255,.22);}
+tbody tr:hover{background:var(--row-hover);}
+th[scope="row"]{background:var(--surface-2);font-weight:700;}
+
+/* ---------- Diagram frames ---------- */
+figure{margin:1.3rem 0;}
+.diagram-frame{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:1rem;
+}
+.diagram-frame svg{width:100%;height:auto;display:block;}
+figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
+
+/* ---------- Flip cards ---------- */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
+.flip-card{
+  perspective:1000px;background:none;border:0;padding:0;font:inherit;
+  text-align:left;cursor:pointer;min-height:180px;
+}
+.flip-inner{
+  display:block;position:relative;width:100%;min-height:180px;height:100%;
+  transition:transform .5s;transform-style:preserve-3d;
+}
+.flip-card[aria-pressed="true"] .flip-inner{transform:rotateY(180deg);}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:1rem;display:flex;flex-direction:column;justify-content:center;
+  background:var(--surface);box-shadow:var(--shadow);overflow:auto;
+}
+.flip-front{border-top:4px solid var(--accent);}
+.flip-front .term{font-weight:800;font-size:1.05rem;}
+.flip-front .hint{font-size:.78rem;color:var(--muted);margin-top:.5rem;}
+.flip-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent-line);font-size:.9rem;}
+
+/* ---------- Activity blocks ---------- */
+.activity-block{
+  border:2px solid var(--accent);border-radius:var(--radius);
+  overflow:hidden;margin:1.5rem 0;background:var(--surface);
+}
+.activity-header{
+  background:var(--accent);color:#fff;padding:.7rem 1.1rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+html[data-theme="dark"] .activity-header{color:#1a1300;}
+.activity-header h3{margin:0;font-size:1.05rem;color:inherit;}
+.activity-header .t{font-size:.8rem;font-weight:700;}
+.activity-body{padding:1.1rem 1.2rem;}
+.instructions{
+  background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:.85rem 1rem;margin:0 0 1rem;font-size:.93rem;
+}
+.ips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem;margin:1rem 0;}
+.ips div{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .85rem;background:var(--surface-2);font-size:.9rem;}
+.ips h4{margin:0 0 .3rem;font-size:.75rem;color:var(--accent);}
+
+/* ---------- Mapping exercise ---------- */
+.mapping-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+.mapping-table-wrap table{min-width:560px;}
+select{
+  font:inherit;font-size:.88rem;padding:.35rem .5rem;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--surface);color:var(--text);max-width:100%;
+}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .5rem;}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.btn-secondary:hover{background:var(--accent-soft);color:var(--accent-2);}
+html[data-theme="dark"] .btn-secondary{color:var(--accent);}
+.result-line{font-weight:700;font-size:.95rem;margin:.4rem 0 0;}
+tr.map-correct td{background:var(--ok-bg);}
+tr.map-wrong td{background:var(--no-bg);}
+.map-note{font-size:.8rem;display:block;margin-top:.3rem;}
+tr.map-correct .map-note{color:var(--ok-text);}
+tr.map-wrong .map-note{color:var(--no-text);}
+
+/* ---------- Simulation ---------- */
+.sim{
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface-2);padding:1.1rem 1.2rem;margin:1.3rem 0;
+}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.7rem;margin:.8rem 0;}
+.asset{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.65rem .8rem;
+}
+.asset .name{font-weight:700;font-size:.93rem;display:block;}
+.asset .desc{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem;}
+.asset label{font-size:.78rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem;}
+.sim-out{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:.9rem 1rem;margin-top:.9rem;font-size:.92rem;min-height:2.5rem;
+}
+.sim-out ul{margin:.4rem 0 .8rem;padding-left:1.2rem;}
+.finding{border-left:4px solid var(--no-line);background:var(--no-bg);color:var(--no-text);padding:.5rem .7rem;border-radius:6px;margin:.4rem 0;font-size:.88rem;}
+.finding.pass{border-left-color:var(--ok-line);background:var(--ok-bg);color:var(--ok-text);}
+.finding.warn{border-left-color:var(--warn-line);background:var(--warn-bg);color:var(--warn-text);}
+.conduit-item{font-family:"Cascadia Mono",Consolas,monospace;font-size:.85rem;}
+
+/* ---------- Quiz ---------- */
+.quiz-block{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:1.2rem 1.3rem;}
+.q{border-bottom:1px solid var(--border);padding:.9rem 0;}
+.q:last-of-type{border-bottom:0;}
+.q legend{font-weight:700;font-size:1rem;padding:0;margin-bottom:.5rem;}
+.q fieldset{border:0;margin:0;padding:0;}
+.q label{display:block;padding:.32rem .2rem .32rem 0;font-size:.95rem;cursor:pointer;}
+.q input[type="radio"]{margin-right:.5rem;accent-color:var(--accent);}
+.q-feedback{margin-top:.55rem;padding:.6rem .8rem;border-radius:6px;font-size:.9rem;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.correct{background:var(--ok-bg);color:var(--ok-text);border-left:4px solid var(--ok-line);}
+.q-feedback.incorrect{background:var(--no-bg);color:var(--no-text);border-left:4px solid var(--no-line);}
+.q-feedback.unanswered{background:var(--warn-bg);color:var(--warn-text);border-left:4px solid var(--warn-line);}
+.score{font-weight:800;font-size:1.05rem;margin-top:1rem;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:64px;display:flex;flex-direction:column;gap:1.1rem;}
+.side-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.1rem;
+}
+.side-card h2{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;}
+.sidebar-toc ul{list-style:none;margin:0;padding:0;font-size:.88rem;}
+.sidebar-toc li{margin-bottom:.4rem;}
+.sidebar-toc a{text-decoration:none;color:var(--text);}
+.sidebar-toc a:hover{color:var(--accent);text-decoration:underline;}
+.sidebar-toc .defn{display:block;color:var(--muted);font-size:.79rem;line-height:1.45;}
+.lo-check{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;margin-bottom:.55rem;}
+.lo-check input{margin-top:.25rem;accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
+.progress-bar{height:9px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin:.2rem 0 .6rem;}
+.progress-bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease;}
+.progress-text{font-size:.8rem;color:var(--muted);margin:0 0 .7rem;}
+.prevnext{display:flex;flex-direction:column;gap:.55rem;font-size:.85rem;}
+.prevnext a{
+  display:block;text-decoration:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.6rem .75rem;color:var(--text);background:var(--surface-2);
+}
+.prevnext a:hover{border-color:var(--accent);color:var(--accent);}
+.prevnext .dir{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:800;}
+
+/* ---------- Resource cards ---------- */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin:1rem 0;}
+.res{
+  border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:var(--radius-sm);padding:.8rem .9rem;background:var(--surface-2);font-size:.9rem;
+}
+.res a{font-weight:700;}
+.res .kind{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:.25rem;}
+
+/* ---------- Footer ---------- */
+.footer-nav{border-top:1px solid var(--border);background:var(--surface);}
+.footer-nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:1rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.9rem;
+}
+.footer-nav a{text-decoration:none;font-weight:700;}
+.footer-nav a:hover{text-decoration:underline;}
+footer.site{background:var(--header-bg);color:var(--header-muted);}
+footer.site .inner{max-width:var(--maxw);margin:0 auto;padding:1.6rem 1.25rem;font-size:.88rem;}
+footer.site strong{color:#fff;}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  .flip-inner{transition:none;}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  html[data-theme="dark"]{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  body{background:#fff !important;color:#000 !important;font-size:11.5pt;}
+  .topbar,.section-nav,.sidebar,.header-tools,.skip-link,.footer-nav{display:none !important;}
+  .layout{display:block;max-width:none;padding:0;}
+  .card,.quiz-block,.activity-block,.sim{box-shadow:none;border:1px solid #999;break-inside:avoid;}
+  .lesson-header{background:#fff !important;color:#000 !important;border-bottom:2px solid #000;}
+  .lesson-header h1,.tagline{color:#000 !important;}
+  .meta-chip{color:#000 !important;border-color:#000;}
+  .part-banner{background:#fff !important;color:#000 !important;border:1px solid #000;border-left:6px solid #000;}
+  .part-banner h2,.part-banner p,.part-banner .p-label{color:#000 !important;}
+  .activity-header{background:#eee !important;color:#000 !important;}
+  thead th{background:#ddd !important;color:#000 !important;}
+  .flip-inner{transform:none !important;}
+  .flip-face{position:static;transform:none !important;backface-visibility:visible;min-height:0;margin-bottom:.4rem;}
+  .flip-card{min-height:0;}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;}
+  footer.site{background:#fff !important;color:#000 !important;border-top:1px solid #000;}
+  footer.site strong{color:#000 !important;}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home-link" href="index.html">&larr; Course Home</a>
+    <span>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands</span>
+  </div>
+</div>
+
+<!-- ============================ HEADER ============================ -->
+<header class="lesson-header">
+  <div class="lesson-header-inner">
+    <p class="eyebrow">OT-101 &middot; Day 5 &middot; Lesson 10 &middot; 4 contact hours</p>
+    <h1>Access Control &amp; Identity Management in OT</h1>
+    <p class="tagline">Who gets to touch the control system, how you prove it was really them, and what happens to that access the day they leave — without ever locking an operator out of an alarm.</p>
+    <div class="meta-row">
+      <span class="meta-chip">Level: Intermediate</span>
+      <span class="meta-chip">Strand: Identity &amp; Access</span>
+      <span class="meta-chip">Duration: 4 hours</span>
+      <span class="meta-chip">6 learning objectives</span>
+    </div>
+    <div class="header-tools">
+      <button type="button" class="btn btn-ghost" id="themeToggle" aria-pressed="false">
+        <span aria-hidden="true" id="themeIcon">&#9789;</span>
+        <span id="themeLabel">Switch to dark mode</span>
+      </button>
+      <button type="button" class="btn btn-ghost" id="printBtn">
+        <span aria-hidden="true">&#128424;</span> Print / Save as PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ SECTION NAV ============================ -->
+<nav class="section-nav" aria-label="Sections in this lesson">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#roles">1. Roles &amp; RBAC</a></li>
+    <li><a href="#shared-console">2. Shared Console</a></li>
+    <li><a href="#pam">3. PAM &amp; Jump Hosts</a></li>
+    <li><a href="#mfa">4. MFA Placement</a></li>
+    <li><a href="#lifecycle">5. Identity Lifecycle</a></li>
+    <li><a href="#compare">6. Side by Side</a></li>
+    <li><a href="#sim">7. Provisioning Simulator</a></li>
+    <li><a href="#mapping">8. Mapping Lab</a></li>
+    <li><a href="#activity">9. Vendor Access Policy</a></li>
+    <li><a href="#review">10. Knowledge Check</a></li>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+
+<div class="layout">
+
+<!-- ============================ MAIN ============================ -->
+<main id="main">
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section id="overview" class="card" aria-labelledby="h-overview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-overview">Lesson Overview</h2>
+        <p class="sub">Orientation, anchoring analogy, and what you should be able to do by the end.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <p>Ask an IT security team how they manage identity, and the answer usually runs through a single directory: one account per person, multi-factor authentication (MFA) everywhere, automatic disablement the moment HR marks someone terminated. Ask an OT team the same question, and the honest answer is messier — and the mess is not incompetence. It is the predictable result of building identity controls for equipment that was never designed to have any.</p>
+
+    <p>This lesson is an SME-level walkthrough of <strong>why identity and access management (IAM) is genuinely harder in an industrial control system (ICS) than in a typical office network</strong>, and what a defensible OT identity program does about it anyway. Before we get to roles, privileged access, or MFA, it's worth naming the constraints up front, because every technique in this lesson exists specifically to work around one of them:</p>
+
+    <ul class="tight">
+      <li><strong>Shared, generic logins are common at the operator level.</strong> A control room HMI often stays logged into one "Operator" session across an entire shift rotation, because logging out mid-shift risks missing an alarm.</li>
+      <li><strong>Many field devices have no concept of a user at all.</strong> A PLC's engineering port frequently supports a single shared password — or nothing — not per-person accounts, so "who has access" and "who logged in" can be two different questions.</li>
+      <li><strong>Vendors need real, but temporary, access.</strong> A relay or drive vendor may need hands-on control of a live device for a two-hour troubleshooting call, then never again — a pattern IT identity systems, built around long-lived employee accounts, don't handle gracefully by default.</li>
+      <li><strong>You cannot lock someone out during a safety event.</strong> A control that would be reasonable on a laptop — session timeout, forced re-authentication, account lockout after failed attempts — can itself become the hazard if it fires while an operator is responding to an alarm.</li>
+      <li><strong>Equipment outlives identity systems.</strong> A relay or RTU commissioned in 2008 may still be in service in 2030, long after the vendor's original authentication scheme (if any) is obsolete, while the plant's IT directory has been replaced two or three times over.</li>
+      <li><strong>Deprovisioning lags.</strong> Disabling someone's corporate Active Directory account does nothing to a local account on an isolated engineering workstation that was never synchronized to that directory in the first place.</li>
+    </ul>
+
+    <div class="analogy-box">
+      <span class="label">Anchoring analogy — the master key and the guest badge</span>
+      <p>Think about how a large hotel handles access. The general manager doesn't hand every housekeeper an identical master key to every room in the building forever — that's a liability the moment one key goes missing. Instead, housekeeping staff get a key that opens only the rooms on their assigned floor, for their assigned shift (<strong>role-based access</strong> at the minimum needed to do the job — <strong>least privilege</strong>). A plumber called in for one afternoon gets a temporary card, escorted or logged, that expires the moment the work order closes (a <strong>time-boxed, brokered</strong> credential — the same idea behind <strong>PAM</strong> and a <strong>jump host</strong>). The front desk itself, where anyone can walk up, requires the clerk to show ID before touching the reservation system (<strong>MFA</strong> at a genuine choke point). And when an employee quits, the hotel doesn't just cancel their badge in one system — it re-keys every lock that badge could have opened, because a badge nobody remembers to physically collect is still a working key (the deprovisioning gap this lesson keeps returning to).</p>
+      <p>Every technique in this lesson is one piece of that hotel's key policy, translated to a plant floor where some of the "rooms" are 1990s vintage and were never built with a lock cylinder that accepts a modern key at all.</p>
+    </div>
+
+    <h3>Learning objectives</h3>
+    <p>By the end of this 4-hour session, you will be able to:</p>
+    <ol class="lo-list">
+      <li><strong>Explain</strong> why identity and access management in an ICS/OT environment differs from a typical IT environment, citing at least two OT-specific constraints.</li>
+      <li><strong>Identify</strong> appropriate operator, engineer, and vendor roles and apply role-based access control (RBAC) to a described plant network.</li>
+      <li><strong>Evaluate</strong> the shared-console problem and propose a compensating control that restores individual accountability without disrupting continuous operations.</li>
+      <li><strong>Configure</strong>, in simulation, a least-privilege access request that matches a privileged access management (PAM) and jump-host architecture for a remote vendor session.</li>
+      <li><strong>Evaluate</strong> where multi-factor authentication is appropriate on a control network and where it introduces unacceptable operational risk.</li>
+      <li><strong>Design</strong> a provisioning-to-deprovisioning identity lifecycle checklist that closes the OT deprovisioning gaps discussed in this lesson.</li>
+    </ol>
+
+    <div class="callout safety">
+      <strong>Safeguards &amp; Responsible Use.</strong> Nothing in this lesson touches live or production equipment, energized panels, or any real network or credential system. All hands-on work is browser-based simulation using fictional data. We study defensive identity design, not offensive tooling or credential-harvesting techniques. Real incidents appear only as case-study discussion, never as step-by-step procedures. No vendor, employer, or customer data appears in any example — every organization, account, and role below is fictional.
+    </div>
+  </section>
+
+  <!-- ===================== PART A BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part A</span>
+    <h2>The Access Control Toolkit — Roles, Privilege, Brokers, and MFA</h2>
+    <p>Roughly 2 hours of guided lecture, diagrams, and worked examples.</p>
+  </div>
+
+  <!-- ===================== 1. ROLES & RBAC ===================== -->
+  <section id="roles" class="card" aria-labelledby="h-roles">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="8" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><circle cx="17" cy="9" r="2.6"/><path d="M14.5 20c.3-2.8 2-4.8 4.3-4.8"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-roles">1. Roles, RBAC &amp; the OT Access Challenge</h2>
+        <p class="sub">Operators, engineers, and vendors don't just have different jobs — they need structurally different accounts.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Role-based access control (RBAC)</strong> assigns permissions to a named role — Operator, Controls Engineer, Vendor Support Technician — rather than to each person individually, so that everyone who fills that role inherits the same, pre-approved permission set. The companion principle, <strong>least privilege</strong>, says that whatever role a person is assigned, the actual permissions granted should be the minimum needed to do that specific job — not the minimum for the role in the abstract, and not "whatever's convenient to provision." RBAC answers <em>which permission set does this job need</em>; least privilege answers <em>has this person actually been given more than that</em>. The two work together, but they are not the same question, and a defensible OT access program checks both.</p>
+
+    <p>In a plant, three broad role families cover most accounts, and each has a different natural ceiling on what it should be able to do:</p>
+    <ul class="tight">
+      <li><strong>Operators</strong> — view process data, acknowledge alarms, and change setpoints within a pre-approved safe range from an HMI. They should not be able to modify PLC logic, change alarm thresholds outside policy, or reach the engineering network.</li>
+      <li><strong>Controls engineers</strong> — configure and modify PLC/RTU logic, tune loops, and manage firmware, typically scoped to the specific line, unit, or system they are responsible for — not the whole plant by default.</li>
+      <li><strong>Vendors / support technicians</strong> — need deep, sometimes privileged access to a specific device for a specific, time-limited reason, and almost never need standing access at all.</li>
+    </ul>
+
+    <h3>Worked example — role matrix, Ironwood Precision Manufacturing</h3>
+    <p><strong>Ironwood Precision Manufacturing</strong> (fictional) runs a CNC machining line with a small PLC-based SCADA system. Its identity team maintains one role matrix that both the plant and IT security refer to when provisioning any new account:</p>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 1. Role-to-permission matrix, Ironwood Precision Manufacturing CNC line (fictional).</caption>
+        <thead>
+          <tr><th scope="col">Permission</th><th scope="col">Operator</th><th scope="col">Shift Supervisor</th><th scope="col">Controls Engineer</th><th scope="col">Vendor Tech</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">View HMI screens &amp; trends</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Time-boxed only</td></tr>
+          <tr><th scope="row">Acknowledge alarms</th><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+          <tr><th scope="row">Change setpoints within safe range</th><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+          <tr><th scope="row">Override safe-range limits</th><td>No</td><td>Yes, logged</td><td>Yes, logged</td><td>No</td></tr>
+          <tr><th scope="row">Modify PLC logic / firmware</th><td>No</td><td>No</td><td>Yes, assigned line only</td><td>Time-boxed, PAM-brokered only</td></tr>
+          <tr><th scope="row">Remote access to engineering network</th><td>No</td><td>No</td><td>Yes, MFA required</td><td>Jump host only, MFA + session recording</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Notice that the <strong>Vendor Tech</strong> column is never "No" across the board and never "Yes" without a qualifier — vendor accounts are the row where least privilege has to be enforced hardest, because a vendor's business relationship with the plant, unlike an employee's, has no natural deprovisioning trigger like an exit interview.</p>
+
+    <h3>Four terms, one toolkit</h3>
+    <p>The rest of this lesson builds out four techniques faculty often blur together. Each answers a different question:</p>
+    <div class="flip-grid">
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">RBAC</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"what permission set does this job need?"</em> Permissions are assigned to a named role once, then inherited by every account placed in that role.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Least Privilege</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"has this specific account actually been given more than it needs?"</em> Even within a role, standing access should be scoped to the narrowest set that lets the job get done.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">PAM</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"how do we grant powerful, temporary access without handing over a standing credential?"</em> A broker checks credentials out for a defined window and revokes them automatically.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">MFA</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Answers <em>"is the person authenticating really who the credential says they are?"</em> Effective at general-purpose choke points; risky where it can delay a safety-critical response.</span>
+        </span>
+      </button>
+    </div>
+    <p class="sub">Each card is a button: press <kbd>Enter</kbd> or <kbd>Space</kbd> to flip it. All four definitions also print in full.</p>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> Students with an IT background often assume RBAC alone is sufficient. It isn't — RBAC without a least-privilege review just means everyone in a role gets the role's <em>maximum</em> permission set by default, whether or not any given person needs all of it. The Ironwood matrix above intentionally shows a Controls Engineer role scoped to "assigned line only," not "any line" — that scoping decision is least privilege, layered on top of RBAC.
+    </div>
+  </section>
+
+  <!-- ===================== 2. SHARED CONSOLE ===================== -->
+  <section id="shared-console" class="card" aria-labelledby="h-shared-console">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><circle cx="12" cy="10" r="2.2"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-shared-console">2. The Shared Console Problem</h2>
+        <p class="sub">Restoring "who did that" without breaking a station that can never go dark.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p>Walk into almost any control room and you'll find at least one HMI station logged into a single, generic operator session that has been open for months. This is the <strong>shared console problem</strong>: an OS or application session shared across an entire shift rotation, so that whatever any operator does — acknowledge an alarm, change a setpoint, silence a horn — is attributed to "Operator," not to a specific person. From a pure IT standpoint this looks like a glaring control gap. From an operations standpoint, it is often a deliberate, defensible choice: logging out to switch users mid-shift risks a missed alarm during the seconds the screen is unavailable, and some HMI software doesn't support fast user-switching at all.</p>
+
+    <p>The wrong fix is to treat this as a simple policy violation to be stamped out — "just require individual logins" ignores the real operational constraint that created the shared session in the first place. The right fix preserves the always-available session while restoring individual accountability through a layer <em>on top of</em> it.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the fire station radio</span>
+      <p>A fire station's dispatch radio stays on and monitored around the clock; nobody logs out of it between calls. But every transmission is still tied to a specific unit and, on the call log, a specific responding crew — not because the radio itself has a login screen, but because a separate accountability layer (the dispatch log) records who was on duty and who keyed the mic for which call. The radio's always-on session and individual accountability are not in tension; they were simply solved by two different systems.</p>
+    </div>
+
+    <h3>Worked example — Cascade Summit Electric, Substation 12 control room</h3>
+    <p>At <strong>Cascade Summit Electric</strong> (fictional), the SCADA HMI at Substation 12 stays logged into a shared Windows session called <code>SUB12-OPR</code> across all three shifts, because the HMI application does not support fast user-switching without a full restart. The identity team's compensating design:</p>
+    <ul class="tight">
+      <li>The Windows OS session stays shared, as operations requires — but every operator badges in with an RFID proximity card at station start, which sets an "active operator" flag inside the SCADA application itself.</li>
+      <li>Every alarm acknowledgment, setpoint change, and override is timestamped and tagged with the currently active operator's name at the <em>application</em> layer, independent of the shared OS login.</li>
+      <li>If no badge tap has occurred in the current shift window, the application flags every action in that period as <strong>unattributed</strong> — a finding, not a silent gap.</li>
+      <li>The shared account's password is still rotated and known only to the identity team, and it is never used to log into anything else, so a compromised shared credential can't be replayed against the engineering network.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Why not just require individual OS logins?</strong> In some plants that <em>is</em> the right answer — if the HMI software supports fast user-switching and the risk of a missed alarm during a switch is genuinely negligible, individual login is the cleaner control and should be preferred. The badge-plus-application-layer pattern above exists specifically for the case where the software or the operational tempo won't tolerate it. Teach students to ask "can we actually log out here?" before reaching for a compensating control — the compensating control is the fallback, not the default.
+    </div>
+
+    <p>Two failure modes to watch for when reviewing a shared-console design: first, a <strong>paper sign-in sheet</strong> at the console is not a substitute for either fix — it isn't enforced, isn't tamper-evident, and nobody checks it until after an incident. Second, <strong>rotating the shared password on a schedule</strong> improves hygiene but does nothing for accountability — it doesn't tell you who did what, only that the same password isn't stale.</p>
+  </section>
+
+  <!-- ===================== 3. PAM & JUMP HOSTS ===================== -->
+  <section id="pam" class="card" aria-labelledby="h-pam">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/><circle cx="12" cy="15" r="1.6"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-pam">3. Privileged Access, Jump Hosts &amp; Remote Vendor Sessions</h2>
+        <p class="sub">The specific architecture that lets a vendor fix a relay without ever holding a standing OT credential.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p><strong>Privileged access management (PAM)</strong> is the practice of brokering high-privilege credentials — engineering-level logins, PLC programming access, firewall admin — through a system that checks credentials out for a defined purpose and window, records what happens during the session, and revokes access automatically when the window closes. PAM exists because standing privileged accounts are exactly the accounts an attacker or a careless insider does the most damage with, and a plant's most privileged accounts are often the ones handed out most casually — to whichever vendor called last.</p>
+
+    <p>A <strong>jump host</strong> (also called a bastion host) is the single, hardened, closely monitored server that all remote sessions into the OT environment must pass through — never a direct path from the outside world to a PLC or HMI. A jump host does not, by itself, grant any privilege; it is the choke point where identity, PAM, and logging all converge before a session is allowed to continue inward.</p>
+
+    <p><strong>Remote access</strong> in an OT context refers narrowly to any session that originates outside the control network's trust boundary — a vendor connecting from their own office, an engineer working from home, corporate IT reaching into a plant historian. Every remote access path should terminate at a jump host, never inside the control zone itself.</p>
+
+    <h3>Worked example — a vendor troubleshooting call at Ironwood</h3>
+    <p>A protective relay at Ironwood Precision Manufacturing throws an intermittent fault code. The relay vendor's support engineer needs hands-on access to the device's configuration software to diagnose it. The session that follows:</p>
+    <ol class="tight">
+      <li>The plant's controls engineer opens a scheduled access request in the PAM system: specific device, specific two-hour window, specific vendor account.</li>
+      <li>The vendor authenticates to the jump host in the OT DMZ from their own network, over an approved remote-access gateway, with <strong>MFA</strong> required at this step.</li>
+      <li>The PAM broker checks out a scoped credential for the target relay's configuration port — the vendor never sees or types the actual device password.</li>
+      <li>The session is screen-recorded and keystroke-logged for the full two hours, viewable later by the controls engineer if needed.</li>
+      <li>At the end of the two-hour window, the PAM broker automatically revokes the checked-out credential and terminates the session, whether or not the vendor is finished.</li>
+      <li>No standing VPN account, no long-lived password, and no direct route from the vendor's laptop to the relay ever existed.</li>
+    </ol>
+
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 900 300" role="img" aria-labelledby="t-pam d-pam">
+          <title id="t-pam">The jump host and PAM broker path for a remote vendor session</title>
+          <desc id="d-pam">A vertical chain of five stages from top to bottom, each a labelled box. Stage one, vendor workstation, located off-site on the public internet, untrusted. Stage two, corporate remote access gateway, where multi-factor authentication is enforced before any session proceeds. Stage three, jump host and PAM broker, positioned in the OT demilitarized zone, which checks out a scoped, time-boxed credential and records the full session. Stage four, OT firewall, which permits only the brokered session to pass from the jump host inward. Stage five, target OT asset such as a protective relay or PLC configuration port, which the vendor never receives a standing credential for. An arrow beside the chain reads increasing trust and increasing consequence moving downward.</desc>
+          <g font-family="Segoe UI, sans-serif">
+            <line x1="40" y1="30" x2="40" y2="270" stroke="currentColor" stroke-width="2" opacity=".4"/>
+            <polygon points="40,24 35,36 45,36" fill="currentColor" opacity=".4"/>
+            <text x="18" y="150" fill="currentColor" font-size="11.5" opacity=".75" transform="rotate(-90 18 150)" text-anchor="middle">Deeper into the OT trust zone &#8594;</text>
+
+            <rect x="70" y="18" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="18" width="8" height="46" rx="4" fill="var(--muted)"/>
+            <text x="94" y="46" font-size="13.5" font-weight="700" fill="var(--text)">Vendor workstation — off-site, public internet, untrusted</text>
+
+            <rect x="70" y="74" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="74" width="8" height="46" rx="4" fill="var(--accent)"/>
+            <text x="94" y="102" font-size="13.5" font-weight="700" fill="var(--text)">Corporate remote-access gateway — MFA required here</text>
+
+            <rect x="70" y="130" width="800" height="46" rx="8" fill="var(--accent-soft)" stroke="var(--accent-line)" stroke-width="1.5"/>
+            <text x="94" y="158" font-size="13.5" font-weight="700" fill="var(--text)">Jump host / PAM broker (OT DMZ) — checks out scoped, time-boxed credential; records session</text>
+
+            <rect x="70" y="186" width="800" height="46" rx="8" fill="var(--surface)" stroke="var(--border)"/>
+            <rect x="70" y="186" width="8" height="46" rx="4" fill="var(--accent-2)"/>
+            <text x="94" y="214" font-size="13.5" font-weight="700" fill="var(--text)">OT firewall — permits only the brokered session inward</text>
+
+            <rect x="70" y="242" width="800" height="46" rx="8" fill="var(--warn-bg)" stroke="var(--warn-line)" stroke-width="2"/>
+            <text x="94" y="270" font-size="13.5" font-weight="700" fill="var(--warn-text)">Target OT asset (relay / PLC config port) — no standing vendor credential ever exists here</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 1. A remote vendor session never touches the OT asset directly. It passes through an MFA-protected gateway, a jump host that brokers a time-boxed credential through PAM, and a firewall that only permits that brokered session — leaving no standing account on the target device for anyone to forget about later.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>Assessment idea.</strong> Give students a description of a vendor request ("needs to update firmware on RTU-14 sometime this week") and ask them to write the PAM ticket: scope, duration, MFA requirement, and what gets logged. A ticket that leaves any of those four blank is not ready to approve.
+    </div>
+  </section>
+
+  <!-- ===================== 4. MFA PLACEMENT ===================== -->
+  <section id="mfa" class="card" aria-labelledby="h-mfa">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-mfa">4. Where MFA Is Safe on a Control Network</h2>
+        <p class="sub">"MFA everywhere" is IT advice. On a control network, placement is the whole discipline.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Multi-factor authentication (MFA)</strong> requires two or more independent proofs of identity — something you know (a password), something you have (a token or authenticator app), or something you are (biometrics) — before granting access. In IT, the guidance is close to "use it everywhere you can." In OT, that advice can be actively dangerous if applied without thinking about where the authentication event actually happens.</p>
+
+    <p>The deciding question is not <em>"is this device important?"</em> — everything in a control system is important. The deciding question is: <strong>does adding a second authentication factor introduce a delay or a failure mode that is worse than the risk it mitigates, at this specific point in the network?</strong> A general-purpose gateway with a keyboard and time to spare is a good MFA candidate. A touchscreen an operator is stabbing at mid-alarm is not.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the seatbelt you can't unbuckle in a crash</span>
+      <p>A seatbelt latch that required two hands and a six-digit code to release would be an obviously bad design — it adds friction at the exact moment speed matters most. The same latch, required to even start the car in the first place, is uncontroversial. MFA on an OT network works the same way: it belongs at the moment you're starting a session with time to spare, not at the moment you're already inside an emergency response.</p>
+    </div>
+
+    <h3>Worked example — MFA placement at Cascade Summit Electric</h3>
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 900 320" role="img" aria-labelledby="t-mfa d-mfa">
+          <title id="t-mfa">Where MFA is and is not applied across the OT trust zones</title>
+          <desc id="d-mfa">A vertical chain of five zones from top to bottom, color coded. Corporate remote access entry point, colored as MFA appropriate, general purpose login with time to authenticate. Jump host and PAM broker, colored as MFA appropriate, the single choke point for every remote session. Engineering workstation at level three, colored as MFA appropriate, a general purpose computer with a keyboard used for planned configuration work. HMI operator console at level two, colored as MFA generally not appropriate, a touchscreen used for time critical alarm response where a second factor could delay a safety action. Field controller engineering port at level zero or one, colored as MFA not supported, legacy hardware with only a single shared password or no authentication capability at all.</desc>
+          <g font-family="Segoe UI, sans-serif">
+            <rect x="70" y="16" width="800" height="46" rx="8" fill="var(--ok-bg)" stroke="var(--ok-line)" stroke-width="1.5"/>
+            <text x="94" y="44" font-size="13.5" font-weight="700" fill="var(--ok-text)">Corporate remote-access entry — MFA appropriate: time to authenticate, keyboard present</text>
+
+            <rect x="70" y="72" width="800" height="46" rx="8" fill="var(--ok-bg)" stroke="var(--ok-line)" stroke-width="1.5"/>
+            <text x="94" y="100" font-size="13.5" font-weight="700" fill="var(--ok-text)">Jump host / PAM broker (OT DMZ) — MFA appropriate: single choke point for every remote session</text>
+
+            <rect x="70" y="128" width="800" height="46" rx="8" fill="var(--ok-bg)" stroke="var(--ok-line)" stroke-width="1.5"/>
+            <text x="94" y="156" font-size="13.5" font-weight="700" fill="var(--ok-text)">Engineering workstation (Level 3) — MFA appropriate: planned work, general-purpose keyboard</text>
+
+            <rect x="70" y="184" width="800" height="46" rx="8" fill="var(--warn-bg)" stroke="var(--warn-line)" stroke-width="2"/>
+            <text x="94" y="212" font-size="13.5" font-weight="700" fill="var(--warn-text)">HMI operator console (Level 2) — MFA usually inappropriate: touchscreen, time-critical alarm response</text>
+
+            <rect x="70" y="240" width="800" height="46" rx="8" fill="var(--no-bg)" stroke="var(--no-line)" stroke-width="2"/>
+            <text x="94" y="268" font-size="13.5" font-weight="700" fill="var(--no-text)">Field controller engineering port (Level 0/1) — MFA not supported: legacy device, single shared password or none</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 2. Moving down through the trust zones, MFA fits naturally at general-purpose choke points — remote entry, the jump host, and engineering workstations — but becomes operationally risky at the alarm-response HMI and technically impossible at legacy field-device engineering ports that were never built to support a second factor.</figcaption>
+    </figure>
+
+    <p>Where a device genuinely cannot support MFA — most Level 0/1 field equipment — the compensating control isn't "skip authentication," it's pushing the strong authentication requirement upstream to the nearest point that <em>can</em> enforce it: the jump host or engineering workstation gating access to that device. This is the same logic as Section 3's PAM broker — the control lives where it can actually be enforced without breaking the physical process.</p>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> A common student misconception is that skipping MFA on the HMI means "OT just doesn't do MFA." Correct that directly: OT applies MFA aggressively at the zones built to support it, and compensates elsewhere — it does not abandon strong authentication, it relocates it.
+    </div>
+  </section>
+
+  <!-- ===================== 5. IDENTITY LIFECYCLE ===================== -->
+  <section id="lifecycle" class="card" aria-labelledby="h-lifecycle">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M12 3a9 9 0 100 18 9 9 0 000-18z"/><path d="M12 7v5l3 2"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-lifecycle">5. Identity Lifecycle in a Plant</h2>
+        <p class="sub">Provisioning gets the attention. Deprovisioning is where OT identity programs actually fail.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Provisioning</strong> is the process of creating an account and granting it a role's permissions, gated on the prerequisites being genuinely met — background check, safety training, a signed access request — before the account exists, not after. <strong>Deprovisioning</strong> is the reverse: disabling or removing access when it's no longer justified, whether because of termination, role change, or a vendor's contract ending. In a well-run IT environment, both halves run through one directory and largely take care of themselves. In OT, provisioning tends to get real attention because it's tied to a visible event (a new hire's first day); deprovisioning is where programs quietly fail, because OT accounts often live outside the systems that trigger deprovisioning in the first place.</p>
+
+    <h3>Worked example — a new controls engineer at Ironwood, hire to termination</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Table 2. Identity lifecycle for a Controls Engineer hire, Ironwood Precision Manufacturing (fictional).</caption>
+        <thead>
+          <tr><th scope="col">Stage</th><th scope="col">Trigger</th><th scope="col">Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Pre-provisioning</th><td>Offer accepted</td><td>Background check and OT safety training completed and recorded before any request is submitted.</td></tr>
+          <tr><th scope="row">Provisioning</th><td>Manager submits access request</td><td>Account created in the Controls Engineer role, scoped to the assigned line only, per the Section 1 role matrix.</td></tr>
+          <tr><th scope="row">Periodic review</th><td>Quarterly access review</td><td>Supervisor confirms the account's scope still matches the employee's current line assignment; unused permissions are removed.</td></tr>
+          <tr><th scope="row">Role change</th><td>Employee transfers to a different line</td><td>Access to the old line is revoked before access to the new line is granted — not added on top of it.</td></tr>
+          <tr><th scope="row">Termination</th><td>HR marks employee terminated</td><td>Corporate directory account disabled same-day. <strong>Separately</strong>, any local accounts on isolated engineering workstations or PLC programming software are located and disabled — these do not follow HR's trigger automatically.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>The gap this table exists to prevent.</strong> HR-triggered deprovisioning reliably reaches whatever is connected to the corporate directory. It does not reliably reach a local Windows account on an air-gapped engineering laptop, a shared PLC programming-software password, or a vendor's standing VPN credential that nobody remembers granting eighteen months ago. A defensible OT identity program maintains a separate, periodically audited inventory of exactly these <em>out-of-band</em> accounts, precisely because they're invisible to the system most organizations trust to catch a departure.
+    </div>
+
+    <p>Vendor accounts deserve their own lifecycle note: because a vendor relationship has no exit interview, the trigger for deprovisioning has to be contractual and calendar-based — a defined contract end date, a PAM session that expires automatically (Section 3), and a periodic vendor-account audit — rather than waiting on an event that will never come from the vendor's side.</p>
+  </section>
+
+  <!-- ===================== 6. COMPARISON ===================== -->
+  <section id="compare" class="card" aria-labelledby="h-compare">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5h7v14H4zM13 5h7v14h-7z"/><path d="M7.5 9h0M16.5 9h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-compare">6. Side by Side: IT Identity vs. OT Identity</h2>
+        <p class="sub">Same underlying goals — authenticate the right person, grant the right access — very different defaults.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 3. IT identity practice and OT identity practice compared across the dimensions that shape this lesson.</caption>
+        <thead>
+          <tr><th scope="col">Dimension</th><th scope="col">Typical IT practice</th><th scope="col">Typical OT practice</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Account model</th><td>One account per person, centrally directory-managed</td><td>Mix of per-person accounts and shared/generic accounts at the operator level</td></tr>
+          <tr><th scope="row">MFA expectation</th><td>Applied broadly, including most login screens</td><td>Applied at general-purpose choke points; avoided at time-critical HMI touchpoints</td></tr>
+          <tr><th scope="row">Session timeout / auto-lock</th><td>Standard, short timeout is normal practice</td><td>Often disabled at operator consoles that must stay available during a shift</td></tr>
+          <tr><th scope="row">Privileged access</th><td>PAM increasingly standard for admin accounts</td><td>PAM critical for vendor and engineering accounts; historically under-deployed</td></tr>
+          <tr><th scope="row">Provisioning trigger</th><td>HR system of record, largely automated</td><td>HR trigger reliably covers directory accounts; local/embedded accounts need a separate process</td></tr>
+          <tr><th scope="row">Deprovisioning speed</th><td>Same-day, automated across connected systems</td><td>Same-day for directory accounts; local and legacy accounts require manual audit</td></tr>
+          <tr><th scope="row">Device authentication capability</th><td>Assumed present on virtually every endpoint</td><td>Often absent or minimal on Level 0/1 field devices</td></tr>
+          <tr><th scope="row">Vendor access model</th><td>Time-boxed VPN or SaaS account, contract-linked</td><td>Should be PAM-brokered, jump-host-only, session-recorded</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The fields both worlds need are identical — a role, a least-privilege scope, an authentication method, an expiration trigger. What differs is which of those fields a plant can fill in automatically versus which one requires a person to remember to check, because the underlying device was never built to report its own account state to anyone.</p>
+  </section>
+
+  <!-- ===================== PART B BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part B</span>
+    <h2>Hands-On — Provision Accounts, Map Controls, and Write a Policy</h2>
+    <p>Roughly 2 hours of simulation and applied design work. Everything below runs in your browser.</p>
+  </div>
+
+  <!-- ===================== 7. SIMULATION ===================== -->
+  <section id="sim" class="card" aria-labelledby="h-sim">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="9" cy="7" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M16 8h5M18.5 5.5v5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-sim">7. Simulation: OT Identity &amp; Access Provisioning</h2>
+        <p class="sub">Build an account the way a real access request would be evaluated — role, zone, duration, authentication, and privilege must all agree.</p>
+      </div>
+      <span class="time-pill">35 min</span>
+    </div>
+
+    <p class="safety-flag"><span aria-hidden="true">&#9888;</span> Simulation only — no real accounts, no live directory, no actual credentials are created or transmitted.</p>
+
+    <p>This builder models a single access request against the fictional <strong>Cascade Summit Electric, Substation 12</strong> network. Choose a requestor role, the network zone the account needs to reach, how long the access should last, the authentication method, and the privilege level requested. Select <strong>Provision account</strong> and the tool will evaluate the combination the way an identity reviewer would — flagging least-privilege violations, MFA placed where it doesn't belong (or missing where it should be required), and access durations that don't match the requestor's role. Provision a few different combinations, including at least one you expect to be flagged, and compare the reasoning in the results panel.</p>
+
+    <div class="sim">
+      <h3 style="margin-top:0">Access request builder</h3>
+      <div class="sim-grid" id="provGrid">
+        <div class="asset">
+          <span class="name">Requestor role</span>
+          <span class="desc">Who is asking for the account?</span>
+          <label for="provRole">Role</label>
+          <select id="provRole">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="operator">Operator</option>
+            <option value="engineer">Controls Engineer</option>
+            <option value="vendor">Vendor / Support Tech</option>
+            <option value="itadmin">IT Administrator</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Target zone</span>
+          <span class="desc">Where does this account need to reach?</span>
+          <label for="provZone">Zone</label>
+          <select id="provZone">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="field">Level 0/1 — Field device engineering port</option>
+            <option value="control">Level 2 — HMI / control network</option>
+            <option value="eng">Level 3 — Engineering workstation / historian</option>
+            <option value="dmz">OT DMZ — Jump host</option>
+            <option value="corp">Corporate IT network</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Access duration</span>
+          <span class="desc">How long should this access remain valid?</span>
+          <label for="provDuration">Duration</label>
+          <select id="provDuration">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="permanent">Standing / permanent</option>
+            <option value="timeboxed">Time-boxed (defined window)</option>
+            <option value="onetime">One-time / single session</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Authentication method</span>
+          <span class="desc">How does the account prove it's really them?</span>
+          <label for="provAuth">Method</label>
+          <select id="provAuth">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="password">Password only</option>
+            <option value="mfa">Password + MFA</option>
+            <option value="badge">Badge + PIN (application layer)</option>
+            <option value="pam">PAM-brokered checkout (no standing password)</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Privilege level</span>
+          <span class="desc">What can the account actually do?</span>
+          <label for="provPriv">Privilege</label>
+          <select id="provPriv">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="view">View only</option>
+            <option value="operate">Operate (ack alarms, setpoints in range)</option>
+            <option value="engineer">Engineer (modify logic / config)</option>
+            <option value="admin">Administrator (full control)</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn" id="provAdd">Provision account</button>
+        <button type="button" class="btn btn-secondary" id="provClear">Clear roster</button>
+      </div>
+      <div class="sim-out" id="provFeedback" role="status" aria-live="polite">
+        <p style="margin:0;color:var(--muted)">Fill in all five fields, then choose <strong>Provision account</strong>. Feedback on this specific request appears here.</p>
+      </div>
+
+      <div class="table-wrap" style="margin-top:1rem">
+        <table style="min-width:0">
+          <caption>Roster of accounts provisioned so far in this session.</caption>
+          <thead>
+            <tr><th scope="col">Role</th><th scope="col">Zone</th><th scope="col">Duration</th><th scope="col">Auth</th><th scope="col">Privilege</th><th scope="col">Review</th></tr>
+          </thead>
+          <tbody id="provRoster">
+            <tr><td colspan="6" style="color:var(--muted)">No accounts provisioned yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Facilitator prompt.</strong> Ask participants to deliberately provision one account they believe will be flagged (for example, a permanent, password-only Vendor Tech account with Administrator privilege on the field-device zone) and one they believe will pass cleanly. Compare the tool's stated reasoning to what the group predicted — disagreements are usually the most productive discussion in this activity.
+    </div>
+  </section>
+
+  <!-- ===================== 8. MAPPING LAB ===================== -->
+  <section id="mapping" class="card" aria-labelledby="h-mapping">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 7h6M14 7h6M4 12h6M14 12h6M4 17h6M14 17h6"/><path d="M10 7l4 5M10 17l4-5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-mapping">8. Mapping Lab: Scenario to Concept</h2>
+        <p class="sub">Six short scenarios. Match each to the identity concept it actually demonstrates.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 8.1 — Scenario-to-concept matching</h3>
+        <span class="t">25 minutes &middot; pairs</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Instructions.</strong> Each row describes a real identity-management moment in a plant. Choose the single concept from this lesson's key terms that the scenario is <em>demonstrating</em> — several scenarios could plausibly involve more than one term, but only one is the best fit for what's actually being described.
+        </div>
+        <div class="ips">
+          <div><h4>Individual · 6 min</h4>Answer all six on your own without discussion.</div>
+          <div><h4>Pairs · 10 min</h4>Compare with a partner. Argue any row where you disagree before checking.</div>
+          <div><h4>Share · 9 min</h4>Report the row your pair argued longest about. That row is usually the most teachable.</div>
+        </div>
+
+        <div class="mapping-table-wrap">
+          <table>
+            <caption>Table 4. Match each identity scenario to the concept it demonstrates.</caption>
+            <thead>
+              <tr><th scope="col" style="width:58%">Scenario</th><th scope="col">Concept</th></tr>
+            </thead>
+            <tbody id="mapBody"><!-- populated by script --></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="mapCheck">Check my mapping</button>
+          <button type="button" class="btn btn-secondary" id="mapReset">Reset</button>
+        </div>
+        <p class="result-line" id="mapResult" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9. VENDOR ACCESS POLICY ACTIVITY ===================== -->
+  <section id="activity" class="card" aria-labelledby="h-activity">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 12h6M9 16h6"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-activity">9. Design a Remote Vendor Access Policy</h2>
+        <p class="sub">The one-page deliverable that turns Figure 1's chain of boxes into something a real vendor coordinator can follow.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>A <strong>remote vendor access policy</strong> is the short document that answers, before the phone rings, exactly how a vendor gets in, what they can touch, and how the access ends. Without one, every vendor request gets negotiated from scratch under time pressure — usually while a line is down and nobody wants to be the person who says no.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the hotel's plumber, one more time</span>
+      <p>Recall the temporary card given to the hotel's plumber. A good policy is the laminated procedure the front desk already has taped under the counter for exactly this situation — who authorizes it, how long the card stays active, and what happens to it when the plumber leaves. Nobody improvises that procedure the day the pipe bursts.</p>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 9.1 — Draft a one-page remote vendor access policy (assessment artifact)</h3>
+        <span class="t">30 minutes &middot; individual, then gallery walk</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Deliverable.</strong> One page, submitted as a PDF or a single slide, written for a real plant identity coordinator at a fictional organization of your choosing (utility, manufacturer, or another OT sector).
+        </div>
+        <p>Your policy must contain:</p>
+        <ol class="tight">
+          <li><strong>The approval path</strong> — who authorizes a vendor remote-access request before any credential is issued, and what information the request must include (device, reason, requested window).</li>
+          <li><strong>The connection path</strong> — a statement that every vendor session terminates at a jump host in the OT DMZ, never a direct connection to a control-network device.</li>
+          <li><strong>The authentication requirement</strong> — MFA at the gateway/jump host, and how credentials to the target device are brokered (PAM) rather than shared directly with the vendor.</li>
+          <li><strong>The expiration rule</strong> — how the access window is time-boxed and what happens automatically when it ends.</li>
+          <li><strong>The logging requirement</strong> — what is recorded during the session and who can review it afterward.</li>
+          <li><strong>The deprovisioning trigger</strong> — since a vendor relationship has no exit interview, name the calendar or contract event that forces a periodic review of standing vendor accounts.</li>
+        </ol>
+        <h4>Success criteria</h4>
+        <ul class="tight">
+          <li>A new vendor coordinator could read the policy and know exactly what to ask for and what to say no to.</li>
+          <li>The policy names an approving role, not a vague "management."</li>
+          <li>No clause allows a standing, un-expiring vendor credential anywhere in the OT network.</li>
+          <li>The logging clause specifies what is captured (session recording, keystrokes, or both) — not just "logging occurs."</li>
+        </ul>
+        <p><strong>Gallery walk.</strong> Post your policy. Read three others. On a sticky note, write the one clause you would add if this were your own program.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 10. REVIEW ===================== -->
+  <section id="review" class="card" aria-labelledby="h-review">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 113.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><path d="M12 17h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-review">10. Knowledge Check</h2>
+        <p class="sub">Five questions. Feedback explains the reasoning, not just the letter.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="quiz-block">
+      <form id="quizForm" novalidate>
+        <div class="q">
+          <fieldset>
+            <legend>1. A control room HMI must stay logged into the SCADA application continuously across a 24-hour shift rotation so alarms are never missed. Which control best restores individual accountability without breaking that requirement?</legend>
+            <label><input type="radio" name="q1" value="a"> Share one login and keep a written paper sign-out log at the station.</label>
+            <label><input type="radio" name="q1" value="b"> A badge-based, application-layer identity check that timestamps every alarm acknowledgment and setpoint change to a specific operator, while the OS session stays logged in.</label>
+            <label><input type="radio" name="q1" value="c"> Require a hardware MFA prompt every time an alarm is acknowledged.</label>
+            <label><input type="radio" name="q1" value="d"> Rotate the shared password every month.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q1"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>2. What is the actual purpose of routing a vendor's remote support session through a jump host with a PAM broker?</legend>
+            <label><input type="radio" name="q2" value="a"> To give the vendor a permanent VPN account into the OT network for convenience on future visits.</label>
+            <label><input type="radio" name="q2" value="b"> To check out a scoped, time-boxed credential so the vendor never holds a standing OT credential, and to record the session for accountability.</label>
+            <label><input type="radio" name="q2" value="c"> To let the vendor bypass the OT DMZ and connect directly to the PLC for faster troubleshooting.</label>
+            <label><input type="radio" name="q2" value="d"> To replace role-based access control entirely, since PAM already grants full access.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q2"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>3. An HMI touchscreen at a Level 2 operator console has no physical keyboard and must respond instantly during an alarm. A jump host in the OT DMZ authenticates remote engineering sessions from off-site. Where does MFA belong?</legend>
+            <label><input type="radio" name="q3" value="a"> On the HMI touchscreen, because operators are the highest-risk insiders.</label>
+            <label><input type="radio" name="q3" value="b"> On the jump host, a general-purpose gatekeeper with normal input devices and time to authenticate — not on the alarm-response HMI.</label>
+            <label><input type="radio" name="q3" value="c"> Nowhere; MFA should never be used anywhere on an OT network.</label>
+            <label><input type="radio" name="q3" value="d"> It doesn't matter — MFA and a single password are interchangeable at every point in the network.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q3"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>4. A Controls Engineer role is defined to permit modifying PLC logic on any line in the plant. One specific engineer, however, is only responsible for Line 3. What does the least-privilege principle say should happen to her account?</legend>
+            <label><input type="radio" name="q4" value="a"> She should still receive the full Controls Engineer role, since RBAC roles must never be customized per person.</label>
+            <label><input type="radio" name="q4" value="b"> Her standing access should be scoped to Line 3 only, even though the general role would technically permit more.</label>
+            <label><input type="radio" name="q4" value="c"> She should be granted Administrator rights to compensate for the narrower scope of her job.</label>
+            <label><input type="radio" name="q4" value="d"> Least privilege only applies to vendor accounts, not to employees.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q4"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>5. An OT engineer's employment ends and IT immediately disables her Active Directory account. Two weeks later, an auditor finds she can still log into a PLC engineering workstation using a local account never tied to the corporate directory. What does this reveal?</legend>
+            <label><input type="radio" name="q5" value="a"> The AD disablement proves deprovisioning worked correctly and nothing further was needed.</label>
+            <label><input type="radio" name="q5" value="b"> Deprovisioning must also cover local and embedded accounts on OT devices, since many control-system logins are never synchronized with the corporate directory.</label>
+            <label><input type="radio" name="q5" value="c"> This is expected and not a security concern, since the workstation is presumed isolated.</label>
+            <label><input type="radio" name="q5" value="d"> The engineer's manager, not IT or OT security, is solely responsible for catching this gap.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q5"></div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn" id="gradeBtn">Grade my quiz</button>
+          <button type="button" class="btn btn-secondary" id="quizReset">Clear answers</button>
+        </div>
+        <p class="score" id="scoreOut" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== RESOURCES ===================== -->
+  <section id="resources" class="card" aria-labelledby="h-res">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5z"/><path d="M4 18h16v3H6.5A2.5 2.5 0 014 18.5z"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-res">Further Reading &amp; Viewing</h2>
+        <p class="sub">Supporting resources cited in this lesson. External links open in a new tab.</p>
+      </div>
+      <span class="time-pill">Reference</span>
+    </div>
+
+    <h3>Standards, guidance, and video</h3>
+    <div class="res-grid">
+      <div class="res">
+        <span class="kind">Video</span>
+        <a href="https://www.youtube.com/watch?v=mNC5T00XBi0" target="_blank" rel="noopener noreferrer">Supplementary video on identity &amp; access management</a>
+        <p style="margin:.4rem 0 0">A companion video introducing identity and access management concepts. Useful as a pre-class primer or a Part A refresher; verify the specific content aligns with this lesson before assigning it.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Federal guidance</span>
+        <a href="https://csrc.nist.gov/pubs/sp/800/82/r3/final" target="_blank" rel="noopener noreferrer">NIST SP 800-82 Rev. 3 — Guide to OT Security</a>
+        <p style="margin:.4rem 0 0">Background on tailoring identification and authentication controls for OT, referenced throughout Sections 3–5.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Standard</span>
+        <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards" target="_blank" rel="noopener noreferrer">ISA/IEC 62443-3-3 — System Security Requirements</a>
+        <p style="margin:.4rem 0 0">Foundational Requirement 2 (Use Control) covers identification, authentication, and authorization — the standards basis for the RBAC and least-privilege guidance in Section 1.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Federal guidance</span>
+        <a href="https://pages.nist.gov/800-63-3/" target="_blank" rel="noopener noreferrer">NIST SP 800-63 — Digital Identity Guidelines</a>
+        <p style="margin:.4rem 0 0">The general-purpose federal reference for authentication assurance levels, useful context for the MFA placement discussion in Section 4.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Draft status.</strong> This lesson page is a first AI-generated draft prepared for OT-101. It has not yet been reviewed by a human subject-matter expert. Verify every standard reference, protocol detail, and technical claim against the primary sources above before using it with students.
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside class="sidebar" aria-label="Lesson tools and navigation">
+
+  <nav class="side-card sidebar-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On this page</h2>
+    <ul>
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#roles">1. Roles &amp; RBAC</a></li>
+      <li><a href="#shared-console">2. Shared Console</a></li>
+      <li><a href="#pam">3. PAM &amp; Jump Hosts</a></li>
+      <li><a href="#mfa">4. MFA Placement</a></li>
+      <li><a href="#lifecycle">5. Identity Lifecycle</a></li>
+      <li><a href="#compare">6. Side by Side</a></li>
+      <li><a href="#sim">7. Provisioning Simulator</a></li>
+      <li><a href="#mapping">8. Mapping Lab</a></li>
+      <li><a href="#activity">9. Vendor Access Policy</a></li>
+      <li><a href="#review">10. Knowledge Check</a></li>
+      <li><a href="#resources">Further Reading</a></li>
+    </ul>
+  </nav>
+
+  <section class="side-card" aria-labelledby="lo-h">
+    <h2 id="lo-h">Objectives progress</h2>
+    <div class="progress-bar"><span id="loBar"></span></div>
+    <p class="progress-text" id="loText" role="status" aria-live="polite">0 of 6 objectives marked complete</p>
+    <div class="lo-check"><input type="checkbox" id="lo1" class="lo-box"><label for="lo1">Explain why OT identity management differs from IT</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo2" class="lo-box"><label for="lo2">Apply RBAC to operator, engineer, and vendor roles</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo3" class="lo-box"><label for="lo3">Evaluate compensating controls for the shared-console problem</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo4" class="lo-box"><label for="lo4">Configure a least-privilege PAM/jump-host access request</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo5" class="lo-box"><label for="lo5">Evaluate safe vs. unsafe placement of MFA on a control network</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo6" class="lo-box"><label for="lo6">Design a provisioning-to-deprovisioning lifecycle checklist</label></div>
+  </section>
+
+  <nav class="side-card sidebar-toc" aria-labelledby="kt-h">
+    <h2 id="kt-h">Key terms</h2>
+    <ul>
+      <li><a href="#roles">RBAC</a><span class="defn">Role-based access control; permissions assigned to a named role and inherited by every account placed in it.</span></li>
+      <li><a href="#roles">Least Privilege</a><span class="defn">Standing access should be the minimum a specific person needs, even within a broader role.</span></li>
+      <li><a href="#pam">PAM</a><span class="defn">Privileged access management; brokers powerful credentials for a defined, time-boxed purpose and revokes them automatically.</span></li>
+      <li><a href="#pam">Jump Host</a><span class="defn">The single hardened bastion every remote OT session must pass through before reaching the control network.</span></li>
+      <li><a href="#mfa">MFA</a><span class="defn">Multi-factor authentication; two or more independent proofs of identity, placed where it won't delay a safety-critical response.</span></li>
+      <li><a href="#pam">Remote Access</a><span class="defn">Any session originating outside the control network's trust boundary; should always terminate at a jump host.</span></li>
+      <li><a href="#lifecycle">Provisioning</a><span class="defn">Creating an account and granting role permissions once prerequisites are genuinely met.</span></li>
+      <li><a href="#lifecycle">Deprovisioning</a><span class="defn">Disabling or removing access when it's no longer justified, including local and embedded accounts outside the corporate directory.</span></li>
+    </ul>
+  </nav>
+
+  <nav class="side-card" aria-labelledby="pn-h">
+    <h2 id="pn-h">Lesson navigation</h2>
+    <div class="prevnext">
+      <a href="lesson09.html"><span class="dir">&larr; Previous</span>Day 4 &middot; Lesson 9 — Governance, Risk &amp; Compliance for IT/OT</a>
+      <a href="lesson11.html"><span class="dir">Next &rarr;</span>Day 5 &middot; Lesson 11 — Monitoring, Detection &amp; OT Incident Response</a>
+    </div>
+  </nav>
+
+</aside>
+</div>
+
+<!-- ============================ FOOTER NAV ============================ -->
+<nav class="footer-nav" aria-label="Previous and next lesson">
+  <div class="footer-nav-inner">
+    <a href="lesson09.html">&larr; Lesson 9 — Governance, Risk &amp; Compliance for IT/OT</a>
+    <a href="index.html">Course Home</a>
+    <a href="lesson11.html">Lesson 11 — Monitoring, Detection &amp; OT Incident Response &rarr;</a>
+  </div>
+</nav>
+
+<footer class="site">
+  <div class="inner">
+    <p><strong>OT-101 &middot; Teaching Operational Technologies and Cybersecurity for Community College Faculty</strong></p>
+    <p>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands &nbsp;|&nbsp; Day 5 &middot; Lesson 10 — Access Control &amp; Identity Management in OT</p>
+    <p>All activities are simulation-only using fictional organizations and data. No live or production equipment, no offensive tooling, no vendor or customer data. First AI-generated draft — pending subject-matter expert review.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Theme toggle (light default, localStorage persisted) --------------- */
+  var root = document.documentElement;
+  var toggle = document.getElementById("themeToggle");
+  var icon = document.getElementById("themeIcon");
+  var label = document.getElementById("themeLabel");
+  var KEY = "ot101-theme";
+
+  function safeGet() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function safeSet(v) { try { localStorage.setItem(KEY, v); } catch (e) { /* storage unavailable */ } }
+
+  function applyTheme(mode) {
+    root.setAttribute("data-theme", mode);
+    var dark = mode === "dark";
+    toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    icon.innerHTML = dark ? "&#9728;" : "&#9789;";
+    label.textContent = dark ? "Switch to light mode" : "Switch to dark mode";
+  }
+  applyTheme(safeGet() === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(next);
+    safeSet(next);
+  });
+
+  /* ---------------- Print ---------------- */
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  /* ---------------- Scrollspy for section nav ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".section-nav a"));
+  var targets = navLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+
+  function setCurrent(id) {
+    navLinks.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+  }
+  if ("IntersectionObserver" in window && targets.length) {
+    var obs = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; })
+        .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+      if (visible.length) { setCurrent(visible[0].target.id); }
+    }, { rootMargin: "-140px 0px -60% 0px", threshold: 0 });
+    targets.forEach(function (t) { obs.observe(t); });
+  }
+
+  /* ---------------- Flip cards ---------------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".flip-card"), function (card) {
+    card.addEventListener("click", function () {
+      var on = card.getAttribute("aria-pressed") === "true";
+      card.setAttribute("aria-pressed", on ? "false" : "true");
+    });
+  });
+
+  /* ---------------- Objectives progress ---------------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".lo-box"));
+  var bar = document.getElementById("loBar");
+  var loText = document.getElementById("loText");
+  function updateLO() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    bar.style.width = (done / boxes.length * 100) + "%";
+    loText.textContent = done + " of " + boxes.length + " objectives marked complete";
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", updateLO); });
+  updateLO();
+
+  /* ---------------- Identity & Access Provisioning simulator ---------------- */
+  var ROLE_LABELS = { operator: "Operator", engineer: "Controls Engineer", vendor: "Vendor / Support Tech", itadmin: "IT Administrator" };
+  var ZONE_LABELS = { field: "Level 0/1 field device", control: "Level 2 HMI / control", eng: "Level 3 engineering workstation", dmz: "OT DMZ jump host", corp: "Corporate IT network" };
+  var DUR_LABELS = { permanent: "Standing / permanent", timeboxed: "Time-boxed", onetime: "One-time session" };
+  var AUTH_LABELS = { password: "Password only", mfa: "Password + MFA", badge: "Badge + PIN", pam: "PAM-brokered" };
+  var PRIV_LABELS = { view: "View only", operate: "Operate", engineer: "Engineer", admin: "Administrator" };
+  var PRIV_RANK = { view: 0, operate: 1, engineer: 2, admin: 3 };
+  var ROLE_CEILING = { operator: "operate", engineer: "engineer", vendor: "view", itadmin: "admin" };
+  var ROLE_NORMAL_ZONES = { operator: ["control"], engineer: ["eng", "control", "field", "dmz"], vendor: ["field", "eng", "dmz"], itadmin: ["corp", "dmz"] };
+
+  function evaluateRequest(role, zone, duration, auth, priv) {
+    var findings = [];
+    var brokered = (duration === "timeboxed" || duration === "onetime") && auth === "pam";
+
+    /* Rule 1: privilege ceiling for the role */
+    var ceilingRank = PRIV_RANK[ROLE_CEILING[role]];
+    if (PRIV_RANK[priv] > ceilingRank) {
+      if (brokered) {
+        findings.push(["warn", ROLE_LABELS[role] + " normally caps at " + PRIV_LABELS[ROLE_CEILING[role]] + ", but " + PRIV_LABELS[priv] + " is acceptable here only because it is PAM-brokered and time-boxed rather than standing."]);
+      } else {
+        findings.push(["fail", ROLE_LABELS[role] + " exceeds least privilege: this role should be capped at " + PRIV_LABELS[ROLE_CEILING[role]] + " for standing or casual access, not " + PRIV_LABELS[priv] + "."]);
+      }
+    } else {
+      findings.push(["pass", PRIV_LABELS[priv] + " privilege is within " + ROLE_LABELS[role] + "'s normal ceiling."]);
+    }
+
+    /* Rule 2: zone appropriateness */
+    if (ROLE_NORMAL_ZONES[role].indexOf(zone) === -1) {
+      findings.push(["warn", ROLE_LABELS[role] + " reaching " + ZONE_LABELS[zone] + " is outside this role's normal zone. Confirm this is a deliberate, documented exception, not a default grant."]);
+    } else {
+      findings.push(["pass", ROLE_LABELS[role] + " reaching " + ZONE_LABELS[zone] + " matches this role's expected zone."]);
+    }
+
+    /* Rule 3: authentication vs. zone */
+    if (zone === "field" && auth === "mfa") {
+      findings.push(["fail", "Level 0/1 field-device engineering ports typically cannot support MFA at all. Push strong authentication upstream to the jump host or engineering workstation instead (Section 4)."]);
+    } else if (zone === "control" && auth === "mfa" && priv === "operate") {
+      findings.push(["warn", "Requiring MFA at the alarm-response HMI can delay a safety-critical action. Consider the badge/application-layer identity pattern from Section 2 instead."]);
+    } else if (zone === "dmz" && auth !== "mfa" && auth !== "pam") {
+      findings.push(["fail", "The jump host is the network's core choke point (Section 3). It must require MFA or a PAM-brokered session, not a bare password."]);
+    } else if (zone === "corp" && auth === "password") {
+      findings.push(["warn", "Corporate remote-access entry is a general-purpose choke point with time to authenticate \u2014 MFA is recommended here even though the deeper OT risk hasn't been reached yet."]);
+    } else if (zone === "eng" && auth === "password" && (priv === "engineer" || priv === "admin")) {
+      findings.push(["warn", "The engineering workstation has a normal keyboard and supports planned work \u2014 add MFA here rather than relying on a password alone for engineer/admin-level access."]);
+    } else {
+      findings.push(["pass", AUTH_LABELS[auth] + " is a reasonable authentication method for " + ZONE_LABELS[zone] + "."]);
+    }
+
+    /* Rule 4: duration vs. role */
+    if (role === "vendor" && duration === "permanent") {
+      findings.push(["fail", "Vendor relationships have no exit interview to trigger deprovisioning. Standing/permanent vendor access should never be issued \u2014 use time-boxed or one-time, PAM-brokered access instead (Section 3)."]);
+    } else if (role === "vendor" && !brokered) {
+      findings.push(["warn", "Time-boxing is good, but without PAM brokering (\"" + AUTH_LABELS[auth] + "\") the vendor may still be handed a standing credential that outlives the access window."]);
+    } else if (role === "vendor" && brokered) {
+      findings.push(["pass", "Time-boxed, PAM-brokered vendor access matches the pattern this lesson recommends \u2014 no standing credential is created."]);
+    } else if ((role === "engineer" || role === "itadmin" || role === "operator") && duration === "permanent") {
+      findings.push(["pass", "Standing access is normal for an employee role, provided it is captured in the periodic access review from Section 5."]);
+    } else {
+      findings.push(["pass", DUR_LABELS[duration] + " duration is reasonable for this request."]);
+    }
+
+    var verdict = "pass";
+    findings.forEach(function (f) { if (f[0] === "fail") { verdict = "fail"; } else if (f[0] === "warn" && verdict !== "fail") { verdict = "warn"; } });
+    return { findings: findings, verdict: verdict };
+  }
+
+  var provFeedback = document.getElementById("provFeedback");
+  var provRoster = document.getElementById("provRoster");
+  var rosterCount = 0;
+
+  function verdictWord(v) { return v === "fail" ? "Flagged \u2014 do not approve as written" : (v === "warn" ? "Flagged \u2014 review before approving" : "Clear"); }
+  function verdictColor(v) { return v === "fail" ? "var(--no-text)" : (v === "warn" ? "var(--warn-text)" : "var(--ok-text)"); }
+
+  document.getElementById("provAdd").addEventListener("click", function () {
+    var role = document.getElementById("provRole").value;
+    var zone = document.getElementById("provZone").value;
+    var duration = document.getElementById("provDuration").value;
+    var auth = document.getElementById("provAuth").value;
+    var priv = document.getElementById("provPriv").value;
+
+    if (!role || !zone || !duration || !auth || !priv) {
+      provFeedback.innerHTML = '<div class="finding warn">Please choose a value for all five fields before provisioning the account.</div>';
+      return;
+    }
+
+    var result = evaluateRequest(role, zone, duration, auth, priv);
+    var html = "<h4 style='margin-top:0'>Review: " + verdictWord(result.verdict) + "</h4>";
+    result.findings.forEach(function (f) {
+      var cls = f[0] === "pass" ? "finding pass" : (f[0] === "warn" ? "finding warn" : "finding");
+      var tagChar = f[0] === "pass" ? "\u2713 " : (f[0] === "warn" ? "\u26A0 " : "\u2717 ");
+      html += '<div class="' + cls + '">' + tagChar + f[1] + "</div>";
+    });
+    provFeedback.innerHTML = html;
+
+    if (rosterCount === 0) { provRoster.innerHTML = ""; }
+    rosterCount++;
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + ROLE_LABELS[role] + "</td>" +
+      "<td>" + ZONE_LABELS[zone] + "</td>" +
+      "<td>" + DUR_LABELS[duration] + "</td>" +
+      "<td>" + AUTH_LABELS[auth] + "</td>" +
+      "<td>" + PRIV_LABELS[priv] + "</td>" +
+      "<td style='color:" + verdictColor(result.verdict) + ";font-weight:700'>" + verdictWord(result.verdict) + "</td>";
+    provRoster.appendChild(tr);
+  });
+
+  document.getElementById("provClear").addEventListener("click", function () {
+    rosterCount = 0;
+    provRoster.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">No accounts provisioned yet.</td></tr>';
+    provFeedback.innerHTML = '<p style="margin:0;color:var(--muted)">Roster cleared. Fill in all five fields, then choose <strong>Provision account</strong>.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll("#provGrid select"), function (s) { s.value = ""; });
+  });
+
+  /* ---------------- Mapping lab ---------------- */
+  var MAP_OPTIONS = [
+    "RBAC",
+    "Least Privilege",
+    "PAM",
+    "MFA",
+    "Remote Access",
+    "Provisioning"
+  ];
+  var MAP_ROWS = [
+    {
+      text: "Every account tagged \u201cControl Room Operator\u201d automatically receives the same fixed set of HMI permissions, defined once and reused for every operator hired.",
+      answer: "RBAC",
+      why: "Permissions are attached to a named role and inherited by anyone placed in it \u2014 the defining pattern of role-based access control."
+    },
+    {
+      text: "A controls engineer who normally maintains only Line 3 is denied standing access to Line 1 and Line 2, even though her account role would technically support all three lines.",
+      answer: "Least Privilege",
+      why: "Scoping a specific account down below what its role would technically allow, to match the actual job, is least privilege layered on top of RBAC."
+    },
+    {
+      text: "A vendor's remote session credentials are checked out from a broker for a two-hour maintenance window and automatically expire the moment the window ends.",
+      answer: "PAM",
+      why: "Brokering a scoped, time-boxed credential and revoking it automatically is exactly what privileged access management is built to do."
+    },
+    {
+      text: "Logging into the jump host from off-site requires a password plus a one-time code from an authenticator app before the session is granted.",
+      answer: "MFA",
+      why: "Two independent proofs of identity \u2014 something known and something held \u2014 required before authentication succeeds is multi-factor authentication."
+    },
+    {
+      text: "A support technician's connection route runs from the internet, through a firewall and a jump host, into the OT DMZ \u2014 never directly into the control network.",
+      answer: "Remote Access",
+      why: "Any session originating outside the control network's trust boundary, terminating at a jump host rather than a direct path in, is the remote access pattern this lesson teaches."
+    },
+    {
+      text: "HR confirms a new hire's background check and safety training are complete before the identity team creates the employee's account and assigns a role.",
+      answer: "Provisioning",
+      why: "Creating an account only once the real prerequisites are met, then granting the role's permissions, is provisioning."
+    }
+  ];
+
+  var mapBody = document.getElementById("mapBody");
+  var mapResult = document.getElementById("mapResult");
+
+  function buildMap() {
+    mapBody.innerHTML = "";
+    MAP_ROWS.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      var sid = "map-" + i;
+      var opts = ['<option value="">\u2014 select \u2014</option>'].concat(MAP_OPTIONS.map(function (o) {
+        return '<option value="' + o + '">' + o + "</option>";
+      })).join("");
+      tr.innerHTML =
+        "<td><label for='" + sid + "'>" + (i + 1) + ". " + r.text + "</label><span class='map-note'></span></td>" +
+        "<td><select id='" + sid + "' data-row='" + i + "'>" + opts + "</select></td>";
+      mapBody.appendChild(tr);
+    });
+    mapResult.textContent = "";
+  }
+  buildMap();
+
+  document.getElementById("mapCheck").addEventListener("click", function () {
+    var right = 0, blank = 0;
+    Array.prototype.forEach.call(mapBody.querySelectorAll("tr"), function (tr, i) {
+      var sel = tr.querySelector("select");
+      var note = tr.querySelector(".map-note");
+      tr.classList.remove("map-correct", "map-wrong");
+      if (!sel.value) {
+        blank++;
+        note.textContent = "Not answered yet.";
+        return;
+      }
+      if (sel.value === MAP_ROWS[i].answer) {
+        right++;
+        tr.classList.add("map-correct");
+        note.textContent = "Correct. " + MAP_ROWS[i].why;
+      } else {
+        tr.classList.add("map-wrong");
+        note.textContent = "Not quite \u2014 this is " + MAP_ROWS[i].answer + ". " + MAP_ROWS[i].why;
+      }
+    });
+    mapResult.textContent = right + " of " + MAP_ROWS.length + " correct" + (blank ? " (" + blank + " left blank)." : ".");
+  });
+
+  document.getElementById("mapReset").addEventListener("click", function () {
+    buildMap();
+  });
+
+  /* ---------------- Quiz ---------------- */
+  var ANSWERS = {
+    q1: { correct: "b", why: {
+      b: "Correct. A badge-based, application-layer identity check preserves the always-on session operations requires while still timestamping every action to a specific operator.",
+      a: "Not correct. A paper sign-out log is not enforced or tamper-evident, and nobody checks it until after an incident \u2014 the same weak-evidence problem as an unverified verbal claim.",
+      c: "Not correct. Requiring MFA at the moment of alarm acknowledgment can delay a safety-critical response, which is exactly the placement mistake Section 4 warns against.",
+      d: "Not correct. Rotating the shared password improves hygiene but does nothing to tell you who performed a specific action."
+    }},
+    q2: { correct: "b", why: {
+      b: "Correct. A jump host with a PAM broker checks out a scoped, time-boxed credential and records the session, so the vendor never holds a standing OT credential.",
+      a: "Not correct. A permanent VPN account is exactly the standing credential this architecture is designed to avoid \u2014 it has no natural expiration and no exit interview to trigger removal.",
+      c: "Not correct. Bypassing the jump host for a direct PLC connection removes the one choke point where identity, brokering, and logging converge.",
+      d: "Not correct. PAM brokers credentials for a defined purpose; it does not replace role-based access control, which still determines what any brokered session is allowed to do."
+    }},
+    q3: { correct: "b", why: {
+      b: "Correct. The jump host is a general-purpose gatekeeper with time and the right input devices to authenticate; the alarm-response HMI is not, and a second factor there risks delaying a safety-critical action.",
+      a: "Not correct. Placing MFA on the alarm-response touchscreen introduces exactly the kind of delay this lesson identifies as dangerous, regardless of the operator's risk profile.",
+      c: "Not correct. OT applies MFA aggressively at zones built to support it \u2014 it relocates strong authentication rather than abandoning it everywhere.",
+      d: "Not correct. Placement matters precisely because the consequence of an authentication delay differs sharply between a general-purpose gateway and a time-critical control point."
+    }},
+    q4: { correct: "b", why: {
+      b: "Correct. Least privilege scopes standing access to what a specific person's job actually requires, even when the broader role would technically permit more.",
+      a: "Not correct. RBAC roles can and should be scoped per person where the job doesn't need the role's full permission set \u2014 that scoping is least privilege, not a violation of RBAC.",
+      c: "Not correct. Granting Administrator rights to compensate for a narrower job is the opposite of least privilege \u2014 it expands access rather than scoping it down.",
+      d: "Not correct. Least privilege applies to every account type, including employees; vendor accounts simply make the stakes of skipping it more visible."
+    }},
+    q5: { correct: "b", why: {
+      b: "Correct. Many OT logins \u2014 local Windows accounts, PLC programming software, embedded device passwords \u2014 are never synchronized with the corporate directory, so HR-triggered deprovisioning does not reliably reach them.",
+      a: "Not correct. The surviving local account is exactly the gap the AD disablement failed to close \u2014 disabling one system's account says nothing about accounts that were never connected to it.",
+      c: "Not correct. A functioning, unrevoked account belonging to a former employee is a security concern regardless of whether the workstation is otherwise isolated.",
+      d: "Not correct. Closing this kind of gap requires a maintained, periodically audited inventory of out-of-band accounts \u2014 a shared identity-program responsibility, not one person's alone."
+    }}
+  };
+
+  document.getElementById("gradeBtn").addEventListener("click", function () {
+    var score = 0, unanswered = 0;
+    Object.keys(ANSWERS).forEach(function (q) {
+      var chosen = document.querySelector('input[name="' + q + '"]:checked');
+      var fb = document.getElementById("fb-" + q);
+      fb.className = "q-feedback show";
+      if (!chosen) {
+        unanswered++;
+        fb.classList.add("unanswered");
+        fb.textContent = "No answer selected. Choose an option and grade again.";
+        return;
+      }
+      if (chosen.value === ANSWERS[q].correct) {
+        score++;
+        fb.classList.add("correct");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      } else {
+        fb.classList.add("incorrect");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      }
+    });
+    var out = document.getElementById("scoreOut");
+    out.textContent = "Score: " + score + " of 5" +
+      (unanswered ? " \u00b7 " + unanswered + " question(s) not answered." : "") +
+      (score === 5 ? " \u2014 every item correct." : "");
+  });
+
+  document.getElementById("quizReset").addEventListener("click", function () {
+    document.getElementById("quizForm").reset();
+    Array.prototype.forEach.call(document.querySelectorAll(".q-feedback"), function (fb) {
+      fb.className = "q-feedback";
+      fb.textContent = "";
+    });
+    document.getElementById("scoreOut").textContent = "";
+  });
+
+})();
+</script>
+</body>
+</html>
