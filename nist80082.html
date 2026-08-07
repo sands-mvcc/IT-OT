@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIST SP 800-82 Rev. 3 — Student Guide | Teaching Operational Technologies</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --surface: #ffffff; --surface2: #f0f4ff; --border: #d1d9e6;
+    --text: #1a1e2e; --text-muted: #5a6480; --accent: #b45309; --accent2: #92400e; --on-accent: #ffffff;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10); --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e; --header-text: #ffffff; --card-hover: #f3f0e8;
+    --tag-gov: #6a1b9a; --tag-gov-bg: #f3e5f5;
+    --tag-found: #e65100; --tag-found-bg: #fff3e0;
+    --tag-proto: #1565c0; --tag-proto-bg: #e3f0fd;
+    --tag-ops: #276221; --tag-ops-bg: #e8f5e9;
+    --tag-safety: #b45309; --tag-safety-bg: #fdf3e3;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117; --surface: #1c1f2e; --surface2: #252840; --border: #2e3352;
+    --text: #e8ecf4; --text-muted: #8a92b2; --accent: #f59e0b; --accent2: #fbbf24; --on-accent: #17130a;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40); --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14; --header-text: #e8ecf4; --card-hover: #232636;
+    --tag-gov: #ce93d8; --tag-gov-bg: #1f0d2a;
+    --tag-found: #ffcc80; --tag-found-bg: #2a1a00;
+    --tag-proto: #90caf9; --tag-proto-bg: #0d1f35;
+    --tag-ops: #a5d6a7; --tag-ops-bg: #0d2010;
+    --tag-safety: #fbbf24; --tag-safety-bg: #2a1c05;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .skip-link { position: absolute; left: -999px; top: auto; }
+  .skip-link:focus { position: fixed; left: 12px; top: 12px; z-index: 400; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; }
+
+  /* HEADER */
+  header { background: var(--header-bg); color: var(--header-text); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .header-inner { max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .icon-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); color: var(--header-text); cursor: pointer; width: 38px; height: 38px; border-radius: 10px; font-size: 1.05rem; display: none; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+  .icon-btn:hover { background: rgba(255,255,255,0.22); }
+  .brand-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--on-accent); flex-shrink: 0; letter-spacing: -1px; }
+  .brand-text h1 { font-size: 1rem; font-weight: 700; line-height: 1.2; }
+  .brand-text p { font-size: 0.74rem; opacity: 0.65; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .back-pill, .theme-toggle { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); color: var(--header-text); cursor: pointer; padding: 7px 13px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; white-space: nowrap; }
+  .back-pill:hover, .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #1a1e2e 0%, #22304a 60%, #6a1b9a33 100%); color: #fff; padding: 30px 24px; }
+  .hero-inner { max-width: 1180px; margin: 0 auto; }
+  .hero-tag { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .hero h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; line-height: 1.25; }
+  .hero p { opacity: 0.82; font-size: 0.92rem; max-width: 74ch; line-height: 1.55; }
+
+  /* PAGE SHELL: sidebar + main */
+  .page-shell { max-width: 1180px; margin: 0 auto; padding: 26px 24px 64px; display: grid; grid-template-columns: 250px 1fr; gap: 30px; align-items: start; }
+  .toc-sidebar { position: sticky; top: 82px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); max-height: calc(100vh - 100px); overflow-y: auto; }
+  .toc-sidebar h5 { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 14px 0 6px; }
+  .toc-sidebar h5:first-child { margin-top: 0; }
+  .toc-sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .toc-sidebar a { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-decoration: none; padding: 6px 8px; border-radius: 6px; }
+  .toc-sidebar a:hover { background: var(--surface2); color: var(--text); }
+  .toc-overlay { display: none; }
+
+  main.content { min-width: 0; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--tag-gov); text-decoration: none; margin-bottom: 18px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .page-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .ctrl-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 0.78rem; font-weight: 700; padding: 7px 12px; border-radius: 20px; cursor: pointer; }
+  .ctrl-btn:hover { background: var(--surface2); }
+
+  /* QUICK FACTS */
+  .quickfacts { background: var(--surface); border: 2px solid var(--tag-gov); border-radius: 14px; padding: 18px 20px; margin-bottom: 32px; box-shadow: var(--shadow); }
+  .quickfacts h4 { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tag-gov); margin-bottom: 12px; }
+  .fact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .fact-tile { background: var(--surface2); border-radius: 10px; padding: 10px 12px; }
+  .fact-tile .fact-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 4px; }
+  .fact-tile .fact-value { font-size: 0.86rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+
+  /* NUMBERED SECTIONS */
+  section.numsec { margin-bottom: 44px; padding-top: 8px; scroll-margin-top: 88px; }
+  .numsec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .numsec-num { font-size: 0.78rem; font-weight: 800; color: var(--on-accent); background: var(--accent); border-radius: 8px; padding: 3px 9px; flex-shrink: 0; }
+  .numsec-head h3 { font-size: 1.2rem; font-weight: 800; }
+  .numsec > p { font-size: 0.92rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 14px; max-width: 82ch; }
+  .numsec h4.sub-head { font-size: 0.95rem; font-weight: 800; margin: 20px 0 10px; color: var(--text); }
+
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 8px 0 4px; }
+  .concept-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--tag-gov); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .concept-item h4 { font-size: 0.86rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .concept-item p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0; }
+
+  /* NUMBERED ORDERED LIST (how to use this guide) */
+  .howto-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+  .howto-list li { display: flex; gap: 12px; }
+  .howto-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--tag-gov-bg); color: var(--tag-gov); font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; }
+  .howto-list p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; }
+  .howto-list strong { color: var(--text); }
+
+  /* COMPARISON TABLE */
+  .cmp-table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-size: 0.84rem; }
+  .cmp-table th, .cmp-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; line-height: 1.5; }
+  .cmp-table th { background: var(--surface2); font-weight: 800; color: var(--text); }
+  .cmp-table td.attr { font-weight: 700; color: var(--tag-gov); white-space: nowrap; }
+  .cmp-table td { color: var(--text-muted); }
+  .table-scroll { overflow-x: auto; border-radius: 10px; }
+
+  /* PILLAR CARDS */
+  .stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 14px 0 6px; }
+  .stage-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+  .stage-band { padding: 10px 16px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .stage-card.understand .stage-band { background: var(--tag-found-bg); color: var(--tag-found); }
+  .stage-card.risk       .stage-band { background: var(--tag-gov-bg); color: var(--tag-gov); }
+  .stage-card.architect  .stage-band { background: var(--tag-proto-bg); color: var(--tag-proto); }
+  .stage-card.align      .stage-band { background: var(--tag-ops-bg); color: var(--tag-ops); }
+  .stage-card h5 { padding: 12px 16px 0; font-size: 0.94rem; font-weight: 800; }
+  .stage-card .stage-body { padding: 8px 16px 16px; font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+  .tactic-strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .stage-card.understand .tactic-chip { color: var(--tag-found); background: var(--tag-found-bg); }
+  .stage-card.risk .tactic-chip       { color: var(--tag-gov); background: var(--tag-gov-bg); }
+  .stage-card.architect .tactic-chip  { color: var(--tag-proto); background: var(--tag-proto-bg); }
+  .stage-card.align .tactic-chip      { color: var(--tag-ops); background: var(--tag-ops-bg); }
+  .tactic-chip { font-size: 0.7rem; font-weight: 700; border-radius: 20px; padding: 4px 10px; }
+
+  /* SUBSECTION ACCORDIONS */
+  .sub-card { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; background: var(--surface); }
+  .sub-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface2); border: none; text-align: left; padding: 12px 14px; cursor: pointer; font-family: inherit; color: var(--text); }
+  .sub-toggle:hover { background: var(--card-hover); }
+  .sub-toggle-left { display: flex; align-items: center; gap: 10px; }
+  .sub-caret { color: var(--tag-gov); font-size: 0.85rem; flex-shrink: 0; width: 1em; display: inline-block; }
+  .sub-title { font-weight: 700; font-size: 0.86rem; }
+  .sub-chip { font-size: 0.66rem; font-weight: 700; color: var(--tag-gov); background: var(--tag-gov-bg); border-radius: 10px; padding: 2px 8px; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; white-space: nowrap; }
+  .sub-chip.understand { color: var(--tag-found); background: var(--tag-found-bg); }
+  .sub-chip.risk       { color: var(--tag-gov); background: var(--tag-gov-bg); }
+  .sub-chip.architect  { color: var(--tag-proto); background: var(--tag-proto-bg); }
+  .sub-chip.align      { color: var(--tag-ops); background: var(--tag-ops-bg); }
+  .sub-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .sub-body.open { max-height: 1400px; }
+  .sub-body-inner { padding: 4px 16px 16px; font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; }
+  .sub-body-inner strong { color: var(--text); }
+  .sub-body-inner ul { margin: 6px 0 0 18px; }
+  .sub-body-inner li { margin-bottom: 4px; }
+
+  .teaching-note { background: var(--surface2); border: 2px solid var(--accent); border-radius: 14px; padding: 18px 20px; margin-top: 6px; }
+  .teaching-note h4 { font-size: 0.95rem; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+  .teaching-note p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px; }
+  .safety-flag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; }
+
+  .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 8px; }
+  .exercise-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .exercise-card h5 { font-size: 0.88rem; font-weight: 800; margin-bottom: 6px; color: var(--tag-gov); }
+  .exercise-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+
+  .reading-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .reading-list a { font-size: 0.88rem; font-weight: 600; color: var(--tag-gov); text-decoration: none; }
+  .reading-list a:hover { text-decoration: underline; }
+  .reading-list span { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+  .disclaimer { font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 14px; line-height: 1.6; }
+
+  footer { text-align: center; padding: 20px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border); line-height: 1.6; }
+
+  @media (max-width: 880px) {
+    .icon-btn { display: flex; }
+    .page-shell { grid-template-columns: 1fr; padding: 22px 16px 48px; }
+    .toc-sidebar { position: fixed; top: 0; left: 0; height: 100vh; width: 78vw; max-width: 320px; z-index: 300; border-radius: 0; transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: var(--shadow-hover); }
+    .toc-sidebar.open { transform: translateX(0); }
+    .toc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 250; }
+    .toc-overlay.open { display: block; }
+    .hero { padding: 24px 16px; }
+    .header-inner { padding: 14px 16px; }
+  }
+  @media print {
+    header, .toc-sidebar, .toc-overlay, .page-controls, .back-link { display: none !important; }
+    .page-shell { grid-template-columns: 1fr; padding: 0 12px; }
+    .sub-body { max-height: none !important; }
+    .hero { background: none; color: var(--text); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <button class="icon-btn" id="tocToggleBtn" aria-expanded="false" aria-controls="tocSidebar" aria-label="Toggle table of contents">☰</button>
+      <div class="brand-icon">OT</div>
+      <div class="brand-text">
+        <h1>Teaching Operational Technologies</h1>
+        <p>Core Frameworks — Student Guide</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="printBtn" onclick="window.print()" aria-label="Print or save as PDF" style="display:flex;">🖨️</button>
+      <a class="back-pill" href="index.html">← Course Navigation</a>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+    </div>
+  </div>
+</header>
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-tag">U.S. Federal Guide · Risk Management</span>
+    <h2>NIST SP 800-82 Rev. 3 — Guide to Operational Technology (OT) Security</h2>
+    <p>A student's walk-through of NIST's flagship OT security guide: how it's organized, what changed in the 2023 rewrite, its risk-management process, its architecture guidance, and the SP 800-53 overlays that turn it into an actual control baseline.</p>
+  </div>
+</div>
+
+<div class="toc-overlay" id="tocOverlay"></div>
+<div class="page-shell">
+  <nav class="toc-sidebar" id="tocSidebar" aria-label="Page contents">
+    <h5>Orientation</h5>
+    <ul>
+      <li><a href="#sec-01">01 · Foundations</a></li>
+      <li><a href="#sec-02">02 · How to Use This Guide</a></li>
+      <li><a href="#sec-03">03 · Positioning</a></li>
+    </ul>
+    <h5>The Guide</h5>
+    <ul>
+      <li><a href="#sec-04">04 · Structure &amp; Overlays</a></li>
+      <li><a href="#sec-05">05 · Definitions &amp; Scope</a></li>
+      <li><a href="#sec-06">06 · Related NIST Resources</a></li>
+      <li><a href="#sec-07">07 · Adoption &amp; Practical Use</a></li>
+    </ul>
+    <h5>Reference</h5>
+    <ul>
+      <li><a href="#sec-08">08 · Classroom Uses</a></li>
+      <li><a href="#sec-09">09 · Sources &amp; Further Reading</a></li>
+    </ul>
+  </nav>
+
+  <main class="content" id="main-content">
+    <a class="back-link" href="index.html">← Back to Course Navigation</a>
+
+    <div class="page-controls">
+      <button class="ctrl-btn" id="expandAllBtn">▾ Expand all sections</button>
+      <button class="ctrl-btn" id="collapseAllBtn">▸ Collapse all</button>
+    </div>
+
+    <div class="quickfacts">
+      <h4>Quick Facts</h4>
+      <div class="fact-grid">
+        <div class="fact-tile"><div class="fact-label">Type</div><div class="fact-value">U.S. federal guidance document</div></div>
+        <div class="fact-tile"><div class="fact-label">Publisher</div><div class="fact-value">NIST, Computer Security Resource Center</div></div>
+        <div class="fact-tile"><div class="fact-label">Current Version</div><div class="fact-value">Revision 3 (2023)</div></div>
+        <div class="fact-tile"><div class="fact-label">Scope</div><div class="fact-value">All OT — ICS, building automation, physical access control</div></div>
+        <div class="fact-tile"><div class="fact-label">Built On</div><div class="fact-value">SP 800-53 Rev. 5 controls, tailored via overlays</div></div>
+        <div class="fact-tile"><div class="fact-label">Primary Use</div><div class="fact-value">OT risk management baseline, free and vendor-neutral</div></div>
+      </div>
+    </div>
+
+    <!-- 01 FOUNDATIONS -->
+    <section class="numsec" id="sec-01">
+      <div class="numsec-head"><span class="numsec-num">01</span><h3>Foundations</h3></div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n1-1"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">What it is</span></span><span class="sub-chip">Definition</span></button>
+        <div class="sub-body" id="n1-1" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>NIST Special Publication 800-82, <em>Guide to Operational Technology (OT) Security</em>, is federal guidance from NIST's Computer Security Resource Center (CSRC). It's free, vendor-neutral, and comprehensive enough that it's often the first document handed to a new OT security hire — but it is guidance, not a certifiable standard or a legal mandate.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n1-2"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Why it was revised: Rev. 1 → Rev. 2 → Rev. 3</span></span><span class="sub-chip">Origin</span></button>
+        <div class="sub-body" id="n1-2" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>Rev. 1 (2006) and Rev. 2 (2015) were both titled around <strong>Industrial Control Systems (ICS) Security</strong> — the classic SCADA/DCS/PLC world. Rev. 3 (2023) is a substantial rewrite: the title itself changed to <strong>Operational Technology (OT) Security</strong>, explicitly folding in building automation systems, physical access control systems, and other non-industrial OT. It also added SP 800-53 Rev. 5 overlays and tightened alignment with the NIST Cybersecurity Framework — both new to this revision.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n1-3"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">Who it's for</span></span><span class="sub-chip">Scope</span></button>
+        <div class="sub-body" id="n1-3" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>It's the default reference for U.S. federal agencies operating OT-adjacent systems, where it feeds into FISMA-driven Risk Management Framework processes. Far beyond federal use, it's voluntarily adopted across manufacturing, water, energy, and healthcare facilities precisely because it costs nothing and doesn't require joining any certification scheme.</p></div>
+        </div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n1-4"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">What makes it different from a design standard</span></span><span class="sub-chip">Distinction</span></button>
+        <div class="sub-body" id="n1-4" aria-hidden="true" inert>
+          <div class="sub-body-inner"><p>IEC 62443 is written by control-systems engineers around zones, conduits, and security levels. SP 800-82 is written inside NIST's broader risk-management ecosystem — it inherits the control catalog (SP 800-53), the risk process (SP 800-37), and the outcome language (the Cybersecurity Framework) that IT security teams already use, then tailors all three for OT. That heritage is exactly why it's often the easier on-ramp for an organization that already runs NIST-based IT security.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 HOW TO USE THIS GUIDE -->
+    <section class="numsec" id="sec-02">
+      <div class="numsec-head"><span class="numsec-num">02</span><h3>How to Use This Guide</h3></div>
+      <ol class="howto-list">
+        <li><span class="howto-num">1</span><p><strong>Skim the Quick Facts panel first.</strong> The scope line — "all OT," not just ICS — is the single fact that most separates Rev. 3 from everything that came before it.</p></li>
+        <li><span class="howto-num">2</span><p><strong>Read Section 03 before the structure itself.</strong> Seeing how SP 800-82 differs from IEC 62443, ATT&amp;CK for ICS, and CIP-008 makes its risk-management framing easier to place.</p></li>
+        <li><span class="howto-num">3</span><p><strong>Work through Section 04's four pillar cards in order</strong> — Understand → Manage Risk → Architect → Align. They follow the guide's own chapter progression from OT fundamentals through to the SP 800-53 overlays.</p></li>
+        <li><span class="howto-num">4</span><p><strong>Treat Section 05 as a lookup, not a read-through.</strong> Terms like "overlay" and "tailoring" get reused constantly once you reach Section 04.3 — come back here when one is unfamiliar.</p></li>
+        <li><span class="howto-num">5</span><p><strong>If you're prepping to teach, start at Section 08.</strong> The Overlay Tailoring Drill is the exercise most students find clarifies the whole guide at once.</p></li>
+      </ol>
+    </section>
+
+    <!-- 03 POSITIONING -->
+    <section class="numsec" id="sec-03">
+      <div class="numsec-head"><span class="numsec-num">03</span><h3>Positioning: SP 800-82 vs. the Other Core Frameworks</h3></div>
+      <p>IEC 62443 is a standalone, certifiable design standard. ATT&amp;CK for ICS is a descriptive threat-intelligence knowledge base. CIP-008 is a mandatory sector regulation. SP 800-82 sits in a fourth position: voluntary federal guidance that pulls an organization's OT risk management into the same ecosystem as its IT risk management.</p>
+      <div class="table-scroll">
+        <table class="cmp-table">
+          <thead><tr><th>Attribute</th><th>NIST SP 800-82 Rev. 3</th><th>IEC 62443 / ATT&amp;CK for ICS / CIP-008</th></tr></thead>
+          <tbody>
+            <tr><td class="attr">Type</td><td>Federal risk-management guidance</td><td>Certifiable design standard, threat-intel knowledge base, or mandatory sector regulation</td></tr>
+            <tr><td class="attr">Origin / Authority</td><td>NIST, a U.S. federal standards body</td><td>ISA/IEC standards body, MITRE (federally funded R&amp;D), NERC (the ERO, under FERC)</td></tr>
+            <tr><td class="attr">Primary Question</td><td>"How do I manage OT risk using the same control catalog and process my IT team already uses?"</td><td>"How should this be designed?", "What has been done to systems like this?", or "What must I legally report?"</td></tr>
+            <tr><td class="attr">Enforcement</td><td>Required for U.S. federal agencies via FISMA/RMF; voluntary elsewhere</td><td>Certification (62443), none (ATT&amp;CK for ICS), or legal penalty (CIP-008)</td></tr>
+            <tr><td class="attr">Typical Pairing</td><td>Supplies the risk-management and control-baseline layer that the others plug into</td><td>62443 supplies the zones/conduits vocabulary; ATT&amp;CK for ICS supplies the threat data; CIP-008 supplies the reporting obligation once a risk becomes an incident</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 STRUCTURE & OVERLAYS -->
+    <section class="numsec" id="sec-04">
+      <div class="numsec-head"><span class="numsec-num">04</span><h3>Structure &amp; Overlays</h3></div>
+      <p>SP 800-82 Rev. 3 reads as four pillars building on each other: understand what OT actually is, manage risk against it, architect a defense, and align that defense to the broader NIST control ecosystem. The colors below deliberately reuse this site's existing strand colors — Understand borrows the orange used for "Foundations," Manage Risk borrows the purple used for "Frameworks," Architect borrows the blue used for "Protocols," and Align borrows the green used for "Operations."</p>
+      <div class="stage-grid">
+        <div class="stage-card understand"><div class="stage-band"><span>Ch. 1–2</span><span>Understand</span></div><h5>OT Overview</h5><div class="stage-body">What OT is, how it differs from IT, and the full range of systems Rev. 3 now covers.</div></div>
+        <div class="stage-card risk"><div class="stage-band"><span>Ch. 3</span><span>Manage Risk</span></div><h5>OT Risk Management</h5><div class="stage-body">A risk process tailored to OT's safety- and availability-first priorities, and the threats/vulnerabilities specific to it.</div></div>
+        <div class="stage-card architect"><div class="stage-band"><span>Ch. 4</span><span>Architect</span></div><h5>Cybersecurity Architecture</h5><div class="stage-body">Reference network architectures, defense-in-depth, segmentation, and boundary protection patterns for OT.</div></div>
+        <div class="stage-card align"><div class="stage-band"><span>Ch. 5 + App.</span><span>Align</span></div><h5>Frameworks &amp; Overlays</h5><div class="stage-body">Mapping to the NIST Cybersecurity Framework, and the SP 800-53 overlays that turn all of this into a selectable control baseline.</div></div>
+      </div>
+
+      <h4 class="sub-head">Pillar 1 — Understand OT</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-1"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.1 Scope expansion — ICS to OT</span></span><span class="sub-chip understand">Understand</span></button>
+        <div class="sub-body" id="n4-1" aria-hidden="true" inert><div class="sub-body-inner"><p>Rev. 3 explicitly folds in building automation systems (HVAC, elevators, fire/life-safety), physical access control systems, and other non-industrial OT alongside traditional SCADA, DCS, and PLC environments — matching how converged campuses and facilities actually look today, not just process plants.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-2"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.2 How OT differs from IT</span></span><span class="sub-chip understand">Understand</span></button>
+        <div class="sub-body" id="n4-2" aria-hidden="true" inert><div class="sub-body-inner">
+          <ul><li><strong>Safety over confidentiality</strong> — a compromised OT system can hurt someone; that reorders the priority the CIA triad usually assumes</li><li><strong>Availability and determinism</strong> — a control loop needs a response within a fixed time window, every time</li><li><strong>Long lifecycles</strong> — 15–20 year equipment lifespans mean legacy protocols and unpatched firmware are the norm, not the exception</li><li><strong>Narrow patch windows</strong> — many systems can only be updated during scheduled outages, sometimes years apart</li></ul>
+        </div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-3"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.3 OT asset types covered</span></span><span class="sub-chip understand">Understand</span></button>
+        <div class="sub-body" id="n4-3" aria-hidden="true" inert><div class="sub-body-inner"><p>SCADA and DCS platforms, PLCs and RTUs, safety instrumented systems, building automation systems (BAS), physical access control systems (PACS), and the engineering workstations, HMIs, and historians that support them all fall inside Rev. 3's scope.</p></div></div>
+      </div>
+
+      <h4 class="sub-head">Pillar 2 — Manage Risk</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-4"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.4 The OT risk management process</span></span><span class="sub-chip risk">Risk</span></button>
+        <div class="sub-body" id="n4-4" aria-hidden="true" inert><div class="sub-body-inner"><p>A dedicated chapter walks through framing risk in OT terms, identifying assets and their criticality to safety and production, assessing risk with availability weighted above confidentiality, responding with controls that respect operational constraints, and monitoring continuously rather than through periodic-only reviews.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-5"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.5 Threat sources</span></span><span class="sub-chip risk">Risk</span></button>
+        <div class="sub-body" id="n4-5" aria-hidden="true" inert><div class="sub-body-inner"><p>Nation-state and criminal actors, insiders and contractors, ransomware crossing over from a compromised IT network, and non-adversarial sources — equipment failure, natural disaster, or simple human error — that matter just as much in an availability-first environment.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-6"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.6 Vulnerability categories</span></span><span class="sub-chip risk">Risk</span></button>
+        <div class="sub-body" id="n4-6" aria-hidden="true" inert><div class="sub-body-inner"><p>Legacy protocols with no built-in authentication, flat unsegmented networks, default or shared credentials, and firmware that can't be patched without a planned outage — the same vulnerability classes Lesson 7 already covers, here framed as risk inputs rather than standalone findings.</p></div></div>
+      </div>
+
+      <h4 class="sub-head">Pillar 3 — Architect Defense</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-7"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.7 Defense-in-depth &amp; reference architectures</span></span><span class="sub-chip architect">Architect</span></button>
+        <div class="sub-body" id="n4-7" aria-hidden="true" inert><div class="sub-body-inner"><p>Layered controls across the network, host, and application levels, illustrated with example architectures that show where each layer sits relative to the Purdue model's levels.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-8"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.8 Zones &amp; segmentation</span></span><span class="sub-chip architect">Architect</span></button>
+        <div class="sub-body" id="n4-8" aria-hidden="true" inert><div class="sub-body-inner"><p>SP 800-82 reinforces network segmentation and an IT/OT DMZ without inventing a competing vocabulary — it is written to be compatible with, and is frequently cited alongside, IEC 62443's zones-and-conduits model rather than replacing it.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-9"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.9 Boundary protection &amp; remote access</span></span><span class="sub-chip architect">Architect</span></button>
+        <div class="sub-body" id="n4-9" aria-hidden="true" inert><div class="sub-body-inner"><p>Guidance on jump hosts, one-way data diodes, and tightly scoped vendor remote-access patterns — the architectural controls that show up again in Lesson 10's identity and access content.</p></div></div>
+      </div>
+
+      <h4 class="sub-head">Pillar 4 — Align to Frameworks &amp; Controls</h4>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-10"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.10 Mapping to the NIST Cybersecurity Framework</span></span><span class="sub-chip align">Align</span></button>
+        <div class="sub-body" id="n4-10" aria-hidden="true" inert><div class="sub-body-inner"><p>OT risk activities are mapped onto the CSF's functions — Govern, Identify, Protect, Detect, Respond, Recover in CSF 2.0 — giving an organization already using the CSF for IT a structured on-ramp for OT instead of a second, disconnected framework.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-11"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.11 SP 800-53 Rev. 5 OT overlays</span></span><span class="sub-chip align">Align</span></button>
+        <div class="sub-body" id="n4-11" aria-hidden="true" inert><div class="sub-body-inner"><p>The headline new artifact in Rev. 3. An <strong>overlay</strong> is a pre-tailored subset of SP 800-53 controls, with OT-specific supplemental guidance, built for each impact tier (Low, Moderate, High). Instead of starting from the full IT-oriented control catalog, an OT team starts from a baseline already adjusted for legacy hardware, narrow patch windows, and safety priority.</p></div></div>
+      </div>
+      <div class="sub-card">
+        <button class="sub-toggle" aria-expanded="false" aria-controls="n4-12"><span class="sub-toggle-left"><span class="sub-caret">▸</span><span class="sub-title">4.12 Using overlays in practice</span></span><span class="sub-chip align">Align</span></button>
+        <div class="sub-body" id="n4-12" aria-hidden="true" inert><div class="sub-body-inner"><p>Teams select the applicable overlay, then further tailor individual controls to their environment. Where a control genuinely isn't feasible — patching a 15-year-old HMI, for instance — the expected response is a documented compensating control and a POA&amp;M entry, not silence. This is the direct bridge into Lesson 9's governance content.</p></div></div>
+      </div>
+    </section>
+
+    <!-- 05 DEFINITIONS -->
+    <section class="numsec" id="sec-05">
+      <div class="numsec-head"><span class="numsec-num">05</span><h3>Definitions &amp; Scope</h3></div>
+      <p>These terms come directly from the broader NIST risk-management vocabulary that SP 800-82 inherits and tailors.</p>
+      <div class="concept-grid">
+        <div class="concept-item"><h4>Operational Technology (OT)</h4><p>Hardware and software that detects or causes changes in physical processes through direct monitoring or control — the Rev. 3 scope, wider than "ICS."</p></div>
+        <div class="concept-item"><h4>Industrial Control System (ICS)</h4><p>The classic subset of OT — SCADA, DCS, and PLC-based systems controlling industrial processes — that Rev. 1 and Rev. 2 focused on exclusively.</p></div>
+        <div class="concept-item"><h4>Overlay</h4><p>A pre-tailored, specialized set of security controls, control enhancements, and supplemental guidance for a particular type of system or environment — here, OT at a given impact tier.</p></div>
+        <div class="concept-item"><h4>Security Control Baseline</h4><p>The starting set of controls associated with a system's impact level (Low, Moderate, High) before any further tailoring is applied.</p></div>
+        <div class="concept-item"><h4>Tailoring</h4><p>The documented process of adjusting a control baseline — adding, removing, or modifying controls — to fit an actual environment's constraints.</p></div>
+        <div class="concept-item"><h4>Compensating Control</h4><p>An alternative safeguard used when the originally specified control can't be implemented as written — the standard response to OT's patch and legacy constraints.</p></div>
+        <div class="concept-item"><h4>Risk Management Framework (RMF)</h4><p>NIST SP 800-37's overall process — categorize, select, implement, assess, authorize, monitor — that SP 800-82's OT risk chapter follows and tailors.</p></div>
+        <div class="concept-item"><h4>System Security Plan (SSP)</h4><p>The document that records which controls apply to a system and how they're implemented — where an OT overlay's selections ultimately get written down.</p></div>
+      </div>
+    </section>
+
+    <!-- 06 RELATED RESOURCES -->
+    <section class="numsec" id="sec-06">
+      <div class="numsec-head"><span class="numsec-num">06</span><h3>Related NIST Resources</h3></div>
+      <p>SP 800-82 doesn't stand alone — it's one node in NIST's much larger risk-management publication set, and it borrows structure and vocabulary from several others.</p>
+      <div class="table-scroll">
+        <table class="cmp-table">
+          <thead><tr><th>Resource</th><th>Focus</th><th>How It Connects to SP 800-82</th></tr></thead>
+          <tbody>
+            <tr><td class="attr">SP 800-53 Rev. 5</td><td>The base security &amp; privacy control catalog</td><td>The catalog that SP 800-82's OT overlays tailor for Low/Moderate/High-impact OT</td></tr>
+            <tr><td class="attr">NIST Cybersecurity Framework 2.0</td><td>Outcome-based function structure</td><td>The Govern/Identify/Protect/Detect/Respond/Recover functions SP 800-82's risk activities are mapped onto</td></tr>
+            <tr><td class="attr">SP 800-37</td><td>Risk Management Framework (RMF)</td><td>The overall categorize-select-implement-assess-authorize-monitor process SP 800-82's OT risk chapter follows</td></tr>
+            <tr><td class="attr">SP 800-30</td><td>Guide for Conducting Risk Assessments</td><td>The general risk-assessment methodology that SP 800-82 tailors for OT-specific threat sources and impact</td></tr>
+            <tr><td class="attr">NIST SP 1800 Series</td><td>NCCoE practice guides</td><td>Sector-specific, hands-on implementation examples that show SP 800-82 guidance applied to real reference architectures</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 07 ADOPTION -->
+    <section class="numsec" id="sec-07">
+      <div class="numsec-head"><span class="numsec-num">07</span><h3>Adoption &amp; Practical Use</h3></div>
+      <p>SP 800-82 occupies a middle ground between CIP-008's legal mandate and ATT&amp;CK for ICS's total lack of enforcement: it is required for U.S. federal agencies through FISMA-driven RMF processes, and voluntarily — but very widely — adopted everywhere else.</p>
+      <div class="concept-grid">
+        <div class="concept-item"><h4>Federal Agencies</h4><p>Required as the OT-specific control reference within FISMA-driven Risk Management Framework processes for federal OT-adjacent systems.</p></div>
+        <div class="concept-item"><h4>Critical Infrastructure Operators</h4><p>Adopted voluntarily as a free, vendor-neutral OT security reference — often the first document a new OT security hire is handed.</p></div>
+        <div class="concept-item"><h4>Auditors &amp; Assessors</h4><p>Used as a control-mapping reference when assessing an OT environment against the SP 800-53 catalog it tailors.</p></div>
+        <div class="concept-item"><h4>Vendors &amp; Integrators</h4><p>Cited directly in RFPs and contracts as the expected control baseline for a delivered OT system, especially in the public sector.</p></div>
+      </div>
+      <div class="teaching-note">
+        <h4>📖 Teaching Note</h4>
+        <p><strong>Anchor lesson:</strong> Lesson 8 (Frameworks for OT Security) and Lesson 9 (Governance, Risk &amp; Compliance). For the "pick one spine instead of four" discussion in Lesson 8, have students open the OT overlay appendix and select five controls to map against a fictional plant; in Lesson 9, have them write POA&amp;M entries for a control that isn't feasible.</p>
+      </div>
+    </section>
+
+    <!-- 08 CLASSROOM USES -->
+    <section class="numsec" id="sec-08">
+      <div class="numsec-head"><span class="numsec-num">08</span><h3>Classroom Uses</h3></div>
+      <div class="exercise-grid">
+        <div class="exercise-card"><h5>Overlay Tailoring Drill</h5><p>Give students five controls from an OT overlay baseline and a fictional plant scenario. For each, they decide: implement as-is, tailor, or compensating control + POA&amp;M — and justify it against OT's safety, availability, and legacy-equipment constraints.</p></div>
+        <div class="exercise-card"><h5>CSF Function Mapping</h5><p>Take a documented incident (TRITON/TRISIS works well — see the MITRE ATT&amp;CK for ICS page) and map the organization's before/during/after actions onto the six CSF 2.0 functions.</p></div>
+        <div class="exercise-card"><h5>Architecture Sketch</h5><p>Students draw a reference OT network — IT/OT DMZ, zones, boundary protection — following Pillar 3's guidance, and justify each boundary they drew.</p></div>
+        <div class="exercise-card"><h5>Cross-Framework Bridge</h5><p>Take the same five overlay controls from the Tailoring Drill and identify which IEC 62443 foundational requirement each one most closely maps to — reinforcing why Lesson 8 treats these frameworks as compatible, not competing.</p></div>
+      </div>
+    </section>
+
+    <!-- 09 SOURCES -->
+    <section class="numsec" id="sec-09">
+      <div class="numsec-head"><span class="numsec-num">09</span><h3>Sources &amp; Further Reading</h3></div>
+      <ul class="reading-list">
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/82/r3/final" target="_blank" rel="noopener">NIST SP 800-82 Rev. 3 (Official Publication)<span>Full text, supplemental material, and errata from NIST's Computer Security Resource Center</span></a></li>
+        <li><a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">NIST Cybersecurity Framework<span>The CSF functions SP 800-82's OT risk guidance is mapped against</span></a></li>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" target="_blank" rel="noopener">NIST SP 800-53 Rev. 5<span>The base control catalog that SP 800-82's OT overlays tailor</span></a></li>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/37/r2/final" target="_blank" rel="noopener">NIST SP 800-37 Rev. 2 — Risk Management Framework<span>The overall risk process SP 800-82's OT risk chapter follows</span></a></li>
+      </ul>
+      <p class="disclaimer">This page is a teaching summary of a publicly available federal guidance document, not a reproduction of its full text. Section and appendix numbering, exact overlay content, and control counts should be verified against the current official SP 800-82 Rev. 3 publication before use in coursework — per this course's own Safeguards policy on faculty review of generated content.</p>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
+  Educational use only. Framework analysis is defensive and standards-based in scope.
+</footer>
+<script>
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+    try { localStorage.setItem('otfac-theme', theme); } catch (e) {}
+  }
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('otfac-theme'); } catch (e) {}
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  // Mobile TOC drawer
+  var tocBtn = document.getElementById('tocToggleBtn');
+  var toc = document.getElementById('tocSidebar');
+  var overlay = document.getElementById('tocOverlay');
+  function closeToc() {
+    toc.classList.remove('open');
+    overlay.classList.remove('open');
+    tocBtn.setAttribute('aria-expanded', 'false');
+  }
+  tocBtn.addEventListener('click', function () {
+    var isOpen = toc.classList.contains('open');
+    if (isOpen) { closeToc(); } else {
+      toc.classList.add('open');
+      overlay.classList.add('open');
+      tocBtn.setAttribute('aria-expanded', 'true');
+    }
+  });
+  overlay.addEventListener('click', closeToc);
+  toc.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeToc); });
+
+  // Subsection accordions (event delegation)
+  function setSub(btn, expand) {
+    var card = btn.closest('.sub-card');
+    var body = card.querySelector('.sub-body');
+    var caret = btn.querySelector('.sub-caret');
+    btn.setAttribute('aria-expanded', String(expand));
+    body.setAttribute('aria-hidden', String(!expand));
+    if (expand) {
+      body.classList.add('open');
+      body.removeAttribute('inert');
+      if (caret) caret.textContent = '▾';
+    } else {
+      body.classList.remove('open');
+      body.setAttribute('inert', '');
+      if (caret) caret.textContent = '▸';
+    }
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.sub-toggle');
+    if (!btn) return;
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    setSub(btn, !expanded);
+  });
+  document.getElementById('expandAllBtn').addEventListener('click', function () {
+    document.querySelectorAll('.sub-toggle').forEach(function (btn) { setSub(btn, true); });
+  });
+  document.getElementById('collapseAllBtn').addEventListener('click', function () {
+    document.querySelectorAll('.sub-toggle').forEach(function (btn) { setSub(btn, false); });
+  });
+</script>
+</body>
+</html>
