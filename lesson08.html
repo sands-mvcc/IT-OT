@@ -253,7 +253,7 @@ figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
 /* ---------- Flip cards ---------- */
 .flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
 .flip-card{
-  display:block;width:100%;height:16rem;
+  display:block;width:100%;height:17.5rem;
   perspective:1200px;background:none;border:0;padding:0;font:inherit;
   color:inherit;text-align:left;cursor:pointer;
 }
@@ -268,13 +268,17 @@ figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
   position:absolute;top:0;right:0;bottom:0;left:0;
   -webkit-backface-visibility:hidden;backface-visibility:hidden;
   border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:1rem;display:flex;flex-direction:column;justify-content:center;
+  padding:1rem;display:flex;flex-direction:column;justify-content:flex-start;
   background:var(--surface);box-shadow:var(--shadow);overflow:auto;
 }
-.flip-front{border-top:4px solid var(--accent);}
+.flip-front{border-top:4px solid var(--accent);justify-content:center;}
 .flip-front .term{font-weight:800;font-size:1.05rem;}
 .flip-front .hint{font-size:.78rem;color:var(--muted);margin-top:.5rem;}
-.flip-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent-line);font-size:.9rem;}
+.flip-back{
+  transform:rotateY(180deg);background:var(--accent-soft);
+  border-color:var(--accent-line);border-top:4px solid var(--accent);
+}
+.flip-copy{display:block;margin:0;font-size:.88rem;line-height:1.5;}
 
 /* ---------- Activity blocks ---------- */
 .activity-block{
@@ -770,25 +774,25 @@ footer.site strong{color:#fff;}
       <button type="button" class="flip-card" aria-pressed="false">
         <span class="flip-inner">
           <span class="flip-face flip-front"><span class="term">SL-T</span><span class="hint">Target &mdash; press to reveal</span></span>
-          <span class="flip-face flip-back">The <strong>target</strong> Security Level: what a zone <em>needs</em>, decided by risk assessment in IEC 62443-3-2. Set before you shop for products. It is a requirement, not an observation.</span>
+          <span class="flip-face flip-back"><span class="flip-copy">The <strong>target</strong> Security Level: what a zone <em>needs</em>, decided by risk assessment in IEC 62443-3-2. Set before you shop for products. It is a requirement, not an observation.</span></span>
         </span>
       </button>
       <button type="button" class="flip-card" aria-pressed="false">
         <span class="flip-inner">
           <span class="flip-face flip-front"><span class="term">SL-C</span><span class="hint">Capability &mdash; press to reveal</span></span>
-          <span class="flip-face flip-back">The <strong>capability</strong> Security Level: what a product or system <em>can</em> deliver when correctly configured. This is what a supplier certifies. A device with SL-C 3 installed with default credentials still achieves far less.</span>
+          <span class="flip-face flip-back"><span class="flip-copy">The <strong>capability</strong> Security Level: what a product or system <em>can</em> deliver when correctly configured. This is what a supplier certifies. A device with SL-C 3 installed with default credentials still achieves far less.</span></span>
         </span>
       </button>
       <button type="button" class="flip-card" aria-pressed="false">
         <span class="flip-inner">
           <span class="flip-face flip-front"><span class="term">SL-A</span><span class="hint">Achieved &mdash; press to reveal</span></span>
-          <span class="flip-face flip-back">The <strong>achieved</strong> Security Level: what the zone actually delivers as installed, configured, and operated today. The gap between SL-A and SL-T is the remediation backlog — the most useful number in the whole assessment.</span>
+          <span class="flip-face flip-back"><span class="flip-copy">The <strong>achieved</strong> Security Level: what the zone actually delivers as installed, configured, and operated today. The gap between SL-A and SL-T is the remediation backlog — the most useful number in the whole assessment.</span></span>
         </span>
       </button>
       <button type="button" class="flip-card" aria-pressed="false">
         <span class="flip-inner">
           <span class="flip-face flip-front"><span class="term">Essential function</span><span class="hint">Press to reveal</span></span>
-          <span class="flip-face flip-back">A function whose loss creates safety, environmental, or availability consequences. IEC 62443 requires that security controls must not compromise essential functions — a countermeasure that trips the process has failed, however strong it looks on paper.</span>
+          <span class="flip-face flip-back"><span class="flip-copy">A function whose loss creates safety, environmental, or availability consequences. IEC 62443 requires that security controls must not compromise essential functions — a countermeasure that trips the process has failed, however strong it looks on paper.</span></span>
         </span>
       </button>
     </div>
