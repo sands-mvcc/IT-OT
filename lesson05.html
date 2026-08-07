@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5: Industrial Communication Protocols | Teaching Operational Technologies</title>
+<meta name="description" content="Day 2, Lesson 5 of the Teaching Operational Technologies faculty development workshop: Modbus TCP, DNP3, EtherNet/IP, PROFINET, BACnet/IP, and OPC UA — their history, framing and function codes at a level students can read in a capture, why the legacy protocols carry no authentication, and what OPC UA changes.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .topbar-inner {
+    max-width: 1280px; margin: 0 auto; padding: 9px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 28px 24px 22px;
+  }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav {
+    position: sticky; top: 0; z-index: 90;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a {
+    display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600;
+    color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px;
+  }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title {
+    font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+
+  /* Sidebar: table of contents */
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  /* Sidebar: objectives progress */
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer;
+  }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  /* Sidebar: glossary */
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* Sidebar: prev/next */
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  /* ---------- Main content sections ---------- */
+  .part-banner {
+    background: var(--header-bg); color: var(--header-text);
+    padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800;
+    font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    margin: 40px 0 18px;
+  }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box {
+    background: var(--accent-light); border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0;
+  }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px 20px; margin: 18px 0;
+  }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .safety-flag {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700;
+    color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px;
+  }
+  .safety-flag.lesson-top { font-size: 0.8rem; padding: 7px 14px; margin: 0 0 18px; }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  /* comparison table */
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  /* diagram wrap */
+  .diagram-wrap { overflow-x: auto; margin: 18px 0; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .diagram-caption { font-size: 0.82rem; color: var(--text-muted); margin: 10px 0 0; text-align: center; }
+
+  /* protocol landscape grid (concept-map style) */
+  .protocol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 6px 0 4px; }
+  .protocol-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.83rem;
+  }
+  .protocol-card h4 { margin: 0 0 4px; font-size: 0.95rem; color: var(--accent2); }
+  [data-theme="dark"] .protocol-card h4 { color: var(--accent); }
+  .protocol-card .domain-tag {
+    display: inline-block; font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 6px;
+  }
+  .protocol-card p { margin: 0; color: var(--text-muted); }
+
+  /* activity block */
+  .activity-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin: 18px 0;
+  }
+  .activity-head {
+    background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px;
+  }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .mapping-table-wrap { overflow-x: auto; }
+  table.mapping-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  table.mapping-table th, table.mapping-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.mapping-table thead th { background: var(--surface2); font-weight: 700; }
+  table.mapping-table select {
+    width: 100%; padding: 7px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.86rem;
+  }
+  .map-row.correct td:first-child { border-left: 4px solid var(--ok); }
+  .map-row.incorrect td:first-child { border-left: 4px solid var(--bad); }
+  .mapping-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+  .mapping-result { font-size: 0.85rem; font-weight: 700; }
+
+  .btn {
+    background: var(--accent); color: var(--on-accent); border: none; cursor: pointer;
+    padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit;
+  }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+
+  /* simulation: Modbus frame builder */
+  .sim-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .sim-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+  .sim-field select, .sim-field input {
+    padding: 8px 9px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.87rem;
+  }
+  .sim-readout {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.87rem; min-height: 3.5em;
+  }
+  .sim-readout strong { color: var(--accent2); }
+  [data-theme="dark"] .sim-readout strong { color: var(--accent); }
+  .frame-block { margin-top: 10px; }
+  .frame-block-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .frame-bytes { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 4px; }
+  .frame-byte {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 5px;
+    padding: 5px 7px; font-family: 'Courier New', monospace; font-size: 0.78rem; text-align: center; min-width: 34px;
+  }
+  .frame-byte.mbap { border-color: var(--text-muted); }
+  .frame-byte.fc { border-color: var(--accent); color: var(--accent2); font-weight: 700; }
+  [data-theme="dark"] .frame-byte.fc { color: var(--accent); }
+  .frame-byte.data { border-color: var(--ok); }
+  .frame-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.74rem; color: var(--text-muted); margin: 6px 0 14px; }
+  .frame-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; border: 1px solid var(--border); }
+  .legend-swatch.mbap { background: var(--surface2); border-color: var(--text-muted); }
+  .legend-swatch.fc { background: var(--accent-light); border-color: var(--accent); }
+  .legend-swatch.data { background: var(--ok-bg); border-color: var(--ok); }
+  .decode-line { font-size: 0.85rem; margin-top: 10px; }
+
+  /* quiz */
+  .quiz-block { display: flex; flex-direction: column; gap: 20px; }
+  .q-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .q-stem { font-weight: 700; margin-bottom: 10px; font-size: 0.92rem; }
+  .q-num { color: var(--accent); margin-right: 6px; }
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); }
+  .q-feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; display: none;
+  }
+  .q-feedback.show { display: block; }
+  .q-feedback.correct { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.incorrect { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback.unanswered { background: var(--tag-safety-bg); color: var(--tag-safety); }
+  .quiz-score {
+    margin-top: 6px; background: var(--header-bg); color: var(--header-text);
+    border-radius: var(--radius-sm); padding: 16px 20px; font-weight: 700; display: none;
+    align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .quiz-score.show { display: flex; }
+  .quiz-score-big { font-size: 1.4rem; }
+
+  /* resource list */
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 16px; font-size: 0.88rem;
+  }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note {
+    border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px;
+    margin: 16px 0; font-size: 0.85rem; color: var(--text-muted);
+  }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .icon-row { display: flex; gap: 18px; margin: 14px 0; flex-wrap: wrap; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); width: 88px; text-align: center; }
+
+  .lesson-nav-bottom {
+    display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap;
+  }
+  .nav-btn {
+    text-decoration: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text);
+    box-shadow: var(--shadow); font-size: 0.88rem;
+  }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer {
+    background: var(--header-bg); color: var(--header-text); opacity: 0.85;
+    text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6;
+  }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* PRINT */
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .q-card, .sim-readout, .diagram-wrap, .protocol-card { box-shadow: none; border: 1px solid #999; }
+    footer { background: #ffffff; color: #000000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · NCyTE · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Day 2 · Lesson 5 · 4 Contact Hours</span>
+    <h1>Industrial Communication Protocols</h1>
+    <p class="tagline">Modbus TCP, DNP3, EtherNet/IP, PROFINET, BACnet/IP, and OPC UA — where each one came from, how to read its framing in a capture, and why only one of them was built with authentication in mind.</p>
+    <div class="meta-row">
+      <span class="meta-item">📊 Intermediate</span>
+      <span class="meta-item">⏱ 4 hours</span>
+      <span class="meta-item">🎯 6 objectives</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Lesson sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#s1" data-section="s1">Modbus TCP</a>
+    <a href="#s2" data-section="s2">DNP3</a>
+    <a href="#s3" data-section="s3">EtherNet/IP &amp; PROFINET</a>
+    <a href="#s4" data-section="s4">BACnet/IP</a>
+    <a href="#s5" data-section="s5">OPC UA</a>
+    <a href="#compare" data-section="compare">Comparison</a>
+    <a href="#activity" data-section="activity">Activity</a>
+    <a href="#simulation" data-section="simulation">Simulation</a>
+    <a href="#review" data-section="review">Review</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <h2>Lesson Overview</h2>
+      <p>Lesson 4 gave you the Ethernet, TCP/IP, and network-service foundation that industrial traffic now rides on. This lesson climbs one layer up, to the protocols devices actually use to ask each other for data and issue commands: <dfn id="def-modbus-intro">Modbus TCP</dfn>, <dfn id="def-dnp3-intro">DNP3</dfn>, <dfn id="def-eip-intro">EtherNet/IP</dfn>, <dfn id="def-profinet-intro">PROFINET</dfn>, <dfn id="def-bacnet-intro">BACnet/IP</dfn>, and <dfn id="def-opcua-intro">OPC UA</dfn>. Each one was built for a different corner of industry — discrete manufacturing, electric and water utilities, building automation — often a decade or more before "cybersecurity" was part of the design conversation at all. That history is not trivia; it directly explains why five of these six protocols will happily execute a command from anyone able to reach them on the wire, no password required, and why OPC UA looks so different from the rest.</p>
+      <p>We'll take the protocols roughly in the order most faculty will encounter them in the field: <dfn id="def-modbus-intro2">Modbus TCP</dfn> first, because its simplicity makes it the easiest place to learn to read function codes and framing in a packet capture; then <dfn id="def-dnp3-intro2">DNP3</dfn>, built specifically for utility SCADA; then the two competing industrial-Ethernet standards, <dfn id="def-eip-intro2">EtherNet/IP</dfn> and <dfn id="def-profinet-intro2">PROFINET</dfn>; then <dfn id="def-bacnet-intro2">BACnet/IP</dfn>, the protocol running the building your classroom is probably in right now; and finally <dfn id="def-opcua-intro2">OPC UA</dfn>, the one protocol on this list that was designed after the industry already understood these systems were being attacked.</p>
+      <div class="analogy-box">
+        <span class="analogy-label">Anchoring analogy</span>
+        <p>Think of these six protocols as six different languages spoken at six different job sites, each shaped by the era and the trust level of the room it was born in. Modbus is a two-word pidgin invented in 1979 for machines that only ever talked to other machines on the same factory floor — it has no concept of "prove who you are" because that idea never came up. OPC UA is a modern language built by committee decades later, after everyone in the room had already been burned by strangers walking in and giving orders in the old pidgin — so it comes with an ID-check built into every conversation from the start. Same general job — describing and requesting data — but the assumptions baked into each language are a generation apart.</p>
+      </div>
+      <h3 style="margin-top:22px;font-size:1.05rem;">Learning objectives</h3>
+      <p style="margin-bottom:6px;color:var(--text-muted);font-size:0.85rem;">By the end of this lesson, you will be able to:</p>
+      <ul class="lo-display">
+        <li>Explain the historical origin and intended use case of Modbus, DNP3, EtherNet/IP, PROFINET, BACnet/IP, and OPC UA.</li>
+        <li>Identify the function code, addressing, and framing fields of a Modbus TCP request and response in a packet capture.</li>
+        <li>Compare DNP3's utility-SCADA design, including unsolicited event reporting, against Modbus's simpler master/slave model.</li>
+        <li>Describe why Modbus, DNP3, EtherNet/IP, PROFINET, and BACnet/IP carry no native authentication by default.</li>
+        <li>Evaluate how OPC UA's built-in security model differs from that of the five legacy protocols in this lesson.</li>
+        <li>Configure a simulated Modbus TCP read or write request and correctly interpret every field in its response.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="part-banner">Part A · Protocol Lecture</div>
+
+  <!-- ================= MODULE 1: MODBUS TCP ================= -->
+  <section id="s1" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔢</span>
+      <h2><dfn id="def-modbus">Modbus TCP</dfn>: the simplest language on the floor</h2>
+      <span class="module-time">≈ 40 min</span>
+    </div>
+    <p><dfn id="def-modbus2">Modbus</dfn> is the oldest protocol in this lesson by a wide margin. Modicon (now part of Schneider Electric) published it in 1979 as a serial protocol for its own PLCs, and it was deliberately minimal: one master device polls one or more slave devices for data using a small set of numbered <dfn id="def-function-code">function codes</dfn>, and the slave replies in kind. There was no committee, no security review, and no expectation the protocol would ever leave a single factory's wiring closet. In 1999, Schneider published <dfn id="def-modbus-tcp">Modbus TCP</dfn>, which wraps that same simple request/response structure inside a standard TCP/IP packet on port 502 — swapping the old serial wiring for Ethernet without changing the underlying conversation at all. That age and simplicity are exactly why Modbus remains one of the most widely implemented industrial protocols on earth: it is easy to build into a $40 sensor, and after 45 years almost every SCADA and HMI package on the market already speaks it.</p>
+    <p>A Modbus TCP message has two parts. The <dfn id="def-mbap">MBAP header</dfn> (Modbus Application Protocol header) is seven bytes that TCP itself needed but the original serial protocol never had: a two-byte transaction identifier the master picks to match each response to its request, a two-byte protocol identifier that is always zero for Modbus, a two-byte length field counting the bytes that follow, and a one-byte unit identifier for addressing a specific device behind a gateway. After that comes the <dfn id="def-pdu">PDU</dfn> (protocol data unit): a one-byte function code — such as <code>0x01</code> Read Coils, <code>0x03</code> Read Holding Registers, <code>0x06</code> Write Single Register, or <code>0x10</code> Write Multiple Registers — followed by whatever address, quantity, or value data that function code requires. Nothing in either part identifies who is asking, or checks whether they are allowed to ask.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 660 190" role="img" aria-labelledby="mbapTitle mbapDesc" style="width:100%;max-width:660px;display:block;margin:0 auto;">
+        <title id="mbapTitle">Modbus TCP frame structure: MBAP header plus PDU</title>
+        <desc id="mbapDesc">A Modbus TCP frame is divided into two regions. The MBAP header occupies the first seven bytes: a two-byte transaction identifier, a two-byte protocol identifier that is always zero, a two-byte length field, and a one-byte unit identifier. Immediately after the MBAP header comes the PDU, beginning with a one-byte function code followed by a variable amount of data whose size and meaning depend on that function code, such as a starting address and quantity for a read, or an address and value for a write.</desc>
+        <rect x="10" y="20" width="640" height="34" rx="6" fill="var(--surface2)" stroke="var(--border)"></rect>
+        <text x="330" y="42" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">Modbus TCP Frame</text>
+        <rect x="10" y="70" width="360" height="90" rx="8" fill="var(--surface2)" stroke="var(--text-muted)"></rect>
+        <text x="190" y="92" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-muted)">MBAP Header (7 bytes)</text>
+        <rect x="24" y="104" width="80" height="42" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="64" y="122" text-anchor="middle" font-size="9" fill="var(--text)">Transaction ID</text>
+        <text x="64" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">2 bytes</text>
+        <rect x="112" y="104" width="72" height="42" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="148" y="122" text-anchor="middle" font-size="9" fill="var(--text)">Protocol ID</text>
+        <text x="148" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">2 bytes = 0</text>
+        <rect x="192" y="104" width="72" height="42" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="228" y="122" text-anchor="middle" font-size="9" fill="var(--text)">Length</text>
+        <text x="228" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">2 bytes</text>
+        <rect x="272" y="104" width="80" height="42" rx="4" fill="var(--surface)" stroke="var(--border)"></rect>
+        <text x="312" y="122" text-anchor="middle" font-size="9" fill="var(--text)">Unit ID</text>
+        <text x="312" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">1 byte</text>
+        <rect x="384" y="70" width="266" height="90" rx="8" fill="var(--accent-light)" stroke="var(--accent)" stroke-dasharray="5 3"></rect>
+        <text x="517" y="92" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent2)">PDU — Function Code + Data</text>
+        <rect x="398" y="104" width="90" height="42" rx="4" fill="var(--surface)" stroke="var(--accent)"></rect>
+        <text x="443" y="122" text-anchor="middle" font-size="9" fill="var(--accent2)">Function Code</text>
+        <text x="443" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">1 byte, e.g. 0x03</text>
+        <rect x="498" y="104" width="138" height="42" rx="4" fill="var(--surface)" stroke="var(--ok)"></rect>
+        <text x="567" y="122" text-anchor="middle" font-size="9" fill="var(--ok)">Address / Qty / Value</text>
+        <text x="567" y="136" text-anchor="middle" font-size="8" fill="var(--text-muted)">variable, by function</text>
+      </svg>
+      <p class="diagram-caption">Diagram: every Modbus TCP frame is a fixed seven-byte MBAP header followed by a PDU that starts with a one-byte function code. Nowhere in this structure is there a field for a username, password, or certificate — the frame has no concept of identity at all.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>At a small water treatment plant, a SCADA client polls a level transmitter's Modbus TCP gateway every ten seconds. The request is <code>00 01 00 00 00 06 01 03 00 00 00 02</code> — transaction ID 1, protocol ID 0, length 6, unit ID 1, function code <code>03</code> (Read Holding Registers), starting address <code>0000</code>, and quantity <code>0002</code>. The gateway replies <code>00 01 00 00 00 07 01 03 04 00 80 00 2D</code>: same transaction ID, length 7, unit ID 1, function code <code>03</code>, byte count 4, and two register values — <code>0080</code> hex (128 decimal) for holding register 0, which this plant scales as tank level in tenths of a foot (12.8 ft), and <code>002D</code> hex (45 decimal) for holding register 1, effluent turbidity in hundredths of an NTU (0.45 NTU). Any device on that network segment that can form the same twelve bytes gets the identical answer — there is no login step to skip, because none exists.</p>
+    </div>
+    <table class="compare-table">
+      <caption>Common Modbus function codes worth recognizing in a capture</caption>
+      <thead>
+        <tr><th scope="col">Code</th><th scope="col">Name</th><th scope="col">What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0x01</td><td>Read Coils</td><td>Reads one or more single-bit discrete outputs (e.g. a pump run command)</td></tr>
+        <tr><td>0x02</td><td>Read Discrete Inputs</td><td>Reads one or more single-bit field inputs (e.g. a limit switch)</td></tr>
+        <tr><td>0x03</td><td>Read Holding Registers</td><td>Reads one or more 16-bit read/write values (e.g. a setpoint or scaled sensor reading)</td></tr>
+        <tr><td>0x04</td><td>Read Input Registers</td><td>Reads one or more 16-bit read-only values (e.g. a raw analog input)</td></tr>
+        <tr><td>0x05</td><td>Write Single Coil</td><td>Sets one discrete output on or off</td></tr>
+        <tr><td>0x06</td><td>Write Single Register</td><td>Writes one 16-bit value, such as a setpoint</td></tr>
+        <tr><td>0x10</td><td>Write Multiple Registers</td><td>Writes several consecutive 16-bit values in one message</td></tr>
+      </tbody>
+    </table>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Students with an IT background often expect a "read" operation to be inherently safe. Worth pausing here: Modbus function code 0x03 is a read, but 0x06 and 0x10 write directly to a controller's memory, and the protocol has no way to check whether the requester was supposed to be allowed to do that. The verb "read" versus "write" is the only safety distinction the protocol itself makes.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2: DNP3 ================= -->
+  <section id="s2" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">⚡</span>
+      <h2><dfn id="def-dnp3">DNP3</dfn>: built for the substation, not the factory floor</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p><dfn id="def-dnp3-2">DNP3</dfn> (Distributed Network Protocol version 3) was developed in the early 1990s by Westronic, later absorbed into GE Harris, drawing heavily on the still-unfinished IEC 60870-5 standard. It was purpose-built for a problem Modbus never had to solve: electric and water utility SCADA systems spread across dozens or hundreds of miles, where a central <dfn id="def-master-outstation">master station</dfn> supervises many remote <dfn id="def-outstation">outstations</dfn> — substations, pump stations, reclosers — often connected over slow, unreliable, or metered communication links like leased phone lines or radio. That environment shaped everything about DNP3's design. Rather than a master constantly polling every point the way a Modbus client does, a DNP3 outstation can send an <dfn id="def-unsolicited">unsolicited response</dfn> the instant something changes — a breaker trips, a tank overflows — so the master learns about the event immediately instead of waiting for its next scheduled poll, which matters enormously when the link between them is expensive or intermittent.</p>
+    <p>DNP3 organizes data into typed <dfn id="def-object-group">object groups</dfn> — binary inputs, analog inputs, counters, binary outputs — each assigned to an event <dfn id="def-dnp3-class">class</dfn> (Class 0 for static/current values, Classes 1–3 for events by priority). A master periodically performs an <dfn id="def-integrity-poll">integrity poll</dfn>, requesting Class 0 plus all pending events, to reconcile its picture of the system in case any unsolicited responses were lost in transit — a real concern on the unreliable links DNP3 was designed for. Like Modbus, the base protocol was published with no authentication: any device that can reach a master or outstation on the wire can issue commands or inject data. A later extension, <dfn id="def-dnp3-sa">DNP3 Secure Authentication</dfn> (SAv5, standardized in IEEE 1815-2012), added challenge-response authentication and message integrity checks, but it is an optional add-on that many fielded utility systems still do not run.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>Modbus is a supervisor walking the factory floor every few minutes, asking each machine in turn, "what's your status?" DNP3 is closer to a 911 dispatch system covering a county: most of the time the dispatcher checks in on a schedule, but if a house catches fire, the alarm calls in immediately without waiting to be asked — and periodically the dispatcher still double-checks with every station to make sure no call was missed along the way. Different geography, different failure modes, different design.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A distribution utility's SCADA master polls 40 recloser outstations every fifteen minutes for an integrity poll (Class 0 plus events). At 3:14 a.m., a fault causes Recloser 17 to open. Rather than wait up to fifteen minutes for the next scheduled poll, Recloser 17 immediately sends an unsolicited response reporting a Class 1 binary-input event: "breaker status changed to OPEN," complete with a timestamp. The master acknowledges the unsolicited response, updates its display, and still performs its next scheduled integrity poll at 3:15 to confirm no other event was missed on that same outstation.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>A good discussion prompt: without DNP3 Secure Authentication enabled, what stops someone who can reach a recloser's DNP3 port from sending it an unsolicited-looking "breaker OPEN" command of their own? The honest answer — nothing in the base protocol — is exactly the motivator for Lesson 6's threat landscape discussion.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3: ETHERNET/IP & PROFINET ================= -->
+  <section id="s3" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🏭</span>
+      <h2><dfn id="def-eip">EtherNet/IP</dfn> and <dfn id="def-profinet">PROFINET</dfn>: two continents, two industrial Ethernets</h2>
+      <span class="module-time">≈ 35 min</span>
+    </div>
+    <p><dfn id="def-eip2">EtherNet/IP</dfn> ("IP" here means Industrial Protocol, not internet protocol) was introduced around 1998–2000, driven by Rockwell Automation and standardized by <dfn id="def-odva">ODVA</dfn> (Open DeviceNet Vendors Association). It doesn't invent a new wire format; instead it carries the vendor-neutral <dfn id="def-cip">Common Industrial Protocol</dfn> (CIP) — the same object-and-service model used by ControlNet and DeviceNet — inside standard Ethernet and TCP/IP frames, using TCP port 44818 for explicit (request/response) messaging and UDP port 2222 for implicit (real-time I/O) traffic. That heritage made EtherNet/IP the dominant industrial-Ethernet choice across North American discrete manufacturing, especially anywhere Rockwell/Allen-Bradley PLCs are already installed.</p>
+    <p><dfn id="def-profinet2">PROFINET</dfn> took a different path. Released in 2003 by PROFIBUS &amp; PROFINET International (PI), with Siemens as the primary driver, it grew out of the PROFIBUS fieldbus community and was built to squeeze hard real-time performance directly out of Ethernet frames rather than riding on top of standard TCP/IP for time-critical traffic. PROFINET defines three conformance classes: RT (Real-Time, using standard Ethernet hardware for millisecond-range determinism), IRT (Isochronous Real-Time, requiring PROFINET-aware switches for microsecond-range determinism used in motion control), and a TCP/UDP-based class for non-time-critical configuration and diagnostics traffic. That heritage made PROFINET the dominant choice across European manufacturing, particularly for motion-control-heavy applications like packaging and printing lines.</p>
+    <div class="protocol-grid" role="img" aria-labelledby="grid-caption-1">
+      <div class="protocol-card">
+        <span class="domain-tag">Origin: Rockwell / ODVA, 1998–2000</span>
+        <h4>EtherNet/IP</h4>
+        <p>Common Industrial Protocol over standard Ethernet/TCP-IP. Dominant in North American discrete manufacturing.</p>
+      </div>
+      <div class="protocol-card">
+        <span class="domain-tag">Origin: PI / Siemens, 2003</span>
+        <h4>PROFINET</h4>
+        <p>Real-time Ethernet with RT and IRT classes. Dominant in European manufacturing and motion control.</p>
+      </div>
+    </div>
+    <p id="grid-caption-1" class="diagram-caption" style="text-align:left;">Text alternative: two cards summarize EtherNet/IP and PROFINET side by side — their originating organization and year, what each carries over Ethernet, and the region and application type where each is most commonly deployed.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>EtherNet/IP and PROFINET are like two countries that both adopted the automobile around the same decade but ended up with different road standards. Both chose "Ethernet" the way both chose "cars" — but one grew its own conventions out of an existing device ecosystem (CIP objects, in EtherNet/IP's case, tracing back to DeviceNet) and the other rebuilt the roads themselves for higher precision (PROFINET's RT and IRT classes). A vehicle built for one country's roads doesn't natively drive on the other's without a translator — which is exactly why a PLC that only speaks EtherNet/IP cannot talk directly to a drive that only speaks PROFINET.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A bottling line in Ohio uses Allen-Bradley ControlLogix PLCs talking EtherNet/IP to remote I/O racks and VFDs over standard managed Ethernet switches — no special hardware required beyond industrially rated switches. A sister plant in Germany runs the same bottling process on Siemens S7 PLCs using PROFINET IRT to synchronize servo-driven capping heads to within microseconds, which requires PROFINET-aware switches that reserve time slots for the isochronous traffic. Both lines do the same job; neither PLC's native protocol can talk directly to the other plant's field devices without a protocol gateway in between.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Like Modbus and DNP3, neither EtherNet/IP nor PROFINET's real-time (RT) class includes authentication by default — the same "we trusted the wire" design assumption from a decade earlier. PROFINET Security extensions and CIP Security exist as optional, newer additions, mirroring DNP3 Secure Authentication's story: security bolted on after the fact, not built in from day one.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4: BACnet/IP ================= -->
+  <section id="s4" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🏢</span>
+      <h2><dfn id="def-bacnet">BACnet/IP</dfn>: the protocol running the building you're standing in</h2>
+      <span class="module-time">≈ 25 min</span>
+    </div>
+    <p><dfn id="def-bacnet2">BACnet</dfn> (Building Automation and Control network) began in 1987 as an ASHRAE committee project aimed at a problem the HVAC industry still has today: getting thermostats, chillers, air handlers, lighting panels, and access-control systems from different manufacturers to talk to one another instead of each vendor requiring its own proprietary front end. ASHRAE published the standard as ANSI/ASHRAE 135 in 1995, originally over its own data-link options (including a native Ethernet framing and an RS-485 variant called MS/TP). In 1999, Annex J added <dfn id="def-bacnet-ip">BACnet/IP</dfn>, tunneling BACnet messages inside UDP on port 47808 (hex <code>0xBAC0</code> — a deliberate nod to the protocol's name) so BACnet devices could ride ordinary IP networks and be reached across a campus rather than only a single wiring segment.</p>
+    <p>Where Modbus addresses raw registers and DNP3 addresses typed points inside object groups, BACnet takes an explicitly <dfn id="def-object-oriented">object-oriented</dfn> approach: every controllable or readable value on a device is a numbered <dfn id="def-bacnet-object">object</dfn> — an Analog Input, Analog Output, Binary Input, Binary Value, Multi-State Value, and so on — each with a standard set of properties (Present_Value, Units, Status_Flags). A single Device object identifies the controller itself on the network by a unique Device Instance number. That structure is why a building engineer can point a single BACnet workstation at controllers from a dozen different HVAC vendors and see consistent object types across all of them, something neither Modbus nor DNP3's more numeric addressing was designed to guarantee across vendors.</p>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A community college's building automation system polls an air-handling unit's BACnet controller (Device Instance 4021) for Analog Input object AI-3, Present_Value property — the supply-air temperature sensor — and receives back a real value of 54.2°F. The same controller exposes Binary Output object BO-1 for the supply fan's run command and Multi-State Value object MSV-2 for the unit's current operating mode (Occupied / Unoccupied / Warm-up / Cool-down). None of that traffic, by default, requires the requesting workstation to authenticate — any device on the same BACnet/IP network segment can issue the identical read, and in most fielded systems, the identical write to BO-1.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>Faculty are often surprised BACnet/IP belongs in an OT cybersecurity course at all, since "the building" doesn't sound like critical infrastructure. Worth naming directly: HVAC, access control, and life-safety systems in hospitals, labs, and data centers all commonly run on BACnet, and a compromised building controller can affect physical safety and equipment (like server-room cooling) well beyond comfort. A newer extension, <dfn id="def-bacnet-sc">BACnet/SC</dfn> (Secure Connect), adds TLS-based encryption and certificate authentication, following the same "security added later" pattern as DNP3 SAv5.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 5: OPC UA ================= -->
+  <section id="s5" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔐</span>
+      <h2><dfn id="def-opcua">OPC UA</dfn>: designed after the industry already knew better</h2>
+      <span class="module-time">≈ 30 min</span>
+    </div>
+    <p>The story of <dfn id="def-opcua2">OPC UA</dfn> (OPC Unified Architecture) starts with its predecessor. <dfn id="def-opc-classic">OPC Classic</dfn> — originally "OLE for Process Control" — appeared in 1996 as a way to let Windows-based HMI and SCADA software talk to PLCs from many vendors through a common interface, but it was built directly on Microsoft's <dfn id="def-dcom">DCOM</dfn> (Distributed Component Object Model), which meant it was Windows-only, notoriously difficult to configure through firewalls, and inherited whatever security DCOM itself provided — which was not designed with industrial exposure in mind. By the mid-2000s, the OPC Foundation set out to replace that foundation entirely. OPC UA, released in 2006, is platform-independent (it runs on Windows, Linux, and embedded systems alike), transport-independent (commonly TCP port 4840, but also HTTPS and WebSocket bindings), and built around a self-describing, service-oriented information model rather than DCOM's fragile remote-object plumbing.</p>
+    <p>The part that matters most for this lesson is what changed about security. Every one of the five protocols covered earlier in this lesson assumes that whoever can reach the wire is authorized — a design decision that made sense when these protocols lived on physically isolated serial links or dedicated plant networks, and that has aged very badly as those networks became routable and, in some documented incidents, internet-reachable. OPC UA was designed after that lesson had already been learned the hard way. It builds in <dfn id="def-x509">X.509 certificate</dfn>-based authentication between client and server, message signing and encryption at the transport level, and a separate user-authentication layer (username/password, certificates, or other credentials) — none of which is bolted on as an optional extension the way DNP3 SAv5, CIP Security, and BACnet/SC are for their respective protocols. Security was part of OPC UA's specification from its first release, not a later patch.</p>
+    <div class="analogy-box">
+      <span class="analogy-label">Anchoring analogy</span>
+      <p>If Modbus, DNP3, EtherNet/IP, PROFINET, and BACnet are all buildings that were constructed with a front door but no lock — because in 1985, or 1993, or 2003, nobody serious thought a stranger would ever be standing at that door — OPC UA is a building designed in the 2000s by an architect who had already read the incident reports. The door comes with a lock, a peephole, and a sign-in sheet built into the blueprint, not added afterward by a tenant who got burglarized.</p>
+    </div>
+    <div class="worked-example">
+      <span class="worked-example-label">Worked example</span>
+      <p>A manufacturer migrating an aging OPC Classic historian connection replaces it with an OPC UA server on the PLC and an OPC UA client on the historian. During setup, the two endpoints exchange X.509 certificates and the engineer configures a security policy requiring signed and encrypted messages; the historian's service account is granted read-only access to a defined set of tags, while a separate operator account with write access to setpoints requires its own credential. An unauthorized laptop plugged into the same switch can see OPC UA traffic on the wire, but without a trusted certificate and valid credentials, it cannot establish a session with the server at all — a categorically different outcome than the same laptop pointed at a Modbus or BACnet/IP device on that same network.</p>
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>It's worth being precise with students: OPC UA's security features are only as strong as their configuration. A deployment left at "Security Policy: None" for compatibility reasons gets none of these protections despite running the newer protocol. The protocol changed what's possible; it did not remove the need for someone to actually configure it correctly.</p>
+    </div>
+  </section>
+
+  <!-- ================= COMPARISON ================= -->
+  <section id="compare" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📋</span>
+      <h2>Side-by-Side: Six Protocols, Six Origins</h2>
+      <span class="module-time">≈ 10 min</span>
+    </div>
+    <p>The table below puts the history, transport, and — most importantly for a security course — the native authentication story for all six protocols in one place.</p>
+    <table class="compare-table">
+      <caption>Comparison of the six industrial communication protocols covered in this lesson</caption>
+      <thead>
+        <tr>
+          <th scope="col">Protocol</th>
+          <th scope="col">Origin / year introduced</th>
+          <th scope="col">Transport &amp; port</th>
+          <th scope="col">Typical domain</th>
+          <th scope="col">Addressing / data model</th>
+          <th scope="col">Native authentication</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Modbus TCP</td>
+          <td>Modicon, 1979 (serial); TCP variant, 1999</td>
+          <td>TCP port 502</td>
+          <td>General industrial, discrete manufacturing</td>
+          <td>Numbered coils and registers, accessed by function code</td>
+          <td>None — no authentication or encryption</td>
+        </tr>
+        <tr>
+          <td>DNP3</td>
+          <td>Westronic / GE Harris, 1993, based on IEC 60870-5</td>
+          <td>TCP/UDP port 20000</td>
+          <td>Electric and water utility SCADA</td>
+          <td>Typed object groups with class-based unsolicited event reporting</td>
+          <td>None by default; optional DNP3 Secure Authentication (SAv5)</td>
+        </tr>
+        <tr>
+          <td>EtherNet/IP</td>
+          <td>Rockwell Automation / ODVA, 1998–2000</td>
+          <td>TCP 44818 (explicit), UDP 2222 (implicit I/O)</td>
+          <td>North American discrete manufacturing</td>
+          <td>Common Industrial Protocol (CIP) objects and services</td>
+          <td>None natively; optional CIP Security extension</td>
+        </tr>
+        <tr>
+          <td>PROFINET</td>
+          <td>PROFIBUS &amp; PROFINET International / Siemens, 2003</td>
+          <td>Real-time Ethernet frames (RT/IRT); TCP/UDP for non-real-time traffic</td>
+          <td>European manufacturing, motion control</td>
+          <td>Device/module data defined per GSD device description</td>
+          <td>None natively in RT/IRT; optional PROFINET Security extensions</td>
+        </tr>
+        <tr>
+          <td>BACnet/IP</td>
+          <td>ASHRAE, 1995 (BACnet); Annex J, 1999 (IP tunneling)</td>
+          <td>UDP port 47808 (0xBAC0)</td>
+          <td>Building automation — HVAC, lighting, access control</td>
+          <td>Object-oriented (Analog/Binary/Multi-State objects, Device Instance)</td>
+          <td>None by default; newer BACnet/SC adds TLS and certificates</td>
+        </tr>
+        <tr>
+          <td>OPC UA</td>
+          <td>OPC Foundation, 2006 (successor to OPC Classic/DCOM, 1996)</td>
+          <td>TCP port 4840; also HTTPS/WebSocket bindings</td>
+          <td>Cross-domain — manufacturing, utilities, IT/OT convergence</td>
+          <td>Self-describing, service-oriented information model</td>
+          <td>Built in — X.509 certificates, message signing/encryption, user auth</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="teach-note">
+      <span class="teach-label">Teaching note</span>
+      <p>A useful in-class prompt: ask faculty to notice the pattern in the rightmost column before you say it out loud. Five protocols built for trusted, isolated networks share "none by default." The one protocol built after those networks stopped being isolated has authentication built into its specification. That contrast is this lesson's central takeaway.</p>
+    </div>
+  </section>
+
+  <div class="part-banner">Part B · Applied Lab</div>
+
+  <!-- ================= ACTIVITY ================= -->
+  <section id="activity" class="module">
+    <div class="activity-block">
+      <div class="activity-head">
+        <span aria-hidden="true">🧩</span>
+        <h3>Activity: Match the Protocol to Its Defining Trait</h3>
+        <span class="activity-structure">Individual, then pair-share</span>
+        <span class="activity-time">≈ 20 min</span>
+      </div>
+      <div class="activity-body">
+        <p class="activity-instructions"><strong>Individual (10 min):</strong> For each protocol, select the description that best captures its origin and design purpose. <strong>Pair-share (10 min):</strong> Compare answers with a neighbor — several descriptions can sound plausible for more than one protocol, but each has one best fit. Use this as a low-stakes way to explore the six protocols before the simulation below.</p>
+        <div class="mapping-table-wrap">
+          <table class="mapping-table" id="mappingTable">
+            <thead>
+              <tr><th scope="col">Protocol</th><th scope="col">Best-fit description</th></tr>
+            </thead>
+            <tbody>
+              <tr class="map-row" data-answer="a">
+                <td>Modbus TCP</td>
+                <td>
+                  <select aria-label="Description for Modbus TCP">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="b">
+                <td>DNP3</td>
+                <td>
+                  <select aria-label="Description for DNP3">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="c">
+                <td>EtherNet/IP</td>
+                <td>
+                  <select aria-label="Description for EtherNet/IP">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="d">
+                <td>PROFINET</td>
+                <td>
+                  <select aria-label="Description for PROFINET">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="e">
+                <td>BACnet/IP</td>
+                <td>
+                  <select aria-label="Description for BACnet/IP">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="map-row" data-answer="f">
+                <td>OPC UA</td>
+                <td>
+                  <select aria-label="Description for OPC UA">
+                    <option value="">— Select —</option>
+                    <option value="a">A simple, decades-old master/query-response protocol using numeric function codes over TCP port 502; no native authentication and only a numeric unit identifier</option>
+                    <option value="b">Originally built for electric and water utility SCADA; outstations can send unsolicited event reports and an optional secure-authentication extension exists</option>
+                    <option value="c">Wraps the vendor-neutral Common Industrial Protocol (CIP) over standard Ethernet and TCP/IP; common in North American discrete manufacturing</option>
+                    <option value="d">A real-time industrial Ethernet standard from PROFIBUS &amp; PROFINET International, widely used in European manufacturing and motion control</option>
+                    <option value="e">An object-oriented building-automation protocol standardized by ASHRAE; addresses HVAC, lighting, and access-control points as numbered objects</option>
+                    <option value="f">A platform-independent, service-oriented protocol with certificate-based authentication and encryption built into the specification, designed to replace an older Windows-only, DCOM-based protocol</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mapping-actions">
+          <button class="btn" id="checkMapping">Check My Mapping</button>
+          <button class="btn secondary" id="resetMapping">Reset</button>
+          <span class="mapping-result" id="mappingResult" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIMULATION ================= -->
+  <section id="simulation" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🧪</span>
+      <h2>Simulation: Modbus TCP Frame Builder</h2>
+      <span class="module-time">≈ 25 min</span>
+    </div>
+    <span class="safety-flag">⚠ Simulation only — no live equipment or network</span>
+    <p>Choose a function code and fill in the fields below to build a realistic Modbus TCP request against the same simulated water-treatment holding registers from the worked example above, then see the exact response bytes the gateway would return. This tool builds byte sequences entirely in your browser — nothing is sent anywhere, and no real device is contacted.</p>
+    <div class="activity-block">
+      <div class="activity-body">
+        <div class="sim-form">
+          <label class="sim-field">Function code
+            <select id="simFunction">
+              <option value="03">0x03 — Read Holding Registers</option>
+              <option value="01">0x01 — Read Coils</option>
+              <option value="06">0x06 — Write Single Register</option>
+              <option value="10">0x10 — Write Multiple Registers</option>
+            </select>
+          </label>
+          <label class="sim-field">Starting address
+            <input type="number" id="simAddress" min="0" max="65535" value="0">
+          </label>
+          <label class="sim-field" id="simQtyWrap">Quantity
+            <input type="number" id="simQuantity" min="1" max="10" value="2">
+          </label>
+          <label class="sim-field" id="simValueWrap" style="display:none;">Value to write
+            <input type="number" id="simValue" min="0" max="65535" value="500">
+          </label>
+          <label class="sim-field" id="simValuesWrap" style="display:none;">Values (comma-separated)
+            <input type="text" id="simValues" value="500,750">
+          </label>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px;">Registers 0–4 are pre-loaded in this simulation: 0 = Tank Level (ft ×10), 1 = Effluent Turbidity (NTU ×100), 2 = Pump 1 Speed (Hz ×10), 3 = Pump 2 Speed (Hz ×10), 4 = Chlorine Residual (mg/L ×100). Coils 0–3: 0 = Pump 1 Run, 1 = Pump 2 Run, 2 = Alarm Horn, 3 = Bypass Valve Open.</p>
+        <button type="button" class="btn" id="buildFrame">Build Request &amp; Response</button>
+        <div class="sim-readout" id="simReadout" aria-live="polite" style="margin-top:16px;">
+          <strong>Select a function code and click Build</strong> to see the MBAP header, function code, and data bytes for both the request and its response.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REVIEW ================= -->
+  <section id="review" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">✅</span>
+      <h2>Review &amp; Knowledge Check</h2>
+      <span class="module-time">≈ 15 min</span>
+    </div>
+    <p>Five questions covering the lesson's key distinctions. Answer each, then select <strong>Grade My Quiz</strong> to see your score and an explanation for every item.</p>
+    <div class="quiz-block" id="quizBlock">
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q1.</span>Why do Modbus, DNP3, EtherNet/IP, PROFINET, and BACnet/IP carry no native authentication by default?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q1" value="a"> Adding authentication fields would have exceeded the available bandwidth of early industrial networks</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="b"> They were designed for isolated, trusted networks where anyone able to reach the wire was assumed to be authorized, decades before that assumption stopped holding</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="c"> International licensing agreements prohibited vendors from including security features</label></li>
+          <li class="q-opt"><label><input type="radio" name="q1" value="d"> Authentication was included originally but later removed for regulatory compliance reasons</label></li>
+        </ul>
+        <div class="q-feedback" id="fb1"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q2.</span>In a Modbus TCP frame, which field tells the receiving device how many bytes follow in the message (the Unit ID, function code, and data combined)?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q2" value="a"> The transaction identifier</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="b"> The protocol identifier</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="c"> The length field in the MBAP header</label></li>
+          <li class="q-opt"><label><input type="radio" name="q2" value="d"> The function code</label></li>
+        </ul>
+        <div class="q-feedback" id="fb2"></div>
+      </div>
+
+      <div class="q-card" data-answer="a">
+        <div class="q-stem"><span class="q-num">Q3.</span>Which protocol was purpose-built for electric and water utility SCADA and supports unsolicited event reporting from field outstations?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q3" value="a"> DNP3</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="b"> BACnet/IP</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="c"> PROFINET</label></li>
+          <li class="q-opt"><label><input type="radio" name="q3" value="d"> OPC UA</label></li>
+        </ul>
+        <div class="q-feedback" id="fb3"></div>
+      </div>
+
+      <div class="q-card" data-answer="b">
+        <div class="q-stem"><span class="q-num">Q4.</span>What is the primary architectural change OPC UA introduces compared to the five legacy protocols in this lesson?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q4" value="a"> It eliminates the need for TCP/IP entirely and runs only over dedicated fiber</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="b"> It builds certificate-based authentication, message signing, and encryption directly into the specification rather than as a later add-on</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="c"> It requires proprietary vendor hardware and cannot run on general-purpose computers</label></li>
+          <li class="q-opt"><label><input type="radio" name="q4" value="d"> It replaces the concept of read and write operations with a single universal command</label></li>
+        </ul>
+        <div class="q-feedback" id="fb4"></div>
+      </div>
+
+      <div class="q-card" data-answer="c">
+        <div class="q-stem"><span class="q-num">Q5.</span>A campus building-automation workstation reads an air handler's supply-air temperature over IP, addressing it as an Analog Input object on a specific Device Instance. Which protocol is this?</div>
+        <ul class="q-opts">
+          <li class="q-opt"><label><input type="radio" name="q5" value="a"> DNP3</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="b"> EtherNet/IP</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="c"> BACnet/IP</label></li>
+          <li class="q-opt"><label><input type="radio" name="q5" value="d"> Modbus TCP</label></li>
+        </ul>
+        <div class="q-feedback" id="fb5"></div>
+      </div>
+
+    </div>
+    <div class="mapping-actions">
+      <button class="btn" id="gradeQuiz">Grade My Quiz</button>
+      <button class="btn secondary" id="resetQuiz">Reset Quiz</button>
+    </div>
+    <div class="quiz-score" id="quizScore">
+      <span class="quiz-score-big" id="quizScoreBig">0 / 5</span>
+      <span id="quizScoreText"></span>
+    </div>
+
+    <div class="teach-note" style="margin-top:26px;">
+      <span class="teach-label">Suggested assessment artifact</span>
+      <p>Have each faculty member choose one protocol from this lesson (not Modbus, to push beyond the most-covered example) and produce a half-page "protocol profile" covering: its origin and the problem it was built to solve, one worked scenario in that protocol's typical domain, and an honest statement of its native authentication story — including any optional security extension and why fielded systems might not be running it. This mirrors the comparison table's structure and confirms the history-to-security connection transferred before Lesson 6's threat-landscape discussion.</p>
+    </div>
+  </section>
+
+  <!-- ================= FURTHER READING ================= -->
+  <section id="further-reading" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">📚</span>
+      <h2>Further Reading</h2>
+    </div>
+    <ul class="resource-list">
+      <li><a href="https://sands-mvcc.github.io/ot/otprotocols.html" target="_blank" rel="noopener noreferrer">OT Protocols Overview</a> — a broader course-site reference covering the industrial protocol landscape beyond this lesson's six.</li>
+      <li><a href="https://sands-mvcc.github.io/ot/modbus.html" target="_blank" rel="noopener noreferrer">Modbus Deep Dive</a> — extended detail on Modbus function codes, register types, and serial-versus-TCP variants.</li>
+      <li><a href="https://sands-mvcc.github.io/ot/ethernet.html" target="_blank" rel="noopener noreferrer">EtherNet/IP Deep Dive</a> — additional detail on CIP objects and explicit versus implicit messaging.</li>
+      <li><a href="https://sands-mvcc.github.io/ot/bacnet.html" target="_blank" rel="noopener noreferrer">BACnet Deep Dive</a> — additional detail on BACnet object types and the MS/TP and IP data-link options.</li>
+      <li><a href="https://sands-mvcc.github.io/ot/opc.html" target="_blank" rel="noopener noreferrer">OPC UA Deep Dive</a> — additional detail on OPC UA's security model and information modeling.</li>
+    </ul>
+  </section>
+
+  <nav class="lesson-nav-bottom" aria-label="Lesson navigation">
+    <a class="nav-btn" href="lesson04.html">← Lesson 4: IT Protocols Inside OT Networks</a>
+    <a class="nav-btn" href="lesson06.html">Lesson 6: The OT Threat Landscape →</a>
+  </nav>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Lesson tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#s1">1. Modbus TCP</a></li>
+      <li><a href="#s2">2. DNP3</a></li>
+      <li><a href="#s3">3. EtherNet/IP &amp; PROFINET</a></li>
+      <li><a href="#s4">4. BACnet/IP</a></li>
+      <li><a href="#s5">5. OPC UA</a></li>
+      <li><a href="#compare">Side-by-Side Comparison</a></li>
+      <li><a href="#activity">Activity: Matching Exercise</a></li>
+      <li><a href="#simulation">Simulation: Frame Builder</a></li>
+      <li><a href="#review">Review &amp; Knowledge Check</a></li>
+      <li><a href="#further-reading">Further Reading</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Objectives Progress</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 6 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Learning objectives checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Explain the origin and intended use of each protocol</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Identify Modbus TCP function codes and framing in a capture</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Compare DNP3's design against Modbus's simpler model</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Describe why legacy protocols carry no native authentication</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Evaluate how OPC UA's security model differs from the rest</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo6"><label for="lo6">Configure a simulated Modbus read/write request</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Key Terms</div>
+    <ul class="glossary-list">
+      <li><a href="#s1"><span class="glossary-term">Modbus TCP</span></a><span class="glossary-def">1979 master/slave protocol wrapped in TCP on port 502; addresses coils and registers by function code, with no native authentication.</span></li>
+      <li><a href="#s2"><span class="glossary-term">DNP3</span></a><span class="glossary-def">Protocol built for electric and water utility SCADA; supports unsolicited event reporting from outstations, with an optional secure-authentication extension.</span></li>
+      <li><a href="#s3"><span class="glossary-term">EtherNet/IP</span></a><span class="glossary-def">Carries the Common Industrial Protocol (CIP) over standard Ethernet/TCP-IP; dominant in North American discrete manufacturing.</span></li>
+      <li><a href="#s4"><span class="glossary-term">BACnet/IP</span></a><span class="glossary-def">ASHRAE's object-oriented building-automation protocol, tunneled over UDP port 47808 for HVAC, lighting, and access control.</span></li>
+      <li><a href="#s5"><span class="glossary-term">OPC UA</span></a><span class="glossary-def">Platform-independent successor to OPC Classic with certificate-based authentication and encryption built into the specification.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Lesson Navigation</div>
+    <div class="prevnext-links">
+      <a href="lesson04.html">← Previous: Lesson 4 — IT Protocols Inside OT Networks</a>
+      <a href="lesson06.html">Next: Lesson 6 — The OT Threat Landscape →</a>
+    </div>
+  </div>
+
+</aside>
+</div>
+
+<footer>
+  Lesson 5 · Day 2 · Industrial Communication Protocols<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-assisted first draft. A human subject-matter expert should review it for technical accuracy before use with students. Educational use only — all activities are simulation-based and defensive in scope.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME (light default, dark only if previously chosen) ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- OBJECTIVES PROGRESS TRACKER ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+  }
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- MAPPING ACTIVITY ---------------- */
+  var mappingRows = Array.prototype.slice.call(document.querySelectorAll('#mappingTable .map-row'));
+  var mappingResult = document.getElementById('mappingResult');
+
+  document.getElementById('checkMapping').addEventListener('click', function () {
+    var correctCount = 0;
+    var totalAnswered = 0;
+    mappingRows.forEach(function (row) {
+      var select = row.querySelector('select');
+      var correctVal = row.getAttribute('data-answer');
+      row.classList.remove('correct', 'incorrect');
+      if (!select.value) return;
+      totalAnswered++;
+      if (select.value === correctVal) {
+        row.classList.add('correct');
+        correctCount++;
+      } else {
+        row.classList.add('incorrect');
+      }
+    });
+    mappingResult.textContent = correctCount + ' of ' + mappingRows.length + ' correct'
+      + (totalAnswered < mappingRows.length ? ' (some rows left unanswered)' : '');
+  });
+
+  document.getElementById('resetMapping').addEventListener('click', function () {
+    mappingRows.forEach(function (row) {
+      row.querySelector('select').value = '';
+      row.classList.remove('correct', 'incorrect');
+    });
+    mappingResult.textContent = '';
+  });
+
+  /* ---------------- SIMULATION: MODBUS FRAME BUILDER ---------------- */
+  var registerMap = {
+    0: { name: 'Tank Level', unit: 'ft', scale: 10, value: 128 },
+    1: { name: 'Effluent Turbidity', unit: 'NTU', scale: 100, value: 45 },
+    2: { name: 'Pump 1 Speed', unit: 'Hz', scale: 10, value: 600 },
+    3: { name: 'Pump 2 Speed', unit: 'Hz', scale: 10, value: 0 },
+    4: { name: 'Chlorine Residual', unit: 'mg/L', scale: 100, value: 82 }
+  };
+  var coilMap = {
+    0: { name: 'Pump 1 Run', value: 1 },
+    1: { name: 'Pump 2 Run', value: 0 },
+    2: { name: 'Alarm Horn', value: 0 },
+    3: { name: 'Bypass Valve Open', value: 0 }
+  };
+
+  var fnSelect = document.getElementById('simFunction');
+  var qtyWrap = document.getElementById('simQtyWrap');
+  var valueWrap = document.getElementById('simValueWrap');
+  var valuesWrap = document.getElementById('simValuesWrap');
+
+  function updateSimFields() {
+    var fn = fnSelect.value;
+    qtyWrap.style.display = (fn === '03' || fn === '01' || fn === '10') ? 'flex' : 'none';
+    valueWrap.style.display = (fn === '06') ? 'flex' : 'none';
+    valuesWrap.style.display = (fn === '10') ? 'flex' : 'none';
+  }
+  fnSelect.addEventListener('change', updateSimFields);
+  updateSimFields();
+
+  function toHexByte(n) { return ('0' + (n & 0xFF).toString(16).toUpperCase()).slice(-2); }
+  function toHexWord(n) { return toHexByte((n >> 8) & 0xFF) + ' ' + toHexByte(n & 0xFF); }
+
+  function renderBytes(container, bytes, cls) {
+    var html = '<div class="frame-bytes">';
+    bytes.forEach(function (b) {
+      html += '<span class="frame-byte ' + (b.cls || cls) + '">' + b.hex + (b.label ? '<br><span style="font-size:0.62rem;color:var(--text-muted);">' + b.label + '</span>' : '') + '</span>';
+    });
+    html += '</div>';
+    container.innerHTML += html;
+  }
+
+  document.getElementById('buildFrame').addEventListener('click', function () {
+    var fn = fnSelect.value;
+    var addr = parseInt(document.getElementById('simAddress').value, 10) || 0;
+    var qty = parseInt(document.getElementById('simQuantity').value, 10) || 1;
+    var val = parseInt(document.getElementById('simValue').value, 10) || 0;
+    var valsRaw = document.getElementById('simValues').value.split(',').map(function (s) { return parseInt(s.trim(), 10) || 0; });
+
+    var reqBytes = [];
+    var respBytes = [];
+    var summary = '';
+    var respSummary = '';
+
+    // MBAP: Transaction ID, Protocol ID, Length (added after), Unit ID
+    function mbap(length) {
+      return [
+        { hex: '00', label: 'TxID hi', cls: 'mbap' }, { hex: '01', label: 'TxID lo', cls: 'mbap' },
+        { hex: '00', label: 'Proto hi', cls: 'mbap' }, { hex: '00', label: 'Proto lo', cls: 'mbap' },
+        { hex: '00', label: 'Len hi', cls: 'mbap' }, { hex: toHexByte(length), label: 'Len lo', cls: 'mbap' },
+        { hex: '01', label: 'Unit ID', cls: 'mbap' }
+      ];
+    }
+
+    if (fn === '03' || fn === '01') {
+      var isCoil = (fn === '01');
+      reqBytes = mbap(6).concat([
+        { hex: fn, label: 'Func', cls: 'fc' },
+        { hex: toHexByte((addr >> 8) & 0xFF), label: 'Addr hi', cls: 'data' },
+        { hex: toHexByte(addr & 0xFF), label: 'Addr lo', cls: 'data' },
+        { hex: toHexByte((qty >> 8) & 0xFF), label: 'Qty hi', cls: 'data' },
+        { hex: toHexByte(qty & 0xFF), label: 'Qty lo', cls: 'data' }
+      ]);
+      summary = 'Request: ' + (isCoil ? 'Read Coils' : 'Read Holding Registers') + ' — starting address ' + addr + ', quantity ' + qty + '.';
+
+      var respData = [];
+      var decodeParts = [];
+      if (isCoil) {
+        var byteVal = 0;
+        for (var ci = 0; ci < qty; ci++) {
+          var c = coilMap[addr + ci] || { name: 'Coil ' + (addr + ci), value: 0 };
+          if (c.value) byteVal |= (1 << ci);
+          decodeParts.push('Coil ' + (addr + ci) + ' (' + c.name + ') = ' + (c.value ? 'ON' : 'OFF'));
+        }
+        respData = [{ hex: toHexByte(1), label: 'Byte cnt', cls: 'data' }, { hex: toHexByte(byteVal), label: 'Coil byte', cls: 'data' }];
+        respBytes = mbap(3 + 1 + 1).concat([{ hex: fn, label: 'Func', cls: 'fc' }]).concat(respData);
+      } else {
+        var byteCount = qty * 2;
+        respData.push({ hex: toHexByte(byteCount), label: 'Byte cnt', cls: 'data' });
+        for (var ri = 0; ri < qty; ri++) {
+          var r = registerMap[addr + ri] || { name: 'Register ' + (addr + ri), unit: '', scale: 1, value: (addr + ri) * 7 + 100 };
+          respData.push({ hex: toHexByte((r.value >> 8) & 0xFF), label: 'Reg ' + (addr + ri) + ' hi', cls: 'data' });
+          respData.push({ hex: toHexByte(r.value & 0xFF), label: 'Reg ' + (addr + ri) + ' lo', cls: 'data' });
+          decodeParts.push('Register ' + (addr + ri) + ' (' + r.name + ') = ' + r.value + ' raw → ' + (r.value / r.scale) + ' ' + r.unit);
+        }
+        respBytes = mbap(3 + byteCount).concat([{ hex: fn, label: 'Func', cls: 'fc' }]).concat(respData);
+      }
+      respSummary = 'Response decodes to: ' + decodeParts.join('; ') + '.';
+
+    } else if (fn === '06') {
+      reqBytes = mbap(6).concat([
+        { hex: fn, label: 'Func', cls: 'fc' },
+        { hex: toHexByte((addr >> 8) & 0xFF), label: 'Addr hi', cls: 'data' },
+        { hex: toHexByte(addr & 0xFF), label: 'Addr lo', cls: 'data' },
+        { hex: toHexByte((val >> 8) & 0xFF), label: 'Val hi', cls: 'data' },
+        { hex: toHexByte(val & 0xFF), label: 'Val lo', cls: 'data' }
+      ]);
+      summary = 'Request: Write Single Register — address ' + addr + ', value ' + val + '.';
+      respBytes = reqBytes.slice(); // FC06 response echoes the request exactly
+      var regName = (registerMap[addr] || { name: 'Register ' + addr }).name;
+      respSummary = 'Response echoes the request exactly, confirming the write. In this simulation, ' + regName + ' (register ' + addr + ') would now read ' + val + ' — note the simulation does not persist this change between builds.';
+
+    } else if (fn === '10') {
+      var n = valsRaw.length;
+      var byteCnt2 = n * 2;
+      var dataBytes = [];
+      var decodeParts2 = [];
+      valsRaw.forEach(function (v, i) {
+        dataBytes.push({ hex: toHexByte((v >> 8) & 0xFF), label: 'V' + i + ' hi', cls: 'data' });
+        dataBytes.push({ hex: toHexByte(v & 0xFF), label: 'V' + i + ' lo', cls: 'data' });
+        var rr = registerMap[addr + i] || { name: 'Register ' + (addr + i) };
+        decodeParts2.push('Register ' + (addr + i) + ' (' + rr.name + ') ← ' + v);
+      });
+      reqBytes = mbap(7 + byteCnt2).concat([
+        { hex: fn, label: 'Func', cls: 'fc' },
+        { hex: toHexByte((addr >> 8) & 0xFF), label: 'Addr hi', cls: 'data' },
+        { hex: toHexByte(addr & 0xFF), label: 'Addr lo', cls: 'data' },
+        { hex: '00', label: 'Qty hi', cls: 'data' },
+        { hex: toHexByte(n), label: 'Qty lo', cls: 'data' },
+        { hex: toHexByte(byteCnt2), label: 'Byte cnt', cls: 'data' }
+      ]).concat(dataBytes);
+      summary = 'Request: Write Multiple Registers — starting address ' + addr + ', ' + n + ' value(s): ' + valsRaw.join(', ') + '.';
+      respBytes = mbap(6).concat([
+        { hex: fn, label: 'Func', cls: 'fc' },
+        { hex: toHexByte((addr >> 8) & 0xFF), label: 'Addr hi', cls: 'data' },
+        { hex: toHexByte(addr & 0xFF), label: 'Addr lo', cls: 'data' },
+        { hex: '00', label: 'Qty hi', cls: 'data' },
+        { hex: toHexByte(n), label: 'Qty lo', cls: 'data' }
+      ]);
+      respSummary = 'Response confirms starting address and count written: ' + decodeParts2.join('; ') + '. Note the simulation does not persist these changes between builds.';
+    }
+
+    var out = document.getElementById('simReadout');
+    out.innerHTML = '<strong>' + summary + '</strong>';
+    out.innerHTML += '<div class="frame-block"><span class="frame-block-label">Request bytes (MBAP header + PDU)</span></div>';
+    renderBytes(out, reqBytes);
+    out.innerHTML += '<div class="frame-block"><span class="frame-block-label">Response bytes</span></div>';
+    renderBytes(out, respBytes);
+    out.innerHTML += '<div class="frame-legend"><span><span class="legend-swatch mbap"></span>MBAP header</span><span><span class="legend-swatch fc"></span>Function code</span><span><span class="legend-swatch data"></span>Data</span></div>';
+    out.innerHTML += '<div class="decode-line">' + respSummary + '</div>';
+    out.innerHTML += '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:10px;margin-bottom:0;">Notice that nothing in either byte sequence identifies who sent the request or checks whether they were allowed to. That is true of every function code above, including the writes.</p>';
+  });
+
+  /* ---------------- QUIZ ---------------- */
+  var quizCards = Array.prototype.slice.call(document.querySelectorAll('#quizBlock .q-card'));
+  var quizFeedback = {
+    1: { correct: "Correct. These protocols were designed for physically isolated, trusted networks where reaching the wire at all implied authorization — an assumption that made sense in their original era but has not aged well as OT networks became routable.", incorrect: "Not quite. The reason isn't bandwidth, licensing, or a compliance-driven removal — it's that these protocols were built for an era and environment where anyone reaching the wire was assumed to belong there." },
+    2: { correct: "Correct. The MBAP header's length field tells the receiver exactly how many bytes follow — Unit ID, function code, and data combined — so it knows where the message ends.", incorrect: "Not quite. The transaction ID matches requests to responses, the protocol ID is always zero for Modbus, and the function code identifies the operation — none of those states the message's byte length." },
+    3: { correct: "Correct. DNP3 was built specifically for electric and water utility SCADA, where outstations can report events immediately via unsolicited responses rather than waiting for the next scheduled poll.", incorrect: "Not quite. BACnet/IP targets building automation, PROFINET targets real-time manufacturing, and OPC UA is a modern cross-domain protocol — none of those was purpose-built around utility SCADA and unsolicited event reporting the way DNP3 was." },
+    4: { correct: "Correct. OPC UA builds certificate-based authentication, message signing, and encryption into its specification from the start, unlike the legacy protocols in this lesson, where security exists only as optional, later add-ons.", incorrect: "Not quite. OPC UA doesn't eliminate TCP/IP, require proprietary hardware, or replace reads and writes with a single command — its defining change is built-in security." },
+    5: { correct: "Correct. Addressing a value as an 'Analog Input object' on a numbered 'Device Instance' is BACnet/IP's object-oriented model, and building automation is exactly the domain it was designed for.", incorrect: "Not quite. DNP3, EtherNet/IP, and Modbus TCP don't use BACnet's object-and-Device-Instance addressing model — that vocabulary is specific to BACnet/IP." }
+  };
+
+  document.getElementById('gradeQuiz').addEventListener('click', function () {
+    var correctCount = 0;
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      var name = 'q' + qNum;
+      var selected = card.querySelector('input[name="' + name + '"]:checked');
+      var fb = document.getElementById('fb' + qNum);
+      var correctVal = card.getAttribute('data-answer');
+      fb.className = 'q-feedback show';
+      if (!selected) {
+        fb.classList.add('unanswered');
+        fb.textContent = 'Not answered — select an option above, then grade again.';
+        return;
+      }
+      if (selected.value === correctVal) {
+        fb.classList.add('correct');
+        fb.textContent = '✓ Correct — ' + quizFeedback[qNum].correct;
+        correctCount++;
+      } else {
+        fb.classList.add('incorrect');
+        fb.textContent = '✗ Not quite — ' + quizFeedback[qNum].incorrect;
+      }
+    });
+    var scoreBox = document.getElementById('quizScore');
+    var scoreBig = document.getElementById('quizScoreBig');
+    var scoreText = document.getElementById('quizScoreText');
+    scoreBox.classList.add('show');
+    scoreBig.textContent = correctCount + ' / ' + quizCards.length;
+    scoreText.textContent = correctCount === quizCards.length
+      ? 'All five — you are ready for Lesson 6.'
+      : (correctCount >= 3 ? 'Solid grasp — review the items you missed before Lesson 6.' : 'Worth a re-read of the sections above before moving on.');
+  });
+
+  document.getElementById('resetQuiz').addEventListener('click', function () {
+    quizCards.forEach(function (card, i) {
+      var qNum = i + 1;
+      card.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+      var fb = document.getElementById('fb' + qNum);
+      fb.className = 'q-feedback';
+      fb.textContent = '';
+    });
+    document.getElementById('quizScore').classList.remove('show');
+  });
+
+})();
+</script>
+</body>
+</html>
