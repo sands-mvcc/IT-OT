@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GLFM SOC — Screen 1: Plant Overview</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121820; --panel2:#161e29; --border:#233042;
+    --text:#e6edf5; --muted:#8b9bb0;
+    --green:#22c55e; --green-dim:#16321f;
+    --amber:#f59e0b; --amber-dim:#3a2c0d;
+    --red:#ef4444; --red-dim:#3a1414;
+    --blue:#3b82f6;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  #app{display:flex;flex-direction:column;height:100vh;}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 18px;background:linear-gradient(180deg,#101720,#0c1119);
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .logo{
+    width:34px;height:34px;border-radius:6px;
+    background:linear-gradient(135deg,#1d4ed8,#0ea5e9);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:#fff;
+  }
+  .brand h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.2px;}
+  .brand .sub{font-size:11px;color:var(--muted);margin-top:1px;}
+  .headerRight{display:flex;align-items:center;gap:18px;font-size:12px;color:var(--muted);}
+  .clock{font-family:var(--mono);color:var(--text);font-size:13px;}
+  .leaderTag{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;}
+  .leaderTag.leader{background:var(--green-dim);color:var(--green);border:1px solid #1f4d31;}
+  .leaderTag.follower{background:#1c2430;color:var(--muted);border:1px solid var(--border);}
+
+  .scenarioBar{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 18px;background:var(--panel2);border-bottom:1px solid var(--border);
+    font-size:12px;flex-shrink:0;
+  }
+  .scenarioBar label{color:var(--muted);}
+  select, button{
+    background:#1a2330;color:var(--text);border:1px solid var(--border);
+    border-radius:5px;padding:6px 10px;font-size:12px;font-family:var(--sans);
+  }
+  button.primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff;cursor:pointer;font-weight:600;}
+  button.primary:hover{background:#2563eb;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  .scenarioStatus{margin-left:auto;font-family:var(--mono);color:var(--amber);display:flex;align-items:center;gap:8px;}
+  .scenarioStatus.idle{color:var(--muted);}
+
+  main{flex:1;display:flex;overflow:hidden;}
+
+  .flowPane{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:24px;overflow:auto;}
+  .flowRow{display:flex;align-items:center;gap:6px;}
+  .arrow{color:var(--muted);font-size:20px;}
+  .downArrow{color:var(--muted);font-size:18px;margin:2px 0;}
+
+  .areaBox{
+    width:168px;min-height:112px;border-radius:10px;padding:12px 12px 10px;
+    background:var(--panel);border:1.5px solid var(--border);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+    position:relative;
+  }
+  .areaBox:hover{transform:translateY(-2px);}
+  .areaBox.selected{outline:2px solid var(--blue);}
+  .areaBox .dot{
+    width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;
+    box-shadow:0 0 6px currentColor;
+  }
+  .areaBox.status-normal{border-color:#1f4d31;}
+  .areaBox.status-warning{border-color:#7a5410;}
+  .areaBox.status-critical{border-color:#7a1f1f;animation:pulseCrit 1.4s infinite;}
+  @keyframes pulseCrit{
+    0%,100%{box-shadow:0 0 0 rgba(239,68,68,0);}
+    50%{box-shadow:0 0 16px rgba(239,68,68,.55);}
+  }
+  .dot.normal{color:var(--green);background:var(--green);}
+  .dot.warning{color:var(--amber);background:var(--amber);}
+  .dot.critical{color:var(--red);background:var(--red);}
+
+  .areaBox .code{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .areaBox .name{font-size:12.5px;font-weight:700;margin:4px 0 8px;line-height:1.25;}
+  .areaBox .metric{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-top:2px;}
+  .areaBox .metric b{color:var(--text);font-weight:600;}
+  .alarmBadge{
+    position:absolute;top:8px;right:8px;background:var(--red);color:#fff;
+    font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;
+  }
+
+  .utilBox{
+    align-self:center;margin-top:14px;
+  }
+
+  .sidePane{
+    width:340px;flex-shrink:0;background:var(--panel2);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .sidePane .paneHeader{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+  .sidePane .paneHeader h2{margin:0;font-size:14px;}
+  .sidePane .paneHeader .status{font-size:11px;margin-top:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+  .sidePane .paneBody{padding:12px 16px;overflow:auto;flex:1;}
+  .tagRow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--border);font-family:var(--mono);font-size:12px;}
+  .tagRow .tname{color:var(--muted);}
+  .tagRow .tval{font-weight:700;}
+  .tagRow.warn .tval{color:var(--amber);}
+  .tagRow.crit .tval{color:var(--red);}
+  .lineRow{padding:8px 0;border-bottom:1px dashed var(--border);}
+  .lineRow .lname{font-size:12px;font-weight:700;}
+  .lineRow .lstate{display:inline-block;margin-left:6px;font-size:10px;padding:1px 6px;border-radius:3px;font-weight:700;}
+  .lstate.RUNNING{background:var(--green-dim);color:var(--green);}
+  .lstate.BLOCKED,.lstate.STARVED,.lstate.CHANGEOVER,.lstate.MAINTENANCE,.lstate.CLEANING{background:var(--amber-dim);color:var(--amber);}
+  .lstate.FAULTED,.lstate.EMERGENCY_STOP{background:var(--red-dim);color:var(--red);}
+  .lineRow .lmetrics{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;}
+
+  .noSelect{color:var(--muted);font-size:12.5px;padding:20px 4px;line-height:1.5;}
+
+  footer{
+    flex-shrink:0;background:var(--panel);border-top:1px solid var(--border);
+    height:150px;display:flex;flex-direction:column;
+  }
+  footer .ftHeader{padding:6px 16px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+  .eventLog{flex:1;overflow-y:auto;font-family:var(--mono);font-size:11.5px;}
+  .eventRow{display:flex;gap:10px;padding:4px 16px;border-bottom:1px solid #182130;}
+  .eventRow .ets{color:var(--muted);width:70px;flex-shrink:0;}
+  .eventRow .esev{width:64px;flex-shrink:0;font-weight:700;}
+  .esev.Critical{color:var(--red);}
+  .esev.Warning{color:var(--amber);}
+  .esev.Info{color:var(--muted);}
+  .eventRow .esrc{width:110px;flex-shrink:0;color:#7dd3fc;}
+  .eventRow .emsg{color:var(--text);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">GL</div>
+      <div>
+        <h1>GLFM Cyber-Physical Security Operations Center</h1>
+        <div class="sub">Great Lakes Foods Manufacturing — Chicago South Mfg. Center &nbsp;|&nbsp; Screen 1: Plant Overview</div>
+      </div>
+    </div>
+    <div class="headerRight">
+      <span id="leaderTag" class="leaderTag follower">SYNCING…</span>
+      <span class="clock" id="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="scenarioBar">
+    <label for="scenarioSelect">Instructor scenario injector:</label>
+    <select id="scenarioSelect"></select>
+    <button class="primary" id="injectBtn">Inject Scenario</button>
+    <span class="scenarioStatus idle" id="scenarioStatus">No active scenario</span>
+  </div>
+
+  <main>
+    <div class="flowPane" id="flowPane">
+      <!-- built by JS -->
+    </div>
+    <div class="sidePane">
+      <div class="paneHeader">
+        <h2 id="paneTitle">Select an area</h2>
+        <div class="status" id="paneStatus"></div>
+      </div>
+      <div class="paneBody" id="paneBody">
+        <div class="noSelect">Click any area box on the plant map to view its live PLC tags, equipment, and current status. Areas outlined in red have an active critical alarm; amber indicates a warning-level condition.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="ftHeader"><span>PLANT-WIDE EVENT / ALARM LOG</span><span id="eventCount">0 events</span></div>
+    <div class="eventLog" id="eventLog"></div>
+  </footer>
+</div>
+
+<script>
+/* === GLFM SIMULATION ENGINE (inlined copy — canonical source: simulation-engine.js) === */
+/* ==========================================================================
+   GLFM Cyber-Physical Security Operations Center
+   Shared Simulation Engine  —  window.GLFM
+   ==========================================================================
+   This file is the single source of truth for the simulated plant. Every
+   screen (Plant Overview, Production, Process, OT Network, Security,
+   Incident Correlation) loads a copy of this same script and reads from
+   the same GLFM namespace, so all screens stay correlated with each other.
+
+   DESIGN NOTES FOR FUTURE SCREENS
+   --------------------------------
+   - Areas, equipment and tags are registered in GLFM.config.areas. Add new
+     areas/equipment there; the tick loop and status rollup are generic and
+     do not need to change.
+   - Each tag has {value, min, max, warn, critHigh/critLow, unit}. The tick
+     loop does a bounded random walk within [min,max] under normal
+     conditions, and scenario injection can override that behavior
+     temporarily (see GLFM.scenarios).
+   - Cross-tab sync: one browser tab is elected "leader" and runs the
+     simulation; all tabs (leader included) render from BroadcastChannel
+     messages. This means every open screen shows the exact same plant
+     state, which is what makes correlation across screens meaningful.
+     Leader election requires the page to be served over http(s) — file://
+     origins are NOT guaranteed to share a BroadcastChannel/localStorage
+     origin across tabs in modern Chrome. Run a local static server, e.g.
+     `python3 -m http.server 8000`, and open each screen at
+     http://localhost:8000/screenN.html.
+   - If no leader is present (e.g. this is the only tab open, or served via
+     file://), the engine still runs standalone with no errors — you just
+     don't get cross-tab sync.
+   ========================================================================== */
+
+(function (global) {
+  "use strict";
+
+  const CHANNEL_NAME = "glfm-soc-bus";
+  const LEADER_KEY = "glfm_leader_heartbeat";
+  const STATE_KEY = "glfm_last_state";
+  const HEARTBEAT_MS = 1500;
+  const LEADER_TIMEOUT_MS = 4500;
+  const TICK_MS = 2000;
+
+  // ------------------------------------------------------------------
+  // 1. PLANT DEFINITION — areas, equipment, tags, normal operating ranges
+  // ------------------------------------------------------------------
+  // Tag shape: { key, label, unit, value, min, max, warnLow, warnHigh,
+  //              critLow, critHigh, kind: 'analog'|'discrete', walk }
+  // `walk` = max change per tick under normal drift.
+
+  function tag(key, label, unit, value, min, max, warnLow, warnHigh, critLow, critHigh, walk) {
+    return { key, label, unit, value, min, max, warnLow, warnHigh, critLow, critHigh, walk, kind: "analog" };
+  }
+  function discreteTag(key, label, states, value) {
+    return { key, label, states, value, kind: "discrete" };
+  }
+
+  const AREA_DEFS = [
+    {
+      id: "100", name: "Raw Material Receiving", short: "RECEIVING",
+      plcs: ["PLC-101"],
+      equipment: ["TK101", "TK102", "TK103", "TK104", "P101", "P102", "P103", "FV101", "FIT101"],
+      tags: [
+        tag("TK101_LEVEL", "Tank 101 Level", "%", 62, 0, 100, 10, 90, 5, 95, 0.6),
+        tag("TK101_TEMP", "Tank 101 Temp", "°F", 68, 32, 120, 40, 90, 32, 100, 0.3),
+        tag("P101_SPEED", "Pump 101 Speed", "RPM", 1750, 0, 3600, 500, 3200, 0, 3500, 15),
+        tag("P101_CURRENT", "Pump 101 Current", "A", 22, 0, 60, 5, 45, 0, 55, 1.2),
+        tag("FV101_POSITION", "Valve FV-101 Position", "%", 0, 0, 100, null, null, null, null, 0),
+        tag("FIT101_FLOW", "Flow FIT-101", "GPM", 0, 0, 300, null, 260, null, 285, 4),
+      ],
+    },
+    {
+      id: "200", name: "Mixing & Batch Processing", short: "PROCESSING",
+      plcs: ["PLC-201", "PLC-202", "PLC-203"],
+      equipment: ["MX201", "MX202", "MX203", "MX204", "MX205", "MX206"],
+      tags: [
+        tag("MX201_TEMP", "Mixer 201 Temp", "°F", 78, 32, 200, 70, 90, 60, 110, 0.5),
+        tag("MX201_LEVEL", "Mixer 201 Level", "%", 55, 0, 100, 20, 90, 10, 95, 0.8),
+        tag("MX201_AGITATOR", "Mixer 201 Agitator", "RPM", 1050, 0, 1800, 850, 1300, 0, 1600, 8),
+        tag("MX201_PH", "Mixer 201 pH", "pH", 4.2, 0, 14, 3.8, 4.8, 3.0, 6.0, 0.03),
+        tag("MX201_PRESSURE", "Mixer 201 Pressure", "PSI", 15, 0, 60, 10, 22, 5, 30, 0.4),
+        tag("FV204_POSITION", "Ingredient Valve FV-204", "%", 0, 0, 100, null, null, null, null, 0),
+        tag("FIT204_FLOW", "Ingredient Flow FIT-204", "GPM", 0, 0, 60, null, 40, null, 50, 1.5),
+      ],
+    },
+    {
+      id: "300", name: "Thermal Processing", short: "THERMAL",
+      plcs: ["PLC-301"],
+      equipment: ["HT301"],
+      tags: [
+        tag("HT301_IN_TEMP", "HT-301 Inlet Temp", "°F", 92, 32, 220, 70, 150, 40, 200, 0.4),
+        tag("HT301_OUT_TEMP", "HT-301 Outlet Temp", "°F", 170, 32, 220, 165, 180, 150, 200, 0.5),
+        tag("HT301_STEAM_PRESSURE", "HT-301 Steam Pressure", "PSI", 45, 0, 100, 35, 60, 20, 80, 0.7),
+        tag("HT301_FLOW", "HT-301 Flow", "GPM", 140, 0, 300, 100, 220, 60, 260, 3),
+        tag("HT301_HOLD_TIME", "HT-301 Hold Time", "sec", 16, 0, 60, 12, 30, 8, 45, 0.3),
+        // engineering limits used for DET-OT-004 style checks
+      ],
+      setpoint: { key: "HT301_SETPOINT", label: "Sterilization Setpoint", unit: "°F", value: 170, nominal: 170 },
+    },
+    {
+      id: "400", name: "Filling & Packaging", short: "PACKAGING",
+      plcs: ["PLC-401", "PLC-402", "PLC-403"],
+      equipment: ["LINE1", "LINE2", "LINE3"],
+      lines: [
+        { id: "LINE1", name: "Line 1 — Bottling", target: 190, state: "RUNNING", speed: 182, oee: 87.4, reject: 1.3 },
+        { id: "LINE2", name: "Line 2 — Carton Packaging", target: 160, state: "RUNNING", speed: 146, oee: 92.1, reject: 0.8 },
+        { id: "LINE3", name: "Line 3 — High-Speed Beverage", target: 240, state: "RUNNING", speed: 231, oee: 89.6, reject: 1.0 },
+      ],
+      tags: [],
+    },
+    {
+      id: "500", name: "Robotics", short: "ROBOTICS/PALLETIZING",
+      plcs: ["PLC-501"],
+      equipment: ["RB501", "RB502", "RB503", "AGV501", "AGV502", "AGV503", "AGV504", "AGV505", "AGV506"],
+      tags: [
+        tag("RB503_CYCLE_TIME", "Palletizer Cycle Time", "sec", 14, 5, 60, 8, 22, 5, 30, 0.4),
+      ],
+      robotStates: ["AUTO", "MANUAL", "FAULT", "E-STOP", "MAINTENANCE"],
+    },
+    {
+      id: "600", name: "Plant Utilities", short: "UTILITIES",
+      plcs: ["PLC-601", "PLC-602", "PLC-603"],
+      equipment: ["BOILER1", "COMP1", "COMP2", "AHU1"],
+      tags: [
+        tag("BOILER1_STEAM_PRESSURE", "Boiler Steam Pressure", "PSI", 110, 0, 180, 90, 140, 60, 160, 1.2),
+        tag("COMP_AIR_PRESSURE", "Plant Air Pressure", "PSI", 98, 0, 130, 80, 115, 60, 125, 0.9),
+        tag("WATER_INLET_FLOW", "Incoming Water Flow", "GPM", 210, 0, 500, 100, 420, 50, 460, 4),
+      ],
+    },
+    {
+      id: "700", name: "Automated Warehouse", short: "WAREHOUSE",
+      plcs: ["PLC-701"],
+      equipment: ["ASRS1", "CONV701", "WMS01"],
+      tags: [
+        tag("ASRS1_CYCLE_TIME", "AS/RS Cycle Time", "sec", 38, 15, 90, 20, 60, 15, 75, 0.6),
+        tag("WH_TEMP", "Warehouse Ambient Temp", "°F", 64, 32, 100, 40, 85, 32, 95, 0.3),
+      ],
+    },
+  ];
+
+  // ------------------------------------------------------------------
+  // 2. STATE
+  // ------------------------------------------------------------------
+  const state = {
+    tick: 0,
+    simTimeMs: 0,
+    areas: {},          // areaId -> { status, tags:{}, lines?, alarms:[] }
+    events: [],          // rolling event/alarm log, newest first
+    activeScenario: null,
+    isLeader: false,
+  };
+
+  function cloneAreaDefsIntoState() {
+    AREA_DEFS.forEach((def) => {
+      const tagMap = {};
+      def.tags.forEach((t) => (tagMap[t.key] = Object.assign({}, t)));
+      state.areas[def.id] = {
+        id: def.id,
+        name: def.name,
+        short: def.short,
+        plcs: def.plcs,
+        equipment: def.equipment,
+        tags: tagMap,
+        lines: def.lines ? def.lines.map((l) => Object.assign({}, l)) : undefined,
+        setpoint: def.setpoint ? Object.assign({}, def.setpoint) : undefined,
+        status: "normal", // normal | warning | critical
+        activeAlarms: [],
+      };
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // 3. EVENT LOG
+  // ------------------------------------------------------------------
+  const MAX_EVENTS = 300;
+  function pushEvent(evt) {
+    evt.id = "EVT-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1e4).toString(36);
+    evt.ts = evt.ts || nowLabel();
+    state.events.unshift(evt);
+    if (state.events.length > MAX_EVENTS) state.events.length = MAX_EVENTS;
+  }
+
+  function nowLabel() {
+    const d = new Date(Date.now());
+    return d.toLocaleTimeString("en-US", { hour12: false });
+  }
+
+  // ------------------------------------------------------------------
+  // 4. TICK LOGIC — random-walk tags, evaluate thresholds, roll up status
+  // ------------------------------------------------------------------
+  function walk(t) {
+    if (t.kind !== "analog" || !t.walk) return;
+    const delta = (Math.random() * 2 - 1) * t.walk;
+    let v = t.value + delta;
+    // gentle pull back toward mid-band so values don't wander forever
+    const mid = (t.warnLow + t.warnHigh) / 2;
+    v += (mid - v) * 0.02;
+    v = Math.max(t.min, Math.min(t.max, v));
+    t.value = Math.round(v * 100) / 100;
+  }
+
+  function evaluateTag(area, t) {
+    if (t.kind !== "analog") return null;
+    if (t.critHigh != null && t.value >= t.critHigh) return { level: "critical", msg: `${t.label} HIGH-HIGH (${t.value}${t.unit})` };
+    if (t.critLow != null && t.value <= t.critLow) return { level: "critical", msg: `${t.label} LOW-LOW (${t.value}${t.unit})` };
+    if (t.warnHigh != null && t.value >= t.warnHigh) return { level: "warning", msg: `${t.label} HIGH (${t.value}${t.unit})` };
+    if (t.warnLow != null && t.value <= t.warnLow) return { level: "warning", msg: `${t.label} LOW (${t.value}${t.unit})` };
+    return null;
+  }
+
+  function tickLine(line) {
+    if (line.state === "RUNNING") {
+      const delta = (Math.random() * 2 - 1) * 2.5;
+      line.speed = Math.max(0, Math.min(line.target * 1.03, line.speed + delta));
+      line.reject = Math.max(0, Math.min(8, line.reject + (Math.random() * 2 - 1) * 0.08));
+      line.oee = Math.max(0, Math.min(100, (line.speed / line.target) * 100 * (1 - line.reject / 100) * 0.98));
+    } else if (line.state === "FAULTED" || line.state === "EMERGENCY STOP") {
+      line.speed = 0;
+      line.oee = Math.max(0, line.oee - 3);
+    }
+  }
+
+  function tick() {
+    state.tick += 1;
+    state.simTimeMs += TICK_MS;
+
+    Object.values(state.areas).forEach((area) => {
+      let worst = "normal";
+      const alarms = [];
+
+      Object.values(area.tags).forEach((t) => {
+        walk(t);
+        const result = evaluateTag(area, t);
+        if (result) {
+          alarms.push({ tagKey: t.key, level: result.level, msg: result.msg, areaId: area.id, areaName: area.short });
+          if (result.level === "critical") worst = "critical";
+          else if (result.level === "warning" && worst !== "critical") worst = "warning";
+        }
+      });
+
+      if (area.lines) area.lines.forEach(tickLine);
+      if (area.lines) {
+        area.lines.forEach((l) => {
+          if (l.state === "FAULTED" || l.state === "EMERGENCY STOP") worst = "critical";
+          else if ((l.state === "BLOCKED" || l.state === "STARVED") && worst !== "critical") worst = "warning";
+        });
+      }
+
+      const wasStatus = area.status;
+      area.status = worst;
+      area.activeAlarms = alarms;
+
+      // Log newly-crossed alarms (edge-triggered, not every tick)
+      alarms.forEach((a) => {
+        const key = a.tagKey + ":" + a.level;
+        if (!area._loggedAlarmKeys) area._loggedAlarmKeys = new Set();
+        if (!area._loggedAlarmKeys.has(key)) {
+          area._loggedAlarmKeys.add(key);
+          pushEvent({
+            type: "PROCESS_ALARM",
+            severity: a.level === "critical" ? "Critical" : "Warning",
+            area: area.short,
+            source: area.plcs[0] || area.short,
+            message: a.msg,
+          });
+        }
+      });
+      // clear logged keys that are no longer active so they can re-fire later
+      if (area._loggedAlarmKeys) {
+        const activeKeys = new Set(alarms.map((a) => a.tagKey + ":" + a.level));
+        Array.from(area._loggedAlarmKeys).forEach((k) => {
+          if (!activeKeys.has(k)) area._loggedAlarmKeys.delete(k);
+        });
+      }
+
+      if (wasStatus !== "critical" && area.status === "critical") {
+        pushEvent({ type: "AREA_STATUS", severity: "Critical", area: area.short, source: "SOC", message: `${area.name} entered CRITICAL state` });
+      }
+    });
+
+    if (state.activeScenario && state.activeScenario.onTick) {
+      state.activeScenario.onTick(state, pushEvent);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // 5. SCENARIOS — instructor-triggered demo attacks / faults
+  // ------------------------------------------------------------------
+  const scenarios = {
+    thermal_setpoint_attack: {
+      label: "Unauthorized PLC-301 Setpoint Change (Thermal)",
+      start(s, log) {
+        log({ type: "AUTH", severity: "Info", area: "IT", source: "ENG-WS01", message: "Engineering login: jsmith @ ENG-WS01" });
+        log({ type: "OT_IDS", severity: "Critical", area: "THERMAL", source: "PLC-301", message: "Write command issued to PLC-301 (mode RUN → PROGRAM)" });
+        s.areas["300"].setpoint.value = 205;
+        log({ type: "PROCESS", severity: "Critical", area: "THERMAL", source: "PLC-301", message: "Temperature setpoint changed: 170°F → 205°F" });
+      },
+      onTick(s) {
+        const area = s.areas["300"];
+        const t = area.tags.HT301_OUT_TEMP;
+        if (t.value < area.setpoint.value - 1) {
+          t.value = Math.min(area.setpoint.value, t.value + 1.4);
+        }
+      },
+      durationTicks: 20,
+      end(s, log) {
+        s.areas["300"].setpoint.value = 170;
+        log({ type: "SOC", severity: "Info", area: "THERMAL", source: "SOC", message: "Scenario ended — setpoint restored to 170°F, temperature recovering" });
+      },
+    },
+    receiving_pump_anomaly: {
+      label: "Abnormal Motor Behavior — Pump P-101 (mechanical/possible tamper)",
+      start(s, log) {
+        log({ type: "EQUIPMENT", severity: "Warning", area: "RECEIVING", source: "PLC-101", message: "Pump P-101 commanded OFF, but current still present" });
+      },
+      onTick(s) {
+        const area = s.areas["100"];
+        area.tags.P101_CURRENT.value = 38 + Math.random() * 4;
+        area.tags.P101_SPEED.value = 0;
+      },
+      durationTicks: 15,
+      end(s, log) {
+        log({ type: "SOC", severity: "Info", area: "RECEIVING", source: "SOC", message: "Scenario ended — pump current normalized" });
+      },
+    },
+    compressed_air_loss: {
+      label: "Compressor Failure → Cascading Line Stoppage",
+      start(s, log) {
+        log({ type: "EQUIPMENT", severity: "Warning", area: "UTILITIES", source: "PLC-602", message: "Compressor #2 offline" });
+      },
+      onTick(s, ticksRemaining, ticksTotal) {
+        const u = s.areas["600"];
+        u.tags.COMP_AIR_PRESSURE.value = Math.max(55, u.tags.COMP_AIR_PRESSURE.value - 3);
+        if (u.tags.COMP_AIR_PRESSURE.value < 75) {
+          const pkg = s.areas["400"];
+          pkg.lines.forEach((l) => { if (l.state === "RUNNING") l.state = "BLOCKED"; });
+        }
+      },
+      durationTicks: 18,
+      end(s, log) {
+        s.areas["600"].tags.COMP_AIR_PRESSURE.value = 98;
+        s.areas["400"].lines.forEach((l) => { if (l.state === "BLOCKED") l.state = "RUNNING"; });
+        log({ type: "SOC", severity: "Info", area: "UTILITIES", source: "SOC", message: "Scenario ended — Compressor #2 restored, lines resuming" });
+      },
+    },
+  };
+
+  let scenarioTicksLeft = 0;
+  let scenarioTicksTotal = 0;
+
+  function injectScenario(name) {
+    const sc = scenarios[name];
+    if (!sc) return false;
+    state.activeScenario = Object.assign({ name }, sc);
+    scenarioTicksTotal = sc.durationTicks || 15;
+    scenarioTicksLeft = scenarioTicksTotal;
+    sc.start(state, pushEvent);
+    return true;
+  }
+
+  function tickScenarioLifecycle() {
+    if (!state.activeScenario) return;
+    scenarioTicksLeft -= 1;
+    if (scenarioTicksLeft <= 0) {
+      if (state.activeScenario.end) state.activeScenario.end(state, pushEvent);
+      state.activeScenario = null;
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // 6. CROSS-TAB SYNC (leader election over BroadcastChannel + localStorage)
+  // ------------------------------------------------------------------
+  let channel = null;
+  try {
+    if ("BroadcastChannel" in global) channel = new BroadcastChannel(CHANNEL_NAME);
+  } catch (e) { channel = null; }
+
+  const listeners = new Set();
+  function notifyListeners() {
+    listeners.forEach((fn) => {
+      try { fn(state); } catch (e) { /* ignore listener errors */ }
+    });
+  }
+
+  function serializeState() {
+    return JSON.stringify(state);
+  }
+
+  function applyRemoteState(remote) {
+    Object.assign(state, remote);
+    notifyListeners();
+  }
+
+  function broadcastState() {
+    const payload = serializeState();
+    try { localStorage.setItem(STATE_KEY, payload); } catch (e) {}
+    if (channel) {
+      try { channel.postMessage({ type: "state", payload: state }); } catch (e) {}
+    }
+  }
+
+  function heartbeat() {
+    try { localStorage.setItem(LEADER_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  function isLeaderStale() {
+    try {
+      const last = parseInt(localStorage.getItem(LEADER_KEY) || "0", 10);
+      return Date.now() - last > LEADER_TIMEOUT_MS;
+    } catch (e) { return true; }
+  }
+
+  let leaderInterval = null;
+  let tickInterval = null;
+
+  function becomeLeader() {
+    if (state.isLeader) return;
+    state.isLeader = true;
+    heartbeat();
+    if (leaderInterval) clearInterval(leaderInterval);
+    leaderInterval = setInterval(heartbeat, HEARTBEAT_MS);
+    if (tickInterval) clearInterval(tickInterval);
+    tickInterval = setInterval(() => {
+      tick();
+      tickScenarioLifecycle();
+      heartbeat();
+      broadcastState();
+      notifyListeners();
+    }, TICK_MS);
+  }
+
+  function stopLeading() {
+    state.isLeader = false;
+    if (leaderInterval) clearInterval(leaderInterval);
+    if (tickInterval) clearInterval(tickInterval);
+    leaderInterval = null;
+    tickInterval = null;
+  }
+
+  function maybeClaimLeadership() {
+    if (state.isLeader) return;
+    if (isLeaderStale()) {
+      becomeLeader();
+    }
+  }
+
+  if (channel) {
+    channel.onmessage = (ev) => {
+      if (!ev.data) return;
+      if (ev.data.type === "state" && !state.isLeader) {
+        applyRemoteState(ev.data.payload);
+      }
+    };
+  }
+
+  // ------------------------------------------------------------------
+  // 7. PUBLIC API
+  // ------------------------------------------------------------------
+  const GLFM = {
+    AREA_DEFS,
+    state,
+    scenarios,
+    onUpdate(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    getAreaList() { return Object.values(state.areas); },
+    getArea(id) { return state.areas[id]; },
+    getEvents(limit) { return limit ? state.events.slice(0, limit) : state.events.slice(); },
+    injectScenario,
+    getActiveScenario() { return state.activeScenario; },
+    getScenarioProgress() { return state.activeScenario ? { ticksLeft: scenarioTicksLeft, ticksTotal: scenarioTicksTotal } : null; },
+    isLeader() { return state.isLeader; },
+    init() {
+      cloneAreaDefsIntoState();
+      pushEvent({ type: "SOC", severity: "Info", area: "SOC", source: "SYSTEM", message: "GLFM simulation engine initialized" });
+
+      // Try to hydrate from a recent leader broadcast first (fast paint).
+      try {
+        const cached = localStorage.getItem(STATE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.areas) Object.assign(state, parsed);
+        }
+      } catch (e) {}
+
+      maybeClaimLeadership();
+      // Re-check leadership periodically in case the leader tab closed.
+      setInterval(maybeClaimLeadership, HEARTBEAT_MS);
+      notifyListeners();
+    },
+  };
+
+  global.GLFM = GLFM;
+})(window);
+
+</script>
+
+<script>
+/* === SCREEN 1 — PLANT OVERVIEW RENDERER === */
+(function(){
+  const FLOW_ORDER = ["100","200","300","400","500","700"];
+  const AREA_LABELS = {
+    "100":"RECEIVING","200":"PROCESSING","300":"THERMAL","400":"PACKAGING","500":"PALLETIZING / ROBOTICS","700":"WAREHOUSE","600":"UTILITIES"
+  };
+
+  let selectedArea = null;
+
+  function fmt(v){ return (typeof v === "number") ? (Math.round(v*10)/10) : v; }
+
+  function areaBoxHtml(area){
+    const alarmCount = area.activeAlarms.filter(a=>a.level==='critical').length;
+    let metricsHtml = "";
+    if (area.lines) {
+      const running = area.lines.filter(l=>l.state==='RUNNING').length;
+      metricsHtml = `<div class="metric"><span>Lines running</span><b>${running}/${area.lines.length}</b></div>
+                     <div class="metric"><span>Avg OEE</span><b>${fmt(area.lines.reduce((s,l)=>s+l.oee,0)/area.lines.length)}%</b></div>`;
+    } else {
+      const tagVals = Object.values(area.tags).slice(0,2);
+      metricsHtml = tagVals.map(t=>`<div class="metric"><span>${t.label.replace(/^.*? /,'')}</span><b>${fmt(t.value)}${t.unit}</b></div>`).join("");
+    }
+    return `<div class="areaBox status-${area.status} ${selectedArea===area.id?'selected':''}" data-area="${area.id}">
+      ${alarmCount>0 ? `<span class="alarmBadge">${alarmCount}</span>`:""}
+      <div class="code">AREA ${area.id} &nbsp;•&nbsp; ${area.plcs.join(", ")}</div>
+      <div class="name"><span class="dot ${area.status}"></span>${AREA_LABELS[area.id]||area.name}</div>
+      ${metricsHtml}
+    </div>`;
+  }
+
+  function renderFlow(){
+    const pane = document.getElementById('flowPane');
+    const areas = GLFM.getAreaList();
+    const byId = {}; areas.forEach(a=>byId[a.id]=a);
+
+    let html = `<div class="flowRow">`;
+    FLOW_ORDER.forEach((id,i)=>{
+      html += areaBoxHtml(byId[id]);
+      if (i < FLOW_ORDER.length-1) html += `<span class="arrow">➜</span>`;
+    });
+    html += `</div>`;
+    html += `<div class="downArrow">⬆ feeds from ⬆</div>`;
+    html += `<div class="utilBox">${areaBoxHtml(byId["600"])}</div>`;
+
+    pane.innerHTML = html;
+    pane.querySelectorAll('.areaBox').forEach(el=>{
+      el.addEventListener('click', ()=>{ selectedArea = el.getAttribute('data-area'); renderSide(); renderFlow(); });
+    });
+  }
+
+  function renderSide(){
+    const title = document.getElementById('paneTitle');
+    const statusEl = document.getElementById('paneStatus');
+    const body = document.getElementById('paneBody');
+    if (!selectedArea){
+      title.textContent = "Select an area";
+      statusEl.textContent = "";
+      return;
+    }
+    const area = GLFM.getArea(selectedArea);
+    title.textContent = `AREA ${area.id} — ${area.name}`;
+    statusEl.textContent = area.status.toUpperCase();
+    statusEl.style.color = area.status==='critical' ? 'var(--red)' : area.status==='warning' ? 'var(--amber)' : 'var(--green)';
+
+    let html = `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">PLCs: ${area.plcs.join(", ")} &nbsp;|&nbsp; Equipment: ${area.equipment.join(", ")}</div>`;
+
+    if (area.setpoint){
+      html += `<div class="tagRow"><span class="tname">${area.setpoint.label}</span><span class="tval">${area.setpoint.value}${area.setpoint.unit}${area.setpoint.value!==area.setpoint.nominal ? ' ⚠ changed from '+area.setpoint.nominal+area.setpoint.unit : ''}</span></div>`;
+    }
+
+    if (area.lines){
+      area.lines.forEach(l=>{
+        html += `<div class="lineRow">
+          <span class="lname">${l.name}</span><span class="lstate ${l.state.replace(' ','_')}">${l.state}</span>
+          <div class="lmetrics">Speed: ${fmt(l.speed)} / ${l.target} u-min &nbsp;|&nbsp; OEE: ${fmt(l.oee)}% &nbsp;|&nbsp; Reject: ${fmt(l.reject)}%</div>
+        </div>`;
+      });
+    }
+
+    Object.values(area.tags).forEach(t=>{
+      const alarm = area.activeAlarms.find(a=>a.tagKey===t.key);
+      const cls = alarm ? (alarm.level==='critical'?'crit':'warn') : '';
+      html += `<div class="tagRow ${cls}"><span class="tname">${t.key}</span><span class="tval">${fmt(t.value)}${t.unit||''}</span></div>`;
+    });
+
+    body.innerHTML = html;
+  }
+
+  function renderEvents(){
+    const log = document.getElementById('eventLog');
+    const events = GLFM.getEvents(60);
+    document.getElementById('eventCount').textContent = GLFM.getEvents().length + " events";
+    log.innerHTML = events.map(e=>`
+      <div class="eventRow">
+        <span class="ets">${e.ts}</span>
+        <span class="esev ${e.severity}">${e.severity.toUpperCase()}</span>
+        <span class="esrc">${e.source}</span>
+        <span class="emsg">[${e.area}] ${e.message}</span>
+      </div>`).join("");
+  }
+
+  function renderScenarioBar(){
+    const active = GLFM.getActiveScenario();
+    const statusEl = document.getElementById('scenarioStatus');
+    const btn = document.getElementById('injectBtn');
+    if (active){
+      const prog = GLFM.getScenarioProgress();
+      statusEl.classList.remove('idle');
+      statusEl.textContent = `ACTIVE: ${active.label}  (${prog.ticksLeft}/${prog.ticksTotal} ticks remaining)`;
+      btn.disabled = true;
+    } else {
+      statusEl.classList.add('idle');
+      statusEl.textContent = "No active scenario";
+      btn.disabled = false;
+    }
+  }
+
+  function renderLeaderTag(){
+    const el = document.getElementById('leaderTag');
+    if (GLFM.isLeader()){
+      el.textContent = "SIMULATION LEADER";
+      el.className = "leaderTag leader";
+    } else {
+      el.textContent = "SYNCED (FOLLOWER)";
+      el.className = "leaderTag follower";
+    }
+  }
+
+  function renderAll(){
+    renderFlow();
+    renderSide();
+    renderEvents();
+    renderScenarioBar();
+    renderLeaderTag();
+  }
+
+  function populateScenarioSelect(){
+    const sel = document.getElementById('scenarioSelect');
+    Object.keys(GLFM.scenarios).forEach(key=>{
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = GLFM.scenarios[key].label;
+      sel.appendChild(opt);
+    });
+  }
+
+  document.getElementById('injectBtn').addEventListener('click', ()=>{
+    const sel = document.getElementById('scenarioSelect');
+    GLFM.injectScenario(sel.value);
+    renderScenarioBar();
+  });
+
+  function tickClock(){
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US',{hour12:false});
+  }
+  setInterval(tickClock, 1000); tickClock();
+
+  populateScenarioSelect();
+  GLFM.onUpdate(renderAll);
+  GLFM.init();
+  renderAll();
+})();
+</script>
+</body>
+</html>
