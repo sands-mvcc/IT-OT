@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 11 · Monitoring, Detection &amp; OT Incident Response — OT-101</title>
+<meta name="description" content="OT-101 Day 5 Lesson 11: Passive asset discovery, syslog coverage gaps on field devices, time synchronization for correlation, alert triage, and an incident lifecycle where isolating the affected host may not be an option the plant can accept.">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#f4f6f9;
+  --surface:#ffffff;
+  --surface-2:#eef1f6;
+  --text:#1a1e2e;
+  --muted:#5a6480;
+  --accent:#b45309;
+  --accent-2:#92400e;
+  --accent-soft:#fdf3e7;
+  --accent-line:#e7c9a2;
+  --header-bg:#1a1e2e;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#d1d9e6;
+  --table-head-bg:#1a1e2e;
+  --table-head-text:#ffffff;
+  --row-hover:#f7f2ea;
+  --ok-bg:#e8f5ec; --ok-text:#155724; --ok-line:#2e7d4f;
+  --no-bg:#fdeaea; --no-text:#7f1d1d; --no-line:#b91c1c;
+  --warn-bg:#fdf3e7; --warn-text:#7c3a06; --warn-line:#b45309;
+  --shadow:0 1px 2px rgba(26,30,46,.06), 0 6px 18px rgba(26,30,46,.07);
+  --radius:12px;
+  --radius-sm:8px;
+  --focus:#b45309;
+  --maxw:1240px;
+}
+html[data-theme="dark"]{
+  --bg:#0f1117;
+  --surface:#1c1f2e;
+  --surface-2:#161927;
+  --text:#e8ecf4;
+  --muted:#a8b2c8;
+  --accent:#f59e0b;
+  --accent-2:#fbbf24;
+  --accent-soft:#2a2313;
+  --accent-line:#7a5a1c;
+  --header-bg:#0a0c14;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#333a52;
+  --table-head-bg:#0a0c14;
+  --table-head-text:#ffffff;
+  --row-hover:#242840;
+  --ok-bg:#12281c; --ok-text:#9be6b4; --ok-line:#3fa76b;
+  --no-bg:#2d1414; --no-text:#ffb3b3; --no-line:#e05a5a;
+  --warn-bg:#2a2313; --warn-text:#fbd38d; --warn-line:#f59e0b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  --focus:#f59e0b;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:150px;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{line-height:1.25;font-weight:700;color:var(--text);}
+h2{font-size:1.6rem;margin:0 0 .35rem;}
+h3{font-size:1.18rem;margin:1.6rem 0 .5rem;}
+h4{font-size:1.02rem;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);}
+p{margin:0 0 1rem;}
+a{color:var(--accent);}
+a:hover{color:var(--accent-2);}
+code{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:4px;padding:.08em .35em;font-size:.9em;
+}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px;}
+
+/* ---------- Skip link ---------- */
+.skip-link{
+  position:absolute;left:8px;top:-60px;z-index:200;
+  background:var(--accent);color:#fff;font-weight:700;
+  padding:.6rem 1rem;border-radius:0 0 8px 8px;text-decoration:none;
+  transition:top .15s ease;
+}
+.skip-link:focus{top:0;color:#fff;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  font-size:.85rem;color:var(--muted);
+}
+.topbar-inner{
+  max-width:var(--maxw);margin:0 auto;padding:.5rem 1.25rem;
+  display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;align-items:center;justify-content:space-between;
+}
+.topbar a.home-link{font-weight:700;color:var(--accent);text-decoration:none;}
+.topbar a.home-link:hover{text-decoration:underline;}
+
+/* ---------- Header ---------- */
+.lesson-header{background:var(--header-bg);color:var(--header-text);}
+.lesson-header-inner{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 1.75rem;}
+.eyebrow{
+  font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-2);font-weight:700;margin:0 0 .6rem;
+}
+html[data-theme="light"] .eyebrow{color:#f0b360;}
+.lesson-header h1{font-size:2.3rem;margin:0 0 .5rem;color:var(--header-text);}
+.tagline{font-size:1.08rem;color:var(--header-muted);max-width:62ch;margin:0 0 1.1rem;}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.meta-chip{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);
+  color:#fff;border-radius:999px;padding:.28rem .8rem;font-size:.82rem;font-weight:600;
+}
+.header-tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{
+  font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent;
+  border-radius:999px;padding:.5rem 1.05rem;display:inline-flex;align-items:center;gap:.45rem;
+}
+.btn:hover{background:var(--accent-2);}
+html[data-theme="dark"] .btn{color:#1a1300;}
+html[data-theme="dark"] .btn:hover{background:var(--accent-2);}
+.btn-ghost{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;}
+html[data-theme="dark"] .btn-ghost{color:#fff;}
+
+/* ---------- Section nav ---------- */
+.section-nav{
+  position:sticky;top:0;z-index:60;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(26,30,46,.06);
+}
+.section-nav ul{
+  max-width:var(--maxw);margin:0 auto;padding:0 1.25rem;
+  list-style:none;display:flex;gap:.25rem;overflow-x:auto;
+}
+.section-nav a{
+  display:block;padding:.7rem .8rem;font-size:.83rem;font-weight:600;
+  color:var(--muted);text-decoration:none;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.section-nav a:hover{color:var(--accent);}
+.section-nav a[aria-current="true"]{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ---------- Layout ---------- */
+.layout{
+  max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 3rem;
+  display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static !important;}
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1.5rem 1.6rem;margin:0 0 1.6rem;
+}
+.section-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.section-icon{
+  flex:0 0 auto;width:42px;height:42px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  display:grid;place-items:center;
+}
+.section-icon svg{width:24px;height:24px;}
+.section-head .titles{flex:1 1 240px;min-width:0;}
+.time-pill{
+  flex:0 0 auto;font-size:.75rem;font-weight:700;color:var(--accent);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:999px;padding:.2rem .65rem;white-space:nowrap;
+}
+.sub{color:var(--muted);font-size:.92rem;margin:.15rem 0 0;}
+
+/* ---------- Part banners ---------- */
+.part-banner{
+  background:var(--header-bg);color:#fff;border-radius:var(--radius);
+  padding:1rem 1.4rem;margin:2.2rem 0 1.4rem;border-left:6px solid var(--accent);
+}
+.part-banner .p-label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:#f0b360;font-weight:700;}
+html[data-theme="dark"] .part-banner .p-label{color:var(--accent);}
+.part-banner h2{color:#fff;font-size:1.35rem;margin:.15rem 0 .2rem;}
+.part-banner p{margin:0;color:var(--header-muted);font-size:.95rem;}
+
+/* ---------- Callouts / analogy ---------- */
+.analogy-box{
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-left:5px solid var(--accent);border-radius:var(--radius-sm);
+  padding:1rem 1.15rem;margin:1.2rem 0;
+}
+.analogy-box .label{
+  display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--accent-2);margin-bottom:.4rem;
+}
+html[data-theme="dark"] .analogy-box .label{color:var(--accent);}
+.analogy-box p:last-child{margin-bottom:0;}
+.callout{
+  border:1px solid var(--border);border-left:5px solid var(--muted);
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  padding:.95rem 1.1rem;margin:1.2rem 0;font-size:.95rem;
+}
+.callout.safety{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:var(--warn-line);color:var(--warn-text);}
+.callout strong{color:inherit;}
+.safety-flag{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--warn-bg);color:var(--warn-text);
+  border:1px solid var(--warn-line);border-radius:999px;
+  padding:.25rem .8rem;font-size:.78rem;font-weight:700;margin-bottom:.9rem;
+}
+
+/* ---------- Lists ---------- */
+ul.tight,ol.tight{margin:0 0 1rem;padding-left:1.3rem;}
+ul.tight li,ol.tight li{margin-bottom:.4rem;}
+.lo-list{list-style:none;padding:0;margin:0;counter-reset:lo;}
+.lo-list li{
+  position:relative;padding-left:2.4rem;margin-bottom:.7rem;counter-increment:lo;
+}
+.lo-list li::before{
+  content:"LO" counter(lo);position:absolute;left:0;top:.1rem;
+  font-size:.68rem;font-weight:800;color:#fff;background:var(--accent);
+  border-radius:5px;padding:.15rem .35rem;letter-spacing:.02em;
+}
+html[data-theme="dark"] .lo-list li::before{color:#1a1300;}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto;margin:1.1rem 0 1.3rem;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem;background:var(--surface);}
+caption{caption-side:top;text-align:left;font-size:.88rem;color:var(--muted);padding:.7rem .9rem;font-style:italic;}
+th,td{border:1px solid var(--border);padding:.6rem .75rem;text-align:left;vertical-align:top;}
+thead th{background:var(--table-head-bg);color:var(--table-head-text);font-size:.84rem;letter-spacing:.02em;border-color:rgba(255,255,255,.22);}
+tbody tr:hover{background:var(--row-hover);}
+th[scope="row"]{background:var(--surface-2);font-weight:700;}
+
+/* ---------- Diagram frames ---------- */
+figure{margin:1.3rem 0;}
+.diagram-frame{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:1rem;
+}
+.diagram-frame svg{width:100%;height:auto;display:block;}
+figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
+
+/* ---------- Flip cards ---------- */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
+.flip-card{
+  perspective:1000px;background:none;border:0;padding:0;font:inherit;
+  text-align:left;cursor:pointer;min-height:180px;
+}
+.flip-inner{
+  display:block;position:relative;width:100%;min-height:180px;height:100%;
+  transition:transform .5s;transform-style:preserve-3d;
+}
+.flip-card[aria-pressed="true"] .flip-inner{transform:rotateY(180deg);}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:1rem;display:flex;flex-direction:column;justify-content:center;
+  background:var(--surface);box-shadow:var(--shadow);overflow:auto;
+}
+.flip-front{border-top:4px solid var(--accent);}
+.flip-front .term{font-weight:800;font-size:1.05rem;}
+.flip-front .hint{font-size:.78rem;color:var(--muted);margin-top:.5rem;}
+.flip-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent-line);font-size:.9rem;}
+
+/* ---------- Activity blocks ---------- */
+.activity-block{
+  border:2px solid var(--accent);border-radius:var(--radius);
+  overflow:hidden;margin:1.5rem 0;background:var(--surface);
+}
+.activity-header{
+  background:var(--accent);color:#fff;padding:.7rem 1.1rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+html[data-theme="dark"] .activity-header{color:#1a1300;}
+.activity-header h3{margin:0;font-size:1.05rem;color:inherit;}
+.activity-header .t{font-size:.8rem;font-weight:700;}
+.activity-body{padding:1.1rem 1.2rem;}
+.instructions{
+  background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:.85rem 1rem;margin:0 0 1rem;font-size:.93rem;
+}
+.ips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem;margin:1rem 0;}
+.ips div{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .85rem;background:var(--surface-2);font-size:.9rem;}
+.ips h4{margin:0 0 .3rem;font-size:.75rem;color:var(--accent);}
+
+/* ---------- Mapping exercise ---------- */
+.mapping-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+.mapping-table-wrap table{min-width:560px;}
+select{
+  font:inherit;font-size:.88rem;padding:.35rem .5rem;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--surface);color:var(--text);max-width:100%;
+}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .5rem;}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.btn-secondary:hover{background:var(--accent-soft);color:var(--accent-2);}
+html[data-theme="dark"] .btn-secondary{color:var(--accent);}
+.result-line{font-weight:700;font-size:.95rem;margin:.4rem 0 0;}
+tr.map-correct td{background:var(--ok-bg);}
+tr.map-wrong td{background:var(--no-bg);}
+.map-note{font-size:.8rem;display:block;margin-top:.3rem;}
+tr.map-correct .map-note{color:var(--ok-text);}
+tr.map-wrong .map-note{color:var(--no-text);}
+
+/* ---------- Simulation ---------- */
+.sim{
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface-2);padding:1.1rem 1.2rem;margin:1.3rem 0;
+}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.7rem;margin:.8rem 0;}
+.asset{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.65rem .8rem;
+}
+.asset .name{font-weight:700;font-size:.93rem;display:block;}
+.asset .desc{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem;}
+.asset label{font-size:.78rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem;}
+.sim-out{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:.9rem 1rem;margin-top:.9rem;font-size:.92rem;min-height:2.5rem;
+}
+.sim-out ul{margin:.4rem 0 .8rem;padding-left:1.2rem;}
+.finding{border-left:4px solid var(--no-line);background:var(--no-bg);color:var(--no-text);padding:.5rem .7rem;border-radius:6px;margin:.4rem 0;font-size:.88rem;}
+.finding.pass{border-left-color:var(--ok-line);background:var(--ok-bg);color:var(--ok-text);}
+.finding.warn{border-left-color:var(--warn-line);background:var(--warn-bg);color:var(--warn-text);}
+.conduit-item{font-family:"Cascadia Mono",Consolas,monospace;font-size:.85rem;}
+
+/* ---------- Quiz ---------- */
+.quiz-block{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:1.2rem 1.3rem;}
+.q{border-bottom:1px solid var(--border);padding:.9rem 0;}
+.q:last-of-type{border-bottom:0;}
+.q legend{font-weight:700;font-size:1rem;padding:0;margin-bottom:.5rem;}
+.q fieldset{border:0;margin:0;padding:0;}
+.q label{display:block;padding:.32rem .2rem .32rem 0;font-size:.95rem;cursor:pointer;}
+.q input[type="radio"]{margin-right:.5rem;accent-color:var(--accent);}
+.q-feedback{margin-top:.55rem;padding:.6rem .8rem;border-radius:6px;font-size:.9rem;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.correct{background:var(--ok-bg);color:var(--ok-text);border-left:4px solid var(--ok-line);}
+.q-feedback.incorrect{background:var(--no-bg);color:var(--no-text);border-left:4px solid var(--no-line);}
+.q-feedback.unanswered{background:var(--warn-bg);color:var(--warn-text);border-left:4px solid var(--warn-line);}
+.score{font-weight:800;font-size:1.05rem;margin-top:1rem;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:64px;display:flex;flex-direction:column;gap:1.1rem;}
+.side-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.1rem;
+}
+.side-card h2{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;}
+.sidebar-toc ul{list-style:none;margin:0;padding:0;font-size:.88rem;}
+.sidebar-toc li{margin-bottom:.4rem;}
+.sidebar-toc a{text-decoration:none;color:var(--text);}
+.sidebar-toc a:hover{color:var(--accent);text-decoration:underline;}
+.sidebar-toc .defn{display:block;color:var(--muted);font-size:.79rem;line-height:1.45;}
+.lo-check{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;margin-bottom:.55rem;}
+.lo-check input{margin-top:.25rem;accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
+.progress-bar{height:9px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin:.2rem 0 .6rem;}
+.progress-bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease;}
+.progress-text{font-size:.8rem;color:var(--muted);margin:0 0 .7rem;}
+.prevnext{display:flex;flex-direction:column;gap:.55rem;font-size:.85rem;}
+.prevnext a{
+  display:block;text-decoration:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.6rem .75rem;color:var(--text);background:var(--surface-2);
+}
+.prevnext a:hover{border-color:var(--accent);color:var(--accent);}
+.prevnext .dir{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:800;}
+
+/* ---------- Resource cards ---------- */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin:1rem 0;}
+.res{
+  border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:var(--radius-sm);padding:.8rem .9rem;background:var(--surface-2);font-size:.9rem;
+}
+.res a{font-weight:700;}
+.res .kind{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:.25rem;}
+
+/* ---------- Footer ---------- */
+.footer-nav{border-top:1px solid var(--border);background:var(--surface);}
+.footer-nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:1rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.9rem;
+}
+.footer-nav a{text-decoration:none;font-weight:700;}
+.footer-nav a:hover{text-decoration:underline;}
+footer.site{background:var(--header-bg);color:var(--header-muted);}
+footer.site .inner{max-width:var(--maxw);margin:0 auto;padding:1.6rem 1.25rem;font-size:.88rem;}
+footer.site strong{color:#fff;}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  .flip-inner{transition:none;}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  html[data-theme="dark"]{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  body{background:#fff !important;color:#000 !important;font-size:11.5pt;}
+  .topbar,.section-nav,.sidebar,.header-tools,.skip-link,.footer-nav{display:none !important;}
+  .layout{display:block;max-width:none;padding:0;}
+  .card,.quiz-block,.activity-block,.sim{box-shadow:none;border:1px solid #999;break-inside:avoid;}
+  .lesson-header{background:#fff !important;color:#000 !important;border-bottom:2px solid #000;}
+  .lesson-header h1,.tagline{color:#000 !important;}
+  .meta-chip{color:#000 !important;border-color:#000;}
+  .part-banner{background:#fff !important;color:#000 !important;border:1px solid #000;border-left:6px solid #000;}
+  .part-banner h2,.part-banner p,.part-banner .p-label{color:#000 !important;}
+  .activity-header{background:#eee !important;color:#000 !important;}
+  thead th{background:#ddd !important;color:#000 !important;}
+  .flip-inner{transform:none !important;}
+  .flip-face{position:static;transform:none !important;backface-visibility:visible;min-height:0;margin-bottom:.4rem;}
+  .flip-card{min-height:0;}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;}
+  footer.site{background:#fff !important;color:#000 !important;border-top:1px solid #000;}
+  footer.site strong{color:#000 !important;}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home-link" href="index.html">&larr; Course Home</a>
+    <span>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands</span>
+  </div>
+</div>
+
+<!-- ============================ HEADER ============================ -->
+<header class="lesson-header">
+  <div class="lesson-header-inner">
+    <p class="eyebrow">OT-101 &middot; Day 5 &middot; Lesson 11 &middot; 4 contact hours</p>
+    <h1>Monitoring, Detection &amp; OT Incident Response</h1>
+    <p class="tagline">How you see what's happening on a network you can't safely poke, how you tell time consistently enough to reconstruct what happened, and why "just isolate the affected host" is IT advice that can hurt someone on a plant floor.</p>
+    <div class="meta-row">
+      <span class="meta-chip">Level: Intermediate</span>
+      <span class="meta-chip">Strand: Operations</span>
+      <span class="meta-chip">Duration: 4 hours</span>
+      <span class="meta-chip">6 learning objectives</span>
+    </div>
+    <div class="header-tools">
+      <button type="button" class="btn btn-ghost" id="themeToggle" aria-pressed="false">
+        <span aria-hidden="true" id="themeIcon">&#9789;</span>
+        <span id="themeLabel">Switch to dark mode</span>
+      </button>
+      <button type="button" class="btn btn-ghost" id="printBtn">
+        <span aria-hidden="true">&#128424;</span> Print / Save as PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ SECTION NAV ============================ -->
+<nav class="section-nav" aria-label="Sections in this lesson">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#passive">1. Passive Monitoring</a></li>
+    <li><a href="#syslog">2. Syslog Gaps</a></li>
+    <li><a href="#timesync">3. Time Sync</a></li>
+    <li><a href="#triage">4. Alert Triage &amp; SIEM</a></li>
+    <li><a href="#lifecycle">5. Incident Lifecycle</a></li>
+    <li><a href="#compare">6. Side by Side</a></li>
+    <li><a href="#sim">7. Triage Simulator</a></li>
+    <li><a href="#mapping">8. Mapping Lab</a></li>
+    <li><a href="#activity">9. Build a Playbook</a></li>
+    <li><a href="#review">10. Knowledge Check</a></li>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+
+<div class="layout">
+
+<!-- ============================ MAIN ============================ -->
+<main id="main">
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section id="overview" class="card" aria-labelledby="h-overview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="3.2"/><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-overview">Lesson Overview</h2>
+        <p class="sub">Orientation, anchoring analogy, and what you should be able to do by the end.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <p>Ask an IT security operations center how it watches a network, and the toolkit is familiar: agents on every endpoint, periodic vulnerability scans that actively probe every host, and a SIEM that assumes every log source keeps reasonably accurate time. Ask an OT team the same question, and each of those defaults breaks in a specific, predictable way. This lesson is an SME-level walkthrough of <strong>why monitoring and incident response look different in an industrial control system (ICS)</strong>, and what a defensible OT security operations program does instead — not because OT teams are behind, but because the equipment and the consequences are genuinely different.</p>
+
+    <p>Four constraints drive everything in this lesson:</p>
+    <ul class="tight">
+      <li><strong>You often can't safely ask a device a question.</strong> An active vulnerability scan sends unexpected packets to find out what's listening. Many legacy PLCs and RTUs were never tested against malformed or out-of-sequence packets, and some will hang, reboot, or drop into a fault state when they receive one — during a live process.</li>
+      <li><strong>Most field devices don't know how to tell you what they're doing.</strong> A PLC's engineering port frequently has no logging capability at all. The absence of a log entry is not the absence of an event — it's a coverage gap, and pretending otherwise creates a false sense of visibility.</li>
+      <li><strong>Correlating events across sources requires everyone to agree on the time.</strong> A SIEM's entire value proposition — "this login happened, then two minutes later this setpoint changed" — collapses if the two systems' clocks disagree by more than a few seconds, and isolated OT networks are exactly where clock drift goes unnoticed.</li>
+      <li><strong>The standard incident-response move, isolate the host, can itself be the hazard.</strong> Pulling the network cable on a compromised Windows laptop is a Tuesday. Pulling the network cable on a PLC actively controlling a live batch, or a safety system with no local fallback, can leave a physical process in an undefined and dangerous state.</li>
+    </ul>
+
+    <div class="analogy-box">
+      <span class="label">Anchoring analogy — the security guard who can only watch, not stop and search</span>
+      <p>Imagine a security guard assigned to a busy factory floor who is told: you may watch everything happening on this floor, but you may not stop and search any worker, because interrupting them mid-task could cause an accident. That guard's whole method changes. They can't walk up and demand ID (an <strong>active scan</strong>) — they watch from a fixed vantage point and learn what normal traffic through the floor looks like (<strong>passive monitoring</strong>). Some workers don't carry a badge that logs anywhere (a <strong>syslog gap</strong> on legacy equipment), so the guard has to infer activity from what they can observe directly. The guard's notebook and the loading dock's time clock had better show the same time, or nobody will ever agree on the order of events after something goes wrong (<strong>time synchronization</strong>). And if the guard spots someone suspicious standing next to a running press, "escort them out immediately" might mean grabbing someone mid-motion next to dangerous machinery — the safe move might be to keep watching closely and call the shift supervisor instead of grabbing the person (the <strong>containment</strong> dilemma this lesson keeps returning to).</p>
+      <p>Every technique below is this guard's playbook, translated to packets, logs, and alerts on a plant network.</p>
+    </div>
+
+    <h3>Learning objectives</h3>
+    <p>By the end of this 4-hour session, you will be able to:</p>
+    <ol class="lo-list">
+      <li><strong>Explain</strong> why passive monitoring is preferred over active scanning on an OT network, citing the specific risk active scanning poses to legacy field devices.</li>
+      <li><strong>Identify</strong> syslog coverage gaps common to Level 0/1 field devices and describe at least two compensating telemetry sources that can substitute for a missing device log.</li>
+      <li><strong>Explain</strong> the role of time synchronization in event correlation and describe the consequence of clock drift during incident reconstruction.</li>
+      <li><strong>Triage</strong>, in simulation, a queue of security alerts by weighing asset criticality, safety impact, and confidence rather than alert volume alone.</li>
+      <li><strong>Evaluate</strong> a containment decision in which isolating the affected host risks a safety or production consequence, and select a defensible compensating action.</li>
+      <li><strong>Design</strong> an OT-aware incident response playbook section that names who decides on containment and what happens when full isolation isn't an option the plant can accept.</li>
+    </ol>
+
+    <div class="callout safety">
+      <span class="safety-flag"><span aria-hidden="true">&#9888;</span> Safeguards &amp; Responsible Use</span>
+      <p style="margin:0">Every activity in this lesson is simulation-only, run against fictional organizations and fictional data. Nothing here touches live or production equipment, energized panels, or a real network. This lesson teaches detection and defensive response — it does not teach or demonstrate offensive tooling, and no step-by-step exploitation procedure appears anywhere below. Real incidents are discussed only as case-study-style narrative, never as a how-to.</p>
+    </div>
+  </section>
+
+  <!-- ===================== PART A BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part A</span>
+    <h2>Lecture — Seeing, Logging, and Timing an OT Network</h2>
+    <p>Roughly 2 hours covering passive monitoring, syslog gaps, time synchronization, alert triage, the incident lifecycle, and a side-by-side comparison with IT practice.</p>
+  </div>
+
+  <!-- ===================== 1. PASSIVE MONITORING ===================== -->
+  <section id="passive" class="card" aria-labelledby="h-passive">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-passive">1. Passive Asset Discovery &amp; Monitoring</h2>
+        <p class="sub">Watching the wire instead of asking the device — because some devices can't safely answer.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Active scanning</strong> discovers and characterizes network hosts by sending them unexpected traffic — port probes, crafted packets, sometimes exploit-style test payloads — and interpreting the response. It's the IT default because most modern operating systems are built and tested to survive exactly that kind of traffic without incident. <strong>Passive monitoring</strong> discovers and characterizes the same network by observing traffic that's already flowing, without ever originating a packet toward the devices being watched. It's slower to build a complete picture and it can miss a device that never talks, but it cannot itself cause the outage it's trying to detect.</p>
+
+    <p>The reason OT defaults to passive monitoring isn't caution for its own sake — it's a documented failure mode. Many Level 0/1 field devices (PLCs, RTUs, protective relays) run embedded firmware with a minimal or nonexistent network stack, built decades ago against an assumption that only trusted engineering traffic would ever reach the port. An unexpected packet — even a benign, well-formed one the device just wasn't built to expect — can cause the device to hang, drop its current control logic, or in rarer cases reboot. On a device that's actively holding a valve position or running a safety interlock, that reboot is not an inconvenience; it's a process event.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the doctor who observes vitals instead of running every test</span>
+      <p>A hospital doesn't run every diagnostic test on every patient just to build a baseline — some tests carry their own risk (radiation, sedation, invasive sampling) that isn't justified without a specific reason. Instead, continuous vital-sign monitors passively observe heart rate, oxygen, and blood pressure around the clock, with zero risk to the patient, and a real test is only ordered when the passive data suggests one is needed. Passive network monitoring works the same way: it's the always-on vital-sign monitor, not a substitute for every possible diagnostic, but the right default when the diagnostic itself carries risk.</p>
+    </div>
+
+    <h3>Worked example — deploying a passive sensor at Cascade Summit Electric, Substation 12</h3>
+    <p>Cascade Summit Electric (fictional) wants visibility into which devices are communicating on Substation 12's control LAN without touching any of the relays or RTUs directly. The design:</p>
+    <ul class="tight">
+      <li>A <strong>network tap</strong> or a switch's <strong>SPAN/mirror port</strong> is configured to copy all traffic on the control-LAN switch to a dedicated monitoring port — the copy is one-way; nothing sent to that port can reach back onto the live network.</li>
+      <li>A passive monitoring sensor plugged into that mirrored port parses the copied traffic — Modbus TCP function codes, DNP3 object groups, ARP and DHCP chatter — to build an asset inventory and a baseline of "who normally talks to whom."</li>
+      <li>The sensor never originates a single packet toward the relays or RTUs themselves. It only listens.</li>
+      <li>Over roughly two to four weeks, the sensor's baseline stabilizes: which IEDs poll which RTU, on what cadence, using which function codes. Traffic that doesn't fit that baseline — a new IP address, an unfamiliar function code, a device polling at ten times its normal rate — becomes the anomaly signal Section 4 builds on.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Where active scanning still has a place.</strong> Active scanning isn't banned outright — it's scoped. A scan against general-purpose IT assets in the OT DMZ (jump hosts, historians running standard operating systems) carries the same low risk it does anywhere else. The rule students should walk away with: know which side of the Level 2/3 boundary a device sits on, and default to passive for anything below it unless a vendor has explicitly confirmed the device tolerates active probing.
+    </div>
+
+    <p>Two failure modes to watch for: first, treating a passive sensor's asset list as complete on day one — a device that only talks once a month (a backup RTU, for example) won't appear until it actually communicates, so early asset counts should be treated as a floor, not a ceiling. Second, assuming a mirrored SPAN port on an oversubscribed switch reliably copies every packet — under heavy load, switches can silently drop mirrored traffic before it reaches the sensor, so mirrored coverage should be spot-checked against a known traffic pattern, not assumed.</p>
+  </section>
+
+  <!-- ===================== 2. SYSLOG GAPS ===================== -->
+  <section id="syslog" class="card" aria-labelledby="h-syslog">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 11h6M9 15h4"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-syslog">2. Syslog Coverage Gaps on Field Devices</h2>
+        <p class="sub">The most important device on the network is often the quietest one in the log stream.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p><strong>Syslog</strong> is the standard protocol and message format most IT infrastructure uses to forward event records — logins, configuration changes, errors — to a central collector for retention and analysis. It's the backbone assumption of a typical SIEM deployment: every meaningful device generates a log, and every log gets forwarded somewhere central. That assumption holds reasonably well at Level 2 and above in an OT network — HMIs, engineering workstations, jump hosts, and OT firewalls generally run modern operating systems that support syslog forwarding out of the box.</p>
+
+    <p>It breaks down hard at Level 0/1. Most PLCs, RTUs, and protective relays have no syslog client, no concept of a forwarded event log, and in many cases no persistent event storage at all beyond a small internal fault buffer that overwrites itself. The device that is, arguably, the single most important thing to monitor — because it's the one actually touching the physical process — is frequently the one contributing nothing to the log stream.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the security camera that only covers half the building</span>
+      <p>A building's camera system covering every hallway and every door except the loading dock isn't "mostly covered" — it has a hole exactly where a lot of unsupervised activity could plausibly happen. Nobody would say "we have good camera coverage" about that building; they'd say "we have good coverage everywhere except the loading dock, and here is our compensating plan for that blind spot." A syslog-based OT security program needs the same honesty about Level 0/1 coverage — the gap doesn't go away by not mentioning it.</p>
+    </div>
+
+    <h3>Worked example — instrumenting a legacy PLC with no logging capability at Ironwood</h3>
+    <p>Ironwood Precision Manufacturing (fictional) runs a 2009-vintage PLC controlling a mixing line. The PLC has no syslog client and no forwarded event capability. Rather than accept a total blind spot, the identity of "what happened on this PLC" gets reconstructed from three compensating sources instead of one device log:</p>
+    <ul class="tight">
+      <li><strong>Passive protocol parsing.</strong> The Section 1 passive sensor, already watching the wire, decodes the Modbus function codes flowing to and from the PLC — a write to a holding register, a mode change from Run to Program — and timestamps each one, even though the PLC itself never generated a log entry.</li>
+      <li><strong>Upstream device logs.</strong> The engineering workstation used to connect to the PLC <em>does</em> support logging — its own login events, and which project file was opened and when, become a proxy for "who was working on this PLC and when," even without a log from the PLC confirming what they actually changed.</li>
+      <li><strong>Physical process correlation.</strong> The historian recording the mixer's live tag values (temperature, agitator speed, setpoint) shows exactly when a physical parameter changed — which, cross-referenced against the passive sensor's Modbus writes, tells the investigator which write actually took effect.</li>
+    </ul>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 1. Where telemetry actually comes from when the field device itself can't log.</caption>
+        <thead>
+          <tr><th scope="col">What you want to know</th><th scope="col">Ideal source</th><th scope="col">Realistic OT source when the ideal source doesn't exist</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Who logged in and when</th><td>Device authentication log</td><td>Engineering workstation login log, physical badge/door log for the control room</td></tr>
+          <tr><th scope="row">What command was sent</th><td>Device command log</td><td>Passive protocol decode of the function code and register address from the mirrored traffic</td></tr>
+          <tr><th scope="row">Whether the command took effect</th><td>Device state-change log</td><td>Historian tag-value change, or a physical process reading that moved</td></tr>
+          <tr><th scope="row">Configuration/logic changes</th><td>Device change log with diff</td><td>Version-controlled project-file backups compared before and after, from the engineering workstation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Teaching note.</strong> A common student instinct is to treat "the PLC doesn't log" as a dead end. Redirect that instinct: the field device not logging doesn't mean the event left no trace at all — it means the trace lives somewhere else in the environment, and finding it is the actual skill. That said, be honest with students that compensating sources are inference, not a device's own authoritative record, and should be documented as such in any incident report.
+    </div>
+  </section>
+
+  <!-- ===================== 3. TIME SYNCHRONIZATION ===================== -->
+  <section id="timesync" class="card" aria-labelledby="h-timesync">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-timesync">3. Time Synchronization for Correlation</h2>
+        <p class="sub">A SIEM that can't agree on what time it is can't tell you what happened first.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p>Correlating events across multiple sources — "this remote login happened, then ninety seconds later this setpoint changed" — only works if every source's timestamp reflects the same clock, or close enough to it that the sequence of events is unambiguous. <strong>Network Time Protocol (NTP)</strong> is the standard mechanism for keeping a fleet of devices synchronized to a common time reference, typically a small number of authoritative time servers, often themselves disciplined by GPS.</p>
+
+    <p>OT networks are exactly where clock drift goes unnoticed longest, for a structural reason: many control-network devices are intentionally isolated from the internet and therefore from the public NTP pool most IT infrastructure syncs against by default. Left with no time source at all, a device's internal clock drifts — sometimes by seconds per day, occasionally by more — and nobody notices, because the device's own operation doesn't depend on knowing the correct time. It only becomes a problem the moment someone tries to correlate that device's log against a different system's log during an investigation.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — three witnesses with three different watches</span>
+      <p>Imagine reconstructing a car accident from three witnesses, each reporting the time on their own watch — and none of the watches agree with each other, or with the actual time. "Witness A saw the car swerve at 3:14, Witness B saw it stop at 3:12" sounds like the car stopped before it swerved, until you realize Witness B's watch runs four minutes fast. Every investigation that relies on timestamps is implicitly trusting that the watches agree. An OT SIEM ingesting a firewall log, a jump-host log, and a passively-decoded PLC event without a common time source is running exactly this experiment, usually without realizing it.</p>
+    </div>
+
+    <h3>Worked example — the two-minute gap that wasn't</h3>
+    <p>During a tabletop review at a fictional water utility, investigators initially concluded that a suspicious remote login to a jump host occurred two full minutes <em>after</em> an unauthorized setpoint change on a downstream RTU — which would have made the login irrelevant to the setpoint change, since it happened afterward. A closer look found the RTU's local clock, never synchronized to any time source, had drifted nearly three minutes fast over the eleven months since its last manual clock set. Correcting for the drift put the login <em>before</em> the setpoint change, by about fifty seconds — reversing the entire causal story the investigation had been building.</p>
+
+    <div class="callout safety">
+      <span class="safety-flag"><span aria-hidden="true">&#9888;</span> Design note, not a how-to</span>
+      <p style="margin:0">A defensible time-synchronization design places one or more hardened, GPS-disciplined time servers inside the OT environment as the authoritative internal source, and configures every device capable of NTP client behavior — Level 2 and above, and any Level 0/1 device that happens to support it — to sync against that internal source rather than reaching out to the internet. The OT time server itself may sync from an external reference, but the trust and traffic flow inward only, never allowing an inbound path to be opened toward the control network for the sake of time sync.</p>
+    </div>
+
+    <p>Where a device genuinely can't run an NTP client — a real possibility at Level 0/1 — the compensating practice is a documented, periodic manual clock check against the authoritative internal source, logged so an investigator later knows exactly how much drift to expect and correct for, rather than discovering the gap mid-investigation the way the water-utility example did.</p>
+  </section>
+
+  <!-- ===================== 4. ALERT TRIAGE & SIEM ===================== -->
+  <section id="triage" class="card" aria-labelledby="h-triage">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 19V9M10 19V5M16 19v-7M20 19v-3"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-triage">4. Alert Triage &amp; SIEM in an OT Context</h2>
+        <p class="sub">The loudest alert isn't always the one that matters. Priority is a judgment, not a volume count.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>A <strong>security information and event management (SIEM)</strong> platform aggregates events from many sources — passive network sensors, syslog from Level 2+ devices, firewall logs, authentication systems — into one searchable stream, and applies correlation rules to flag combinations worth a human's attention. A SIEM doesn't decide what matters; it decides what's worth surfacing. Deciding what matters is <strong>alert triage</strong>, and doing it well in OT requires weighing factors a generic IT triage rubric doesn't fully capture.</p>
+
+    <p>A batch changeover on a packaging line can generate dozens of legitimate "anomalies" in a single hour — new setpoints, valves cycling in an unusual order, a brief spike in a flow rate — all completely normal for that specific operating mode. A single unexplained write to a safety PLC's configuration register, by contrast, might generate exactly one alert all week. A triage process that ranks by volume or by generic severity score will bury the second alert under the first. OT alert triage has to weigh at least three things together, not volume alone: <strong>asset criticality</strong> (what does this device actually control, and what happens if it's wrong), <strong>safety impact</strong> (could this plausibly affect a person's safety, not just production), and <strong>confidence</strong> (how well does this match a known bad pattern versus a merely unfamiliar one).</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the ER triage nurse, not the ticket queue</span>
+      <p>An emergency room doesn't see patients in the order they arrived, or in order of how loudly they're complaining. A triage nurse weighs severity and time-sensitivity first, so a quiet patient having a heart attack gets seen before a loud patient with a sprained ankle. OT alert triage needs the same discipline: the alert that's easiest to explain away, or the quietest one in the queue, might be the one actually worth an immediate page.</p>
+    </div>
+
+    <h3>Worked example — two alerts, one shift</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Table 2. Two alerts arriving in the same shift at a fictional beverage plant, triaged by criticality, safety impact, and confidence rather than volume.</caption>
+        <thead>
+          <tr><th scope="col">Alert</th><th scope="col">Asset criticality</th><th scope="col">Safety impact</th><th scope="col">Confidence</th><th scope="col">Triage outcome</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">47 setpoint-change events on Packaging Line 2 in one hour</th><td>Production, non-safety</td><td>None — matches a scheduled changeover</td><td>High match to known changeover pattern</td><td>Log and close; expected behavior for this shift's schedule</td></tr>
+          <tr><th scope="row">One unexplained write to the sterilization holding-time register on the thermal-process safety PLC</th><td>Safety-critical process control</td><td>Direct — governs pathogen kill step</td><td>No known-good explanation on file</td><td>Immediate page to the on-call controls engineer; do not wait for a second occurrence</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Facilitator prompt.</strong> Ask students why alert volume, by itself, would rank the changeover alerts above the single safety-PLC write if a generic "alerts per hour" dashboard were the only lens in use. The answer is the whole point of this section: volume measures how often something happens, not how much it matters.
+    </div>
+  </section>
+
+  <!-- ===================== 5. INCIDENT LIFECYCLE & CONTAINMENT ===================== -->
+  <section id="lifecycle" class="card" aria-labelledby="h-lifecycle">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 12a8 8 0 1116 0 8 8 0 01-16 0z"/><path d="M12 8v4l2.5 1.5"/><path d="M4 4l2 2M20 4l-2 2"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-lifecycle">5. Incident Lifecycle &amp; the Containment Problem</h2>
+        <p class="sub">The standard playbook says isolate the host. Sometimes the plant can't accept that answer.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>Most incident-response frameworks describe a similar lifecycle: <strong>Preparation</strong>, <strong>Detection &amp; Analysis</strong>, <strong>Containment</strong>, <strong>Eradication</strong>, <strong>Recovery</strong>, and <strong>Post-Incident Activity</strong>. The first two phases work almost identically in OT and IT — the differences this lesson has already covered (passive monitoring, syslog gaps, time sync) live inside detection and analysis. It's <strong>containment</strong> — stopping the incident from getting worse — where OT and IT genuinely diverge, and where a well-meaning IT-trained responder can cause real harm by applying the wrong default.</p>
+
+    <p>In IT, the default containment move for a compromised host is to isolate it — pull the network cable, disable the switch port, quarantine the endpoint — while investigation continues elsewhere. That default assumes the host can be safely disconnected without an immediate physical consequence, which is true of nearly every IT endpoint. It is not automatically true of an OT asset. A PLC actively holding a valve position, running a safety interlock, or mid-cycle on a batch process may not have a safe "disconnected" state at all — depending on the specific control architecture, cutting its network connection could leave it holding its last command indefinitely, freeze it in an unsafe intermediate state, or in some designs trigger a fail-safe shutdown that itself has a physical consequence (a line stopping mid-batch, a boiler tripping) that has to be managed, not just accepted as a side effect of "containing" the incident.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — pulling the plug on someone mid-surgery</span>
+      <p>Unplugging a hospital's guest WiFi router because it's misbehaving is a minor inconvenience. Unplugging a patient monitor mid-procedure because its software looks compromised is not the same category of decision, even though "unplug it" is the same physical action in both cases. The decision to disconnect has to weigh what the device is doing right now, not just whether it's suspect. OT containment decisions live entirely in that second category far more often than IT responders expect.</p>
+    </div>
+
+    <h3>Worked example — a suspicious write to a live batch controller</h3>
+    <p>At Ironwood Precision Manufacturing (fictional), the Section 4 triage process flags an unexplained write to a mixer PLC that is, at that exact moment, mid-cycle on an active batch. The incident-response playbook does not default to "isolate the PLC." Instead, it walks a decision the playbook itself has to spell out in advance:</p>
+    <ol class="tight">
+      <li><strong>Confirm current process state</strong> with the shift operator before any network action — is this PLC actively controlling something right now, and what happens physically if its connection drops?</li>
+      <li><strong>Weigh compensating containment options</strong> that don't require full isolation: restricting the specific command/register the write targeted at the firewall, increasing monitoring resolution on that PLC specifically, or placing an operator in direct visual/manual oversight of the process while investigation continues.</li>
+      <li><strong>Escalate the isolation decision itself</strong> to a named role who can authorize it — typically a controls engineer or plant operations lead jointly with the security lead — rather than letting a security analyst unilaterally sever a live control loop.</li>
+      <li><strong>If isolation is chosen</strong>, do it in coordination with operations so the process can be brought to a safe, planned state first, rather than as a unilateral, unannounced network action.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>Playbook</strong>, in this context, is the predefined, written procedure that captures exactly this decision structure ahead of time — who has to be consulted, what compensating options exist short of full isolation, and who is authorized to approve isolation when it's genuinely necessary — so that decision isn't improvised for the first time during a live incident, under pressure, by whoever happens to be on shift.
+    </div>
+
+    <p>None of this means OT incidents never get contained by isolation — sometimes isolation is exactly the right call, and delaying it out of excessive caution is its own failure mode. The point is that the decision requires an extra input IT containment doesn't: current physical process state, confirmed with the people who can actually see it, before the network action happens.</p>
+  </section>
+
+  <!-- ===================== 6. SIDE BY SIDE ===================== -->
+  <section id="compare" class="card" aria-labelledby="h-compare">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 5h7v14H4zM13 5h7v14h-7z"/><path d="M7.5 9h0M16.5 9h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-compare">6. Side by Side: IT Incident Response vs. OT Incident Response</h2>
+        <p class="sub">Same lifecycle phases — very different defaults once you reach containment.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 3. IT incident-response practice and OT incident-response practice compared across the dimensions this lesson covers.</caption>
+        <thead>
+          <tr><th scope="col">Dimension</th><th scope="col">Typical IT practice</th><th scope="col">Typical OT practice</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Asset discovery method</th><td>Active scanning is routine and low-risk</td><td>Passive monitoring by default; active scanning scoped to IT-grade assets only</td></tr>
+          <tr><th scope="row">Event logging coverage</th><td>Near-universal; nearly every host supports syslog</td><td>Strong at Level 2+; frequently absent at Level 0/1 field devices</td></tr>
+          <tr><th scope="row">Time synchronization</th><td>Public NTP pool, largely automatic</td><td>Requires a dedicated internal, one-way-trusted time source; drift often goes unnoticed for months</td></tr>
+          <tr><th scope="row">Alert triage basis</th><td>Volume and generic severity scoring common</td><td>Asset criticality and safety impact must outweigh volume</td></tr>
+          <tr><th scope="row">Default containment action</th><td>Isolate the host immediately</td><td>Confirm physical process state first; isolation may require operations sign-off</td></tr>
+          <tr><th scope="row">Who approves containment</th><td>Security analyst/on-call, usually unilateral</td><td>Joint decision with controls engineering or operations for anything touching a live process</td></tr>
+          <tr><th scope="row">Recovery validation</th><td>Confirm system integrity/patch state</td><td>Confirm system integrity <em>and</em> that the physical process is in a known, safe state</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The lifecycle phases are identical on paper. What changes is which inputs each phase requires before it's safe to act — and in OT, several of those inputs are physical, not just digital.</p>
+  </section>
+
+  <!-- ===================== PART B BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part B</span>
+    <h2>Hands-On — Triage Alerts, Map Concepts, and Write a Playbook Section</h2>
+    <p>Roughly 2 hours of simulation and applied design work. Everything below runs in your browser.</p>
+  </div>
+
+  <!-- ===================== 7. SIMULATION ===================== -->
+  <section id="sim" class="card" aria-labelledby="h-sim">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="9" cy="7" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><path d="M16 8h5M18.5 5.5v5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-sim">7. Simulation: Alert Triage &amp; Containment Decision Builder</h2>
+        <p class="sub">Build an alert the way a real triage analyst would evaluate it — asset, alert source, confidence, safety impact, and current process state must all be weighed together.</p>
+      </div>
+      <span class="time-pill">35 min</span>
+    </div>
+
+    <p class="safety-flag"><span aria-hidden="true">&#9888;</span> Simulation only — no real network traffic, no real SIEM, no live equipment of any kind is touched or represented with real data.</p>
+
+    <p>This builder models a single alert arriving against the fictional <strong>Cascade Summit Electric, Substation 12</strong> network. Choose the asset the alert concerns, where the alert came from, how confident the detection is, whether it carries a safety implication, and what the affected asset is doing physically right now. Select <strong>Triage this alert</strong> and the tool reasons through the combination the way a triage analyst and a controls engineer would together — recommending a priority level and a containment action, and explaining why full isolation is or isn't the right first move.</p>
+
+    <div class="sim">
+      <h3 style="margin-top:0">Alert builder</h3>
+      <div class="sim-grid" id="triageGrid">
+        <div class="asset">
+          <span class="name">Affected asset</span>
+          <span class="desc">What does this alert concern?</span>
+          <label for="triAsset">Asset</label>
+          <select id="triAsset">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="field">Level 0/1 — Field controller (PLC/RTU)</option>
+            <option value="hmi">Level 2 — HMI / operator console</option>
+            <option value="eng">Level 3 — Engineering workstation</option>
+            <option value="dmz">OT DMZ — Jump host</option>
+            <option value="corp">Corporate IT asset</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Alert source</span>
+          <span class="desc">Where did this detection come from?</span>
+          <label for="triSource">Source</label>
+          <select id="triSource">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="passive">Passive network anomaly (protocol/behavior)</option>
+            <option value="syslog">Syslog authentication failure</option>
+            <option value="siem">SIEM correlation rule (multi-source)</option>
+            <option value="process">Physical process deviation (historian tag)</option>
+            <option value="unknown">Unclassified / unrecognized traffic</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Detection confidence</span>
+          <span class="desc">How well does this match a known bad pattern?</span>
+          <label for="triConfidence">Confidence</label>
+          <select id="triConfidence">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="low">Low &mdash; unfamiliar, no known-bad match</option>
+            <option value="medium">Medium &mdash; partial match to a known pattern</option>
+            <option value="high">High &mdash; strong match to a known-bad pattern</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Safety impact</span>
+          <span class="desc">Could this plausibly affect a person's safety?</span>
+          <label for="triSafety">Impact</label>
+          <select id="triSafety">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="none">None &mdash; production/business impact only</option>
+            <option value="process">Process impact &mdash; quality, downtime, no safety link</option>
+            <option value="safety">Safety-related &mdash; interlock, protective function, or similar</option>
+          </select>
+        </div>
+        <div class="asset">
+          <span class="name">Current process state</span>
+          <span class="desc">What is the asset doing right now?</span>
+          <label for="triState">Process state</label>
+          <select id="triState">
+            <option value="">&mdash; choose &mdash;</option>
+            <option value="idle">Idle / not currently controlling a live process</option>
+            <option value="running">Running steady-state</option>
+            <option value="changeover">Mid batch or changeover</option>
+            <option value="safetyevent">Active safety event / alarm response in progress</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn" id="triAdd">Triage this alert</button>
+        <button type="button" class="btn btn-secondary" id="triClear">Clear queue</button>
+      </div>
+      <div class="sim-out" id="triFeedback" role="status" aria-live="polite">
+        <p style="margin:0;color:var(--muted)">Fill in all five fields, then choose <strong>Triage this alert</strong>. Feedback on this specific alert appears here.</p>
+      </div>
+
+      <div class="table-wrap" style="margin-top:1rem">
+        <table style="min-width:0">
+          <caption>Alert queue triaged so far in this session.</caption>
+          <thead>
+            <tr><th scope="col">Asset</th><th scope="col">Source</th><th scope="col">Confidence</th><th scope="col">Safety impact</th><th scope="col">Priority</th></tr>
+          </thead>
+          <tbody id="triQueue">
+            <tr><td colspan="5" style="color:var(--muted)">No alerts triaged yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Facilitator prompt.</strong> Ask participants to deliberately build one alert they expect the tool to recommend full isolation for (for example, a high-confidence, safety-related alert on an idle field controller) and one they expect it to flag as a containment dilemma (the same alert, but on a controller mid-batch or mid-safety-event). Compare the tool's stated reasoning to what the group predicted — the process-state field is usually what surprises people most.
+    </div>
+  </section>
+
+  <!-- ===================== 8. MAPPING LAB ===================== -->
+  <section id="mapping" class="card" aria-labelledby="h-mapping">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 7h6M14 7h6M4 12h6M14 12h6M4 17h6M14 17h6"/><path d="M10 7l4 5M10 17l4-5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-mapping">8. Mapping Lab: Scenario to Concept</h2>
+        <p class="sub">Six short scenarios. Match each to the monitoring or response concept it actually demonstrates.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 8.1 — Scenario-to-concept matching</h3>
+        <span class="t">25 minutes &middot; pairs</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Instructions.</strong> Each row describes a real monitoring or incident-response moment in a plant. Choose the single concept from this lesson's key terms that the scenario is <em>demonstrating</em> — several scenarios could plausibly touch more than one term, but only one is the best fit for what's actually being described.
+        </div>
+        <div class="ips">
+          <div><h4>Individual · 6 min</h4>Answer all six on your own without discussion.</div>
+          <div><h4>Pairs · 10 min</h4>Compare with a partner. Argue any row where you disagree before checking.</div>
+          <div><h4>Share · 9 min</h4>Report the row your pair argued longest about. That row is usually the most teachable.</div>
+        </div>
+
+        <div class="mapping-table-wrap">
+          <table>
+            <caption>Table 4. Match each monitoring/response scenario to the concept it demonstrates.</caption>
+            <thead>
+              <tr><th scope="col" style="width:58%">Scenario</th><th scope="col">Concept</th></tr>
+            </thead>
+            <tbody id="mapBody"><!-- populated by script --></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="mapCheck">Check my mapping</button>
+          <button type="button" class="btn btn-secondary" id="mapReset">Reset</button>
+        </div>
+        <p class="result-line" id="mapResult" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9. BUILD A PLAYBOOK ACTIVITY ===================== -->
+  <section id="activity" class="card" aria-labelledby="h-activity">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h3"/><path d="M9 12h6M9 16h6"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-activity">9. Design a Compensating Monitoring &amp; Containment Plan</h2>
+        <p class="sub">The one-page deliverable that turns Sections 2 and 5's reasoning into something a real shift team can follow.</p>
+      </div>
+      <span class="time-pill">30 min</span>
+    </div>
+
+    <p>A written incident-response <strong>playbook</strong> section for a specific asset class is the short document that answers, before the alert ever fires, exactly what telemetry substitutes for a missing device log, who gets consulted before any containment action, and what happens when full isolation isn't an option the plant can accept. Without one, every incident gets negotiated from scratch under time pressure — usually while a process is running and nobody wants to be the person who guesses wrong.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the loading-dock blind spot, one more time</span>
+      <p>Recall the building whose camera system misses the loading dock. A good compensating plan is the laminated procedure already taped near the dock supervisor's desk — what to check manually, on what schedule, and who to call if something looks wrong — written before anyone needs it, not improvised the day something actually happens there.</p>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Activity 9.1 — Draft a one-page playbook section for a legacy field controller (assessment artifact)</h3>
+        <span class="t">30 minutes &middot; individual, then gallery walk</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Deliverable.</strong> One page, submitted as a PDF or a single slide, written for a real plant shift team at a fictional organization of your choosing (utility, manufacturer, or another OT sector), covering a single legacy PLC or RTU with no native logging capability and no safe network-isolation fallback while it is actively controlling a process.
+        </div>
+        <p>Your playbook section must contain:</p>
+        <ol class="tight">
+          <li><strong>Compensating telemetry</strong> — since the device itself doesn't log, name the specific upstream or physical sources (per Table 1) that stand in for a device log for this asset.</li>
+          <li><strong>Time-sync expectation</strong> — state where this asset gets its time reference, or, if it can't run NTP, the documented manual-check cadence and expected drift tolerance.</li>
+          <li><strong>Triage criteria</strong> — the specific criticality and safety-impact factors that would make an alert on this asset a page-immediately priority versus a log-and-review priority.</li>
+          <li><strong>The containment decision path</strong> — who must confirm current physical process state before any network action, and who is authorized to approve full isolation if it becomes necessary.</li>
+          <li><strong>Compensating containment options</strong> — at least two actions short of full isolation that could contain a suspected incident while the asset remains mid-process.</li>
+          <li><strong>Recovery validation</strong> — what must be confirmed, both digitally and physically, before this asset is considered fully recovered.</li>
+        </ol>
+        <h4>Success criteria</h4>
+        <ul class="tight">
+          <li>A new shift supervisor could read the section and know exactly who to call and what to check before touching the network.</li>
+          <li>The isolation-approval clause names a specific role, not a vague "management."</li>
+          <li>At least one compensating containment option doesn't require disconnecting the asset.</li>
+          <li>The telemetry clause names an actual source (per Table 1), not just "increase logging."</li>
+        </ul>
+        <p><strong>Gallery walk.</strong> Post your playbook section. Read three others. On a sticky note, write the one clause you would add if this were your own plant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 10. REVIEW ===================== -->
+  <section id="review" class="card" aria-labelledby="h-review">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 113.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><path d="M12 17h0"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-review">10. Knowledge Check</h2>
+        <p class="sub">Five questions. Feedback explains the reasoning, not just the letter.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <div class="quiz-block">
+      <form id="quizForm" novalidate>
+        <div class="q">
+          <fieldset>
+            <legend>1. Why does OT security operations default to passive monitoring rather than active vulnerability scanning for Level 0/1 field devices?</legend>
+            <label><input type="radio" name="q1" value="a"> Passive monitoring is cheaper to license than active scanning tools.</label>
+            <label><input type="radio" name="q1" value="b"> Many legacy PLCs and RTUs were never tested against unexpected packets and can hang, fault, or reboot in response to an active scan, during a live process.</label>
+            <label><input type="radio" name="q1" value="c"> Active scanning cannot detect any device that uses an industrial protocol.</label>
+            <label><input type="radio" name="q1" value="d"> Passive monitoring produces a more complete asset inventory on day one than active scanning.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q1"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>2. A PLC has no syslog client and no forwarded event log. Which combination of compensating sources best reconstructs "what happened" on that device during an investigation?</legend>
+            <label><input type="radio" name="q2" value="a"> Wait until the vendor releases a firmware update that adds logging, then re-run the investigation.</label>
+            <label><input type="radio" name="q2" value="b"> Passive protocol decode of commands sent to the device, the engineering workstation's own login/access log, and historian tag-value changes showing whether a command took effect.</label>
+            <label><input type="radio" name="q2" value="c"> Rely solely on the operator's memory of what happened during the shift.</label>
+            <label><input type="radio" name="q2" value="d"> Treat the absence of a log as proof that nothing happened on the device.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q2"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>3. An RTU's clock has drifted three minutes fast because it was never synchronized to a time source. What is the most direct consequence for an investigation that relies on this RTU's timestamps?</legend>
+            <label><input type="radio" name="q3" value="a"> The RTU's logs become completely unreadable.</label>
+            <label><input type="radio" name="q3" value="b"> Event correlation against other systems' timestamps can reverse or distort the actual sequence of events, potentially reaching the wrong causal conclusion.</label>
+            <label><input type="radio" name="q3" value="c"> The RTU will stop functioning until its clock is corrected.</label>
+            <label><input type="radio" name="q3" value="d"> Clock drift only matters for billing systems, not for security investigations.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q3"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>4. In the same shift, a SIEM surfaces 47 setpoint-change alerts from a scheduled packaging changeover and one unexplained write to a safety PLC's configuration register. Which triage approach reflects sound OT practice?</legend>
+            <label><input type="radio" name="q4" value="a"> Prioritize investigating the 47 changeover alerts first, since they represent the larger volume of activity.</label>
+            <label><input type="radio" name="q4" value="b"> Weigh asset criticality, safety impact, and confidence together — the single safety-PLC write likely warrants immediate escalation even though it's a fraction of the alert volume.</label>
+            <label><input type="radio" name="q4" value="c"> Close all 48 alerts without review, since none of them involved a confirmed active exploit.</label>
+            <label><input type="radio" name="q4" value="d"> Escalate only alerts that exceed a fixed numeric severity score, regardless of which asset they concern.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q4"></div>
+        </div>
+
+        <div class="q">
+          <fieldset>
+            <legend>5. A suspicious write is detected on a PLC that is currently mid-cycle on a live batch. Following OT-aware incident-response practice, what should happen before any network containment action is taken?</legend>
+            <label><input type="radio" name="q5" value="a"> The on-call security analyst should immediately isolate the PLC from the network, exactly as they would for a compromised IT laptop.</label>
+            <label><input type="radio" name="q5" value="b"> The current physical process state should be confirmed with the shift operator or controls engineer, and compensating options short of full isolation should be weighed, before a unilateral isolation decision is made.</label>
+            <label><input type="radio" name="q5" value="c"> No containment action of any kind should ever be taken on a device that is actively controlling a process.</label>
+            <label><input type="radio" name="q5" value="d"> The incident should be logged for review at the end of the shift, with no action taken in the meantime.</label>
+          </fieldset>
+          <div class="q-feedback" id="fb-q5"></div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn" id="gradeBtn">Grade my quiz</button>
+          <button type="button" class="btn btn-secondary" id="quizReset">Reset</button>
+        </div>
+        <p class="score" id="scoreOut" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== RESOURCES ===================== -->
+  <section id="resources" class="card" aria-labelledby="h-resources">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-resources">Further Reading</h2>
+        <p class="sub">Primary sources to verify every technical claim above before using this lesson with students.</p>
+      </div>
+      <span class="time-pill">Reference</span>
+    </div>
+
+    <h3>Standards, guidance, and video</h3>
+    <div class="res-grid">
+      <div class="res">
+        <span class="kind">Video</span>
+        <a href="https://www.youtube.com/watch?v=mNC5T00XBi0" target="_blank" rel="noopener noreferrer">Supplementary video on OT monitoring and incident response</a>
+        <p style="margin:.4rem 0 0">A companion video introducing monitoring and detection concepts. Useful as a pre-class primer or a Part A refresher; verify the specific content aligns with this lesson before assigning it.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Federal guidance</span>
+        <a href="https://csrc.nist.gov/pubs/sp/800/82/r3/final" target="_blank" rel="noopener noreferrer">NIST SP 800-82 Rev. 3 — Guide to OT Security</a>
+        <p style="margin:.4rem 0 0">Background on tailoring monitoring, logging, and incident handling for OT environments, referenced throughout Sections 1–5.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Federal guidance</span>
+        <a href="https://csrc.nist.gov/pubs/sp/800/61/r2/final" target="_blank" rel="noopener noreferrer">NIST SP 800-61 Rev. 2 — Computer Security Incident Handling Guide</a>
+        <p style="margin:.4rem 0 0">The general incident-lifecycle framework (Preparation, Detection &amp; Analysis, Containment, Eradication, Recovery, Post-Incident Activity) adapted for OT in Section 5.</p>
+      </div>
+      <div class="res">
+        <span class="kind">Standard</span>
+        <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards" target="_blank" rel="noopener noreferrer">ISA/IEC 62443-3-3 — System Security Requirements</a>
+        <p style="margin:.4rem 0 0">Foundational Requirements covering timely response to events and audit/logging — the standards basis for the monitoring and triage guidance in Sections 2–4.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Draft status.</strong> This lesson page is a first AI-generated draft prepared for OT-101. It has not yet been reviewed by a human subject-matter expert. Verify every standard reference, protocol detail, and technical claim against the primary sources above before using it with students.
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside class="sidebar" aria-label="Lesson tools and navigation">
+
+  <nav class="side-card sidebar-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On this page</h2>
+    <ul>
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#passive">1. Passive Monitoring</a></li>
+      <li><a href="#syslog">2. Syslog Gaps</a></li>
+      <li><a href="#timesync">3. Time Sync</a></li>
+      <li><a href="#triage">4. Alert Triage &amp; SIEM</a></li>
+      <li><a href="#lifecycle">5. Incident Lifecycle</a></li>
+      <li><a href="#compare">6. Side by Side</a></li>
+      <li><a href="#sim">7. Triage Simulator</a></li>
+      <li><a href="#mapping">8. Mapping Lab</a></li>
+      <li><a href="#activity">9. Build a Playbook</a></li>
+      <li><a href="#review">10. Knowledge Check</a></li>
+      <li><a href="#resources">Further Reading</a></li>
+    </ul>
+  </nav>
+
+  <section class="side-card" aria-labelledby="lo-h">
+    <h2 id="lo-h">Objectives progress</h2>
+    <div class="progress-bar"><span id="loBar"></span></div>
+    <p class="progress-text" id="loText" role="status" aria-live="polite">0 of 6 objectives marked complete</p>
+    <div class="lo-check"><input type="checkbox" id="lo1" class="lo-box"><label for="lo1">Explain why passive monitoring is preferred over active scanning</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo2" class="lo-box"><label for="lo2">Identify syslog coverage gaps and compensating telemetry sources</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo3" class="lo-box"><label for="lo3">Explain time synchronization's role in event correlation</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo4" class="lo-box"><label for="lo4">Triage a simulated alert queue by criticality, safety impact, and confidence</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo5" class="lo-box"><label for="lo5">Evaluate a containment decision with a physical process consequence</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo6" class="lo-box"><label for="lo6">Design an OT-aware incident response playbook section</label></div>
+  </section>
+
+  <nav class="side-card sidebar-toc" aria-labelledby="kt-h">
+    <h2 id="kt-h">Key terms</h2>
+    <ul>
+      <li><a href="#passive">Passive Monitoring</a><span class="defn">Observing existing network traffic, via a tap or SPAN port, without ever sending a packet toward the devices being watched.</span></li>
+      <li><a href="#passive">Active Scanning</a><span class="defn">Probing hosts with unexpected traffic to characterize them; scoped away from fragile Level 0/1 field devices in OT.</span></li>
+      <li><a href="#syslog">Syslog</a><span class="defn">The standard protocol most IT infrastructure uses to forward event logs centrally; frequently unsupported on Level 0/1 field devices.</span></li>
+      <li><a href="#timesync">Time Synchronization</a><span class="defn">Keeping every device's clock aligned, typically via NTP, so event correlation across sources is trustworthy.</span></li>
+      <li><a href="#triage">SIEM</a><span class="defn">Security information and event management; aggregates and correlates events from many sources into one searchable stream.</span></li>
+      <li><a href="#triage">Alert Triage</a><span class="defn">Deciding what an alert actually warrants by weighing asset criticality, safety impact, and confidence — not alert volume alone.</span></li>
+      <li><a href="#lifecycle">Playbook</a><span class="defn">A predefined, written incident-response procedure naming who decides on containment and what compensating options exist.</span></li>
+      <li><a href="#lifecycle">Containment</a><span class="defn">Stopping an incident from getting worse; in OT, may require confirming physical process state before any network action.</span></li>
+    </ul>
+  </nav>
+
+  <nav class="side-card" aria-labelledby="pn-h">
+    <h2 id="pn-h">Lesson navigation</h2>
+    <div class="prevnext">
+      <a href="lesson10.html"><span class="dir">&larr; Previous</span>Day 5 &middot; Lesson 10 — Access Control &amp; Identity Management in OT</a>
+      <a href="lesson12.html"><span class="dir">Next &rarr;</span>Day 5 &middot; Lesson 12 — Capstone: Build and Teach Your Own OT Module</a>
+    </div>
+  </nav>
+
+</aside>
+</div>
+
+<!-- ============================ FOOTER NAV ============================ -->
+<nav class="footer-nav" aria-label="Previous and next lesson">
+  <div class="footer-nav-inner">
+    <a href="lesson10.html">&larr; Lesson 10 — Access Control &amp; Identity Management in OT</a>
+    <a href="index.html">Course Home</a>
+    <a href="lesson12.html">Lesson 12 — Capstone: Build and Teach Your Own OT Module &rarr;</a>
+  </div>
+</nav>
+
+<footer class="site">
+  <div class="inner">
+    <p><strong>OT-101 &middot; Teaching Operational Technologies and Cybersecurity for Community College Faculty</strong></p>
+    <p>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands &nbsp;|&nbsp; Day 5 &middot; Lesson 11 — Monitoring, Detection &amp; OT Incident Response</p>
+    <p>All activities are simulation-only using fictional organizations and data. No live or production equipment, no offensive tooling, no vendor or customer data. First AI-generated draft — pending subject-matter expert review.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Theme toggle (light default, localStorage persisted) --------------- */
+  var root = document.documentElement;
+  var toggle = document.getElementById("themeToggle");
+  var icon = document.getElementById("themeIcon");
+  var label = document.getElementById("themeLabel");
+  var KEY = "ot101-theme";
+
+  function safeGet() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function safeSet(v) { try { localStorage.setItem(KEY, v); } catch (e) { /* storage unavailable */ } }
+
+  function applyTheme(mode) {
+    root.setAttribute("data-theme", mode);
+    var dark = mode === "dark";
+    toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    icon.innerHTML = dark ? "&#9728;" : "&#9789;";
+    label.textContent = dark ? "Switch to light mode" : "Switch to dark mode";
+  }
+  applyTheme(safeGet() === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(next);
+    safeSet(next);
+  });
+
+  /* ---------------- Print ---------------- */
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  /* ---------------- Scrollspy for section nav ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".section-nav a"));
+  var targets = navLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+
+  function setCurrent(id) {
+    navLinks.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+  }
+  if ("IntersectionObserver" in window && targets.length) {
+    var obs = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; })
+        .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+      if (visible.length) { setCurrent(visible[0].target.id); }
+    }, { rootMargin: "-140px 0px -60% 0px", threshold: 0 });
+    targets.forEach(function (t) { obs.observe(t); });
+  }
+
+  /* ---------------- Flip cards ---------------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".flip-card"), function (card) {
+    card.addEventListener("click", function () {
+      var on = card.getAttribute("aria-pressed") === "true";
+      card.setAttribute("aria-pressed", on ? "false" : "true");
+    });
+  });
+
+  /* ---------------- Objectives progress ---------------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".lo-box"));
+  var bar = document.getElementById("loBar");
+  var loText = document.getElementById("loText");
+  function updateLO() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    bar.style.width = (done / boxes.length * 100) + "%";
+    loText.textContent = done + " of " + boxes.length + " objectives marked complete";
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", updateLO); });
+  updateLO();
+
+  /* ---------------- Alert Triage & Containment simulator ---------------- */
+  var ASSET_LABELS = { field: "Level 0/1 field controller", hmi: "Level 2 HMI/operator console", eng: "Level 3 engineering workstation", dmz: "OT DMZ jump host", corp: "Corporate IT asset" };
+  var SOURCE_LABELS = { passive: "Passive network anomaly", syslog: "Syslog auth failure", siem: "SIEM correlation rule", process: "Physical process deviation", unknown: "Unclassified traffic" };
+  var CONF_LABELS = { low: "Low confidence", medium: "Medium confidence", high: "High confidence" };
+  var CONF_RANK = { low: 0, medium: 1, high: 2 };
+  var SAFETY_LABELS = { none: "No safety impact", process: "Process impact only", safety: "Safety-related" };
+  var STATE_LABELS = { idle: "Idle", running: "Running steady-state", changeover: "Mid batch/changeover", safetyevent: "Active safety event" };
+
+  function evaluateAlert(asset, source, confidence, safety, state) {
+    var findings = [];
+    var isFieldOrHmi = (asset === "field" || asset === "hmi");
+    var liveProcess = (state === "running" || state === "changeover" || state === "safetyevent");
+
+    var priority = "Monitor / log for review";
+
+    /* Rule 1: safety impact drives baseline priority */
+    if (safety === "safety") {
+      if (CONF_RANK[confidence] >= 1) {
+        findings.push(["warn", "Safety-related impact with " + CONF_LABELS[confidence].toLowerCase() + " warrants immediate escalation to the on-call controls engineer, regardless of alert volume elsewhere in the queue (Section 4)."]);
+        priority = "Immediate escalation";
+      } else {
+        findings.push(["warn", "Safety-related impact, even at low confidence, should not be closed on volume grounds alone \u2014 verify manually before downgrading."]);
+        priority = "Verify manually, do not auto-close";
+      }
+    } else if (safety === "process") {
+      if (CONF_RANK[confidence] === 2) {
+        findings.push(["warn", "High-confidence match with process (non-safety) impact \u2014 investigate this shift, but it does not require an immediate page the way a safety-related alert would."]);
+        priority = "Investigate this shift";
+      } else {
+        findings.push(["pass", "Process-only impact at " + CONF_LABELS[confidence].toLowerCase() + " is reasonably handled as a logged item for routine review."]);
+        priority = "Log for routine review";
+      }
+    } else {
+      findings.push(["pass", "No safety impact identified \u2014 appropriate for routine logging unless a pattern emerges across multiple alerts."]);
+      priority = "Log for routine review";
+    }
+
+    /* Rule 2: source-specific notes */
+    if (source === "passive" && isFieldOrHmi) {
+      findings.push(["pass", SOURCE_LABELS[source] + " on a " + ASSET_LABELS[asset] + " is exactly the kind of detection passive monitoring is designed to surface without ever having probed the device directly (Section 1)."]);
+    } else if (source === "syslog" && asset === "field") {
+      findings.push(["warn", "A syslog alert directly from a Level 0/1 field controller is unusual \u2014 most of these devices don't support syslog at all (Section 2). Confirm the true source isn't actually an upstream device before treating this as device-native."]);
+    } else if (source === "unknown") {
+      findings.push(["warn", "Unclassified traffic deserves investigation before being dismissed, but should not automatically inherit high priority just because it's unfamiliar \u2014 unfamiliar is not the same as malicious (Section 4)."]);
+    } else if (source === "siem") {
+      findings.push(["pass", "A SIEM correlation rule combining multiple sources is generally a stronger signal than any single source alone \u2014 worth weighting confidence upward slightly when reviewing."]);
+    } else {
+      findings.push(["pass", SOURCE_LABELS[source] + " is a reasonable detection source for this scenario."]);
+    }
+
+    /* Rule 3: containment recommendation, driven by process state */
+    if (isFieldOrHmi && liveProcess) {
+      if (state === "safetyevent") {
+        findings.push(["fail", "This asset is mid safety-event response right now. Do not take any network containment action \u2014 including isolation \u2014 without first confirming with the operator that it will not interfere with the active safety response (Section 5)."]);
+      } else if (state === "changeover") {
+        findings.push(["warn", "This asset is mid batch/changeover. Full isolation risks leaving the process in an undefined state. Confirm current process state with the shift operator and weigh compensating options (restrict the specific command, increase monitoring resolution) before isolating."]);
+      } else {
+        findings.push(["warn", "This asset is running steady-state. Isolation is more defensible here than mid-batch, but should still be confirmed with operations and, ideally, coordinated so the process reaches a planned safe state first."]);
+      }
+    } else if (isFieldOrHmi && state === "idle") {
+      findings.push(["pass", "This asset is idle and not currently controlling a live process \u2014 full isolation, if warranted by the alert itself, carries minimal physical-consequence risk right now."]);
+    } else {
+      findings.push(["pass", ASSET_LABELS[asset] + " is a general-purpose IT-grade asset \u2014 standard isolation containment applies without the physical-process caveats that govern Level 0/1 devices."]);
+    }
+
+    var verdict = "pass";
+    findings.forEach(function (f) { if (f[0] === "fail") { verdict = "fail"; } else if (f[0] === "warn" && verdict !== "fail") { verdict = "warn"; } });
+    return { findings: findings, verdict: verdict, priority: priority };
+  }
+
+  var triFeedback = document.getElementById("triFeedback");
+  var triQueue = document.getElementById("triQueue");
+  var triCount = 0;
+
+  document.getElementById("triAdd").addEventListener("click", function () {
+    var asset = document.getElementById("triAsset").value;
+    var source = document.getElementById("triSource").value;
+    var confidence = document.getElementById("triConfidence").value;
+    var safety = document.getElementById("triSafety").value;
+    var state = document.getElementById("triState").value;
+
+    if (!asset || !source || !confidence || !safety || !state) {
+      triFeedback.innerHTML = '<p style="margin:0;color:var(--no-text)">Please choose a value for all five fields before triaging.</p>';
+      return;
+    }
+
+    var result = evaluateAlert(asset, source, confidence, safety, state);
+    var verdictLabel = result.verdict === "fail" ? "Requires careful handling"
+      : result.verdict === "warn" ? "Proceed with caution" : "Clear to handle routinely";
+
+    var html = "<p style='margin:0 0 .5rem'><strong>Recommended priority: " + result.priority + "</strong> &mdash; " + verdictLabel + "</p><ul>";
+    result.findings.forEach(function (f) {
+      html += '<li class="finding ' + f[0] + '">' + f[1] + "</li>";
+    });
+    html += "</ul>";
+    triFeedback.innerHTML = html;
+
+    triCount++;
+    if (triCount === 1) { triQueue.innerHTML = ""; }
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + ASSET_LABELS[asset] + "</td>" +
+      "<td>" + SOURCE_LABELS[source] + "</td>" +
+      "<td>" + CONF_LABELS[confidence] + "</td>" +
+      "<td>" + SAFETY_LABELS[safety] + "</td>" +
+      "<td>" + result.priority + "</td>";
+    triQueue.appendChild(tr);
+  });
+
+  document.getElementById("triClear").addEventListener("click", function () {
+    triQueue.innerHTML = '<tr><td colspan="5" style="color:var(--muted)">No alerts triaged yet.</td></tr>';
+    triCount = 0;
+    triFeedback.innerHTML = '<p style="margin:0;color:var(--muted)">Fill in all five fields, then choose <strong>Triage this alert</strong>. Feedback on this specific alert appears here.</p>';
+  });
+
+  /* ---------------- Mapping Lab ---------------- */
+  var MAP_OPTIONS = ["Passive Monitoring", "Syslog Gap", "Time Synchronization", "SIEM Correlation", "Playbook", "Containment"];
+
+  var MAP_ROWS = [
+    {
+      text: "A network tap copies all switch traffic to a monitoring sensor that never sends a packet of its own toward the relays it's watching.",
+      answer: "Passive Monitoring",
+      why: "Observing existing traffic without originating any packet toward the devices being watched is the definition of passive monitoring."
+    },
+    {
+      text: "An investigator discovers a 2009-vintage PLC has no event log of any kind, and has to reconstruct what happened from the engineering workstation's login log and historian tag changes instead.",
+      answer: "Syslog Gap",
+      why: "The absence of a device-native log, compensated for by other telemetry sources, is exactly the syslog coverage gap this lesson describes."
+    },
+    {
+      text: "Two systems' logs initially appear to show a setpoint change happening before the login that supposedly caused it, until someone realizes one device's clock had drifted three minutes.",
+      answer: "Time Synchronization",
+      why: "Clock drift distorting the apparent order of events is the central risk time synchronization is meant to prevent."
+    },
+    {
+      text: "A single alert only fires because a login anomaly, a configuration change, and an unusual outbound connection from three different systems are combined and weighed together.",
+      answer: "SIEM Correlation",
+      why: "Combining multiple sources into one correlated alert is what a SIEM's correlation rules are built to do."
+    },
+    {
+      text: "Before any incident occurs, the security and controls teams jointly write down exactly who must be consulted and what compensating options exist before a live-process device can be isolated.",
+      answer: "Playbook",
+      why: "A predefined, written procedure captured ahead of time \u2014 not improvised during the incident \u2014 is a playbook."
+    },
+    {
+      text: "A suspicious write is detected on a PLC mid-batch, and the responder confirms with the operator what the physical consequence of disconnecting it would be before taking any network action.",
+      answer: "Containment",
+      why: "Deciding how to stop an incident from getting worse, while weighing the physical process consequence, is the containment decision this lesson focuses on."
+    }
+  ];
+
+  var mapBody = document.getElementById("mapBody");
+  var mapResult = document.getElementById("mapResult");
+
+  function buildMap() {
+    mapBody.innerHTML = "";
+    MAP_ROWS.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      var sid = "map-" + i;
+      var opts = ['<option value="">\u2014 select \u2014</option>'].concat(MAP_OPTIONS.map(function (o) {
+        return '<option value="' + o + '">' + o + "</option>";
+      })).join("");
+      tr.innerHTML =
+        "<td><label for='" + sid + "'>" + (i + 1) + ". " + r.text + "</label><span class='map-note'></span></td>" +
+        "<td><select id='" + sid + "' data-row='" + i + "'>" + opts + "</select></td>";
+      mapBody.appendChild(tr);
+    });
+    mapResult.textContent = "";
+  }
+  buildMap();
+
+  document.getElementById("mapCheck").addEventListener("click", function () {
+    var right = 0, blank = 0;
+    Array.prototype.forEach.call(mapBody.querySelectorAll("tr"), function (tr, i) {
+      var sel = tr.querySelector("select");
+      var note = tr.querySelector(".map-note");
+      tr.classList.remove("map-correct", "map-wrong");
+      if (!sel.value) {
+        blank++;
+        note.textContent = "Not answered yet.";
+        return;
+      }
+      if (sel.value === MAP_ROWS[i].answer) {
+        right++;
+        tr.classList.add("map-correct");
+        note.textContent = "Correct. " + MAP_ROWS[i].why;
+      } else {
+        tr.classList.add("map-wrong");
+        note.textContent = "Not quite \u2014 this is " + MAP_ROWS[i].answer + ". " + MAP_ROWS[i].why;
+      }
+    });
+    mapResult.textContent = right + " of " + MAP_ROWS.length + " correct" + (blank ? " (" + blank + " left blank)." : ".");
+  });
+
+  document.getElementById("mapReset").addEventListener("click", function () {
+    buildMap();
+  });
+
+  /* ---------------- Quiz ---------------- */
+  var ANSWERS = {
+    q1: { correct: "b", why: {
+      b: "Correct. Legacy PLCs and RTUs often weren't tested against unexpected packets and can hang, fault, or reboot when actively scanned \u2014 an unacceptable risk on a device actively controlling a live process.",
+      a: "Not correct. Cost isn't the driver \u2014 the driver is the physical risk an active scan poses to fragile embedded devices.",
+      c: "Not correct. Passive monitoring can and does decode industrial protocols like Modbus and DNP3 \u2014 that's exactly how it builds its baseline.",
+      d: "Not correct. Passive monitoring's asset list actually starts incomplete and improves over time as more devices communicate \u2014 completeness is a tradeoff, not the reason it's preferred."
+    }},
+    q2: { correct: "b", why: {
+      b: "Correct. Combining a passive protocol decode of commands, the engineering workstation's access log, and historian tag changes reconstructs the event from sources that do exist, without relying on the device's own (nonexistent) log.",
+      a: "Not correct. Waiting for a firmware update leaves the current investigation with no answer at all \u2014 compensating sources exist right now and should be used.",
+      c: "Not correct. Operator memory is a useful cross-check but isn't a substitute for the actual technical telemetry sources in Table 1.",
+      d: "Not correct. Absence of a log is a coverage gap, not evidence that nothing happened \u2014 treating it as proof of nothing is the exact mistake this section warns against."
+    }},
+    q3: { correct: "b", why: {
+      b: "Correct. Clock drift can reverse or distort the apparent sequence of events across systems, as the water-utility example showed, leading an investigation to the wrong causal conclusion.",
+      a: "Not correct. Drifted logs remain readable \u2014 the problem is that their timestamps no longer align with other systems, not that the log itself becomes unreadable.",
+      c: "Not correct. Most devices continue operating normally with a drifted clock; the operational impact is on investigations and correlation, not device function.",
+      d: "Not correct. Clock drift affects any process that depends on comparing timestamps across systems, security investigations very much included."
+    }},
+    q4: { correct: "b", why: {
+      b: "Correct. Weighing asset criticality, safety impact, and confidence together \u2014 not volume \u2014 correctly surfaces the single safety-PLC write as the higher priority despite being one alert among 48.",
+      a: "Not correct. Prioritizing by volume alone would bury the safety-critical alert under the routine changeover noise, exactly the failure mode Section 4 warns against.",
+      c: "Not correct. Closing alerts without review just because none show a confirmed active exploit ignores that the safety-PLC write has no known-good explanation on file \u2014 that's precisely what warrants escalation.",
+      d: "Not correct. A fixed numeric severity score, applied without considering what the specific asset controls, is the generic-scoring trap this section identifies as insufficient for OT."
+    }},
+    q5: { correct: "b", why: {
+      b: "Correct. Confirming physical process state with the people who can see it, and weighing compensating options, is exactly the extra input OT containment decisions require before a network action that IT containment doesn't need.",
+      a: "Not correct. Treating this identically to an IT laptop skips the physical-consequence check that a live batch process requires \u2014 the core mistake this lesson is built to prevent.",
+      c: "Not correct. Isolation is sometimes the right call \u2014 the point isn't never isolating, it's confirming process state and weighing options first, not defaulting to \"never act.\"",
+      d: "Not correct. Taking no action at all while an active incident continues on a live process is its own failure mode; the playbook should specify an immediate, informed response, not a delay until end of shift."
+    }}
+  };
+
+  document.getElementById("gradeBtn").addEventListener("click", function () {
+    var score = 0, unanswered = 0;
+    Object.keys(ANSWERS).forEach(function (q) {
+      var chosen = document.querySelector('input[name="' + q + '"]:checked');
+      var fb = document.getElementById("fb-" + q);
+      fb.className = "q-feedback show";
+      if (!chosen) {
+        unanswered++;
+        fb.classList.add("unanswered");
+        fb.textContent = "No answer selected. Choose an option and grade again.";
+        return;
+      }
+      if (chosen.value === ANSWERS[q].correct) {
+        score++;
+        fb.classList.add("correct");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      } else {
+        fb.classList.add("incorrect");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      }
+    });
+    var out = document.getElementById("scoreOut");
+    out.textContent = "Score: " + score + " of 5" +
+      (unanswered ? " \u00b7 " + unanswered + " question(s) not answered." : "") +
+      (score === 5 ? " \u2014 every item correct." : "");
+  });
+
+  document.getElementById("quizReset").addEventListener("click", function () {
+    document.getElementById("quizForm").reset();
+    Array.prototype.forEach.call(document.querySelectorAll(".q-feedback"), function (fb) {
+      fb.className = "q-feedback";
+      fb.textContent = "";
+    });
+    document.getElementById("scoreOut").textContent = "";
+  });
+
+})();
+</script>
+</body>
+</html>
