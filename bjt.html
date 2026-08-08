@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive 5-Mode Curve Tracer &amp; Switching Simulator</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.65;transition:background .3s,color .3s;}
+
+.topbar{background:linear-gradient(135deg,#0047AB,#002a66);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+[data-theme="dark"] .topbar{background:linear-gradient(135deg,#0d1b2e,#001a40);}
+.topbar .brand{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;font-size:1.05rem;letter-spacing:.05em;}
+.theme-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 16px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.85rem;transition:background .2s;}
+.theme-btn:hover{background:rgba(255,255,255,.3);}
+
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 60px;}
+section{margin-bottom:44px;}
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+p{margin-bottom:14px;}
+strong{color:var(--navy);}
+[data-theme="dark"] strong{color:#8ab6ff;}
+
+/* ============ GRAPHER / TRACER ============ */
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media(max-width:820px){.grapher-grid{grid-template-columns:1fr;}}
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;}
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.ctrl label .val{color:var(--green-dark);font-weight:bold;}
+.ctrl input[type=range]{width:100%;accent-color:var(--green);}
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+.mode-panel{display:none;}
+.mode-panel.show{display:block;}
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+[data-theme="dark"] .readout .r-bd{color:var(--amber);}
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.g-btn{flex:1;min-width:80px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn:hover{background:var(--navy-dark);}
+.g-btn.g-green{background:var(--green);}
+.g-btn.g-green:hover{background:var(--green-dark);}
+.g-btn.g-red{background:var(--red);}
+.g-btn.g-red:hover{opacity:.85;}
+
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.callout .co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-pro .co-title{color:var(--navy);}
+
+footer{background:var(--navy-darker);color:rgba(255,255,255,.75);text-align:center;padding:26px 20px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.83rem;line-height:1.7;margin-top:20px;}
+[data-theme="dark"] footer{background:#0a1420;}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">⚡ ELT 102 · Solid-State Devices</span>
+  <button class="theme-btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+</div>
+
+<div class="wrap">
+<section id="tracer">
+  <h2 class="sec-title">📈 Interactive 5-Mode Curve Tracer &amp; Switching Simulator</h2>
+  <p>One instrument, five devices. <strong>BJT / JFET / MOSFET</strong> modes plot live characteristic curve families with a DC load line — drag the control slider and ride the green Q-point between cutoff, active/ohmic, and saturation. <strong>SCR</strong> mode is a live latching bench test, and <strong>TRIAC</strong> mode is a working phase-control dimmer.</p>
+  <div class="grapher">
+    <div class="grapher-grid">
+      <div>
+        <canvas class="scope" id="trCv" width="720" height="470" role="img" aria-label="Curve tracer showing characteristic curves, load line and operating point for the selected device"></canvas>
+      </div>
+      <div>
+        <div class="ctrl">
+          <label>Device Under Test</label>
+          <div class="seg" id="devSeg">
+            <button class="active" onclick="setDev('bjt',this)">BJT</button>
+            <button onclick="setDev('jfet',this)">JFET</button>
+            <button onclick="setDev('mos',this)">MOSFET</button>
+            <button onclick="setDev('scr',this)">SCR</button>
+            <button onclick="setDev('triac',this)">TRIAC</button>
+          </div>
+        </div>
+
+        <div class="mode-panel show" id="pan-bjt">
+          <div class="ctrl">
+            <label>Base Current I<sub>B</sub> <span class="val" id="ibVal">30 µA</span></label>
+            <input type="range" id="ib" min="0" max="60" step="1" value="30">
+          </div>
+          <div class="ctrl">
+            <label>Current Gain β <span class="val" id="betaVal">100</span></label>
+            <input type="range" id="beta" min="50" max="200" step="5" value="100">
+          </div>
+          <p class="sans" style="font-size:.8rem;color:var(--text-muted);">Fixed circuit: V<sub>CC</sub> = 20 V, R<sub>C</sub> = 2 kΩ → load line (20 V, 0) ↔ (0, 10 mA)</p>
+        </div>
+
+        <div class="mode-panel" id="pan-jfet">
+          <div class="ctrl">
+            <label>Gate Voltage V<sub>GS</sub> <span class="val" id="vgsjVal">−1.0 V</span></label>
+            <input type="range" id="vgsj" min="-4" max="0" step="0.1" value="-1">
+          </div>
+          <p class="sans" style="font-size:.8rem;color:var(--text-muted);">Device: I<sub>DSS</sub> = 10 mA, V<sub>P</sub> = −4 V · Circuit: V<sub>DD</sub> = 20 V, R<sub>D</sub> = 1.5 kΩ</p>
+        </div>
+
+        <div class="mode-panel" id="pan-mos">
+          <div class="ctrl">
+            <label>Gate Voltage V<sub>GS</sub> <span class="val" id="vgsmVal">3.0 V</span></label>
+            <input type="range" id="vgsm" min="0" max="6" step="0.1" value="3">
+          </div>
+          <p class="sans" style="font-size:.8rem;color:var(--text-muted);">Device: V<sub>TH</sub> = 2 V, K = 1 mA/V² · Circuit: V<sub>DD</sub> = 20 V, R<sub>D</sub> = 1 kΩ</p>
+        </div>
+
+        <div class="mode-panel" id="pan-scr">
+          <div class="g-btns" style="margin-bottom:12px;">
+            <button class="g-btn g-green" onclick="scrGate()">⚡ Gate Pulse</button>
+            <button class="g-btn g-red" onclick="scrBreak()">✂ Interrupt Anode</button>
+          </div>
+          <div class="ctrl">
+            <label>Load Current (when on) <span class="val" id="iaVal">120 mA</span></label>
+            <input type="range" id="ia" min="10" max="200" step="5" value="120">
+          </div>
+          <p class="sans" style="font-size:.8rem;color:var(--text-muted);">12 V DC supply · Holding current I<sub>H</sub> = 30 mA. Set the load below 30 mA and try to latch it…</p>
+        </div>
+
+        <div class="mode-panel" id="pan-triac">
+          <div class="ctrl">
+            <label>Firing Angle α <span class="val" id="faVal">90°</span></label>
+            <input type="range" id="fa" min="5" max="175" step="1" value="90">
+          </div>
+          <p class="sans" style="font-size:.8rem;color:var(--text-muted);">120 VAC 60 Hz through a lamp load. Small angle = early firing = bright; large angle = late = dim.</p>
+        </div>
+
+        <div class="readout" id="trRead" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout co-pro">
+    <div class="co-title">💡 Guided Explorations</div>
+    <strong>1. Ride the load line (BJT):</strong> sweep I<sub>B</sub> from 0 → 60 µA and watch the Q-point travel from cutoff to saturation; note the readout region changing at each end. <strong>2. β sensitivity:</strong> park I<sub>B</sub> at 30 µA and slide β from 50 → 200 — the Q-point drifts across the entire line, which is exactly why β-dependent bias is bad design. <strong>3. Pinch-off (JFET):</strong> start at V<sub>GS</sub> = 0 (I<sub>DSS</sub>) and squeeze to −4 V — the curve family collapses to zero. <strong>4. Threshold (MOSFET):</strong> creep V<sub>GS</sub> upward and find the exact voltage where drain current first appears — that's V<sub>TH</sub>. <strong>5. The latch (SCR):</strong> fire the gate, note the current keeps flowing with no gate; interrupt the anode to reset. Then set the load below 30 mA and prove it won't latch at all. <strong>6. Dimmer (TRIAC):</strong> sweep α from 5° → 175° and watch the shaded conduction area, the power %, and the lamp glow all track together.
+  </div>
+</section>
+</div>
+
+<footer>Extracted from ELT 102 · Digital Logic &amp; Solid-State Devices — Lesson 3 (sands-mvcc.github.io/elt102)</footer>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  if(localStorage.getItem('elt-theme')==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('elt-theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('elt-theme','dark'); }
+}
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* ============ CURVE TRACER ============ */
+var cv=document.getElementById('trCv'), cx=cv.getContext('2d');
+var dev='bjt';
+var scrOn=false, scrPulse=0, scrTrace=[];
+for(var i=0;i<240;i++) scrTrace.push(0);
+
+function setDev(d,btn){
+  dev=d;
+  document.querySelectorAll('#devSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  ['bjt','jfet','mos','scr','triac'].forEach(function(k){
+    document.getElementById('pan-'+k).classList.toggle('show', k===d);
+  });
+}
+function scrGate(){ scrPulse=18; var ia=parseFloat(document.getElementById('ia').value); if(ia>=30) scrOn=true; }
+function scrBreak(){ scrOn=false; }
+
+/* ---- shared axis helpers (curve modes) ---- */
+var PADL=56, PADB=34, PADT=26, PADR=16;
+function ax(v,vmax){ return PADL + v/vmax*(cv.width-PADL-PADR); }
+function ay(i,imax){ return cv.height-PADB - i/imax*(cv.height-PADB-PADT); }
+function frame(xlab,ylab,vmax,imax,xstep,istep){
+  var grid=css('--border'), axis=css('--text-muted'), txt=css('--text');
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,cv.width,cv.height);
+  cx.strokeStyle=grid; cx.lineWidth=1; cx.font='10px Arial'; cx.fillStyle=axis;
+  for(var v=0;v<=vmax;v+=xstep){
+    cx.beginPath(); cx.moveTo(ax(v,vmax),PADT); cx.lineTo(ax(v,vmax),cv.height-PADB); cx.stroke();
+    cx.fillText(v, ax(v,vmax)-4, cv.height-PADB+14);
+  }
+  for(var iM=0;iM<=imax;iM+=istep){
+    cx.beginPath(); cx.moveTo(PADL,ay(iM,imax)); cx.lineTo(cv.width-PADR,ay(iM,imax)); cx.stroke();
+    cx.fillText(iM, PADL-24, ay(iM,imax)+3);
+  }
+  cx.strokeStyle=axis; cx.lineWidth=1.6;
+  cx.strokeRect(PADL,PADT,cv.width-PADL-PADR,cv.height-PADB-PADT);
+  cx.fillStyle=txt; cx.font='bold 11px Arial';
+  cx.fillText(xlab, cv.width-150, cv.height-8);
+  cx.save(); cx.translate(14,150); cx.rotate(-Math.PI/2); cx.fillText(ylab,0,0); cx.restore();
+}
+function qdot(x,y){
+  cx.fillStyle=css('--green');
+  cx.beginPath(); cx.arc(x,y,7,0,Math.PI*2); cx.fill();
+  cx.strokeStyle=css('--card'); cx.lineWidth=2; cx.stroke();
+}
+
+/* ---- BJT ---- */
+function drawBJT(){
+  var IB=parseFloat(document.getElementById('ib').value);   // µA
+  var B=parseFloat(document.getElementById('beta').value);
+  document.getElementById('ibVal').textContent=IB+' µA';
+  document.getElementById('betaVal').textContent=B;
+  var VCC=20, RC=2000, VMAX=20, IMAX=12; // mA axis
+  frame('V-CE (V)','I-C (mA)',VMAX,IMAX,2,2);
+  // curve family IB = 10..60
+  var navy=css('--navy');
+  for(var ib=10; ib<=60; ib+=10){
+    var icA=B*ib/1000; // mA
+    cx.strokeStyle = (ib===IB)? css('--green-dark') : navy;
+    cx.lineWidth = (ib===IB)? 2.6 : 1.4;
+    cx.globalAlpha = (ib===IB)? 1 : 0.55;
+    cx.beginPath();
+    for(var v=0; v<=VMAX; v+=0.05){
+      var ic = v<0.3 ? icA*(v/0.3) : icA*(1+v*0.004); // knee + slight Early slope
+      ic=Math.min(ic,IMAX);
+      var X=ax(v,VMAX), Y=ay(ic,IMAX);
+      v===0?cx.moveTo(X,Y):cx.lineTo(X,Y);
+    }
+    cx.stroke(); cx.globalAlpha=1;
+    cx.fillStyle=navy; cx.font='9px Arial';
+    var iclab=Math.min(B*ib/1000*(1+VMAX*0.004),IMAX);
+    cx.fillText(ib+'µA', cv.width-46, ay(iclab,IMAX)+3);
+  }
+  // load line
+  cx.strokeStyle=css('--red'); cx.lineWidth=2; cx.setLineDash([7,5]);
+  cx.beginPath(); cx.moveTo(ax(VCC,VMAX),ay(0,IMAX)); cx.lineTo(ax(0,VMAX),ay(VCC/RC*1000,IMAX)); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle=css('--red'); cx.font='bold 10px Arial';
+  cx.fillText('DC LOAD LINE', ax(9,VMAX), ay(VCC/RC*1000,IMAX)+((ay(0,IMAX)-ay(VCC/RC*1000,IMAX))*0.42));
+  // Q point
+  var icQ=B*IB/1000, vce=VCC-icQ/1000*RC, region;
+  if(IB===0){ region='CUTOFF (open switch)'; icQ=0; vce=VCC; }
+  else if(vce<0.2){ region='SATURATION (closed switch)'; vce=0.2; icQ=(VCC-0.2)/RC*1000; }
+  else region='ACTIVE (amplifier)';
+  qdot(ax(vce,VMAX), ay(icQ,IMAX));
+  var cls = region.indexOf('ACTIVE')===0?'r-on':(region.indexOf('SAT')===0?'r-bd':'r-off');
+  document.getElementById('trRead').innerHTML=
+    'Device : NPN BJT (V<sub>CC</sub>=20 V, R<sub>C</sub>=2 kΩ)<br>'+
+    'I<sub>B</sub> = '+IB+' µA · β = '+B+'<br>'+
+    'I<sub>C</sub> = <span class="r-on">'+icQ.toFixed(2)+' mA</span><br>'+
+    'V<sub>CE</sub> = '+vce.toFixed(2)+' V<br>'+
+    'Region : <span class="'+cls+'">'+region+'</span>';
+}
+
+/* ---- JFET ---- */
+function drawJFET(){
+  var VGS=parseFloat(document.getElementById('vgsj').value);
+  document.getElementById('vgsjVal').textContent=VGS.toFixed(1)+' V';
+  var IDSS=10, VP=-4, VDD=20, RD=1500, VMAX=20, IMAX=12;
+  frame('V-DS (V)','I-D (mA)',VMAX,IMAX,2,2);
+  var navy=css('--navy');
+  var fam=[0,-1,-2,-3];
+  if(fam.indexOf(Math.round(VGS*10)/10)===-1) fam.push(Math.round(VGS*10)/10);
+  fam.sort(function(a,b){return b-a;});
+  fam.forEach(function(vg){
+    var idsat=IDSS*Math.pow(1-vg/VP,2);
+    var vpk=vg-VP; // saturation onset
+    var sel=Math.abs(vg-VGS)<0.05;
+    cx.strokeStyle= sel? css('--green-dark'):navy;
+    cx.lineWidth= sel?2.6:1.4; cx.globalAlpha= sel?1:0.55;
+    cx.beginPath();
+    for(var v=0;v<=VMAX;v+=0.05){
+      var id = v<vpk ? idsat*(2*(v/vpk)-Math.pow(v/vpk,2)) : idsat*(1+v*0.003);
+      id=Math.min(id,IMAX);
+      var X=ax(v,VMAX), Y=ay(id,IMAX);
+      v===0?cx.moveTo(X,Y):cx.lineTo(X,Y);
+    }
+    cx.stroke(); cx.globalAlpha=1;
+    cx.fillStyle=navy; cx.font='9px Arial';
+    cx.fillText(vg.toFixed(1)+'V', cv.width-46, ay(Math.min(idsat*1.06,IMAX),IMAX)+3);
+  });
+  // load line + Q
+  cx.strokeStyle=css('--red'); cx.lineWidth=2; cx.setLineDash([7,5]);
+  cx.beginPath(); cx.moveTo(ax(VDD,VMAX),ay(0,IMAX)); cx.lineTo(ax(0,VMAX),ay(VDD/RD*1000,IMAX)); cx.stroke(); cx.setLineDash([]);
+  var idQ=IDSS*Math.pow(1-VGS/VP,2), vds=VDD-idQ/1000*RD;
+  var region='SATURATION (constant-current)';
+  if(vds<VGS-VP){ region='OHMIC (resistive)'; vds=Math.max(0.4,VGS-VP); idQ=(VDD-vds)/RD*1000; }
+  if(idQ<0.05){ region='PINCHED OFF'; idQ=0; vds=VDD; }
+  qdot(ax(Math.min(vds,VMAX),VMAX), ay(Math.min(idQ,IMAX),IMAX));
+  document.getElementById('trRead').innerHTML=
+    'Device : N-JFET (I<sub>DSS</sub>=10 mA, V<sub>P</sub>=−4 V)<br>'+
+    'V<sub>GS</sub> = '+VGS.toFixed(1)+' V<br>'+
+    'I<sub>D</sub> = <span class="r-on">'+idQ.toFixed(2)+' mA</span><br>'+
+    'V<sub>DS</sub> = '+Math.min(vds,20).toFixed(2)+' V<br>'+
+    'Region : <span class="'+(region.indexOf('PINCH')===0?'r-off':'r-on')+'">'+region+'</span><br>'+
+    'Shockley check: 10×(1−'+VGS.toFixed(1)+'/−4)² = '+idQ.toFixed(2)+' mA';
+}
+
+/* ---- MOSFET ---- */
+function drawMOS(){
+  var VGS=parseFloat(document.getElementById('vgsm').value);
+  document.getElementById('vgsmVal').textContent=VGS.toFixed(1)+' V';
+  var VTH=2, K=1, VDD=20, RD=1000, VMAX=20, IMAX=20;
+  frame('V-DS (V)','I-D (mA)',VMAX,IMAX,2,4);
+  var navy=css('--navy');
+  var fam=[3,4,5,6];
+  if(VGS>VTH && fam.indexOf(Math.round(VGS*10)/10)===-1) fam.push(Math.round(VGS*10)/10);
+  fam.sort(function(a,b){return a-b;});
+  fam.forEach(function(vg){
+    var vov=vg-VTH; if(vov<=0) return;
+    var idsat=K*vov*vov;
+    var sel=Math.abs(vg-VGS)<0.05;
+    cx.strokeStyle= sel? css('--green-dark'):navy;
+    cx.lineWidth= sel?2.6:1.4; cx.globalAlpha= sel?1:0.55;
+    cx.beginPath();
+    for(var v=0;v<=VMAX;v+=0.05){
+      var id = v<vov ? K*(2*vov*v-v*v) : idsat*(1+v*0.003);
+      id=Math.min(id,IMAX);
+      var X=ax(v,VMAX), Y=ay(id,IMAX);
+      v===0?cx.moveTo(X,Y):cx.lineTo(X,Y);
+    }
+    cx.stroke(); cx.globalAlpha=1;
+    cx.fillStyle=navy; cx.font='9px Arial';
+    cx.fillText(vg.toFixed(1)+'V', cv.width-46, ay(Math.min(idsat*1.06,IMAX),IMAX)+3);
+  });
+  cx.strokeStyle=css('--red'); cx.lineWidth=2; cx.setLineDash([7,5]);
+  cx.beginPath(); cx.moveTo(ax(VDD,VMAX),ay(0,IMAX)); cx.lineTo(ax(0,VMAX),ay(VDD/RD*1000,IMAX)); cx.stroke(); cx.setLineDash([]);
+  var region,idQ,vds;
+  if(VGS<=VTH){ region='CUTOFF (V<sub>GS</sub> &lt; V<sub>TH</sub>)'; idQ=0; vds=VDD; }
+  else{
+    var vov=VGS-VTH;
+    idQ=K*vov*vov; vds=VDD-idQ*RD/1000;
+    if(vds<vov){ // ohmic: solve K(2vov·v−v²)=(VDD−v)/RD(mA)
+      region='OHMIC (switch fully ON)';
+      var lo=0,hi=vov;
+      for(var it=0;it<40;it++){ var mid=(lo+hi)/2;
+        (K*(2*vov*mid-mid*mid) > (VDD-mid)/RD*1000) ? hi=mid : lo=mid; }
+      vds=(lo+hi)/2; idQ=(VDD-vds)/RD*1000;
+    } else region='SATURATION (active)';
+  }
+  qdot(ax(vds,VMAX), ay(Math.min(idQ,IMAX),IMAX));
+  document.getElementById('trRead').innerHTML=
+    'Device : N-MOSFET enh. (V<sub>TH</sub>=2 V)<br>'+
+    'V<sub>GS</sub> = '+VGS.toFixed(1)+' V<br>'+
+    'I<sub>D</sub> = <span class="r-on">'+idQ.toFixed(2)+' mA</span><br>'+
+    'V<sub>DS</sub> = '+vds.toFixed(2)+' V<br>'+
+    'Region : <span class="'+(VGS<=VTH?'r-off':'r-on')+'">'+region+'</span>';
+}
+
+/* ---- SCR (rolling latch demo) ---- */
+function drawSCR(){
+  var IAset=parseFloat(document.getElementById('ia').value);
+  document.getElementById('iaVal').textContent=IAset+' mA';
+  var IH=30;
+  if(scrOn && IAset<IH) scrOn=false;          // dropped below holding
+  scrTrace.push(scrOn?IAset:0); scrTrace.shift();
+  if(scrPulse>0) scrPulse--;
+
+  cx.fillStyle='#0c1420'; cx.fillRect(0,0,cv.width,cv.height);
+  var gx=cv.width/10, gy=cv.height/8;
+  cx.strokeStyle='rgba(120,150,190,.18)';
+  for(var i=1;i<10;i++){ cx.beginPath(); cx.moveTo(i*gx,0); cx.lineTo(i*gx,cv.height); cx.stroke(); }
+  for(var j=1;j<8;j++){ cx.beginPath(); cx.moveTo(0,j*gy); cx.lineTo(cv.width,j*gy); cx.stroke(); }
+  function Y(i){ return cv.height-60 - i/220*(cv.height-140); }
+  // holding current line
+  cx.strokeStyle='#f0b545'; cx.setLineDash([5,5]);
+  cx.beginPath(); cx.moveTo(0,Y(IH)); cx.lineTo(cv.width,Y(IH)); cx.stroke(); cx.setLineDash([]);
+  cx.fillStyle='#f0b545'; cx.font='bold 10px Arial'; cx.fillText('HOLDING CURRENT I-H = 30 mA', 12, Y(IH)-6);
+  // anode current trace
+  cx.strokeStyle='#2ecc8f'; cx.lineWidth=2.4; cx.beginPath();
+  scrTrace.forEach(function(v,i){
+    var X=i/(scrTrace.length-1)*cv.width, Yv=Y(v);
+    i===0?cx.moveTo(X,Yv):cx.lineTo(X,Yv);
+  });
+  cx.stroke();
+  // gate pulse flash
+  if(scrPulse>0){
+    cx.fillStyle='rgba(240,181,69,'+(scrPulse/18)+')';
+    cx.beginPath(); cx.arc(cv.width-40,Y(0)-14,14,0,Math.PI*2); cx.fill();
+    cx.fillStyle='#0c1420'; cx.font='bold 9px Arial'; cx.textAlign='center';
+    cx.fillText('G',cv.width-40,Y(0)-11); cx.textAlign='left';
+  }
+  cx.fillStyle='rgba(160,190,230,.8)'; cx.font='11px Arial';
+  cx.fillText('Anode current vs. time — 12 V DC supply', 12, 18);
+  cx.fillStyle= scrOn? '#2ecc8f':'#e06050'; cx.font='bold 16px Georgia';
+  cx.fillText(scrOn? '● LATCHED ON — gate no longer needed' : '○ BLOCKING (off)', 12, 42);
+
+  var note = (!scrOn && IAset<IH) ? '<span class="r-off">Load &lt; I-H — cannot latch!</span>'
+           : scrOn ? '<span class="r-on">Conducting. Only ✂ interrupting the anode turns it off.</span>'
+           : 'Press ⚡ Gate Pulse to fire.';
+  document.getElementById('trRead').innerHTML=
+    'Device : SCR on 12 V DC<br>'+
+    'State : '+(scrOn?'<span class="r-on">LATCHED</span>':'<span class="r-off">BLOCKING</span>')+'<br>'+
+    'I<sub>A</sub> = '+(scrOn?IAset:0)+' mA · I<sub>H</sub> = 30 mA<br>'+note;
+}
+
+/* ---- TRIAC (phase control) ---- */
+function drawTRIAC(t){
+  var a=parseFloat(document.getElementById('fa').value); // degrees
+  document.getElementById('faVal').textContent=a+'°';
+  var arad=a*Math.PI/180;
+  var P=(1/Math.PI)*(Math.PI-arad+Math.sin(2*arad)/2); // fraction of full power
+  cx.fillStyle='#0c1420'; cx.fillRect(0,0,cv.width,cv.height);
+  var gx=cv.width/10, gy=cv.height/8;
+  cx.strokeStyle='rgba(120,150,190,.18)';
+  for(var i=1;i<10;i++){ cx.beginPath(); cx.moveTo(i*gx,0); cx.lineTo(i*gx,cv.height); cx.stroke(); }
+  for(var j=1;j<8;j++){ cx.beginPath(); cx.moveTo(0,j*gy); cx.lineTo(cv.width,j*gy); cx.stroke(); }
+  var mid=cv.height/2+20, amp=cv.height/3;
+  function px(ph){ return ph/(4*Math.PI)*cv.width; } // two full cycles
+  // conduction shading + load waveform
+  for(var x=0;x<cv.width;x++){
+    var ph=x/cv.width*4*Math.PI;
+    var half=ph%Math.PI;
+    var cond= half>=arad;
+    var v=Math.sin(ph);
+    if(cond){
+      cx.fillStyle='rgba(46,204,143,.18)';
+      cx.fillRect(x, Math.min(mid,mid-v*amp), 1, Math.abs(v*amp));
+    }
+  }
+  // source sine (faint)
+  cx.strokeStyle='rgba(125,143,165,.8)'; cx.lineWidth=1.4; cx.beginPath();
+  for(var x2=0;x2<=cv.width;x2++){
+    var ph2=x2/cv.width*4*Math.PI, y2=mid-Math.sin(ph2)*amp;
+    x2===0?cx.moveTo(x2,y2):cx.lineTo(x2,y2);
+  }
+  cx.stroke();
+  // load voltage (bold where conducting)
+  cx.strokeStyle='#2ecc8f'; cx.lineWidth=2.6; cx.beginPath();
+  var pen=false;
+  for(var x3=0;x3<=cv.width;x3++){
+    var ph3=x3/cv.width*4*Math.PI;
+    var cond3=(ph3%Math.PI)>=arad;
+    var y3= mid-(cond3?Math.sin(ph3):0)*amp;
+    if(!pen){ cx.moveTo(x3,y3); pen=true; } else cx.lineTo(x3,y3);
+  }
+  cx.stroke();
+  // firing markers
+  cx.strokeStyle='#f0b545'; cx.setLineDash([4,4]);
+  for(var k=0;k<4;k++){
+    var X=px(k*Math.PI+arad);
+    cx.beginPath(); cx.moveTo(X,mid-amp-8); cx.lineTo(X,mid+amp+8); cx.stroke();
+  }
+  cx.setLineDash([]);
+  cx.fillStyle='#f0b545'; cx.font='bold 10px Arial'; cx.fillText('fire α='+a+'°', px(arad)+4, mid-amp-12);
+  // lamp glow
+  var lampX=cv.width-58, lampY=54;
+  var g=cx.createRadialGradient(lampX,lampY,3,lampX,lampY,30);
+  g.addColorStop(0,'rgba(255,220,120,'+(0.15+P*0.85)+')');
+  g.addColorStop(1,'rgba(255,220,120,0)');
+  cx.fillStyle=g; cx.beginPath(); cx.arc(lampX,lampY,30,0,Math.PI*2); cx.fill();
+  cx.strokeStyle='#f0b545'; cx.lineWidth=2;
+  cx.beginPath(); cx.arc(lampX,lampY,14,0,Math.PI*2); cx.stroke();
+  cx.fillStyle='rgba(160,190,230,.85)'; cx.font='11px Arial';
+  cx.fillText('LOAD (lamp) — green = conducting portion of each half-cycle', 12, 18);
+  document.getElementById('trRead').innerHTML=
+    'Device : TRIAC, 120 VAC 60 Hz<br>'+
+    'Firing angle α = '+a+'°<br>'+
+    'Conduction angle = '+(180-a)+'° per half-cycle<br>'+
+    'Load power : <span class="r-on">'+(P*100).toFixed(0)+'%</span> of full<br>'+
+    'Turn-off : automatic at every zero crossing';
+}
+
+/* ============ MASTER LOOP ============ */
+function loop(t){
+  if(dev==='bjt') drawBJT();
+  else if(dev==='jfet') drawJFET();
+  else if(dev==='mos') drawMOS();
+  else if(dev==='scr') drawSCR();
+  else drawTRIAC(t);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
