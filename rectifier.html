@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Power Supply Oscilloscope Simulator</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+
+*{box-sizing:border-box;}
+body{
+  font-family:Georgia,'Times New Roman',serif;
+  background:var(--bg); color:var(--text);
+  line-height:1.65; transition:background .3s,color .3s;
+  margin:0; padding:24px 16px 60px;
+}
+.page{max-width:960px; margin:0 auto;}
+.page-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:6px;}
+.theme-btn{
+  font-family:'Arial Narrow',Arial,sans-serif; font-size:.85rem;
+  background:var(--card-alt); color:var(--text); border:1px solid var(--border);
+  border-radius:8px; padding:8px 14px; cursor:pointer; white-space:nowrap;
+}
+.theme-btn:hover{border-color:var(--navy); color:var(--navy);}
+
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+section{margin-bottom:44px;}
+
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media (max-width:720px){ .grapher-grid{grid-template-columns:1fr;} }
+
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;cursor:pointer;}
+
+.trace-toggles{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;margin-top:10px;}
+.trace-toggles label{display:inline-flex;align-items:center;gap:5px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;font-weight:bold;cursor:pointer;border:1px solid var(--border);border-radius:16px;padding:4px 12px;}
+.trace-toggles input{accent-color:var(--green);}
+.tt-in{color:#8899aa;}
+.tt-rect{color:var(--navy);}
+.tt-filt{color:var(--green-dark);}
+.tt-reg{color:#a86e00;}
+[data-theme="dark"] .tt-reg{color:var(--amber);}
+
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.ctrl .val{color:var(--text-muted); font-weight:normal;}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+
+.toggle-row{display:flex;align-items:center;gap:10px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.92rem;font-weight:bold;color:var(--navy);margin-bottom:15px;}
+.toggle-row input{accent-color:var(--green);width:18px;height:18px;cursor:pointer;}
+
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:12px;}
+.g-btn{flex:1;min-width:80px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn:hover{background:var(--navy-dark);}
+.g-btn.g-green{background:var(--green);}
+.g-btn.g-green:hover{background:var(--green-dark);}
+
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+
+input[type="range"]{width:100%; accent-color:var(--navy); cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <div></div>
+    <button class="theme-btn" onclick="toggleTheme()">🌗 Toggle theme</button>
+  </div>
+
+  <!-- ================= SIM 1: POWER SUPPLY SCOPE ================= -->
+  <section id="psim">
+    <h2 class="sec-title">📈 Interactive Power Supply Oscilloscope Simulator</h2>
+    <p>A four-channel virtual scope probing every stage of a live power supply. The waveforms are computed numerically — the capacitor really charges through the diodes and really discharges through your load, so the ripple you see obeys V<sub>r(pp)</sub> ≈ I/(fC) exactly. Toggle traces like moving a probe; the readout is your DMM.</p>
+    <div class="grapher">
+      <div class="grapher-grid">
+        <div>
+          <canvas class="scope" id="psCv" width="720" height="460" role="img" aria-label="Oscilloscope display showing AC input, rectified, filtered, and regulated waveforms of a simulated power supply"></canvas>
+          <div class="trace-toggles">
+            <label class="tt-in"><input type="checkbox" id="trIn" checked onchange="dirty()">CH1 AC Input</label>
+            <label class="tt-rect"><input type="checkbox" id="trRect" checked onchange="dirty()">CH2 Rectified</label>
+            <label class="tt-filt"><input type="checkbox" id="trFilt" checked onchange="dirty()">CH3 Filtered</label>
+            <label class="tt-reg"><input type="checkbox" id="trReg" checked onchange="dirty()">CH4 Regulated</label>
+          </div>
+        </div>
+        <div>
+          <div class="ctrl">
+            <label>Rectifier Topology</label>
+            <div class="seg" id="rectSeg">
+              <button onclick="setRect('none',this)">None</button>
+              <button onclick="setRect('half',this)">Half-Wave</button>
+              <button class="active" onclick="setRect('full',this)">Full Bridge</button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <label>Input Peak Voltage <span class="val" id="vpkVal">17 V</span></label>
+            <input type="range" id="vpk" min="8" max="24" step="0.5" value="17" oninput="dirty()">
+          </div>
+          <div class="ctrl">
+            <label>Filter Capacitor <span class="val" id="capVal">470 µF</span></label>
+            <input type="range" id="cap" min="0" max="7" step="1" value="4" oninput="dirty()">
+          </div>
+          <div class="ctrl">
+            <label>Load Resistance <span class="val" id="rlVal">220 Ω</span></label>
+            <input type="range" id="rl" min="1" max="5" step="0.05" value="2.34" oninput="dirty()">
+          </div>
+          <div class="toggle-row">
+            <input type="checkbox" id="regChk" onchange="dirty()">
+            <label for="regChk" style="cursor:pointer;">Enable 5 V Regulator (7805, 2 V dropout)</label>
+          </div>
+          <div class="readout" id="psRead" aria-live="polite"></div>
+          <div class="g-btns">
+            <button class="g-btn g-green" onclick="psPreset('clean')">✔ Clean 5V Design</button>
+            <button class="g-btn" onclick="psPreset('ripple')">⚠ Undersized Cap</button>
+            <button class="g-btn" onclick="psPreset('reset')">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout co-pro">
+      <div class="co-title">💡 Guided Explorations</div>
+      <strong>1. Dead zones:</strong> Set rectifier to HALF with capacitor at 0 µF — count the flat gaps and confirm 60 Hz ripple in the readout. Switch to FULL BRIDGE and watch the gaps fill in at 120 Hz. <strong>2. The ripple equation live:</strong> With FULL bridge and a 100 Ω load, step the capacitor 100 → 220 → 470 → 1000 µF and record V<sub>r(pp)</sub> each time — it should roughly halve as C doubles. <strong>3. Half vs. full, same cap:</strong> Fix C = 470 µF and toggle HALF ↔ FULL: ripple doubles and halves before your eyes. <strong>4. Dropout hunt:</strong> Enable the regulator, then lower the capacitor until CH4 develops dips — note the readout flipping from REGULATING to DROPOUT the instant the trough crosses 7 V. <strong>5. Load test:</strong> With everything healthy, drag the load from 1 kΩ down to 50 Ω and watch ripple grow linearly with current.
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============ THEME ============ */
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); }
+  dirty();
+}
+
+/* ================================================================
+   SIM 1 — POWER SUPPLY OSCILLOSCOPE
+================================================================ */
+var psCv=document.getElementById('psCv'), psCx=psCv.getContext('2d');
+var CAPS=[0,47,100,220,470,1000,2200,4700]; // µF
+var rectMode='full';
+var F=60, RS=2; // line freq, charge-path series resistance
+
+function setRect(m,btn){
+  rectMode=m;
+  document.querySelectorAll('#rectSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  dirty();
+}
+function psParams(){
+  var vpk=parseFloat(document.getElementById('vpk').value);
+  var C=CAPS[parseInt(document.getElementById('cap').value)]*1e-6;
+  var RL=Math.pow(10,parseFloat(document.getElementById('rl').value));
+  var reg=document.getElementById('regChk').checked;
+  document.getElementById('vpkVal').textContent=vpk.toFixed(1)+' V';
+  document.getElementById('capVal').textContent=CAPS[parseInt(document.getElementById('cap').value)]+' µF';
+  document.getElementById('rlVal').textContent = RL>=1000 ? (RL/1000).toFixed(1)+' kΩ' : Math.round(RL)+' Ω';
+  return {vpk:vpk,C:C,RL:RL,reg:reg};
+}
+function rectify(vin){
+  if(rectMode==='none') return vin;
+  if(rectMode==='half') return Math.max(0, vin-0.7);
+  return Math.max(0, Math.abs(vin)-1.4);
+}
+function simulate(p){
+  // simulate 5 cycles, keep the last 2 for display, last 1 for measurements
+  var Tper=1/F, cycles=5, dt=Tper/600, N=Math.round(cycles*Tper/dt);
+  var t=0, Vc=0;
+  var out={t:[],vin:[],vr:[],vf:[],vg:[]};
+  for(var i=0;i<N;i++){
+    var vin=p.vpk*Math.sin(2*Math.PI*F*t);
+    var vr=rectify(vin);
+    var vf;
+    if(p.C===0){ vf=vr; }
+    else{
+      var dV;
+      if(vr>Vc) dV = ((vr-Vc)/RS - Vc/p.RL) * dt / p.C;
+      else      dV = -(Vc/p.RL) * dt / p.C;
+      Vc=Math.max(0,Vc+dV);
+      vf=Vc;
+    }
+    var vg = !p.reg ? null : (vf>=7 ? 5 : Math.max(0,vf-2));
+    if(t >= (cycles-2)*Tper){
+      out.t.push(t-(cycles-2)*Tper); out.vin.push(vin); out.vr.push(vr); out.vf.push(vf); out.vg.push(vg);
+    }
+    t+=dt;
+  }
+  // measurements over final cycle of stored data
+  var half=Math.floor(out.vf.length/2);
+  var seg=out.vf.slice(half), segG=out.vg.slice(half);
+  var vmax=Math.max.apply(null,seg), vmin=Math.min.apply(null,seg);
+  var vavg=seg.reduce(function(a,b){return a+b;},0)/seg.length;
+  var dropout=false;
+  if(p.reg){ for(var k=0;k<segG.length;k++){ if(segG[k]!==null && segG[k]<4.98){ dropout=true; break; } } }
+  return {data:out, vpp:vmax-vmin, vmax:vmax, vmin:vmin, vavg:vavg, dropout:dropout};
+}
+function drawPS(){
+  var p=psParams(), r=simulate(p);
+  var W=psCv.width,H=psCv.height;
+  // scope-style dark graticule in both themes
+  psCx.fillStyle='#0c1420'; psCx.fillRect(0,0,W,H);
+  var gx=W/10, gy=H/8;
+  psCx.strokeStyle='rgba(120,150,190,.18)'; psCx.lineWidth=1;
+  for(var i=1;i<10;i++){ psCx.beginPath(); psCx.moveTo(i*gx,0); psCx.lineTo(i*gx,H); psCx.stroke(); }
+  for(var j=1;j<8;j++){ psCx.beginPath(); psCx.moveTo(0,j*gy); psCx.lineTo(W,j*gy); psCx.stroke(); }
+  // volt scale: -25..+25
+  function Y(v){ return H/2 - v/25*(H/2-14); }
+  function X(tt){ return tt/(2/F)*W; }
+  psCx.strokeStyle='rgba(120,150,190,.45)';
+  psCx.beginPath(); psCx.moveTo(0,Y(0)); psCx.lineTo(W,Y(0)); psCx.stroke();
+  psCx.fillStyle='rgba(160,190,230,.7)'; psCx.font='10px Arial';
+  [20,10,-10,-20].forEach(function(v){ psCx.fillText((v>0?'+':'')+v+' V',4,Y(v)+3); });
+  psCx.fillText('0 V',4,Y(0)-4);
+  psCx.fillText('5 ms/div · 5 V/div',W-110,H-8);
+
+  var d=r.data;
+  function trace(arr,color,w){
+    psCx.strokeStyle=color; psCx.lineWidth=w; psCx.beginPath();
+    var first=true;
+    for(var i=0;i<arr.length;i++){
+      if(arr[i]===null) continue;
+      var x=X(d.t[i]), y=Y(arr[i]);
+      if(first){ psCx.moveTo(x,y); first=false; } else psCx.lineTo(x,y);
+    }
+    psCx.stroke();
+  }
+  if(document.getElementById('trIn').checked)  trace(d.vin,'#7d8fa5',1.4);
+  if(document.getElementById('trRect').checked) trace(d.vr,'#4d8cff',2);
+  if(document.getElementById('trFilt').checked) trace(d.vf,'#2ecc8f',2.4);
+  if(document.getElementById('trReg').checked && p.reg) trace(d.vg,'#f0b545',2.4);
+
+  // legend
+  psCx.font='bold 10px Arial';
+  var lg=[['CH1 IN','#7d8fa5'],['CH2 RECT','#4d8cff'],['CH3 FILT','#2ecc8f']];
+  if(p.reg) lg.push(['CH4 REG','#f0b545']);
+  lg.forEach(function(l,i){ psCx.fillStyle=l[1]; psCx.fillText('● '+l[0], 10+i*92, 14); });
+
+  // readout
+  var iload=r.vavg/p.RL;
+  var fr = rectMode==='half' ? '60 Hz' : rectMode==='full' ? '120 Hz' : '—';
+  var Cuf=CAPS[parseInt(document.getElementById('cap').value)];
+  var status = !p.reg ? '<span class="r-bd">UNREGULATED</span>'
+             : r.dropout ? '<span class="r-off">DROPOUT — ripple breakthrough!</span>'
+             : '<span class="r-on">REGULATING (5.00 V)</span>';
+  var theory = (rectMode!=='none' && Cuf>0) ? (iload/((rectMode==='half'?60:120)*Cuf*1e-6)).toFixed(2)+' V' : '—';
+  document.getElementById('psRead').innerHTML=
+    'V<sub>PK</sub> in : '+p.vpk.toFixed(1)+' V<br>'+
+    'Filtered V<sub>DC</sub> : <span class="r-on">'+r.vavg.toFixed(2)+' V</span><br>'+
+    'Trough / Crest : '+r.vmin.toFixed(2)+' / '+r.vmax.toFixed(2)+' V<br>'+
+    'Ripple V<sub>r(pp)</sub> : <span class="r-bd">'+r.vpp.toFixed(2)+' V</span> @ '+fr+'<br>'+
+    'Theory I/(fC) : '+theory+'<br>'+
+    'I<sub>LOAD</sub> : '+(iload*1000).toFixed(1)+' mA<br>'+
+    'Regulator : '+status;
+}
+function psPreset(k){
+  if(k==='clean'){ rectMode='full'; document.getElementById('vpk').value=17; document.getElementById('cap').value=5; document.getElementById('rl').value=2.34; document.getElementById('regChk').checked=true; }
+  if(k==='ripple'){ rectMode='full'; document.getElementById('vpk').value=17; document.getElementById('cap').value=1; document.getElementById('rl').value=2; document.getElementById('regChk').checked=true; }
+  if(k==='reset'){ rectMode='full'; document.getElementById('vpk').value=17; document.getElementById('cap').value=4; document.getElementById('rl').value=2.34; document.getElementById('regChk').checked=false; }
+  document.querySelectorAll('#rectSeg button').forEach(function(b,i){ b.classList.toggle('active', i===2); });
+  dirty();
+}
+function dirty(){ drawPS(); }
+
+dirty();
+</script>
+</body>
+</html>
