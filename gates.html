@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive 3-Mode Digital Lab | ELT 102</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.65;transition:background .3s,color .3s;}
+
+/* ============ HEADER ============ */
+.topbar{background:linear-gradient(135deg,#0047AB,#002a66);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+[data-theme="dark"] .topbar{background:linear-gradient(135deg,#0d1b2e,#001a40);}
+.topbar .brand{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;font-size:1.05rem;letter-spacing:.05em;}
+.topbar .lesson-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 14px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.85rem;}
+.theme-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 16px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.85rem;transition:background .2s;}
+.theme-btn:hover{background:rgba(255,255,255,.3);}
+
+/* ============ LAYOUT ============ */
+main{max-width:980px;margin:0 auto;padding:28px 20px 60px;}
+.sec-title{font-family:'Arial Narrow',Arial,sans-serif;color:var(--navy);font-size:1.5rem;margin-bottom:10px;}
+p{margin-bottom:14px;}
+
+/* ============ INTERACTIVE LAB ============ */
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media(max-width:820px){.grapher-grid{grid-template-columns:1fr;}}
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;cursor:pointer;}
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+.mode-panel{display:none;}
+.mode-panel.show{display:block;}
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+[data-theme="dark"] .readout .r-bd{color:var(--amber);}
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.g-btn{flex:1;min-width:64px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn:hover{background:var(--navy-dark);}
+.g-btn.g-green{background:var(--green);}
+.g-btn.g-green:hover{background:var(--green-dark);}
+
+/* ============ CALLOUTS ============ */
+.callout{border-left:5px solid var(--navy);background:var(--card-alt);border-radius:8px;padding:16px 18px;margin:20px 0;}
+.callout.co-pro{border-left-color:var(--green);}
+.co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;color:var(--navy);margin-bottom:6px;}
+.co-pro .co-title{color:var(--green-dark);}
+
+footer{text-align:center;padding:24px;color:var(--text-muted);font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">ELT 102</span>
+  <span class="lesson-badge">📈 Interactive 3-Mode Digital Lab</span>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌓 Mode</button>
+</div>
+
+<main>
+  <h2 class="sec-title">📈 Interactive 3-Mode Digital Lab</h2>
+  <p>Three instruments in one panel. <strong>Binary Explorer:</strong> click bits directly on the canvas and watch decimal, hex, octal, and 2's-complement readings update live — then press <strong>+1</strong> repeatedly to watch carries ripple. <strong>Gate Lab:</strong> pick a gate, flip the input switches, and see the truth-table row light up. <strong>DeMorgan Prover:</strong> two different circuits, one pair of switches, identical outputs on every row — the theorem proven before your eyes.</p>
+  <div class="grapher">
+    <div class="grapher-grid">
+      <div>
+        <canvas class="scope" id="labCv" width="720" height="440" role="img" aria-label="Interactive digital lab canvas showing binary bits, logic gates, or DeMorgan comparison circuits depending on selected mode"></canvas>
+        <p class="sans" style="font-size:.78rem;color:var(--text-muted);margin-top:6px;">💡 The canvas is clickable — toggle bits and switches directly.</p>
+      </div>
+      <div>
+        <div class="ctrl">
+          <label>Lab Mode</label>
+          <div class="seg" id="modeSeg">
+            <button class="active" onclick="setMode('bin',this)">Binary Explorer</button>
+            <button onclick="setMode('gate',this)">Gate Lab</button>
+            <button onclick="setMode('dm',this)">DeMorgan</button>
+          </div>
+        </div>
+
+        <div class="mode-panel show" id="pan-bin">
+          <div class="ctrl">
+            <label style="cursor:pointer;"><span>Interpretation</span></label>
+            <div class="seg">
+              <button class="active" id="unsBtn" onclick="setSigned(false,this)">Unsigned</button>
+              <button id="sgnBtn" onclick="setSigned(true,this)">Signed (2's C)</button>
+            </div>
+          </div>
+          <div class="g-btns" style="margin-bottom:8px;">
+            <button class="g-btn g-green" onclick="binOp('inc')">+1</button>
+            <button class="g-btn g-green" onclick="binOp('dec')">−1</button>
+            <button class="g-btn" onclick="binOp('shl')">&lt;&lt; ×2</button>
+            <button class="g-btn" onclick="binOp('shr')">&gt;&gt; ÷2</button>
+          </div>
+          <div class="g-btns" style="margin-bottom:12px;">
+            <button class="g-btn" onclick="binOp('inv')">Invert Bits</button>
+            <button class="g-btn" onclick="binOp('neg')">Negate (2's C)</button>
+            <button class="g-btn" onclick="binOp('clr')">Clear</button>
+          </div>
+        </div>
+
+        <div class="mode-panel" id="pan-gate">
+          <div class="ctrl">
+            <label>Gate Under Test</label>
+            <div class="seg" id="gateSeg">
+              <button class="active" onclick="setGate('AND',this)">AND</button>
+              <button onclick="setGate('OR',this)">OR</button>
+              <button onclick="setGate('NOT',this)">NOT</button>
+              <button onclick="setGate('NAND',this)">NAND</button>
+              <button onclick="setGate('NOR',this)">NOR</button>
+              <button onclick="setGate('XOR',this)">XOR</button>
+            </div>
+          </div>
+          <div class="g-btns" style="margin-bottom:12px;">
+            <button class="g-btn" id="btnA" onclick="togA()">A = 0</button>
+            <button class="g-btn" id="btnB" onclick="togB()">B = 0</button>
+          </div>
+        </div>
+
+        <div class="mode-panel" id="pan-dm">
+          <div class="ctrl">
+            <label>Theorem</label>
+            <div class="seg" id="thmSeg">
+              <button class="active" onclick="setThm(1,this)">(A·B)&#773; = A&#773;+B&#773;</button>
+              <button onclick="setThm(2,this)">(A+B)&#773; = A&#773;·B&#773;</button>
+            </div>
+          </div>
+          <div class="g-btns" style="margin-bottom:12px;">
+            <button class="g-btn" id="btnA2" onclick="togA()">A = 0</button>
+            <button class="g-btn" id="btnB2" onclick="togB()">B = 0</button>
+            <button class="g-btn g-green" onclick="dmStep()">Step Row ▸</button>
+          </div>
+        </div>
+
+        <div class="readout" id="labRead" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout co-pro">
+    <div class="co-title">💡 Guided Explorations</div>
+    <strong>1. Weights are everything:</strong> in Binary Explorer, build 178 by clicking only the bits whose weights sum to it (128+32+16+2). <strong>2. Ripple carry:</strong> set 0111 1111 (127) and press +1 — watch eight bits flip in one step, and with SIGNED on, watch +127 wrap to −128 (overflow!). <strong>3. Shifts are arithmetic:</strong> set 0000 0110 (6) and press &lt;&lt; twice — doubling each time. <strong>4. Invert-plus-one:</strong> set 25, press Invert, then +1, switch to SIGNED: −25. You just executed 2's complement by hand. <strong>5. Gate fingerprints:</strong> in Gate Lab, find the single input combination that makes AND output 1 and the single one that makes NOR output 1. <strong>6. The proof:</strong> in DeMorgan mode press Step Row four times — the two outputs agree on every row, for both theorems.
+  </div>
+</main>
+
+<footer>Extracted from ELT 102 Lesson 5 — Number Systems, Logic Gates &amp; Boolean Algebra</footer>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  if(localStorage.getItem('elt-theme')==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('elt-theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('elt-theme','dark'); }
+  draw();
+}
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* ============ DIGITAL LAB ============ */
+var cv=document.getElementById('labCv'), cx=cv.getContext('2d');
+var mode='bin', signed=false, bits=[1,0,1,1,0,0,1,0]; // MSB first (178)
+var gate='AND', A=0, B=0, thm=1, dmRow=0;
+
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('#modeSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  ['bin','gate','dm'].forEach(function(k){ document.getElementById('pan-'+k).classList.toggle('show',k===m); });
+  draw();
+}
+function setSigned(s,btn){
+  signed=s;
+  document.getElementById('unsBtn').classList.toggle('active',!s);
+  document.getElementById('sgnBtn').classList.toggle('active',s);
+  draw();
+}
+function setGate(g,btn){
+  gate=g;
+  document.querySelectorAll('#gateSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active'); draw();
+}
+function setThm(t,btn){
+  thm=t;
+  document.querySelectorAll('#thmSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active'); draw();
+}
+function togA(){ A^=1; syncAB(); draw(); }
+function togB(){ B^=1; syncAB(); draw(); }
+function syncAB(){
+  ['btnA','btnA2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='A = '+A; });
+  ['btnB','btnB2'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='B = '+B; });
+}
+function dmStep(){ dmRow=(dmRow+1)%4; A=(dmRow>>1)&1; B=dmRow&1; syncAB(); draw(); }
+
+/* ---- binary value helpers ---- */
+function uVal(){ return bits.reduce(function(a,b){return a*2+b;},0); }
+function setU(v){ v=((v%256)+256)%256; for(var i=7;i>=0;i--){ bits[i]=v&1; v>>=1; } }
+function sVal(){ var u=uVal(); return u>127? u-256 : u; }
+function binOp(op){
+  var u=uVal();
+  if(op==='inc') setU(u+1);
+  if(op==='dec') setU(u-1);
+  if(op==='shl') setU(u<<1);
+  if(op==='shr') setU(u>>1);
+  if(op==='inv') bits=bits.map(function(b){return b^1;});
+  if(op==='neg') setU(256-u);
+  if(op==='clr') bits=[0,0,0,0,0,0,0,0];
+  draw();
+}
+
+/* ---- gate logic ---- */
+function gateOut(g,a,b){
+  if(g==='AND') return a&b;
+  if(g==='OR') return a|b;
+  if(g==='NOT') return a^1;
+  if(g==='NAND') return (a&b)^1;
+  if(g==='NOR') return (a|b)^1;
+  return a^b; // XOR
+}
+
+/* ---- drawing helpers ---- */
+function wire(x1,y1,x2,y2,on){
+  cx.strokeStyle= on? css('--green') : css('--text-muted');
+  cx.lineWidth= on? 3 : 2;
+  cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(x2,y2); cx.stroke();
+}
+function lamp(x,y,on,label){
+  cx.fillStyle= on? css('--green') : css('--card-alt');
+  cx.strokeStyle= on? css('--green-dark') : css('--border');
+  cx.lineWidth=2;
+  cx.beginPath(); cx.arc(x,y,16,0,Math.PI*2); cx.fill(); cx.stroke();
+  cx.fillStyle= on? '#fff' : css('--text-muted');
+  cx.font='bold 13px Arial'; cx.textAlign='center';
+  cx.fillText(on?'1':'0',x,y+5); cx.textAlign='left';
+  if(label){ cx.fillStyle=css('--text'); cx.font='bold 11px Arial'; cx.fillText(label,x-8,y+34); }
+}
+function sw(x,y,v,label){
+  cx.fillStyle= v? css('--green') : css('--card-alt');
+  cx.strokeStyle=css('--navy'); cx.lineWidth=2;
+  cx.beginPath(); cx.roundRect(x-20,y-14,40,28,7); cx.fill(); cx.stroke();
+  cx.fillStyle= v? '#fff' : css('--text-muted'); cx.font='bold 13px Arial'; cx.textAlign='center';
+  cx.fillText(label+'='+v, x, y+5); cx.textAlign='left';
+}
+/* ANSI gate shapes; returns output-terminal x */
+function drawGate(g, x, y, s, a, b){
+  var out=gateOut(g,a,b);
+  cx.strokeStyle=css('--text'); cx.lineWidth=2.6; cx.fillStyle=css('--card');
+  var bub=(g==='NAND'||g==='NOR'||g==='NOT');
+  var isOr=(g==='OR'||g==='NOR'||g==='XOR');
+  if(g==='NOT'){
+    cx.beginPath(); cx.moveTo(x,y-30*s); cx.lineTo(x,y+30*s); cx.lineTo(x+56*s,y); cx.closePath(); cx.fill(); cx.stroke();
+  } else if(isOr){
+    cx.beginPath();
+    cx.moveTo(x,y-30*s);
+    cx.quadraticCurveTo(x+14*s,y, x,y+30*s);
+    cx.quadraticCurveTo(x+46*s,y+26*s, x+76*s,y);
+    cx.quadraticCurveTo(x+46*s,y-26*s, x,y-30*s);
+    cx.closePath(); cx.fill(); cx.stroke();
+    if(g==='XOR'){
+      cx.beginPath(); cx.moveTo(x-10*s,y-30*s); cx.quadraticCurveTo(x+4*s,y, x-10*s,y+30*s); cx.stroke();
+    }
+  } else { // AND family
+    cx.beginPath();
+    cx.moveTo(x,y-30*s); cx.lineTo(x+34*s,y-30*s);
+    cx.arc(x+34*s,y,30*s,-Math.PI/2,Math.PI/2);
+    cx.lineTo(x,y+30*s); cx.closePath(); cx.fill(); cx.stroke();
+  }
+  var ox = g==='NOT'? x+56*s : isOr? x+76*s : x+64*s;
+  if(bub){
+    cx.beginPath(); cx.arc(ox+7*s,y,7*s,0,Math.PI*2); cx.fillStyle=css('--card'); cx.fill(); cx.stroke();
+    ox+=14*s;
+  }
+  return {ox:ox, out:out};
+}
+
+/* ---- mode renderers ---- */
+var binCells=[]; // clickable regions
+function drawBin(){
+  binCells=[];
+  var W=cv.width;
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,W,cv.height);
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText('Click any bit to toggle it', 20, 30);
+  var cw=74, x0=(W-8*cw)/2, y0=90;
+  for(var i=0;i<8;i++){
+    var x=x0+i*cw, on=bits[i]===1;
+    var wgt = signed&&i===0? -128 : Math.pow(2,7-i);
+    // weight label
+    cx.fillStyle= signed&&i===0? css('--red') : css('--text-muted');
+    cx.font='bold 12px Arial'; cx.textAlign='center';
+    cx.fillText(wgt, x+cw/2, y0-12);
+    // cell
+    cx.fillStyle= on? css('--green') : css('--card-alt');
+    cx.strokeStyle= signed&&i===0? css('--red') : css('--navy');
+    cx.lineWidth= signed&&i===0? 3 : 2;
+    cx.beginPath(); cx.roundRect(x+5,y0,cw-10,64,8); cx.fill(); cx.stroke();
+    cx.fillStyle= on? '#fff' : css('--text-muted');
+    cx.font='bold 30px Courier New';
+    cx.fillText(bits[i], x+cw/2, y0+43);
+    binCells.push({x:x+5,y:y0,w:cw-10,h:64,i:i});
+    // contribution
+    cx.font='11px Arial';
+    cx.fillStyle= on? css('--green-dark') : css('--border');
+    cx.fillText(on? '+'+(signed&&i===0? -128:wgt) : '·', x+cw/2, y0+84);
+  }
+  cx.textAlign='left';
+  if(signed){
+    cx.fillStyle=css('--red'); cx.font='bold 11px Arial';
+    cx.fillText('◀ SIGN BIT (weight −128)', x0, y0+108);
+  }
+  // big value display
+  var u=uVal(), s=sVal();
+  cx.fillStyle=css('--navy'); cx.font='bold 44px Georgia'; cx.textAlign='center';
+  cx.fillText(signed? s : u, W/2, 268);
+  cx.font='13px Arial'; cx.fillStyle=css('--text-muted');
+  cx.fillText(signed? 'signed (2\u2019s complement) value' : 'unsigned decimal value', W/2, 290);
+  // conversions row
+  cx.font='bold 15px Courier New'; cx.fillStyle=css('--text');
+  var bstr=bits.slice(0,4).join('')+' '+bits.slice(4).join('');
+  cx.fillText('BIN  '+bstr, W/2, 330);
+  cx.fillText('HEX  0x'+u.toString(16).toUpperCase().padStart(2,'0')+'      OCT  '+u.toString(8).padStart(3,'0'), W/2, 356);
+  cx.textAlign='left';
+  document.getElementById('labRead').innerHTML=
+    'Binary : '+bstr+'<br>'+
+    'Unsigned : <span class="r-on">'+u+'</span><br>'+
+    'Signed : <span class="'+(s<0?'r-off':'r-on')+'">'+s+'</span>'+(u>127?' (MSB=1 → negative)':'')+'<br>'+
+    'Hex : 0x'+u.toString(16).toUpperCase().padStart(2,'0')+' · Oct : '+u.toString(8)+'<br>'+
+    (u===128&&signed? '<span class="r-bd">Most negative value — no positive twin!</span>':'');
+}
+
+var gateSw=[];
+function drawGateLab(){
+  gateSw=[];
+  var W=cv.width;
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,W,cv.height);
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText(gate+' gate — click the input switches', 20, 30);
+  var gy=150, gx=300;
+  var single=(gate==='NOT');
+  var r=drawGate(gate,gx,gy,1.4,A,single?A:B);
+  // inputs
+  if(single){
+    sw(90,gy,A,'A'); gateSw.push({x:70,y:gy-14,w:40,h:28,which:'A'});
+    wire(112,gy,gx,gy,A===1);
+  } else {
+    sw(90,gy-24,A,'A'); gateSw.push({x:70,y:gy-38,w:40,h:28,which:'A'});
+    sw(90,gy+24,B,'B'); gateSw.push({x:70,y:gy+10,w:40,h:28,which:'B'});
+    wire(112,gy-24,gx,gy-24,A===1);
+    wire(112,gy+24,gx,gy+24,B===1);
+  }
+  wire(r.ox,gy,r.ox+60,gy,r.out===1);
+  lamp(r.ox+82,gy,r.out===1,'X');
+  // expression
+  var exprs={AND:'X = A·B', OR:'X = A+B', NOT:'X = A\u0305', NAND:'X = (A·B)\u0305', NOR:'X = (A+B)\u0305', XOR:'X = A ⊕ B'};
+  cx.fillStyle=css('--green-dark'); cx.font='bold 16px Courier New';
+  cx.fillText(exprs[gate], gx+10, gy+72);
+  // truth table
+  var rows= single? [[0],[1]] : [[0,0],[0,1],[1,0],[1,1]];
+  var tx=530, ty=70, rh=32;
+  cx.font='bold 13px Courier New'; cx.fillStyle='#fff';
+  cx.fillStyle=css('--navy'); cx.fillRect(tx,ty,single?120:160,rh);
+  cx.fillStyle='#fff'; cx.textAlign='center';
+  if(single){ cx.fillText('A',tx+30,ty+21); cx.fillText('X',tx+90,ty+21); }
+  else { cx.fillText('A',tx+27,ty+21); cx.fillText('B',tx+80,ty+21); cx.fillText('X',tx+133,ty+21); }
+  rows.forEach(function(rw,ri){
+    var y=ty+rh*(ri+1);
+    var cur = single? (rw[0]===A) : (rw[0]===A && rw[1]===B);
+    cx.fillStyle= cur? 'rgba(0,168,107,.22)' : (ri%2? css('--card-alt'):css('--card'));
+    cx.fillRect(tx,y,single?120:160,rh);
+    cx.strokeStyle=css('--border'); cx.strokeRect(tx,y,single?120:160,rh);
+    var o=gateOut(gate,rw[0], single? rw[0]: rw[1]);
+    cx.fillStyle= cur? css('--green-dark'):css('--text');
+    cx.font=(cur?'bold ':'')+'13px Courier New';
+    if(single){ cx.fillText(rw[0],tx+30,y+21); cx.fillText(o,tx+90,y+21); }
+    else { cx.fillText(rw[0],tx+27,y+21); cx.fillText(rw[1],tx+80,y+21); cx.fillText(o,tx+133,y+21); }
+    if(cur){ cx.fillText('◀',tx+(single?120:160)+14,y+21); }
+  });
+  cx.textAlign='left';
+  var o=gateOut(gate,A,single?A:B);
+  document.getElementById('labRead').innerHTML=
+    'Gate : <span class="r-on">'+gate+'</span> · '+exprs[gate]+'<br>'+
+    'Inputs : A='+A+(single?'':' B='+B)+'<br>'+
+    'Output X = <span class="'+(o?'r-on':'r-off')+'">'+o+'</span><br>'+
+    'Truth table row '+(single?(A+1):((A*2+B)+1))+' of '+(single?2:4)+' highlighted';
+}
+
+var dmSw=[];
+function drawDM(){
+  dmSw=[];
+  var W=cv.width;
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,W,cv.height);
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  var title = thm===1? 'Theorem 1:  (A·B)\u0305  =  A\u0305 + B\u0305' : 'Theorem 2:  (A+B)\u0305  =  A\u0305 · B\u0305';
+  cx.fillText(title, 20, 28);
+  // shared switches
+  sw(60,90,A,'A'); dmSw.push({x:40,y:76,w:40,h:28,which:'A'});
+  sw(60,150,B,'B'); dmSw.push({x:40,y:136,w:40,h:28,which:'B'});
+  var leftGate = thm===1? 'NAND':'NOR';
+  var rightBase= thm===1? 'OR':'AND';
+  // LEFT circuit
+  cx.fillStyle=css('--navy'); cx.font='bold 12px Arial';
+  cx.fillText('CIRCUIT 1: '+leftGate, 150, 64);
+  wire(82,90,180,90,A===1); wire(82,150,180,150,B===1);
+  wire(180,90,190,105,A===1); wire(180,150,190,135,B===1);
+  var g1=drawGate(leftGate,190,120,1.0,A,B);
+  wire(g1.ox,120,g1.ox+34,120,g1.out===1);
+  lamp(g1.ox+52,120,g1.out===1,'OUT1');
+  // RIGHT circuit: inverters then base gate
+  cx.fillStyle=css('--navy');
+  cx.fillText('CIRCUIT 2: NOT inputs → '+rightBase, 430, 64);
+  wire(82,90,420,90,A===1); wire(82,150,420,150,B===1);
+  var n1=drawGate('NOT',420,90,0.55,A,0);
+  var n2=drawGate('NOT',420,150,0.55,B,0);
+  wire(n1.ox,90,500,90,n1.out===1); wire(500,90,510,105,n1.out===1);
+  wire(n2.ox,150,500,150,n2.out===1); wire(500,150,510,135,n2.out===1);
+  var g2=drawGate(rightBase,510,120,1.0,n1.out,n2.out);
+  wire(g2.ox,120,g2.ox+30,120,g2.out===1);
+  lamp(g2.ox+48,120,g2.out===1,'OUT2');
+  // verdict banner
+  var match=(g1.out===g2.out);
+  cx.fillStyle= match? css('--green') : css('--red');
+  cx.font='bold 17px Georgia'; cx.textAlign='center';
+  cx.fillText(match? '✓ OUTPUTS MATCH — the theorem holds for this row' : '✗ mismatch (impossible!)', W/2, 218);
+  cx.textAlign='left';
+  // 4-row proof table
+  var tx=150, ty=250, rh=30, cwd=88;
+  var heads= thm===1? ['A','B','(A·B)\u0305','A\u0305+B\u0305'] : ['A','B','(A+B)\u0305','A\u0305·B\u0305'];
+  cx.fillStyle=css('--navy'); cx.fillRect(tx,ty,cwd*4,rh);
+  cx.fillStyle='#fff'; cx.font='bold 13px Courier New'; cx.textAlign='center';
+  heads.forEach(function(h,i){ cx.fillText(h, tx+cwd*i+cwd/2, ty+20); });
+  for(var r2=0;r2<4;r2++){
+    var a=(r2>>1)&1, b=r2&1, y=ty+rh*(r2+1);
+    var v1= thm===1? ((a&b)^1) : ((a|b)^1);
+    var v2= thm===1? ((a^1)|(b^1)) : ((a^1)&(b^1));
+    var cur=(a===A&&b===B);
+    cx.fillStyle= cur? 'rgba(0,168,107,.22)' : (r2%2? css('--card-alt'):css('--card'));
+    cx.fillRect(tx,y,cwd*4,rh);
+    cx.strokeStyle=css('--border'); cx.strokeRect(tx,y,cwd*4,rh);
+    cx.fillStyle= cur? css('--green-dark'):css('--text');
+    cx.font=(cur?'bold ':'')+'13px Courier New';
+    [a,b,v1,v2].forEach(function(v,i){ cx.fillText(v, tx+cwd*i+cwd/2, y+20); });
+    if(cur) cx.fillText('◀', tx+cwd*4+16, y+20);
+  }
+  cx.textAlign='left';
+  document.getElementById('labRead').innerHTML=
+    'Theorem : '+(thm===1?'(A·B)\u0305 = A\u0305+B\u0305':'(A+B)\u0305 = A\u0305·B\u0305')+'<br>'+
+    'Inputs : A='+A+' B='+B+'<br>'+
+    'OUT1 ('+leftGate+') = <span class="r-on">'+g1.out+'</span> · OUT2 = <span class="r-on">'+g2.out+'</span><br>'+
+    'Status : '+(match?'<span class="r-on">MATCH ✓</span>':'<span class="r-off">MISMATCH</span>')+'<br>'+
+    'Step all four rows to complete the proof.';
+}
+
+function draw(){
+  if(mode==='bin') drawBin();
+  else if(mode==='gate') drawGateLab();
+  else drawDM();
+}
+
+/* canvas clicks */
+cv.addEventListener('click', function(ev){
+  var r=cv.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*cv.width/r.width, y=(ev.clientY-r.top)*cv.height/r.height;
+  function hit(c){ return x>=c.x&&x<=c.x+c.w&&y>=c.y&&y<=c.y+c.h; }
+  if(mode==='bin'){ binCells.forEach(function(c){ if(hit(c)){ bits[c.i]^=1; draw(); } }); }
+  if(mode==='gate'){ gateSw.forEach(function(c){ if(hit(c)){ c.which==='A'?togA():togB(); } }); }
+  if(mode==='dm'){ dmSw.forEach(function(c){ if(hit(c)){ c.which==='A'?togA():togB(); } }); }
+});
+
+/* roundRect polyfill for older engines */
+if(!cx.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.moveTo(x+r,y); this.arcTo(x+w,y,x+w,y+h,r); this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r); this.arcTo(x,y,x+w,y,r); this.closePath(); return this;
+  };
+}
+
+draw();
+</script>
+</body>
+</html>
