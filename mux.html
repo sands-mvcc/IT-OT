@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Conversion &amp; Routing Lab</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+
+*{box-sizing:border-box;}
+body{
+  font-family:Georgia,'Times New Roman',serif;
+  background:var(--bg); color:var(--text);
+  line-height:1.65; transition:background .3s,color .3s;
+  margin:0; padding:24px 16px 60px;
+}
+.page{max-width:960px; margin:0 auto;}
+.page-head{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:6px;}
+.theme-btn{
+  font-family:'Arial Narrow',Arial,sans-serif; font-size:.85rem;
+  background:var(--card-alt); color:var(--text); border:1px solid var(--border);
+  border-radius:8px; padding:8px 14px; cursor:pointer; white-space:nowrap;
+}
+.theme-btn:hover{border-color:var(--navy); color:var(--navy);}
+
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+section{margin-bottom:44px;}
+
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media (max-width:720px){ .grapher-grid{grid-template-columns:1fr;} }
+
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;cursor:pointer;}
+
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.ctrl .val{color:var(--text-muted); font-weight:normal;}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:12px;}
+.g-btn{flex:1;min-width:64px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn.on{background:var(--green);font-weight:bold;}
+
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+
+.toggle-row{display:flex;align-items:center;gap:10px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.92rem;font-weight:bold;color:var(--navy);margin-bottom:12px;}
+
+.mode-panel{display:none;}
+.mode-panel.show{display:block;}
+
+input[type="range"]{width:100%; accent-color:var(--navy); cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <div></div>
+    <button class="theme-btn" onclick="toggleTheme()">🌗 Toggle theme</button>
+  </div>
+
+  <!-- ================= CONVERSION & ROUTING LAB ================= -->
+  <section id="convlab">
+    <h2 class="sec-title">📈 Interactive Conversion &amp; Routing Lab</h2>
+    <p>Three instruments in one panel. <strong>Encoder → Decoder:</strong> press an input pad, watch its binary code form, and see the decoder light the matching output — the full round trip, with a priority-encoder toggle for multi-press conflicts. <strong>MUX → DEMUX:</strong> set data values, steer the select lines, and watch one shared channel carry the chosen signal to the chosen destination — then enable Auto-Scan for live time-division multiplexing. <strong>ADC → DAC:</strong> sample a real waveform, quantize it with your chosen bit depth, and compare the staircase reconstruction against the original.</p>
+    <div class="grapher">
+      <div class="grapher-grid">
+        <div>
+          <canvas class="scope" id="labCv" width="720" height="440" role="img" aria-label="Interactive lab canvas showing encoder-decoder round trip, MUX-DEMUX routing, or ADC-DAC sampling depending on selected mode"></canvas>
+          <p style="font-family:'Arial Narrow',Arial,sans-serif;font-size:.78rem;color:var(--text-muted);margin-top:6px;">💡 The canvas is clickable — input pads and switches respond directly.</p>
+        </div>
+        <div>
+          <div class="ctrl">
+            <label>Lab Mode</label>
+            <div class="seg" id="modeSeg">
+              <button class="active" onclick="setMode('enc',this)">Encoder/Decoder</button>
+              <button onclick="setMode('mux',this)">MUX/DEMUX</button>
+              <button onclick="setMode('adc',this)">ADC/DAC</button>
+            </div>
+          </div>
+
+          <div class="mode-panel show" id="pan-enc">
+            <div class="toggle-row"><input type="checkbox" id="priChk"> <span>Priority encoder (multi-press allowed)</span></div>
+            <div class="g-btns"><button class="g-btn" onclick="encClear()">Clear Inputs</button></div>
+          </div>
+
+          <div class="mode-panel" id="pan-mux">
+            <div class="ctrl">
+              <label>Data Inputs</label>
+              <div class="g-btns">
+                <button class="g-btn" id="md0" onclick="togD(0)">D0 = 0</button>
+                <button class="g-btn" id="md1" onclick="togD(1)">D1 = 0</button>
+                <button class="g-btn" id="md2" onclick="togD(2)">D2 = 0</button>
+                <button class="g-btn" id="md3" onclick="togD(3)">D3 = 0</button>
+              </div>
+            </div>
+            <div class="ctrl">
+              <label>Select Lines</label>
+              <div class="g-btns">
+                <button class="g-btn" id="ms1" onclick="togS(1)">S1 = 0</button>
+                <button class="g-btn" id="ms0" onclick="togS(0)">S0 = 0</button>
+              </div>
+            </div>
+            <div class="toggle-row"><input type="checkbox" id="scanChk"> <span>Auto-Scan (time-division mux)</span></div>
+          </div>
+
+          <div class="mode-panel" id="pan-adc">
+            <div class="ctrl">
+              <label>Resolution <span class="val" id="bitsVal">3 bits · 8 levels</span></label>
+              <input type="range" id="bits" min="1" max="6" step="1" value="3">
+            </div>
+            <div class="ctrl">
+              <label>Sample Interval <span class="val" id="srVal">40 px</span></label>
+              <input type="range" id="srate" min="12" max="80" step="4" value="40">
+            </div>
+            <div class="toggle-row"><input type="checkbox" id="reconChk" checked> <span>Show DAC staircase reconstruction</span></div>
+          </div>
+
+          <div class="readout" id="labRead" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout co-pro">
+      <div class="co-title">💡 Guided Explorations</div>
+      <strong>1. The round trip:</strong> in Encoder/Decoder mode press pad 5 — code reads 101, decoder output 5 lights. Try every pad and confirm the code is always the pad's binary name. <strong>2. The conflict:</strong> priority OFF, press 3 and 4 together — the OR gates merge 011 and 100 into 111, a code claiming input 7 was pressed. It never was! Priority ON: 4 cleanly wins and the code is honest again. <strong>3. Selection:</strong> in MUX/DEMUX mode set D2=1 (others 0), steer S1S0 to 10 — the channel goes live and Y2 lights; every other select code sends 0. <strong>4. TDM:</strong> set D0=1, D1=0, D2=1, D3=0, enable Auto-Scan, and watch each value pop out of its own output in rotation — four signals sharing one wire. <strong>5. The bit budget:</strong> in ADC/DAC mode set 1 bit — the staircase is a crude two-level caricature. Slide to 6 bits and watch it hug the wave. <strong>6. Sampling matters too:</strong> at any resolution, stretch the sample interval and watch detail vanish between samples — resolution AND rate together set fidelity.
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============ THEME ============ */
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); }
+}
+
+/* ============ LAB ============ */
+var cv=document.getElementById('labCv'), cx=cv.getContext('2d');
+var mode='enc', frame=0;
+var encIn=[0,0,0,0,0,1,0,0]; // pad 5 pre-pressed for the round-trip demo
+var D=[0,0,0,0], S1=0, S0=0;
+
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('#modeSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  ['enc','mux','adc'].forEach(function(k){ document.getElementById('pan-'+k).classList.toggle('show',k===m); });
+}
+function encClear(){ encIn=[0,0,0,0,0,0,0,0]; }
+function togD(i){ D[i]^=1; var b=document.getElementById('md'+i); b.textContent='D'+i+' = '+D[i]; b.classList.toggle('on',D[i]===1); }
+function togS(which){
+  if(which===1){ S1^=1; } else { S0^=1; }
+  syncS();
+}
+function syncS(){
+  var b1=document.getElementById('ms1'), b0=document.getElementById('ms0');
+  b1.textContent='S1 = '+S1; b1.classList.toggle('on',S1===1);
+  b0.textContent='S0 = '+S0; b0.classList.toggle('on',S0===1);
+}
+
+/* helpers */
+function lamp(x,y,on,label,badFlag){
+  cx.fillStyle= badFlag? css('--red') : (on? css('--green') : css('--card-alt'));
+  cx.strokeStyle= badFlag? css('--red') : (on? css('--green-dark') : css('--border'));
+  cx.lineWidth=2;
+  cx.beginPath(); cx.arc(x,y,13,0,Math.PI*2); cx.fill(); cx.stroke();
+  cx.fillStyle= (on||badFlag)? '#fff' : css('--text-muted');
+  cx.font='bold 12px Arial'; cx.textAlign='center';
+  cx.fillText(on?'1':'0', x, y+4); cx.textAlign='left';
+  if(label){ cx.fillStyle=css('--text'); cx.font='10px Arial'; cx.fillText(label, x-10, y+27); }
+}
+function wire(x1,y1,x2,y2,on){
+  cx.strokeStyle= on? css('--green') : css('--text-muted');
+  cx.lineWidth= on? 3 : 1.6;
+  cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(x2,y2); cx.stroke();
+}
+
+/* ---- ENCODER/DECODER mode ---- */
+var padBoxes=[];
+function drawEnc(){
+  padBoxes=[];
+  var pri=document.getElementById('priChk').checked;
+  var active=[]; encIn.forEach(function(v,i){ if(v) active.push(i); });
+  var code=0, valid=active.length>0, conflict=false, winner=-1;
+  if(pri){ if(valid){ winner=Math.max.apply(null,active); code=winner; } }
+  else {
+    active.forEach(function(i){ code|=i; }); // OR-merge = garbage on multi-press
+    conflict = active.length>1;
+    if(active.length===1) winner=active[0];
+  }
+  var bits=[(code>>2)&1,(code>>1)&1,code&1];
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText('Encoder → code → Decoder round trip  (click the input pads)', 20, 26);
+  var y0=58, gap=44;
+  // input pads
+  for(var i=0;i<8;i++){
+    var y=y0+i*gap, on=encIn[i]===1;
+    cx.fillStyle= on? css('--green') : css('--card-alt');
+    cx.strokeStyle=css('--navy'); cx.lineWidth=2;
+    cx.beginPath(); cx.roundRect(24,y-15,52,30,7); cx.fill(); cx.stroke();
+    cx.fillStyle= on? '#fff' : css('--text-muted'); cx.font='bold 13px Courier New'; cx.textAlign='center';
+    cx.fillText('I'+i, 50, y+5); cx.textAlign='left';
+    padBoxes.push({x:24,y:y-15,w:52,h:30,i:i});
+    wire(76,y,150,y,on);
+  }
+  // encoder block
+  cx.fillStyle=css('--card'); cx.strokeStyle=css('--text'); cx.lineWidth=2.4;
+  cx.beginPath(); cx.rect(150,44,86,352); cx.fill(); cx.stroke();
+  cx.fillStyle=css('--navy'); cx.font='bold 13px Arial'; cx.textAlign='center';
+  cx.fillText(pri?'PRIORITY':'ENCODER', 193, 216);
+  cx.fillText(pri?'ENCODER':'8 → 3', 193, 232); cx.textAlign='left';
+  // code lamps
+  var cxm=300;
+  ['Y2','Y1','Y0'].forEach(function(L,bi){
+    var y=170+bi*50;
+    wire(236,y,cxm-16,y,bits[bi]===1);
+    lamp(cxm,y,bits[bi]===1,L,conflict);
+  });
+  cx.fillStyle= conflict? css('--red') : css('--green-dark');
+  cx.font='bold 15px Courier New'; cx.textAlign='center';
+  cx.fillText('code = '+bits.join(''), cxm+2, 330);
+  if(pri){ cx.font='11px Arial'; cx.fillStyle= valid? css('--green-dark') : css('--text-muted'); cx.fillText('VALID = '+(valid?1:0), cxm+2, 348); }
+  if(conflict){ cx.font='bold 11px Arial'; cx.fillStyle=css('--red'); cx.fillText('⚠ multi-press merge!', cxm+2, 348); }
+  cx.textAlign='left';
+  // decoder block
+  cx.fillStyle=css('--card'); cx.strokeStyle=css('--text'); cx.lineWidth=2.4;
+  cx.beginPath(); cx.rect(372,44,86,352); cx.fill(); cx.stroke();
+  cx.fillStyle=css('--navy'); cx.font='bold 13px Arial'; cx.textAlign='center';
+  cx.fillText('DECODER', 415, 216); cx.fillText('3 → 8', 415, 232); cx.textAlign='left';
+  ['','',''].forEach(function(_,bi){ wire(cxm+16,170+bi*50,372,170+bi*50,bits[bi]===1); });
+  // outputs
+  for(var o=0;o<8;o++){
+    var y2=y0+o*gap, hot=valid&&(o===code);
+    wire(458,y2,540,y2,hot);
+    lamp(556,y2,hot,'Y'+o, hot&&conflict);
+  }
+  // annotation
+  cx.fillStyle=css('--text-muted'); cx.font='11px Arial';
+  cx.fillText('keypad / sensors', 20, 418);
+  cx.fillText('binary code (3 wires replace 8)', 252, 418);
+  cx.fillText('one-of-8 select', 512, 418);
+  var read='Active input(s) : '+(active.length?active.join(', '):'none')+'<br>'+
+    'Code Y2Y1Y0 : <span class="'+(conflict?'r-off':'r-on')+'">'+bits.join('')+'</span> ('+code+')<br>'+
+    'Decoded output : '+(valid? '<span class="r-on">Y'+code+'</span>':'none')+'<br>'+
+    (pri? 'Priority mode : highest input wins · VALID='+(valid?1:0)
+        : (conflict? '<span class="r-off">Basic encoder: multiple inputs merge into a WRONG code</span>':'Basic mode: assumes one input at a time'));
+  document.getElementById('labRead').innerHTML=read;
+}
+
+/* ---- MUX/DEMUX mode ---- */
+function drawMux(){
+  if(document.getElementById('scanChk').checked && frame%45===0){
+    var sel=((S1<<1)|S0)+1; S1=(sel>>1)&1; S0=sel&1; syncS();
+  }
+  var sel=(S1<<1)|S0, data=D[sel];
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText('MUX → shared channel → DEMUX  (one wire carries the selected signal)', 20, 26);
+  var iy0=90, gap=70;
+  // MUX trapezoid
+  cx.fillStyle=css('--card'); cx.strokeStyle=css('--text'); cx.lineWidth=2.4;
+  cx.beginPath(); cx.moveTo(170,60); cx.lineTo(170,340); cx.lineTo(250,290); cx.lineTo(250,110); cx.closePath(); cx.fill(); cx.stroke();
+  cx.fillStyle=css('--navy'); cx.font='bold 13px Arial'; cx.textAlign='center'; cx.fillText('MUX',210,205); cx.fillText('4→1',210,221); cx.textAlign='left';
+  for(var i=0;i<4;i++){
+    var y=iy0+i*gap, hot=(i===sel);
+    wire(70,y,170,y,D[i]===1);
+    cx.fillStyle= hot? css('--green') : css('--card-alt');
+    cx.strokeStyle= hot? css('--green-dark'):css('--navy'); cx.lineWidth=2;
+    cx.beginPath(); cx.roundRect(20,y-14,48,28,7); cx.fill(); cx.stroke();
+    cx.fillStyle= hot? '#fff':css('--text-muted'); cx.font='bold 12px Courier New'; cx.textAlign='center';
+    cx.fillText('D'+i+'='+D[i], 44, y+4); cx.textAlign='left';
+    if(hot){ cx.fillStyle=css('--green-dark'); cx.font='bold 11px Arial'; cx.fillText('◀ selected', 78, y-8); }
+  }
+  // channel
+  var chOn=data===1;
+  cx.strokeStyle= chOn? css('--green') : css('--text-muted'); cx.lineWidth= chOn?4:2;
+  cx.beginPath(); cx.moveTo(250,200); cx.lineTo(452,200); cx.stroke();
+  // moving data pulse
+  var px=250+((frame*3)%202);
+  cx.fillStyle= chOn? css('--green') : css('--text-muted');
+  cx.beginPath(); cx.arc(px,200,6,0,Math.PI*2); cx.fill();
+  cx.fillStyle=css('--text-muted'); cx.font='11px Arial'; cx.textAlign='center';
+  cx.fillText('ONE shared channel · value = '+data, 351, 182); cx.textAlign='left';
+  // DEMUX trapezoid
+  cx.fillStyle=css('--card'); cx.strokeStyle=css('--text'); cx.lineWidth=2.4;
+  cx.beginPath(); cx.moveTo(452,110); cx.lineTo(452,290); cx.lineTo(532,340); cx.lineTo(532,60); cx.closePath(); cx.fill(); cx.stroke();
+  cx.fillStyle=css('--navy'); cx.font='bold 13px Arial'; cx.textAlign='center'; cx.fillText('DEMUX',492,205); cx.fillText('1→4',492,221); cx.textAlign='left';
+  for(var o=0;o<4;o++){
+    var y2=iy0+o*gap, hot2=(o===sel);
+    wire(532,y2,610,y2, hot2&&chOn);
+    lamp(628,y2, hot2&&data===1, 'Y'+o);
+    if(hot2){ cx.fillStyle=css('--green-dark'); cx.font='bold 11px Arial'; cx.fillText('◀ selected', 648, y2+4); }
+  }
+  // select bus
+  cx.strokeStyle=css('--amber'); cx.lineWidth=2; cx.setLineDash([5,4]);
+  cx.beginPath(); cx.moveTo(210,340); cx.lineTo(210,392); cx.lineTo(492,392); cx.lineTo(492,340); cx.stroke(); cx.setLineDash([]);
+  cx.fillStyle=css('--amber'); cx.font='bold 12px Courier New'; cx.textAlign='center';
+  cx.fillText('S1 S0 = '+S1+' '+S0+'  (synchronized select · channel '+sel+')', 351, 412); cx.textAlign='left';
+  document.getElementById('labRead').innerHTML=
+    'Select S1S0 : <span class="r-on">'+S1+S0+'</span> → channel '+sel+'<br>'+
+    'Data D'+sel+' = <span class="'+(data?'r-on':'r-bd')+'">'+data+'</span> on the shared wire<br>'+
+    'DEMUX output : Y'+sel+' = '+data+' (others 0)<br>'+
+    (document.getElementById('scanChk').checked? '<span class="r-on">AUTO-SCAN: time-division multiplexing</span>' : 'Steer S1/S0 to change the route');
+}
+
+/* ---- ADC/DAC mode ---- */
+function drawAdc(){
+  var n=parseInt(document.getElementById('bits').value);
+  var levels=Math.pow(2,n);
+  var interval=parseInt(document.getElementById('srate').value);
+  var recon=document.getElementById('reconChk').checked;
+  document.getElementById('bitsVal').textContent=n+' bit'+(n>1?'s':'')+' · '+levels+' levels';
+  document.getElementById('srVal').textContent=interval+' px';
+  var W=cv.width,H=cv.height, top=56, bot=H-64, mid=(top+bot)/2, amp=(bot-top)/2*0.88;
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText('ADC: sample + quantize ('+n+'-bit) → DAC staircase reconstruction', 20, 26);
+  // quant level gridlines
+  cx.strokeStyle='rgba(120,150,190,.25)'; cx.lineWidth=1;
+  for(var L=0;L<levels;L++){
+    var vy=bot-(L/(levels-1||1))*(bot-top);
+    cx.beginPath(); cx.moveTo(40,vy); cx.lineTo(W-16,vy); cx.stroke();
+  }
+  var ph=frame*0.006;
+  function sig(x){ return Math.sin((x/W)*2*Math.PI*2.3+ph)*0.8 + Math.sin((x/W)*2*Math.PI*4.6+ph*1.7)*0.18; }
+  function toY(v){ return mid - v*amp; }
+  // analog original
+  cx.strokeStyle='#7d8fa5'; cx.lineWidth=2; cx.beginPath();
+  for(var x=40;x<=W-16;x++){ var y=toY(sig(x)); x===40?cx.moveTo(x,y):cx.lineTo(x,y); }
+  cx.stroke();
+  // samples + quantized staircase
+  var codes=[];
+  var lastQY=null;
+  if(recon){ cx.strokeStyle=css('--green-dark'); cx.lineWidth=2.6; cx.beginPath(); }
+  for(var sx=40;sx<=W-16;sx+=interval){
+    var v=sig(sx);
+    var lvl=Math.round((v+1)/2*(levels-1)); lvl=Math.max(0,Math.min(levels-1,lvl));
+    codes.push(lvl);
+    var qv=(lvl/(levels-1||1))*2-1, qy=toY(qv);
+    if(recon){
+      if(lastQY===null) cx.moveTo(sx,qy);
+      else { cx.lineTo(sx,lastQY); cx.lineTo(sx,qy); }
+      lastQY=qy;
+    }
+    // sample dot
+    cx.fillStyle=css('--amber');
+    cx.beginPath(); cx.arc(sx,toY(v),4,0,Math.PI*2); cx.fill();
+  }
+  if(recon){ cx.lineTo(W-16,lastQY); cx.stroke(); }
+  // legend
+  cx.font='bold 11px Arial';
+  cx.fillStyle='#7d8fa5'; cx.fillText('— analog original', 46, H-40);
+  cx.fillStyle=css('--amber'); cx.fillText('● samples', 170, H-40);
+  cx.fillStyle=css('--green-dark'); cx.fillText('— DAC staircase ('+n+'-bit)', 250, H-40);
+  // first few codes
+  cx.fillStyle=css('--text'); cx.font='12px Courier New';
+  var show=codes.slice(0,6).map(function(c){ return c.toString(2).padStart(n,'0'); }).join(' ');
+  cx.fillText('first codes: '+show+' …', 46, H-18);
+  var step=5/levels;
+  document.getElementById('labRead').innerHTML=
+    'Resolution : <span class="r-on">'+n+' bits = '+levels+' levels</span><br>'+
+    'Step size (5 V range) : '+(step>=0.001? (step*1000).toFixed(1)+' mV' : step.toFixed(4)+' V')+'<br>'+
+    'Samples across screen : '+codes.length+'<br>'+
+    'Quantization error ≤ ½ step — '+(n<=2?'<span class="r-off">very coarse!</span>': n>=5?'<span class="r-on">fine reconstruction</span>':'<span class="r-bd">visible steps</span>');
+}
+
+function draw(){
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,cv.width,cv.height);
+  if(mode==='enc') drawEnc();
+  else if(mode==='mux') drawMux();
+  else drawAdc();
+  frame++;
+  requestAnimationFrame(draw);
+}
+cv.addEventListener('click', function(ev){
+  if(mode!=='enc') return;
+  var r=cv.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*cv.width/r.width, y=(ev.clientY-r.top)*cv.height/r.height;
+  padBoxes.forEach(function(c){ if(x>=c.x&&x<=c.x+c.w&&y>=c.y&&y<=c.y+c.h) encIn[c.i]^=1; });
+});
+if(!cx.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.moveTo(x+r,y); this.arcTo(x+w,y,x+w,y+h,r); this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r); this.arcTo(x,y,x+w,y,r); this.closePath(); return this;
+  };
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
