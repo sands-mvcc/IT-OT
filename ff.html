@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequential Logic Lab — Operation Simulator</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.65;transition:background .3s,color .3s;}
+
+/* ============ HEADER ============ */
+.topbar{background:linear-gradient(135deg,#0047AB,#002a66);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+[data-theme="dark"] .topbar{background:linear-gradient(135deg,#0d1b2e,#001a40);}
+.topbar .brand{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;font-size:1.05rem;letter-spacing:.05em;}
+.theme-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 16px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.85rem;transition:background .2s;}
+.theme-btn:hover{background:rgba(255,255,255,.3);}
+
+/* ============ LAYOUT ============ */
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 60px;}
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+p{margin-bottom:14px;}
+strong{color:var(--navy);}
+[data-theme="dark"] strong{color:#8ab6ff;}
+
+/* ============ CALLOUTS ============ */
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.callout .co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-pro .co-title{color:var(--navy);}
+
+/* ============ LAB ============ */
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media(max-width:820px){.grapher-grid{grid-template-columns:1fr;}}
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;cursor:pointer;}
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+[data-theme="dark"] .readout .r-bd{color:var(--amber);}
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:12px;}
+.g-btn{flex:1;min-width:64px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn:hover{background:var(--navy-dark);}
+.g-btn.g-green{background:var(--green);}
+.g-btn.g-green:hover{background:var(--green-dark);}
+.g-btn.on{background:var(--green);font-weight:bold;}
+.toggle-row{display:flex;align-items:center;gap:10px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.92rem;font-weight:bold;color:var(--navy);margin-bottom:12px;}
+.toggle-row input{accent-color:var(--green);width:18px;height:18px;cursor:pointer;}
+
+footer{background:var(--navy-darker);color:rgba(255,255,255,.75);text-align:center;padding:26px 20px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.83rem;line-height:1.7;}
+[data-theme="dark"] footer{background:#0a1420;}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP BAR ================= -->
+<div class="topbar">
+  <span class="brand">📈 Sequential Logic Lab</span>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌓 Mode</button>
+</div>
+
+<main class="wrap">
+<!-- ================= SEQUENTIAL LOGIC LAB ================= -->
+<section id="seqlab">
+  <h2 class="sec-title">📈 Sequential Logic Lab — Operation Simulator</h2>
+  <p>All eight devices from the symbol library, live. The left side of the canvas shows the device with its current input and output states; the right side is a <strong>scrolling timing diagram</strong> recording everything you do. Toggle inputs with the buttons (or click the input pins on the canvas), pulse the clock manually to see edge-triggering, or switch on the auto-clock and watch behaviors like divide-by-2 draw themselves.</p>
+  <div class="grapher">
+    <div class="grapher-grid">
+      <div>
+        <canvas class="scope" id="labCv" width="720" height="460" role="img" aria-label="Sequential logic lab showing the selected latch or flip-flop with live input, output, and scrolling timing diagram lanes"></canvas>
+        <p style="font-family:'Arial Narrow',Arial,sans-serif;font-size:.78rem;color:var(--text-muted);margin-top:6px;">💡 Input pins on the device symbol are clickable too.</p>
+      </div>
+      <div>
+        <div class="ctrl">
+          <label>Device Under Test</label>
+          <div class="seg" id="devSeg">
+            <button class="active" onclick="setDev('srl',this)">SR Latch</button>
+            <button onclick="setDev('gsr',this)">Gated SR</button>
+            <button onclick="setDev('dl',this)">D Latch</button>
+            <button onclick="setDev('srf',this)">SR FF</button>
+            <button onclick="setDev('dff',this)">D FF</button>
+            <button onclick="setDev('dffe',this)">D FF + EN</button>
+            <button onclick="setDev('jk',this)">JK FF</button>
+            <button onclick="setDev('tff',this)">T FF</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Inputs</label>
+          <div class="g-btns" id="inBtns"></div>
+        </div>
+        <div class="ctrl" id="clkCtrl">
+          <label>Clock</label>
+          <div class="g-btns">
+            <button class="g-btn g-green" onclick="pulseClk()">Pulse Clock ⏶</button>
+          </div>
+          <div class="toggle-row"><input type="checkbox" id="autoClk" onchange="draw()"> <span>Auto-clock (free-running)</span></div>
+        </div>
+        <div class="readout" id="labRead" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout co-pro">
+    <div class="co-title">💡 Guided Explorations</div>
+    <strong>1. Memory itself (SR Latch):</strong> pulse S on then off — Q stays set with both inputs at 0. That hold is the bistable remembering. <strong>2. The forbidden state:</strong> set S=1 and R=1 — read the red INVALID warning, then release both and notice the outcome is arbitrary. <strong>3. Gating (Gated SR):</strong> wiggle S with EN=0 — nothing; raise EN — instant response. <strong>4. Transparency (D Latch):</strong> toggle D rapidly with EN=1 and watch Q chase it in the timing lanes; drop EN and the chase freezes. <strong>5. The camera (D FF):</strong> change D two or three times <em>without</em> pulsing the clock — Q ignores everything; now pulse once — Q captures only the value at the edge. <strong>6. Universal toggle (JK):</strong> J=K=1, auto-clock on — Q flips every rising edge. <strong>7. Divide-by-2 (T FF):</strong> T=1, auto-clock on — count edges in the CLK lane vs the Q lane: exactly 2:1, frequency division drawn live.
+  </div>
+</section>
+</main>
+
+<footer>
+  Sequential Logic Lab · Extracted from ELT 102 Lesson 6: Latches &amp; Flip-Flops<br>
+  Moraine Valley Community College · Self-contained Offline Edition
+</footer>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  if(localStorage.getItem('elt-theme')==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('elt-theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('elt-theme','dark'); }
+}
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* ============ SEQUENTIAL LOGIC LAB ============ */
+var cv=document.getElementById('labCv'), cx=cv.getContext('2d');
+var dev='srl';
+var IN={S:0,R:0,D:0,J:0,K:0,T:0,EN:0};
+var Q=0, invalid=false, edges=0, opState='HOLD';
+var clkPulse=0, prevClk=0, frame=0;
+var DEVICES={
+  srl:{name:'SR Latch', ins:['S','R'], ff:false, lanes:['S','R','Q']},
+  gsr:{name:'Gated SR Latch', ins:['S','R','EN'], ff:false, lanes:['EN','S','R','Q']},
+  dl:{name:'D Latch', ins:['D','EN'], ff:false, lanes:['EN','D','Q']},
+  srf:{name:'SR Flip-Flop', ins:['S','R'], ff:true, lanes:['CLK','S','R','Q']},
+  dff:{name:'D Flip-Flop', ins:['D'], ff:true, lanes:['CLK','D','Q']},
+  dffe:{name:'D Flip-Flop + Enable', ins:['D','EN'], ff:true, lanes:['CLK','EN','D','Q']},
+  jk:{name:'JK Flip-Flop', ins:['J','K'], ff:true, lanes:['CLK','J','K','Q']},
+  tff:{name:'T Flip-Flop', ins:['T'], ff:true, lanes:['CLK','T','Q']}
+};
+var HISTLEN=520, hist={}, badHist=[];
+function resetHist(){
+  hist={}; badHist=[];
+  DEVICES[dev].lanes.forEach(function(L){ hist[L]=[]; });
+}
+function setDev(d,btn){
+  dev=d; Q=0; invalid=false; edges=0; clkPulse=0; prevClk=0;
+  document.querySelectorAll('#devSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('clkCtrl').style.display = DEVICES[d].ff? 'block':'none';
+  document.getElementById('autoClk').checked=false;
+  buildInputBtns();
+  resetHist();
+}
+function buildInputBtns(){
+  var w=document.getElementById('inBtns'); w.innerHTML='';
+  DEVICES[dev].ins.forEach(function(name){
+    var b=document.createElement('button');
+    b.className='g-btn'+(IN[name]?' on':'');
+    b.id='in-'+name;
+    b.textContent=name+' = '+IN[name];
+    b.onclick=function(){ togIn(name); };
+    w.appendChild(b);
+  });
+}
+function togIn(name){
+  IN[name]^=1;
+  var b=document.getElementById('in-'+name);
+  if(b){ b.textContent=name+' = '+IN[name]; b.classList.toggle('on',IN[name]===1); }
+}
+function pulseClk(){ clkPulse=16; }
+
+/* ---- per-frame device evaluation ---- */
+function clkVal(){
+  if(!DEVICES[dev].ff) return 0;
+  if(document.getElementById('autoClk').checked) return (frame%64)<32 ? 1:0;
+  return clkPulse>0 ? 1:0;
+}
+function evalDevice(clk, rising){
+  invalid=false;
+  if(dev==='srl'){
+    if(IN.S&&IN.R){ invalid=true; opState='INVALID'; }
+    else if(IN.S){ Q=1; opState='SET'; }
+    else if(IN.R){ Q=0; opState='RESET'; }
+    else opState='HOLD';
+  }
+  else if(dev==='gsr'){
+    if(!IN.EN){ opState='HOLD (EN=0)'; }
+    else if(IN.S&&IN.R){ invalid=true; opState='INVALID'; }
+    else if(IN.S){ Q=1; opState='SET'; }
+    else if(IN.R){ Q=0; opState='RESET'; }
+    else opState='HOLD';
+  }
+  else if(dev==='dl'){
+    if(IN.EN){ Q=IN.D; opState='TRANSPARENT (Q=D)'; }
+    else opState='HOLD (EN=0)';
+  }
+  else if(dev==='srf'){
+    if(IN.S&&IN.R){ invalid=true; }
+    if(rising){
+      edges++;
+      if(IN.S&&IN.R){ opState='INVALID @ edge'; }
+      else if(IN.S){ Q=1; opState='SET @ edge'; }
+      else if(IN.R){ Q=0; opState='RESET @ edge'; }
+      else opState='HOLD @ edge';
+    }
+  }
+  else if(dev==='dff'){
+    if(rising){ edges++; Q=IN.D; opState='CAPTURED D='+IN.D+' @ edge'; }
+  }
+  else if(dev==='dffe'){
+    if(rising){
+      edges++;
+      if(IN.EN){ Q=IN.D; opState='LOADED D='+IN.D+' @ edge'; }
+      else opState='HOLD (EN=0) @ edge';
+    }
+  }
+  else if(dev==='jk'){
+    if(rising){
+      edges++;
+      if(IN.J&&IN.K){ Q^=1; opState='TOGGLE @ edge'; }
+      else if(IN.J){ Q=1; opState='SET @ edge'; }
+      else if(IN.K){ Q=0; opState='RESET @ edge'; }
+      else opState='HOLD @ edge';
+    }
+  }
+  else if(dev==='tff'){
+    if(rising){
+      edges++;
+      if(IN.T){ Q^=1; opState='TOGGLE @ edge'; }
+      else opState='HOLD @ edge';
+    }
+  }
+}
+
+/* ---- drawing ---- */
+var pinBoxes=[];
+function drawDevice(clk){
+  pinBoxes=[];
+  var d=DEVICES[dev];
+  var bx=250, by=16, bw=130, bh=118;
+  cx.strokeStyle=css('--text'); cx.lineWidth=2.4; cx.fillStyle=css('--card');
+  cx.beginPath(); cx.rect(bx,by,bw,bh); cx.fill(); cx.stroke();
+  cx.font='bold 12px Arial'; cx.fillStyle=css('--navy'); cx.textAlign='center';
+  cx.fillText(d.name, bx+bw/2, by-4);
+  cx.textAlign='left';
+  // input pins (left side)
+  var pins=d.ins.slice();
+  if(d.ff) pins.push('CLK');
+  var n=pins.length, gap=bh/(n+1);
+  pins.forEach(function(p,i){
+    var py=by+gap*(i+1);
+    var v = p==='CLK'? clk : IN[p];
+    cx.strokeStyle= v? css('--green') : css('--text-muted');
+    cx.lineWidth= v? 3:2;
+    cx.beginPath(); cx.moveTo(bx-70,py); cx.lineTo(bx,py); cx.stroke();
+    if(p==='CLK'){
+      cx.strokeStyle=css('--text'); cx.lineWidth=2;
+      cx.beginPath(); cx.moveTo(bx,py-8); cx.lineTo(bx+12,py); cx.lineTo(bx,py+8); cx.stroke();
+      cx.fillStyle=css('--green-dark'); cx.font='11px Arial';
+      cx.fillText('CLK', bx+16, py+4);
+    } else {
+      cx.fillStyle=css('--text'); cx.font='bold 13px Courier New';
+      cx.fillText(p, bx+8, py+4);
+      // clickable switch bubble at wire start
+      cx.fillStyle= v? css('--green') : css('--card-alt');
+      cx.strokeStyle=css('--navy'); cx.lineWidth=2;
+      cx.beginPath(); cx.arc(bx-82,py,12,0,Math.PI*2); cx.fill(); cx.stroke();
+      cx.fillStyle= v? '#fff':css('--text-muted'); cx.font='bold 11px Arial'; cx.textAlign='center';
+      cx.fillText(v, bx-82, py+4); cx.textAlign='left';
+      pinBoxes.push({x:bx-96,y:py-14,w:28,h:28,name:p});
+    }
+    cx.fillStyle=css('--text-muted'); cx.font='10px Arial';
+    if(p!=='CLK') cx.fillText(p, bx-104-cx.measureText(p).width, py+3);
+  });
+  // outputs Q, Q̄
+  var qv= invalid? '?' : Q, qb= invalid? '?' : (Q^1);
+  [[qv,'Q',by+bh*0.3],[qb,'Q\u0305',by+bh*0.7]].forEach(function(o){
+    var on = o[0]===1;
+    cx.strokeStyle= invalid? css('--red') : (on? css('--green'):css('--text-muted'));
+    cx.lineWidth= on?3:2;
+    cx.beginPath(); cx.moveTo(bx+bw,o[2]); cx.lineTo(bx+bw+46,o[2]); cx.stroke();
+    cx.fillStyle=css('--text'); cx.font='bold 13px Courier New';
+    cx.fillText(o[1], bx+bw-24, o[2]+4);
+    // lamp
+    cx.fillStyle= invalid? css('--red') : (on? css('--green'):css('--card-alt'));
+    cx.strokeStyle= invalid? css('--red') : css('--border');
+    cx.beginPath(); cx.arc(bx+bw+62,o[2],14,0,Math.PI*2); cx.fill(); cx.stroke();
+    cx.fillStyle= (on||invalid)? '#fff':css('--text-muted');
+    cx.font='bold 12px Arial'; cx.textAlign='center';
+    cx.fillText(o[0], bx+bw+62, o[2]+4); cx.textAlign='left';
+  });
+  if(invalid){
+    cx.fillStyle=css('--red'); cx.font='bold 14px Arial'; cx.textAlign='center';
+    cx.fillText('⚠ INVALID: S = R = 1', bx+bw/2, by+bh+18);
+    cx.textAlign='left';
+  } else {
+    cx.fillStyle=css('--green-dark'); cx.font='bold 12px Arial'; cx.textAlign='center';
+    cx.fillText(opState, bx+bw/2, by+bh+18);
+    cx.textAlign='left';
+  }
+}
+function drawLanes(){
+  var d=DEVICES[dev], lanes=d.lanes;
+  var x0=70, x1=cv.width-14, y0=170;
+  var laneH=Math.min(64,(cv.height-y0-10)/lanes.length);
+  cx.font='bold 12px Courier New';
+  lanes.forEach(function(L,li){
+    var top=y0+li*laneH, hi=top+10, lo=top+laneH-16;
+    cx.fillStyle=css('--text'); cx.fillText(L, 16, (hi+lo)/2+4);
+    cx.strokeStyle=css('--border'); cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(x0,lo); cx.lineTo(x1,lo); cx.stroke();
+    var h=hist[L]||[];
+    if(h.length<2) return;
+    var step=(x1-x0)/HISTLEN;
+    cx.lineWidth=2.2;
+    var isQ=(L==='Q');
+    cx.beginPath();
+    var started=false, lastY=0;
+    for(var i=0;i<h.length;i++){
+      var x=x1-(h.length-1-i)*step;
+      var y=h[i]?hi:lo;
+      var bad=isQ&&badHist[i];
+      if(isQ){
+        // draw in segments so bad regions can be red
+        if(!started){ cx.beginPath(); cx.moveTo(x,y); started=true; lastY=y; cx.strokeStyle= bad?css('--red'):css('--green-dark'); }
+        else{
+          var prevBad=isQ&&badHist[i-1];
+          if(bad!==prevBad){ cx.lineTo(x,lastY); cx.stroke(); cx.beginPath(); cx.strokeStyle= bad?css('--red'):css('--green-dark'); cx.moveTo(x,lastY); }
+          if(y!==lastY){ cx.lineTo(x,lastY); cx.lineTo(x,y); lastY=y; }
+          else cx.lineTo(x,y);
+        }
+      } else {
+        cx.strokeStyle= L==='CLK'? css('--amber') : css('--navy');
+        if(!started){ cx.moveTo(x,y); started=true; lastY=y; }
+        else{ if(y!==lastY){ cx.lineTo(x,lastY); cx.lineTo(x,y); lastY=y; } else cx.lineTo(x,y); }
+      }
+    }
+    cx.stroke();
+  });
+  cx.fillStyle=css('--text-muted'); cx.font='10px Arial';
+  cx.fillText('time →', x1-40, y0-6);
+}
+function draw(){
+  var clk=clkVal();
+  var rising = clk===1 && prevClk===0;
+  evalDevice(clk, rising);
+  prevClk=clk;
+  if(clkPulse>0) clkPulse--;
+  // record history
+  var d=DEVICES[dev];
+  d.lanes.forEach(function(L){
+    var v = L==='CLK'? clk : L==='Q'? Q : IN[L];
+    hist[L].push(v);
+    if(hist[L].length>HISTLEN) hist[L].shift();
+  });
+  badHist.push(invalid?1:0);
+  if(badHist.length>HISTLEN) badHist.shift();
+  // render
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,cv.width,cv.height);
+  cx.strokeStyle=css('--border'); cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(0,158); cx.lineTo(cv.width,158); cx.stroke();
+  drawDevice(clk);
+  drawLanes();
+  // readout
+  var insTxt=d.ins.map(function(p){return p+'='+IN[p];}).join(' ');
+  document.getElementById('labRead').innerHTML=
+    'Device : <span class="r-on">'+d.name+'</span><br>'+
+    'Inputs : '+insTxt+(d.ff? ' · CLK='+clk : '')+'<br>'+
+    'Q = <span class="'+(invalid?'r-off':(Q?'r-on':'r-bd'))+'">'+(invalid?'?':Q)+'</span> · Q\u0305 = '+(invalid?'?':(Q^1))+'<br>'+
+    'State : '+(invalid?'<span class="r-off">'+opState+'</span>':'<span class="r-on">'+opState+'</span>')+
+    (d.ff? '<br>Clock edges seen : '+edges : '');
+  frame++;
+  requestAnimationFrame(draw);
+}
+/* clickable pins */
+cv.addEventListener('click', function(ev){
+  var r=cv.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*cv.width/r.width, y=(ev.clientY-r.top)*cv.height/r.height;
+  pinBoxes.forEach(function(c){ if(x>=c.x&&x<=c.x+c.w&&y>=c.y&&y<=c.y+c.h) togIn(c.name); });
+});
+
+/* ---- init ---- */
+buildInputBtns();
+resetHist();
+document.getElementById('clkCtrl').style.display = DEVICES[dev].ff? 'block':'none';
+draw();
+</script>
+</body>
+</html>
