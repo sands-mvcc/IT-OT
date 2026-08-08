@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Op-Amp Configuration Grapher | ELT 102</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.65;}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 60px;}
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+p{margin-bottom:14px;}
+strong{color:var(--navy);}
+
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media(max-width:820px){.grapher-grid{grid-template-columns:1fr;}}
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;}
+
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.ctrl label .val{color:var(--green-dark);font-weight:bold;}
+.ctrl input[type=range]{width:100%;accent-color:var(--green);}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+
+.sim-links{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;}
+.sim-chip{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;text-decoration:none;border-radius:22px;padding:8px 18px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;box-shadow:var(--shadow);transition:transform .15s,background .2s;}
+.sim-chip:hover{background:var(--green-dark);transform:translateY(-2px);}
+
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.callout .co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-pro .co-title{color:var(--navy);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ================= OP-AMP GRAPHER ================= -->
+<section id="opgrapher">
+  <h2 class="sec-title">📈 Interactive Op-Amp Configuration Grapher</h2>
+  <p>One op-amp, six circuits, live dual-trace display: <span style="color:#7d8fa5;font-weight:bold;">grey = input</span>, <span style="color:var(--green-dark);font-weight:bold;">green = output</span>. Pick a configuration, shape the input, turn the resistor knobs, and watch the gain equations and calculus behaviors happen in real time — including clipping when you ask for more than the ±12 V rails can give.</p>
+  <div class="grapher">
+    <div class="grapher-grid">
+      <div>
+        <canvas class="scope" id="opCv" width="720" height="440" role="img" aria-label="Dual-trace oscilloscope display showing input and output waveforms for the selected op-amp configuration"></canvas>
+      </div>
+      <div>
+        <div class="ctrl">
+          <label>Configuration</label>
+          <div class="seg" id="cfgSeg">
+            <button class="active" onclick="setCfg('inv',this)">Inverting</button>
+            <button onclick="setCfg('non',this)">Non-Inv</button>
+            <button onclick="setCfg('fol',this)">Follower</button>
+            <button onclick="setCfg('cmp',this)">Comparator</button>
+            <button onclick="setCfg('int',this)">Integrator</button>
+            <button onclick="setCfg('dif',this)">Differentiator</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Input Waveform</label>
+          <div class="seg" id="waveSeg">
+            <button class="active" onclick="setWave('sine',this)">Sine</button>
+            <button onclick="setWave('square',this)">Square</button>
+            <button onclick="setWave('tri',this)">Triangle</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Input Amplitude <span class="val" id="ampVal">2.0 V</span></label>
+          <input type="range" id="amp" min="0.2" max="6" step="0.1" value="2">
+        </div>
+        <div class="ctrl" id="rfCtrl">
+          <label>R<sub>f</sub> <span class="val" id="rfVal">20 kΩ</span></label>
+          <input type="range" id="rf" min="1" max="100" step="1" value="20">
+        </div>
+        <div class="ctrl" id="rinCtrl">
+          <label>R<sub>in</sub> <span class="val" id="rinVal">10 kΩ</span></label>
+          <input type="range" id="rin" min="1" max="100" step="1" value="10">
+        </div>
+        <div class="ctrl" id="refCtrl" style="display:none;">
+          <label>V<sub>REF</sub> (on − input) <span class="val" id="refVal">0.0 V</span></label>
+          <input type="range" id="vref" min="-4" max="4" step="0.1" value="0">
+        </div>
+        <div class="readout" id="opRead" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <div class="callout co-pro">
+    <div class="co-title">💡 Guided Explorations</div>
+    <strong>1. Read the resistors (Inverting):</strong> set R<sub>f</sub>=20k, R<sub>in</sub>=10k, sine input — confirm gain −2 and the 180° flip. <strong>2. The "+1" (Non-Inv):</strong> same resistors — output is now ×3, not ×2, and upright. <strong>3. Meet the rails:</strong> raise gain or amplitude until the green trace flattens at ±12 V; that haircut is clipping. <strong>4. Unity on purpose (Follower):</strong> output hugs the input exactly. <strong>5. Decisions (Comparator):</strong> sine in, slide V<sub>REF</sub> and watch the output's duty cycle change as the slice level moves. <strong>6. Calculus (Integrator/Differentiator):</strong> square → integrator = triangle; triangle → differentiator = square; square → differentiator = edge spikes.
+  </div>
+  <h3 style="color:var(--navy);margin:26px 0 10px;font-size:1.25rem;">🧪 Dedicated Circuit Simulators</h3>
+  <p>Each configuration has a full standalone simulator in the ELT 102 library:</p>
+  <div class="sim-links">
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/inverting.html" target="_blank" rel="noopener">Inverting Amplifier</a>
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/non-inverting.html" target="_blank" rel="noopener">Non-Inverting Amplifier</a>
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/follower.html" target="_blank" rel="noopener">Voltage Follower</a>
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/comparator.html" target="_blank" rel="noopener">Comparator</a>
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/integrator.html" target="_blank" rel="noopener">Integrator</a>
+    <a class="sim-chip" href="https://sands-mvcc.github.io/elt102/differentiator.html" target="_blank" rel="noopener">Differentiator</a>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ============ OP-AMP GRAPHER ============ */
+var cv=document.getElementById('opCv'), cx=cv.getContext('2d');
+var cfg='inv', wave='sine';
+var VSAT=12, FREQ=250; // Hz, display convenience
+var intState=0; // integrator accumulator
+
+function setCfg(c,btn){
+  cfg=c;
+  document.querySelectorAll('#cfgSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  intState=0;
+  var showR = (c==='inv'||c==='non'||c==='int'||c==='dif');
+  document.getElementById('rfCtrl').style.display = showR?'block':'none';
+  document.getElementById('rinCtrl').style.display = showR?'block':'none';
+  document.getElementById('refCtrl').style.display = (c==='cmp')?'block':'none';
+}
+function setWave(w,btn){
+  wave=w; intState=0;
+  document.querySelectorAll('#waveSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+function vin(t,A){
+  var ph=(t*FREQ)%1;
+  if(wave==='sine') return A*Math.sin(2*Math.PI*ph);
+  if(wave==='square') return ph<0.5? A : -A;
+  return ph<0.25? A*4*ph : ph<0.75? A*(2-4*ph) : A*(4*ph-4); // triangle
+}
+function clip(v){ return Math.max(-VSAT, Math.min(VSAT, v)); }
+
+function draw(now){
+  var t0=now/1000;
+  var A=parseFloat(document.getElementById('amp').value);
+  var Rf=parseFloat(document.getElementById('rf').value);
+  var Rin=parseFloat(document.getElementById('rin').value);
+  var Vref=parseFloat(document.getElementById('vref').value);
+  document.getElementById('ampVal').textContent=A.toFixed(1)+' V';
+  document.getElementById('rfVal').textContent=Rf+' kΩ';
+  document.getElementById('rinVal').textContent=Rin+' kΩ';
+  document.getElementById('refVal').textContent=Vref.toFixed(1)+' V';
+
+  var W=cv.width,H=cv.height;
+  cx.fillStyle='#0c1420'; cx.fillRect(0,0,W,H);
+  var gx=W/10,gy=H/8;
+  cx.strokeStyle='rgba(120,150,190,.18)'; cx.lineWidth=1;
+  for(var i=1;i<10;i++){ cx.beginPath(); cx.moveTo(i*gx,0); cx.lineTo(i*gx,H); cx.stroke(); }
+  for(var j=1;j<8;j++){ cx.beginPath(); cx.moveTo(0,j*gy); cx.lineTo(W,j*gy); cx.stroke(); }
+  function Y(v){ return H/2 - v/16*(H/2-16); }
+  // zero + rails
+  cx.strokeStyle='rgba(120,150,190,.45)';
+  cx.beginPath(); cx.moveTo(0,Y(0)); cx.lineTo(W,Y(0)); cx.stroke();
+  cx.strokeStyle='rgba(224,96,80,.55)'; cx.setLineDash([5,5]);
+  [VSAT,-VSAT].forEach(function(r){ cx.beginPath(); cx.moveTo(0,Y(r)); cx.lineTo(W,Y(r)); cx.stroke(); });
+  cx.setLineDash([]);
+  cx.fillStyle='rgba(224,96,80,.9)'; cx.font='10px Arial';
+  cx.fillText('+Vsat +12 V',6,Y(VSAT)-4); cx.fillText('−Vsat −12 V',6,Y(-VSAT)+12);
+  // comparator ref line
+  if(cfg==='cmp'){
+    cx.strokeStyle='#f0b545'; cx.setLineDash([4,4]);
+    cx.beginPath(); cx.moveTo(0,Y(Vref)); cx.lineTo(W,Y(Vref)); cx.stroke(); cx.setLineDash([]);
+    cx.fillStyle='#f0b545'; cx.fillText('V-REF '+Vref.toFixed(1)+' V', W-98, Y(Vref)-5);
+  }
+
+  var span=2/FREQ*1.0; // two cycles
+  var N=W;
+  var dt=span/N;
+  var gain = cfg==='inv'? -Rf/Rin : cfg==='non'? 1+Rf/Rin : 1;
+  var RC = (Rin*1000)*(1e-7)*(Rf/20); // synthetic RC scaling for pleasing display
+  var acc=0, accInit=false;
+
+  // input trace
+  cx.strokeStyle='#7d8fa5'; cx.lineWidth=1.6; cx.beginPath();
+  for(var x=0;x<=N;x++){
+    var tt=t0-span+x*dt, v=vin(tt,A);
+    var yy=Y(v);
+    x===0?cx.moveTo(x,yy):cx.lineTo(x,yy);
+  }
+  cx.stroke();
+
+  // output trace
+  cx.strokeStyle='#2ecc8f'; cx.lineWidth=2.4; cx.beginPath();
+  var clipped=false, lastOut=0;
+  for(var x2=0;x2<=N;x2++){
+    var tt2=t0-span+x2*dt, v2=vin(tt2,A), out;
+    if(cfg==='inv'||cfg==='non') out=gain*v2;
+    else if(cfg==='fol') out=v2;
+    else if(cfg==='cmp') out = (v2>Vref)? VSAT*0.98 : -VSAT*0.98;
+    else if(cfg==='int'){
+      if(!accInit){ acc=0; accInit=true;
+        // pre-integrate one cycle for steady state
+        for(var p=0;p<N/2;p++){ acc += -vin(tt2-span/2+p*dt,A)*(Rf/Rin)*2*Math.PI*FREQ*dt*0.5; acc*=0.999; }
+      }
+      acc += -v2*(Rf/Rin)*2*Math.PI*FREQ*dt*0.5;
+      acc*=0.999; // leak
+      out=acc;
+    }
+    else { // differentiator
+      var v2b=vin(tt2-dt,A);
+      out = -(v2-v2b)/dt * (Rf/Rin) / (2*Math.PI*FREQ) * 0.5;
+    }
+    var oc=clip(out);
+    if(oc!==out) clipped=true;
+    lastOut=oc;
+    var yy2=Y(oc);
+    x2===0?cx.moveTo(x2,yy2):cx.lineTo(x2,yy2);
+  }
+  cx.stroke();
+  cx.fillStyle='#7d8fa5'; cx.font='bold 10px Arial'; cx.fillText('● INPUT',10,14);
+  cx.fillStyle='#2ecc8f'; cx.fillText('● OUTPUT',72,14);
+
+  // readout
+  var names={inv:'Inverting Amplifier',non:'Non-Inverting Amplifier',fol:'Voltage Follower',cmp:'Comparator (open loop)',int:'Integrator',dif:'Differentiator'};
+  var gtxt = cfg==='inv'? 'A<sub>V</sub> = −R<sub>f</sub>/R<sub>in</sub> = −'+(Rf/Rin).toFixed(2)
+           : cfg==='non'? 'A<sub>V</sub> = 1+R<sub>f</sub>/R<sub>in</sub> = +'+(1+Rf/Rin).toFixed(2)
+           : cfg==='fol'? 'A<sub>V</sub> = 1 (unity buffer)'
+           : cfg==='cmp'? 'Output = ±V<sub>sat</sub> by comparison'
+           : cfg==='int'? 'V<sub>out</sub> = −(1/RC)∫V<sub>in</sub>dt'
+           : 'V<sub>out</sub> = −RC·dV<sub>in</sub>/dt';
+  var expect = (cfg==='inv'||cfg==='non') ? 'Expected peak: '+Math.abs((cfg==='inv'?Rf/Rin:1+Rf/Rin)*A).toFixed(1)+' V' :
+               cfg==='int' ? (wave==='square'?'Square → TRIANGLE':'Integrating…') :
+               cfg==='dif' ? (wave==='tri'?'Triangle → SQUARE': wave==='square'?'Edges → SPIKES':'Differentiating…') : '';
+  document.getElementById('opRead').innerHTML=
+    'Circuit : <span class="r-on">'+names[cfg]+'</span><br>'+
+    gtxt+'<br>'+
+    'V<sub>in</sub> peak : '+A.toFixed(1)+' V ('+wave+')<br>'+
+    (expect? expect+'<br>':'')+
+    'Rails : ±'+VSAT+' V — '+(clipped?'<span class="r-off">CLIPPING!</span>':'<span class="r-on">clean</span>');
+}
+
+/* ============ LOOP ============ */
+function loop(now){ draw(now); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
