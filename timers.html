@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer & Counter Lab Simulator</title>
+<style>
+:root{
+  --navy:#0047AB; --navy-dark:#003580; --navy-darker:#002a66;
+  --green:#00a86b; --green-dark:#00875a;
+  --amber:#e8a020; --red:#c0392b;
+  --bg:#f5f7fa; --card:#ffffff; --card-alt:#eef2f8;
+  --text:#1c2733; --text-muted:#5a6b7d;
+  --border:#d7dfe9; --shadow:0 2px 10px rgba(0,40,90,.10);
+  --code-bg:#eef2f8;
+}
+[data-theme="dark"]{
+  --navy:#4d8cff; --navy-dark:#3a6fd0; --navy-darker:#0d1b2e;
+  --green:#2ecc8f; --green-dark:#22b07a;
+  --amber:#f0b545; --red:#e06050;
+  --bg:#0f1620; --card:#18222f; --card-alt:#1f2c3c;
+  --text:#e8eef5; --text-muted:#9fb0c2;
+  --border:#2c3a4c; --shadow:0 2px 12px rgba(0,0,0,.45);
+  --code-bg:#111a26;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.65;transition:background .3s,color .3s;}
+
+/* ============ HEADER ============ */
+.topbar{background:linear-gradient(135deg,#0047AB,#002a66);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+[data-theme="dark"] .topbar{background:linear-gradient(135deg,#0d1b2e,#001a40);}
+.topbar .brand{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;font-size:1.05rem;letter-spacing:.05em;}
+.theme-btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 16px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.85rem;transition:background .2s;}
+.theme-btn:hover{background:rgba(255,255,255,.3);}
+
+/* ============ LAYOUT ============ */
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 60px;}
+h2.sec-title{font-size:1.7rem;color:var(--navy);border-bottom:3px solid var(--green);padding-bottom:8px;margin-bottom:20px;}
+p{margin-bottom:14px;}
+strong{color:var(--navy);}
+[data-theme="dark"] strong{color:#8ab6ff;}
+
+/* ============ LAB ============ */
+.grapher{background:var(--card);border:2px solid var(--navy);border-radius:12px;box-shadow:var(--shadow);padding:22px;margin:20px 0;}
+.grapher-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start;}
+@media(max-width:820px){.grapher-grid{grid-template-columns:1fr;}}
+canvas.scope{width:100%;height:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;display:block;cursor:pointer;}
+.ctrl{margin-bottom:15px;}
+.ctrl label{display:flex;justify-content:space-between;font-family:'Arial Narrow',Arial,sans-serif;font-size:.9rem;font-weight:bold;color:var(--navy);margin-bottom:4px;}
+.seg{display:flex;flex-wrap:wrap;gap:6px;}
+.seg button{flex:1;min-width:58px;font-family:'Arial Narrow',Arial,sans-serif;background:var(--card-alt);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:8px 6px;cursor:pointer;font-size:.85rem;transition:all .2s;}
+.seg button:hover{color:var(--navy);border-color:var(--navy);}
+.seg button.active{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold;}
+.readout{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.84rem;line-height:1.75;}
+.readout .r-on{color:var(--green-dark);font-weight:bold;}
+.readout .r-off{color:var(--red);font-weight:bold;}
+.readout .r-bd{color:#a86e00;font-weight:bold;}
+[data-theme="dark"] .readout .r-bd{color:var(--amber);}
+.g-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:12px;}
+.g-btn{flex:1;min-width:64px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 6px;cursor:pointer;font-family:'Arial Narrow',Arial,sans-serif;font-size:.82rem;transition:background .2s;}
+.g-btn:hover{background:var(--navy-dark);}
+.g-btn.g-green{background:var(--green);}
+.g-btn.g-green:hover{background:var(--green-dark);}
+.g-btn.on{background:var(--green);font-weight:bold;}
+.toggle-row{display:flex;align-items:center;gap:10px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.92rem;font-weight:bold;color:var(--navy);margin-bottom:12px;}
+.toggle-row input{accent-color:var(--green);width:18px;height:18px;cursor:pointer;}
+
+/* ============ CALLOUT ============ */
+.callout{border-radius:10px;padding:16px 20px;margin:18px 0;border-left:6px solid;}
+.callout .co-title{font-family:'Arial Narrow',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;font-size:.9rem;margin-bottom:6px;}
+.co-pro{background:rgba(0,71,171,.08);border-color:var(--navy);}
+.co-pro .co-title{color:var(--navy);}
+[data-theme="dark"] .co-pro .co-title{color:#8ab6ff;}
+
+footer{background:var(--navy-darker);color:rgba(255,255,255,.75);text-align:center;padding:22px 20px;font-family:'Arial Narrow',Arial,sans-serif;font-size:.8rem;line-height:1.6;}
+[data-theme="dark"] footer{background:#0a1420;}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">📈 Timer &amp; Counter Lab Simulator</span>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌓 Mode</button>
+</div>
+
+<main class="wrap">
+  <section id="timelab">
+    <h2 class="sec-title">📈 Timing &amp; Counting Lab</h2>
+    <p>Two instruments, one timing chain. <strong>555 Timer mode:</strong> a live scope showing the capacitor voltage sawing between the ⅓ and ⅔ V<sub>CC</sub> thresholds while the output squares off above it — drag R₁, R₂, and C and verify the frequency formula in real time, or switch to monostable and fire single pulses. <strong>Counter mode:</strong> all four counters — 4-bit binary, BCD, up/down, and Johnson — with an LED state row, decimal readout, and scrolling timing lanes that reveal frequency division as it happens.</p>
+
+    <div class="grapher">
+      <div class="grapher-grid">
+        <div>
+          <canvas class="scope" id="labCv" width="720" height="440" role="img" aria-label="Timing lab canvas showing 555 timer waveforms or counter states with timing diagram depending on selected mode"></canvas>
+        </div>
+        <div>
+          <div class="ctrl">
+            <label>Lab Mode</label>
+            <div class="seg" id="modeSeg">
+              <button class="active" onclick="setMode('t555',this)">555 Timer</button>
+              <button onclick="setMode('ctr',this)">Counter Lab</button>
+            </div>
+          </div>
+
+          <div class="mode-panel show" id="pan-t555">
+            <div class="ctrl">
+              <label>Configuration</label>
+              <div class="seg" id="cfg555">
+                <button class="active" onclick="set555('ast',this)">Astable</button>
+                <button onclick="set555('mono',this)">Monostable</button>
+              </div>
+            </div>
+            <div class="ctrl"><label>R₁ <span class="val" id="r1Val">10 kΩ</span></label>
+              <input type="range" id="r1" min="1" max="100" step="1" value="10"></div>
+            <div class="ctrl" id="r2Ctrl"><label>R₂ <span class="val" id="r2Val">47 kΩ</span></label>
+              <input type="range" id="r2" min="1" max="100" step="1" value="47"></div>
+            <div class="ctrl"><label>C <span class="val" id="cVal">10 µF</span></label>
+              <input type="range" id="cap" min="1" max="100" step="1" value="10"></div>
+            <div class="g-btns" id="trigWrap" style="display:none;">
+              <button class="g-btn g-green" onclick="fireTrig()">Fire Trigger ⏷</button>
+            </div>
+          </div>
+
+          <div class="mode-panel" id="pan-ctr">
+            <div class="ctrl">
+              <label>Counter Type</label>
+              <div class="seg" id="ctrSeg">
+                <button class="active" onclick="setCtr('bin',this)">4-Bit Binary</button>
+                <button onclick="setCtr('bcd',this)">BCD</button>
+                <button onclick="setCtr('ud',this)">Up/Down</button>
+                <button onclick="setCtr('joh',this)">Johnson</button>
+              </div>
+            </div>
+            <div class="g-btns">
+              <button class="g-btn g-green" onclick="pulseClk()">Pulse Clock ⏶</button>
+              <button class="g-btn" id="dirBtn" onclick="togDir()" style="display:none;">DIR: UP ▲</button>
+              <button class="g-btn" onclick="rstCtr()">Reset</button>
+            </div>
+            <div class="toggle-row"><input type="checkbox" id="autoClk"> <span>Auto-clock (free-running)</span></div>
+          </div>
+
+          <div class="readout" id="labRead" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout co-pro">
+      <div class="co-title">💡 Guided Explorations</div>
+      <strong>1. Verify the formula:</strong> 555 astable, R₁=10k, R₂=47k, C=10µF — the readout should confirm ≈1.4 Hz. Halve C and watch frequency double: pure proportionality. <strong>2. The duty-cycle law:</strong> make R₁ huge and R₂ tiny — duty approaches 100%; reverse them — it approaches (but never reaches) 50%. <strong>3. One clean pulse:</strong> switch to Monostable and fire the trigger repeatedly — every pulse is identical width T = 1.1·R₁·C no matter how you mash the button. <strong>4. Two views of one circuit:</strong> Counter mode, 4-bit binary, auto-clock — read the LED row as a number while the lanes below show Q0–Q3 dividing by 2, 4, 8, 16. <strong>5. The decade reset:</strong> BCD mode, single-step past 9 — it snaps to 0, never showing 10–15. <strong>6. Reversal:</strong> Up/Down — count to 5, flip DIR, and watch the lanes' pattern mirror. <strong>7. The wave:</strong> Johnson mode, auto-clock — a wave of 1s washes across the LEDs and back, one bit changing per clock: 8 states from 4 flip-flops, glitch-free by construction.
+    </div>
+  </section>
+</main>
+
+<footer>
+  Timer &amp; Counter Lab Simulator · Extracted from ELT 102 Lesson 8: Oscillators, Timers &amp; Counters<br>
+  Moraine Valley Community College
+</footer>
+
+<style>
+.mode-panel{display:none;}
+.mode-panel.show{display:block;}
+</style>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  if(localStorage.getItem('timerlab-theme')==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+function toggleTheme(){
+  var d=document.documentElement.getAttribute('data-theme')==='dark';
+  if(d){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('timerlab-theme','light'); }
+  else { document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('timerlab-theme','dark'); }
+}
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+/* ============ LAB ============ */
+var cv=document.getElementById('labCv'), cx=cv.getContext('2d');
+var mode='t555', frame=0;
+
+/* --- 555 state --- */
+var m555='ast', VCC=9, capV=0, out555=0, trigArm=false;
+var outHist=[], capHist=[]; var HLEN=560;
+function set555(m,btn){
+  m555=m; capV=0; out555= (m==='ast'?1:0); outHist=[]; capHist=[];
+  document.querySelectorAll('#cfg555 button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('r2Ctrl').style.display = m==='ast'?'block':'none';
+  document.getElementById('trigWrap').style.display = m==='mono'?'flex':'none';
+}
+function fireTrig(){ if(m555==='mono' && out555===0){ out555=1; capV=0; } }
+
+/* --- counter state --- */
+var ctr='bin', count=0, joh=[0,0,0,0], dirUp=true, edges=0;
+var clkPulse=0, prevClk=0;
+var lanes={CLK:[],Q0:[],Q1:[],Q2:[],Q3:[]};
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('#modeSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  ['t555','ctr'].forEach(function(k){ document.getElementById('pan-'+k).classList.toggle('show',k===m); });
+}
+function setCtr(c,btn){
+  ctr=c; rstCtr();
+  document.querySelectorAll('#ctrSeg button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('dirBtn').style.display = c==='ud'?'block':'none';
+}
+function rstCtr(){ count=0; joh=[0,0,0,0]; edges=0; Object.keys(lanes).forEach(function(k){lanes[k]=[];}); }
+function togDir(){ dirUp=!dirUp; document.getElementById('dirBtn').textContent='DIR: '+(dirUp?'UP ▲':'DOWN ▼'); }
+function pulseClk(){ clkPulse=14; }
+function bitsOf(){
+  if(ctr==='joh') return joh.slice(); // [Q0,Q1,Q2,Q3]
+  return [count&1,(count>>1)&1,(count>>2)&1,(count>>3)&1];
+}
+function stepCounter(){
+  edges++;
+  if(ctr==='bin') count=(count+1)%16;
+  else if(ctr==='bcd') count=(count+1)%10;
+  else if(ctr==='ud') count= dirUp? (count+1)%16 : (count+15)%16;
+  else { // johnson: shift Q0->Q1->Q2->Q3, new Q0 = NOT Q3
+    joh=[joh[3]^1, joh[0], joh[1], joh[2]];
+  }
+}
+
+/* --- drawing helpers --- */
+function led(x,y,on,label){
+  cx.fillStyle= on? css('--green') : css('--card-alt');
+  cx.strokeStyle= on? css('--green-dark') : css('--border'); cx.lineWidth=2;
+  cx.beginPath(); cx.arc(x,y,17,0,Math.PI*2); cx.fill(); cx.stroke();
+  cx.fillStyle= on? '#fff' : css('--text-muted');
+  cx.font='bold 14px Arial'; cx.textAlign='center';
+  cx.fillText(on?'1':'0',x,y+5);
+  cx.fillStyle=css('--text'); cx.font='11px Arial'; cx.fillText(label,x,y+34);
+  cx.textAlign='left';
+}
+
+/* --- 555 renderer --- */
+function draw555(){
+  var R1=parseInt(document.getElementById('r1').value);
+  var R2=parseInt(document.getElementById('r2').value);
+  var C=parseInt(document.getElementById('cap').value);
+  document.getElementById('r1Val').textContent=R1+' kΩ';
+  document.getElementById('r2Val').textContent=R2+' kΩ';
+  document.getElementById('cVal').textContent=C+' µF';
+  // simulate: dt scaled so mid-range settings give a pleasing few cycles on screen
+  var dt=0.0016; // seconds per frame (display timebase)
+  var steps=3;
+  for(var s=0;s<steps;s++){
+    if(m555==='ast'){
+      if(out555===1){
+        var tau=(R1+R2)*1e3*C*1e-6;
+        capV += (VCC-capV)*(1-Math.exp(-dt/tau));
+        if(capV>=VCC*2/3){ out555=0; }
+      } else {
+        var tau2=R2*1e3*C*1e-6;
+        capV += (0-capV)*(1-Math.exp(-dt/tau2));
+        if(capV<=VCC/3){ out555=1; }
+      }
+    } else { // monostable
+      if(out555===1){
+        var tau3=R1*1e3*C*1e-6;
+        capV += (VCC-capV)*(1-Math.exp(-dt/tau3));
+        if(capV>=VCC*2/3){ out555=0; capV=0; }
+      }
+    }
+  }
+  capHist.push(capV); outHist.push(out555);
+  if(capHist.length>HLEN){ capHist.shift(); outHist.shift(); }
+  // render
+  var W=cv.width,H=cv.height;
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText(m555==='ast'? '555 Astable — capacitor sawtooth + square output' : '555 Monostable — fire the trigger for one timed pulse', 20, 26);
+  var x0=60,x1=W-16;
+  // output lane (top)
+  var oHi=64,oLo=140;
+  cx.fillStyle=css('--text'); cx.font='bold 12px Courier New'; cx.fillText('OUT',14,(oHi+oLo)/2);
+  cx.strokeStyle=css('--green-dark'); cx.lineWidth=2.4; cx.beginPath();
+  var step=(x1-x0)/HLEN, ly=null;
+  outHist.forEach(function(v,i){
+    var x=x1-(outHist.length-1-i)*step, y=v?oHi:oLo;
+    if(ly===null){cx.moveTo(x,y);} else if(y!==ly){cx.lineTo(x,ly);cx.lineTo(x,y);} else cx.lineTo(x,y);
+    ly=y;
+  });
+  cx.stroke();
+  // cap lane (bottom): 0..VCC maps
+  var cTop=190,cBot=400;
+  function capY(v){ return cBot-(v/VCC)*(cBot-cTop); }
+  cx.fillStyle=css('--text'); cx.fillText('V(C)',12,(cTop+cBot)/2);
+  // threshold lines
+  [[VCC*2/3,'⅔ Vcc — THRESHOLD'],[VCC/3,'⅓ Vcc — TRIGGER']].forEach(function(t){
+    cx.strokeStyle=css('--amber'); cx.setLineDash([5,4]); cx.lineWidth=1.5;
+    cx.beginPath(); cx.moveTo(x0,capY(t[0])); cx.lineTo(x1,capY(t[0])); cx.stroke(); cx.setLineDash([]);
+    cx.fillStyle=css('--amber'); cx.font='10px Arial'; cx.fillText(t[1], x0+6, capY(t[0])-5);
+  });
+  cx.strokeStyle=css('--navy'); cx.lineWidth=2.4; cx.beginPath();
+  var first=true;
+  capHist.forEach(function(v,i){
+    var x=x1-(capHist.length-1-i)*step, y=capY(v);
+    first? cx.moveTo(x,y):cx.lineTo(x,y); first=false;
+  });
+  cx.stroke();
+  cx.fillStyle=css('--text-muted'); cx.font='10px Arial'; cx.fillText('time →', x1-40, cBot+18);
+  // readout
+  var read;
+  if(m555==='ast'){
+    var f=1.44/(((R1+2*R2)*1e3)*(C*1e-6));
+    var duty=(R1+R2)/(R1+2*R2)*100;
+    var T=1/f;
+    read='f = 1.44/((R₁+2R₂)C) = <span class="r-on">'+(f>=1? f.toFixed(2)+' Hz' : (f*1000).toFixed(0)+' mHz')+'</span><br>'+
+      'Period T = '+(T<1? (T*1000).toFixed(0)+' ms' : T.toFixed(2)+' s')+'<br>'+
+      'Duty cycle = <span class="r-bd">'+duty.toFixed(1)+'%</span> (always &gt; 50%)<br>'+
+      'V(C) now = '+capV.toFixed(2)+' V · OUT = '+out555;
+  } else {
+    var Tp=1.1*(R1*1e3)*(C*1e-6);
+    read='Pulse width T = 1.1·R₁·C = <span class="r-on">'+(Tp<1? (Tp*1000).toFixed(0)+' ms' : Tp.toFixed(2)+' s')+'</span><br>'+
+      'State : '+(out555? '<span class="r-on">PULSING (charging to ⅔ Vcc)</span>' : '<span class="r-bd">RESTING — fire the trigger</span>')+'<br>'+
+      'V(C) now = '+capV.toFixed(2)+' V<br>'+
+      'Every pulse is identical, however you trigger.';
+  }
+  document.getElementById('labRead').innerHTML=read;
+}
+
+/* --- counter renderer --- */
+function drawCtr(){
+  var clk = document.getElementById('autoClk').checked? ((frame%56)<28?1:0) : (clkPulse>0?1:0);
+  if(clk===1 && prevClk===0) stepCounter();
+  prevClk=clk;
+  if(clkPulse>0) clkPulse--;
+  var b=bitsOf(); // [Q0..Q3]
+  lanes.CLK.push(clk); lanes.Q0.push(b[0]); lanes.Q1.push(b[1]); lanes.Q2.push(b[2]); lanes.Q3.push(b[3]);
+  Object.keys(lanes).forEach(function(k){ if(lanes[k].length>HLEN) lanes[k].shift(); });
+  var W=cv.width;
+  var names={bin:'4-Bit Binary Counter (MOD-16)',bcd:'BCD / Decade Counter (MOD-10)',ud:'Up/Down Counter (MOD-16, '+(dirUp?'UP':'DOWN')+')',joh:'Johnson Counter (4 FF → 8 states)'};
+  cx.fillStyle=css('--text'); cx.font='bold 15px Georgia';
+  cx.fillText(names[ctr], 20, 26);
+  // LED row Q3..Q0
+  var lx=210;
+  led(lx,70,b[3]===1,'Q3'); led(lx+70,70,b[2]===1,'Q2'); led(lx+140,70,b[1]===1,'Q1'); led(lx+210,70,b[0]===1,'Q0');
+  // decimal
+  var val= ctr==='joh'? (joh[3]*8+joh[2]*4+joh[1]*2+joh[0]) : count;
+  cx.fillStyle=css('--navy'); cx.font='bold 40px Georgia'; cx.textAlign='center';
+  cx.fillText(ctr==='joh'? joh.slice().reverse().join('') : val, 560, 84);
+  cx.font='11px Arial'; cx.fillStyle=css('--text-muted');
+  cx.fillText(ctr==='joh'? 'state (Q3Q2Q1Q0)' : 'decimal count', 560, 102);
+  cx.textAlign='left';
+  // timing lanes
+  var lnames=['CLK','Q0','Q1','Q2','Q3'];
+  var x0=64,x1=W-16,y0=140,laneH=58;
+  var stepPx=(x1-x0)/HLEN;
+  lnames.forEach(function(L,li){
+    var top=y0+li*laneH, hi=top+8, lo=top+laneH-16;
+    cx.fillStyle=css('--text'); cx.font='bold 12px Courier New'; cx.fillText(L,16,(hi+lo)/2+4);
+    cx.strokeStyle=css('--border'); cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(x0,lo); cx.lineTo(x1,lo); cx.stroke();
+    var h=lanes[L]; if(h.length<2) return;
+    cx.strokeStyle= L==='CLK'? css('--amber') : css('--green-dark');
+    cx.lineWidth=2.2; cx.beginPath();
+    var ly=null;
+    h.forEach(function(v,i){
+      var x=x1-(h.length-1-i)*stepPx, y=v?hi:lo;
+      if(ly===null) cx.moveTo(x,y);
+      else if(y!==ly){ cx.lineTo(x,ly); cx.lineTo(x,y); }
+      else cx.lineTo(x,y);
+      ly=y;
+    });
+    cx.stroke();
+  });
+  var extra= ctr==='bin'? 'Q0=÷2 · Q1=÷4 · Q2=÷8 · Q3=÷16'
+           : ctr==='bcd'? 'Counts 0–9 then resets (1010 never shown)'
+           : ctr==='ud'? 'Direction: '+(dirUp?'UP ▲':'DOWN ▼')+' — toggle DIR mid-count'
+           : 'One bit changes per clock — glitch-free decoding';
+  document.getElementById('labRead').innerHTML=
+    'Counter : <span class="r-on">'+names[ctr]+'</span><br>'+
+    'State Q3Q2Q1Q0 : '+b[3]+''+b[2]+''+b[1]+''+b[0]+(ctr!=='joh'? ' = '+count : '')+'<br>'+
+    'Clock edges counted : '+edges+'<br>'+extra;
+}
+
+function draw(){
+  cx.fillStyle=css('--card'); cx.fillRect(0,0,cv.width,cv.height);
+  if(mode==='t555') draw555(); else drawCtr();
+  frame++;
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
