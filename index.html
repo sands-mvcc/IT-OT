@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,6 +91,7 @@
     outline: 3px solid var(--accent);
     outline-offset: 3px;
   }
+
   /* HEADER */
   header {
     background: var(--header-bg);
@@ -155,6 +155,7 @@
     transition: background 0.2s;
   }
   .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+
   /* HERO STRIP */
   .hero {
     background: linear-gradient(135deg, #1a1e2e 0%, #22304a 60%, #b4530933 100%);
@@ -175,6 +176,7 @@
     font-weight: 500;
   }
   .strand-pill span { font-weight: 800; margin-left: 4px; }
+
   /* MAIN CONTENT */
   main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px; }
   .section-label {
@@ -187,6 +189,7 @@
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border);
   }
+
   /* SAFEGUARDS PANEL */
   .safeguards {
     background: var(--surface);
@@ -233,6 +236,7 @@
   }
   .safeguards-foot a { color: var(--accent); font-weight: 700; text-decoration: none; }
   .safeguards-foot a:hover { text-decoration: underline; }
+
   /* CARD GRID */
   .card-grid {
     display: grid;
@@ -264,6 +268,7 @@
   .card.strand-lab    .card-accent-bar { background: var(--tag-lab); }
   .card.strand-tools  .card-accent-bar { background: var(--tag-tools); }
   .card.strand-special .card-accent-bar { background: linear-gradient(90deg, var(--accent), var(--tag-proto)); }
+
   .card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
   .card-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .lesson-num {
@@ -294,6 +299,7 @@
   .tag-lab     { color: var(--tag-lab);    background: var(--tag-lab-bg); }
   .tag-tools   { color: var(--tag-tools);  background: var(--tag-tools-bg); }
   .tag-special { color: var(--accent);     background: var(--accent-light); }
+
   .card-title { font-size: 1.02rem; font-weight: 700; line-height: 1.3; color: var(--text); }
   .card-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; flex: 1; }
   .safety-flag {
@@ -323,6 +329,7 @@
   .card-terms strong { color: var(--text); font-weight: 600; }
   .card-arrow { font-size: 1rem; color: var(--text-muted); transition: transform 0.2s; }
   .card:hover .card-arrow { transform: translateX(4px); }
+
   /* SPECIAL / LAB / TOOLS GRIDS */
   .special-grid, .lab-grid, .tools-grid {
     display: grid;
@@ -336,9 +343,7 @@
   .card.lab-card .card-title { color: var(--tag-lab); }
   .card.tools-card { border: 2px solid var(--tag-tools); }
   .card.tools-card .card-title { color: var(--tag-tools); }
-  /* PROGRESS BAR (decorative) */
-  .progress-strip { display: flex; gap: 4px; margin-bottom: 28px; align-items: center; }
-  .progress-block { height: 6px; border-radius: 3px; flex: 1; }
+
   /* FRAMEWORKS ACCORDION */
   .framework-accordion {
     background: var(--surface);
@@ -414,6 +419,134 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
   }
+
+  /* CONTENT DEVELOPMENT TOOLS — collapsible section (cdt-*) */
+  .cdt-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .cdt-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 18px 22px;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .cdt-toggle:hover { background: var(--accent-light); }
+  .cdt-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cdt-toggle-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .cdt-toggle-title h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .cdt-toggle-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .cdt-chevron {
+    font-size: 0.9rem;
+    color: var(--accent);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+  }
+  .cdt-toggle[aria-expanded="true"] .cdt-chevron { transform: rotate(180deg); }
+
+  .cdt-panel {
+    padding: 4px 22px 22px;
+    border-top: 1px solid var(--border);
+  }
+  .cdt-panel[hidden] { display: none; }
+  .cdt-panel-lead {
+    margin: 16px 0 20px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 62ch;
+  }
+  .cdt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .cdt-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  }
+  .cdt-card.is-live:hover,
+  .cdt-card.is-live:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--accent);
+  }
+  .cdt-card.is-soon { opacity: 0.72; cursor: default; }
+  .cdt-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+  .cdt-card h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cdt-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    flex-grow: 1;
+  }
+  .cdt-cta {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .cdt-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--border);
+    border-radius: 999px;
+    padding: 2px 9px;
+    align-self: flex-start;
+  }
+
+  /* PROGRESS BAR (decorative) */
+  .progress-strip { display: flex; gap: 4px; margin-bottom: 28px; align-items: center; }
+  .progress-block { height: 6px; border-radius: 3px; flex: 1; }
+
   /* FOOTER */
   footer {
     text-align: center;
@@ -424,6 +557,7 @@
     margin-top: 8px;
     line-height: 1.6;
   }
+
   @media (max-width: 520px) {
     .header-inner { padding: 14px 16px; }
     .brand-text h1 { font-size: 1rem; }
@@ -440,6 +574,7 @@
 </style>
 </head>
 <body>
+
 <header>
   <div class="header-inner">
     <div class="header-brand">
@@ -455,6 +590,7 @@
     </div>
   </div>
 </header>
+
 <div class="hero">
   <h2>Course Navigation</h2>
   <p>A faculty development workshop for community college instructors who need to teach operational technology and IT/OT security. Select a lesson below. Each lesson pairs the technical content with the teaching moves, lab design, and assessment ideas you need to run it in your own classroom.</p>
@@ -467,7 +603,9 @@
     <div class="strand-pill">Operations &amp; Capstone <span>2</span></div>
   </div>
 </div>
+
 <main>
+
   <!-- SAFEGUARDS -->
   <section class="safeguards" aria-labelledby="safeguards-title">
     <div class="safeguards-head">
@@ -514,7 +652,9 @@
       <a href="safeguards.html">Read the full policy →</a>
     </div>
   </section>
+
   <div class="section-label">📚 Course Lessons — 12 Lessons / 5 Days</div>
+
   <!-- Strand color strip -->
   <div class="progress-strip" aria-hidden="true">
     <div class="progress-block" style="background:var(--tag-found);"></div>
@@ -530,7 +670,9 @@
     <div class="progress-block" style="background:var(--tag-ops);"></div>
     <div class="progress-block" style="background:var(--accent);"></div>
   </div>
+
   <div class="card-grid">
+
     <!-- Lesson 1 -->
     <a class="card strand-found" href="lesson01.html">
       <div class="card-accent-bar"></div>
@@ -547,6 +689,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 2 -->
     <a class="card strand-found" href="lesson02.html">
       <div class="card-accent-bar"></div>
@@ -563,6 +706,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 3 -->
     <a class="card strand-found" href="lesson03.html">
       <div class="card-accent-bar"></div>
@@ -579,6 +723,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 4 -->
     <a class="card strand-proto" href="lesson04.html">
       <div class="card-accent-bar"></div>
@@ -595,6 +740,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 5 -->
     <a class="card strand-proto" href="lesson05.html">
       <div class="card-accent-bar"></div>
@@ -611,6 +757,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 6 -->
     <a class="card strand-threat" href="lesson06.html">
       <div class="card-accent-bar"></div>
@@ -628,6 +775,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 7 -->
     <a class="card strand-threat" href="lesson07.html">
       <div class="card-accent-bar"></div>
@@ -645,6 +793,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 8 -->
     <a class="card strand-gov" href="lesson08.html">
       <div class="card-accent-bar"></div>
@@ -661,6 +810,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 9 -->
     <a class="card strand-gov" href="lesson09.html">
       <div class="card-accent-bar"></div>
@@ -677,6 +827,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 10 -->
     <a class="card strand-idm" href="lesson10.html">
       <div class="card-accent-bar"></div>
@@ -693,6 +844,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 11 -->
     <a class="card strand-ops" href="lesson11.html">
       <div class="card-accent-bar"></div>
@@ -709,6 +861,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <!-- Lesson 12 -->
     <a class="card strand-special" href="lesson12.html">
       <div class="card-accent-bar"></div>
@@ -725,6 +878,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
   </div>
 
   <!-- CORE FRAMEWORKS (ACCORDION) -->
@@ -813,7 +967,9 @@
   </section>
 
   <div class="section-label">🎓 Faculty Resources</div>
+
   <div class="special-grid">
+
     <a class="card special-card strand-special" href="safeguards.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -829,6 +985,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <a class="card special-card strand-special" href="teaching-guide.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -844,6 +1001,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <a class="card special-card strand-special" href="assessments.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -859,9 +1017,13 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
   </div>
+
   <div class="section-label">🔬 Lab Activities</div>
+
   <div class="lab-grid">
+
     <a class="card lab-card strand-lab" href="labs.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -878,6 +1040,7 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
     <a class="card lab-card strand-lab" href="simulators.html">
       <div class="card-accent-bar"></div>
       <div class="card-body">
@@ -894,45 +1057,80 @@
         <span class="card-arrow">→</span>
       </div>
     </a>
+
   </div>
+
   <div class="section-label">🛠️ Content Development Tools</div>
-  <div class="tools-grid">
-    <a class="card tools-card strand-tools" href="gen-graphics.html">
-      <div class="card-accent-bar"></div>
-      <div class="card-body">
-        <div class="card-header-row">
-          <span class="lesson-num">Tool</span>
-          <span class="strand-tag tag-tools">Dev Tools</span>
+
+  <section class="cdt-section" aria-labelledby="cdtHeading">
+    <button class="cdt-toggle" id="cdtToggleBtn" aria-expanded="false" aria-controls="cdtPanel">
+      <span class="cdt-toggle-title">
+        <h2 id="cdtHeading">🧰 Content Development Tools</h2>
+        <span class="cdt-toggle-sub">Instructional Prompt Building Tools</span>
+      </span>
+      <span class="cdt-chevron" aria-hidden="true">▾</span>
+    </button>
+
+    <div class="cdt-panel" id="cdtPanel" role="region" aria-labelledby="cdtHeading" hidden>
+      <p class="cdt-panel-lead">
+        Prompt builders that turn OT-101's lessons, major concepts, and learning objectives into
+        ready-to-paste prompts for Claude, ChatGPT, Gemini, or Perplexity — for building course
+        graphics, handouts, activities, and other teaching materials.
+      </p>
+
+      <div class="cdt-grid">
+        <a class="cdt-card is-live" href="gen-graphics.html">
+          <span class="cdt-icon" aria-hidden="true">🖼️</span>
+          <h3>Generate Instructional Graphics</h3>
+          <p>Build a prompt for lesson diagrams, architecture/zone maps, protocol comparisons, and analogy illustrations, scoped to any OT-101 lesson.</p>
+          <span class="cdt-cta">Open Tool →</span>
+        </a>
+
+        <a class="cdt-card is-live" href="gen-content.html">
+          <span class="cdt-icon" aria-hidden="true">📝</span>
+          <h3>Generate Instructional Content</h3>
+          <p>Draft lesson text, quiz questions, and scenario descriptions aligned to the course objectives. Output is a starting draft — faculty subject-matter review is required before it reaches students.</p>
+          <span class="cdt-cta">Open Tool →</span>
+        </a>
+
+        <div class="cdt-card is-soon" aria-disabled="true">
+          <span class="cdt-icon" aria-hidden="true">📄</span>
+          <h3>Generate Instructional Cheatsheets</h3>
+          <p>Build quick-reference handouts — protocol tables, framework crosswalks, device glossaries.</p>
+          <span class="cdt-badge">Coming soon</span>
         </div>
-        <div class="card-title">🎨 Graphics Generation</div>
-        <div class="card-desc">Build Purdue model diagrams, network zone drawings, protocol stack illustrations, and concept maps for OT lesson content. Review every generated diagram for technical accuracy before use.</div>
-      </div>
-      <div class="card-footer">
-        <span class="card-terms"><strong>Covers:</strong> Purdue Diagrams · Zone Drawings · Concept Maps</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-    <a class="card tools-card strand-tools" href="gen-content.html">
-      <div class="card-accent-bar"></div>
-      <div class="card-body">
-        <div class="card-header-row">
-          <span class="lesson-num">Tool</span>
-          <span class="strand-tag tag-tools">Dev Tools</span>
+
+        <div class="cdt-card is-soon" aria-disabled="true">
+          <span class="cdt-icon" aria-hidden="true">🎯</span>
+          <h3>Generate Instructional Activities</h3>
+          <p>Build classroom exercises, simulations, and hands-on labs tied to a lesson's objectives.</p>
+          <span class="cdt-badge">Coming soon</span>
         </div>
-        <div class="card-title">✍️ Content Generation</div>
-        <div class="card-desc">Draft lesson text, quiz questions, and scenario descriptions aligned to the course objectives. Output is a starting draft — faculty subject-matter review is required before it reaches students.</div>
+
+        <div class="cdt-card is-soon" aria-disabled="true">
+          <span class="cdt-icon" aria-hidden="true">💡</span>
+          <h3>Generate Instructional Examples</h3>
+          <p>Build worked examples and scenario walk-throughs (e.g., packet captures, zone diagrams).</p>
+          <span class="cdt-badge">Coming soon</span>
+        </div>
+
+        <div class="cdt-card is-soon" aria-disabled="true">
+          <span class="cdt-icon" aria-hidden="true">📚</span>
+          <h3>Generate Instructional Case Studies</h3>
+          <p>Build scenario-based case studies modeled on incidents like Stuxnet or Colonial Pipeline.</p>
+          <span class="cdt-badge">Coming soon</span>
+        </div>
       </div>
-      <div class="card-footer">
-        <span class="card-terms"><strong>Covers:</strong> Lesson Text · Quiz Items · Scenarios · Study Aids</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-  </div>
+    </div>
+  </section>
+
 </main>
+
 <footer>
   Teaching Operational Technologies for Community College Faculty &nbsp;|&nbsp; 12 Lessons / 5 Days &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology<br>
   Educational use only. All exercises are simulation-based and defensive in scope.
 </footer>
+
 <script>
   // Light is default — only apply dark if previously saved
   function applyTheme(theme) {
@@ -941,10 +1139,12 @@
     btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
     try { localStorage.setItem('otfac-theme', theme); } catch (e) { /* storage unavailable */ }
   }
+
   function toggleTheme() {
     var current = document.documentElement.getAttribute('data-theme');
     applyTheme(current === 'dark' ? 'light' : 'dark');
   }
+
   (function () {
     var saved = null;
     try { saved = localStorage.getItem('otfac-theme'); } catch (e) { /* storage unavailable */ }
@@ -974,5 +1174,19 @@
     }
   }
 </script>
+
+<script>
+  // Content Development Tools — collapsible section toggle
+  (function () {
+    var btn = document.getElementById('cdtToggleBtn');
+    var panel = document.getElementById('cdtPanel');
+    btn.addEventListener('click', function () {
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      panel.hidden = expanded;
+    });
+  })();
+</script>
+
 </body>
 </html>
