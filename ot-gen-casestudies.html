@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate Instructional Case Studies — OT-101 Prompt Builder</title>
+<style>
+  :root[data-theme="light"] {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --fg: #1b2430;
+    --muted: #5b6675;
+    --border: #dde2e8;
+    --accent: #0f6f6a;
+    --accent-fg: #ffffff;
+    --accent-soft: #e3f3f1;
+    --code-bg: #101820;
+    --code-fg: #dcecea;
+    --shadow: 0 1px 2px rgba(20,30,40,0.06), 0 4px 12px rgba(20,30,40,0.05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #121820;
+    --surface: #1a222c;
+    --fg: #e8edf2;
+    --muted: #9aa7b5;
+    --border: #2b3542;
+    --accent: #4fd1c5;
+    --accent-fg: #0b1f1d;
+    --accent-soft: #16302d;
+    --code-bg: #0b1116;
+    --code-fg: #d7ece9;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 6px 16px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 90px; }
+
+  header.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .breadcrumb { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
+  .breadcrumb:hover { text-decoration: underline; }
+  h1 { font-size: 1.5rem; margin: 6px 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin: 0 0 4px; max-width: 68ch; }
+  .theme-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card > summary, .card > .card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .card > summary::-webkit-details-marker { display: none; }
+  .card > summary .num, .card-head .num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; flex-shrink: 0;
+  }
+  .card-body { padding: 4px 18px 18px; border-top: 1px solid var(--border); }
+  .card[open] .chev { transform: rotate(180deg); }
+  .chev { margin-left: auto; color: var(--muted); transition: transform .15s ease; }
+
+  .field { margin: 14px 0; }
+  .field label, .field legend {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 5px;
+    padding: 0;
+  }
+  .field select, .field input[type="text"], .field input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  .check-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px 14px;
+    margin-top: 4px;
+  }
+  .check-item { display: flex; align-items: flex-start; gap: 7px; font-size: 0.86rem; }
+  .check-item input { margin-top: 3px; flex-shrink: 0; }
+
+  .concepts-box {
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    color: var(--fg);
+    margin-top: 6px;
+    display: none;
+  }
+  .concepts-box.visible { display: block; }
+  .concepts-box strong { display: block; margin-bottom: 4px; }
+
+  fieldset { border: none; padding: 0; margin: 14px 0; }
+
+  .sticky-panel { position: sticky; top: 16px; }
+  .output-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; font-weight: 700; border-bottom: 1px solid var(--border);
+  }
+  .output-body { padding: 14px 18px; }
+  #promptOutput {
+    width: 100%;
+    min-height: 340px;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    resize: vertical;
+  }
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex: 1;
+    min-width: 92px;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .btn:hover { filter: brightness(0.97); }
+  .copy-flash { color: var(--accent); font-size: 0.8rem; margin-top: 6px; min-height: 1.1em; }
+  .safeguard-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <div>
+      <a class="breadcrumb" href="index.html">← OT-101 Course Home</a>
+      <h1>📚 Generate Instructional Case Studies</h1>
+      <p class="subtitle">
+        Build a precise, ready-to-paste prompt for generating scenario-based case studies — modeled
+        on incidents like Stuxnet or Colonial Pipeline, or fully fictional — scoped to any OT-101
+        lesson, then hand it to Claude, ChatGPT, Gemini, or Perplexity to draft it.
+      </p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button">🌙 Dark</button>
+  </header>
+
+  <div class="layout">
+    <div class="forms">
+
+      <!-- 1. CONTENT -->
+      <details class="card" open>
+        <summary><span class="num">1</span> Content <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="field">
+            <label for="lesson">Lesson</label>
+            <select id="lesson"></select>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="subjectArea">Subject Area / Cluster</label>
+              <select id="subjectArea">
+                <option>Foundations &amp; History</option>
+                <option>Protocols &amp; Networks</option>
+                <option>Threats &amp; Vulnerabilities</option>
+                <option>Governance &amp; Operations</option>
+                <option>Capstone</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="gradeLevel">Grade / Skill Level</label>
+              <select id="gradeLevel">
+                <option>Community College / Undergraduate</option>
+                <option selected>Adult Workforce Training</option>
+                <option>Graduate / Professional</option>
+                <option>Executive / Industry</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="customTopic">Custom Topic / Title Override <span style="font-weight:400;">(optional)</span></label>
+            <input type="text" id="customTopic" placeholder="Leave blank to use the selected lesson title">
+          </div>
+
+          <div class="concepts-box" id="conceptsBox">
+            <strong>Major concepts for this lesson (for reference):</strong>
+            <span id="conceptsText"></span>
+          </div>
+
+          <fieldset class="field">
+            <legend>Learning Objective(s) to Anchor the Case Study</legend>
+            <div class="check-grid" id="objectivesGrid"></div>
+            <div class="hint">Objectives update automatically based on the selected lesson. Check one or more.</div>
+          </fieldset>
+        </div>
+      </details>
+
+      <!-- 2. CASE STUDY BASIS -->
+      <details class="card" open>
+        <summary><span class="num">2</span> Case Study Basis <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="field">
+            <label for="caseBasis">Case Study Basis</label>
+            <select id="caseBasis">
+              <option>Let the model choose based on content</option>
+              <option selected>Modeled on a named historical incident (e.g., Stuxnet, Colonial Pipeline) *</option>
+              <option>Fully fictional composite scenario</option>
+              <option>Fictional scenario inspired by a class of incidents (not one specific case)</option>
+              <option>Modeled on a described threat-actor TTP pattern</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="realIncident">Real Incident to Model After <span style="font-weight:400;">(optional)</span></label>
+            <input type="text" id="realIncident" placeholder="e.g., Colonial Pipeline (2021) — leave blank for a fictional scenario">
+          </div>
+        </div>
+      </details>
+
+      <!-- 3. CASE STUDY DESIGN -->
+      <details class="card" open>
+        <summary><span class="num">3</span> Case Study Design <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="row2">
+            <div class="field">
+              <label for="narrativeStructure">Narrative Structure</label>
+              <select id="narrativeStructure">
+                <option selected>Chronological timeline *</option>
+                <option>Multiple-perspective (operator, IT, management)</option>
+                <option>Decision-point branching (choose-your-own-response)</option>
+                <option>Post-incident retrospective / lessons-learned</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="caseLength">Length</label>
+              <select id="caseLength">
+                <option selected>Short vignette (~1 page) *</option>
+                <option>Full case study (2–4 pages)</option>
+                <option>Extended multi-part case (for capstone / multi-day use)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="technicalDetail">Level of Technical Detail</label>
+            <select id="technicalDetail">
+              <option>High-level / conceptual</option>
+              <option selected>Moderate — some technical specifics *</option>
+              <option>Deep technical detail (protocols, configs, logs)</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
+      <!-- 4. ANALYSIS COMPONENTS -->
+      <details class="card">
+        <summary><span class="num">4</span> Analysis Components <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="check-grid" style="grid-template-columns:1fr;">
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include discussion questions" checked>Include discussion questions</label>
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include a &quot;what went wrong&quot; root-cause breakdown" checked>Include a "what went wrong" root-cause breakdown</label>
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include a framework mapping (map events to IEC 62443/NIST CSF/etc.)" checked>Include a framework mapping (map events to IEC 62443/NIST CSF/etc.)</label>
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include a &quot;what should have happened&quot; counterfactual">Include a "what should have happened" counterfactual</label>
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include role-specific reflection prompts (operator vs. IT vs. management)">Include role-specific reflection prompts (operator vs. IT vs. management)</label>
+            <label class="check-item"><input type="checkbox" data-group="analysisOption" value="Include a proposed remediation / action plan section">Include a proposed remediation / action plan section</label>
+          </div>
+        </div>
+      </details>
+
+      <!-- 5. OUTPUT SPECIFICATIONS -->
+      <details class="card">
+        <summary><span class="num">5</span> Output Specifications <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="field">
+            <label for="outputFormat">Output Format</label>
+            <select id="outputFormat">
+              <option selected>Markdown with headers *</option>
+              <option>Plain text narrative</option>
+              <option>Slide-ready summary format</option>
+              <option>LMS-ready HTML</option>
+            </select>
+          </div>
+          <fieldset class="field">
+            <legend>Options</legend>
+            <div class="check-grid">
+              <label class="check-item"><input type="checkbox" data-group="outputOption" value="Include a one-paragraph executive summary at the top" checked>Include a one-paragraph executive summary at the top</label>
+              <label class="check-item"><input type="checkbox" data-group="outputOption" value="Include a timeline graphic description/outline">Include a timeline graphic description/outline</label>
+              <label class="check-item"><input type="checkbox" data-group="outputOption" value="Include suggested citations/sources for factual claims about the real incident (if applicable)" checked>Include suggested citations/sources for factual claims about the real incident (if applicable)</label>
+            </div>
+          </fieldset>
+        </div>
+      </details>
+
+      <!-- 6. PEDAGOGICAL & SAFEGUARD CONSTRAINTS -->
+      <details class="card">
+        <summary><span class="num">6</span> Pedagogical &amp; Safeguard Constraints <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="check-grid" style="grid-template-columns:1fr;">
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Anonymize or fictionalize identifying details even when modeled on a real incident, unless explicitly citing public reporting" checked>Anonymize or fictionalize identifying details even when modeled on a real incident, unless explicitly citing public reporting</label>
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Cite only publicly reported facts when referencing a real incident; do not invent technical details attributed to it" checked>Cite only publicly reported facts when referencing a real incident; do not invent technical details attributed to it</label>
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Do not name real, identifiable plants, vendors, or facilities beyond what is already public record for the cited incident">Do not name real, identifiable plants, vendors, or facilities beyond what is already public record for the cited incident</label>
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Do not include exploit code, working attack instructions, or credentials" checked>Do not include exploit code, working attack instructions, or credentials</label>
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Keep the narrative respectful of any real organizations or individuals involved" checked>Keep the narrative respectful of any real organizations or individuals involved</label>
+            <label class="check-item"><input type="checkbox" data-group="pedConstraint" value="Match technical depth to the stated audience skill level">Match technical depth to the stated audience skill level</label>
+          </div>
+        </div>
+      </details>
+
+      <!-- TARGET MODEL -->
+      <details class="card" open>
+        <summary><span class="num">7</span> Target Model <span class="chev">▾</span></summary>
+        <div class="card-body">
+          <div class="field">
+            <label for="targetModel">Generate this prompt for</label>
+            <select id="targetModel">
+              <option selected>Claude *</option>
+              <option>ChatGPT</option>
+              <option>Gemini</option>
+              <option>Perplexity</option>
+            </select>
+            <div class="hint">Phrasing adjusts slightly depending on the target model's conventions.</div>
+          </div>
+        </div>
+      </details>
+
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="sticky-panel">
+      <div class="card">
+        <div class="output-head">
+          <span>Generated Prompt</span>
+        </div>
+        <div class="output-body">
+          <textarea id="promptOutput" readonly></textarea>
+          <div class="btn-row">
+            <button class="btn primary" id="copyBtn" type="button">Copy</button>
+            <button class="btn" id="downloadBtn" type="button">⬇ Download .TXT</button>
+            <button class="btn" id="resetBtn" type="button">↺ Reset</button>
+          </div>
+          <div class="copy-flash" id="copyFlash"></div>
+          <div class="safeguard-note">
+            Built for the OT-101 faculty development course · Moraine Valley Community College.
+            Review generated case studies against your institution's Safeguards &amp; Responsible Use policy before classroom use.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// OT-101 LESSON DATA — title, cluster, major concepts, learning objectives
+// Source: OT-101 course design (12 lessons, 5-day faculty development course)
+// =====================================================================
+const LESSONS = [
+  {
+    title: "From Isolated Plants to Converged Networks",
+    day: "Day 1", cluster: "Foundations & History",
+    concepts: [
+      "Relay logic and pneumatic control systems",
+      "Programmable Logic Controllers (PLCs) and ladder logic",
+      "Distributed Control Systems (DCS)",
+      "Supervisory Control and Data Acquisition (SCADA)",
+      "Serial communication protocols versus Ethernet",
+      "Network convergence and the erosion of the \"air gap\"",
+      "Business drivers: dashboards, predictive maintenance, remote support, ERP integration"
+    ],
+    objectives: [
+      "Explain how OT control evolved from relay logic and pneumatic controllers to programmable logic controllers.",
+      "Identify the defining characteristics of DCS and SCADA architectures and the environments each was built for.",
+      "Compare serial-based industrial communication with Ethernet-based communication in terms of underlying design assumptions.",
+      "Describe the business pressures that drove convergence between IT and OT networks.",
+      "Evaluate why the \"air gap\" model failed to keep pace with operational and business needs."
+    ]
+  },
+  {
+    title: "IT/OT Security Principles",
+    day: "Day 1", cluster: "Foundations & History",
+    concepts: [
+      "Why the CIA triad inverts for OT environments",
+      "Safety as a constraint on the triad rather than a ranked property",
+      "Availability as per-cycle deadlines versus annual uptime percentages",
+      "Integrity across multiple objects (process variables, setpoints, logic, timestamps)",
+      "Confidentiality's subordinate ranking under operational conflict",
+      "The three data states and OT's emphasis on data-in-use protection",
+      "Three countermeasure families: administrative, educational, and technical",
+      "Determinism and scan-cycle budgeting as security requirements",
+      "Twenty-year asset lifecycles and constrained patch windows",
+      "The Purdue Model, zones, and conduits as architectural frameworks"
+    ],
+    objectives: [
+      "Reorder the CIA triad for operational technology contexts using consequence-based reasoning.",
+      "Explain why safety sits above rather than alongside confidentiality, integrity, and availability.",
+      "Distinguish the three data states and identify which carries highest risk in control networks.",
+      "Classify countermeasures by family and select balanced combinations for scenarios.",
+      "Describe determinism and PLC scan cycles, explaining latency as a security rather than performance issue.",
+      "Account for how equipment lifecycles and patch windows constrain available controls.",
+      "Place assets on the Purdue Model and express communication paths using IEC 62443 zone-and-conduit language.",
+      "Design classroom sequences that surface and correct IT assumptions in OT instruction."
+    ]
+  },
+  {
+    title: "OT Technologies & Field Devices",
+    day: "Day 1", cluster: "Foundations & History",
+    concepts: [
+      "Programmable Logic Controllers (PLCs)",
+      "Remote Terminal Units (RTUs)",
+      "Intelligent Electronic Devices (IEDs)",
+      "Sensors and actuators",
+      "Human-Machine Interfaces (HMIs)",
+      "Engineering workstations",
+      "Historians (time-series databases)",
+      "Variable frequency drives (VFDs)",
+      "Safety Instrumented Systems (SIS)"
+    ],
+    objectives: [
+      "Explain the primary function of each core OT device type: PLC, RTU, IED, HMI, historian, and safety instrumented system.",
+      "Compare PLCs, RTUs, and IEDs in terms of typical deployment context and protocols.",
+      "Identify how sensors and actuators convert between the physical process and digital control signals.",
+      "Describe what each device type exposes on the network and the risk that exposure creates.",
+      "Evaluate the consequence of a single device's failure on process visibility, control, and safety."
+    ]
+  },
+  {
+    title: "IT Protocols Inside OT Networks",
+    day: "Day 2", cluster: "Protocols & Networks",
+    concepts: [
+      "Ethernet and TCP/IP foundations in OT contexts",
+      "VLANs and network segmentation aligned to Purdue-model zones",
+      "Static IP addressing versus DHCP",
+      "DNS versus static hosts files",
+      "NTP synchronization using local, GPS-disciplined clocks"
+    ],
+    objectives: [
+      "Explain why familiar IT protocols such as Ethernet and TCP/IP appear in OT networks yet are frequently configured differently.",
+      "Identify how VLANs implement network segmentation and align with Purdue-model zone boundaries.",
+      "Compare static and DHCP addressing, including operational tradeoffs.",
+      "Describe why OT networks commonly rely on local, GPS-disciplined time sources for NTP synchronization.",
+      "Evaluate a described network configuration and identify which OT-appropriate practice it is missing."
+    ]
+  },
+  {
+    title: "Industrial Communication Protocols",
+    day: "Day 2", cluster: "Protocols & Networks",
+    concepts: [
+      "Modbus TCP: master/slave architecture, function codes, MBAP framing",
+      "DNP3: utility SCADA design, unsolicited event reporting",
+      "EtherNet/IP and PROFINET: competing industrial-Ethernet standards",
+      "BACnet/IP: building automation, object-oriented addressing",
+      "OPC UA: certificate-based authentication and encryption as native features",
+      "Comparative analysis of protocol origins and security models"
+    ],
+    objectives: [
+      "Explain the historical origin and intended use case of Modbus, DNP3, EtherNet/IP, PROFINET, BACnet/IP, and OPC UA.",
+      "Identify the function code, addressing, and framing fields of a Modbus TCP request and response in a packet capture.",
+      "Compare DNP3's utility-SCADA design, including unsolicited event reporting, against Modbus's simpler master/slave model.",
+      "Describe why Modbus, DNP3, EtherNet/IP, PROFINET, and BACnet/IP carry no native authentication by default.",
+      "Evaluate how OPC UA's built-in security model differs from that of the five legacy protocols in this lesson.",
+      "Configure a simulated Modbus TCP read or write request and correctly interpret every field in its response."
+    ]
+  },
+  {
+    title: "The OT Threat Landscape",
+    day: "Day 3", cluster: "Threats & Vulnerabilities",
+    concepts: [
+      "Six categories of threat actors (nation-state, cybercriminal/ransomware, hacktivist, malicious insider, negligent insider, third-party contractor)",
+      "Ransomware attack paths crossing from business IT into production systems",
+      "Insider risk and access-control failures",
+      "Third-party and contractor access as attack vectors",
+      "Supply-chain compromise and trusted-update exploitation",
+      "Network segmentation, zone-and-conduit architecture, and countermeasures",
+      "Case studies: Ukraine power grid (2015-16), Colonial Pipeline (2021), Maroochy Shire (2000), SolarWinds Orion (2020)"
+    ],
+    objectives: [
+      "Explain how the discovery of Stuxnet changed how security leaders assess risk to physical, safety-critical systems.",
+      "Identify the primary categories of OT threat actors and the motivations that distinguish them.",
+      "Describe the typical path ransomware takes from a business-network infection to an operational shutdown.",
+      "Compare insider risk and third-party/contractor risk as distinct categories of OT threat.",
+      "Evaluate a supply-chain compromise case study to identify where trust was misplaced and what controls could have limited its impact.",
+      "Analyze a simulated attack-path scenario to explain how each stage of intrusion increases operational risk."
+    ]
+  },
+  {
+    title: "Vulnerabilities & Countermeasures",
+    day: "Day 3", cluster: "Threats & Vulnerabilities",
+    concepts: [
+      "Legacy firmware, flat networks, and default credentials as persistent vulnerabilities",
+      "Reading and interpreting CVE entries and ICS advisories",
+      "The \"patch window\" gap between vulnerability disclosure and validated patch deployment",
+      "Compensating controls as risk mitigation during patching delays",
+      "Specific countermeasures: hardening, allowlisting, segmentation, jump hosts, offline backups",
+      "Defense-in-depth layering of multiple controls"
+    ],
+    objectives: [
+      "Explain why legacy firmware, flat networks, and default credentials remain common vulnerabilities in OT environments.",
+      "Identify the parts of a CVE identifier and an ICS advisory, and locate authoritative sources for each.",
+      "Compare hardening, allowlisting, and network segmentation as countermeasure strategies.",
+      "Describe why the patch window so rarely opens in OT, and how compensating controls fill that gap.",
+      "Evaluate a simple network scenario and recommend appropriate countermeasures using zones, conduits, and jump hosts."
+    ]
+  },
+  {
+    title: "Frameworks for OT Security",
+    day: "Day 4", cluster: "Governance & Operations",
+    concepts: [
+      "Zone and conduit partitioning in IEC 62443-3-2",
+      "Security Levels (SL-T, SL-C, SL-A) and foundational requirements",
+      "NIST SP 800-82 Rev. 3 OT control tailoring and compensation strategies",
+      "NIST CSF 2.0 six Functions (Govern, Identify, Protect, Detect, Respond, Recover)",
+      "ISO/IEC 27001 management system scope and certification",
+      "Framework comparison across scope, unit of analysis, and classroom fit",
+      "Zone-planner simulation and conduit derivation",
+      "Spine-selection decision procedure and crosswalk design"
+    ],
+    objectives: [
+      "Explain the scope, intended audience, and structure of IEC 62443, NIST SP 800-82 Rev. 3, NIST CSF 2.0, and ISO/IEC 27001, and state the job each does best.",
+      "Identify zones and conduits in a given plant network description and justify each boundary in terms of shared risk and required communication.",
+      "Differentiate target, capability, and achieved Security Levels (SL-T, SL-C, SL-A) and assign an SL-T to a zone with written rationale.",
+      "Compare the four frameworks across scope, unit of analysis, certification pathway, and classroom usability.",
+      "Evaluate which framework should serve as the spine of a specific course, given a program's constraints, and defend the choice.",
+      "Design a one-page student-facing framework crosswalk that maps supporting standards onto a chosen spine."
+    ]
+  },
+  {
+    title: "Governance, Risk & Compliance for IT/OT",
+    day: "Day 4", cluster: "Governance & Operations",
+    concepts: [
+      "Separate governance structures for IT and OT security functions",
+      "Risk register construction: required fields, scoring, cross-organizational ownership",
+      "POA&M lifecycle: tracking findings from identification through remediation to closure",
+      "Audit evidence standards: what documentation auditors actually validate",
+      "NERC CIP standards and enforcement mechanisms",
+      "CMMC (Cybersecurity Maturity Model Certification) for defense contractors",
+      "Comparative governance: IT vs. OT priorities, patch cadences, regulatory drivers",
+      "Cross-organizational governance charters assigning accountability"
+    ],
+    objectives: [
+      "Explain why IT and OT security functions in the same organization often report through different executives, and how that split affects decision rights over a shared risk.",
+      "Identify the required fields of a risk register entry and construct one from a described asset and threat scenario.",
+      "Differentiate a risk register from a POA&M and describe how a finding moves from one artifact to the other.",
+      "Compare audit evidence expectations under a voluntary framework against a mandatory regulation such as NERC CIP.",
+      "Evaluate a completed risk register and POA&M for completeness and defensibility, given the enforcement stakes NERC CIP attaches to certain findings.",
+      "Design a one-page cross-organizational governance charter that assigns ownership of GRC deliverables between IT and OT stakeholders."
+    ]
+  },
+  {
+    title: "Access Control & Identity Management in OT",
+    day: "Day 5", cluster: "Governance & Operations",
+    concepts: [
+      "Roles and role-based access control (RBAC)",
+      "Least-privilege principle",
+      "The shared-console problem",
+      "Privileged access management (PAM)",
+      "Jump hosts and remote vendor sessions",
+      "Multi-factor authentication placement",
+      "Identity lifecycle (provisioning and deprovisioning)",
+      "OT vs. IT identity practice differences"
+    ],
+    objectives: [
+      "Explain why identity and access management in an ICS/OT environment differs from a typical IT environment, citing at least two OT-specific constraints.",
+      "Identify appropriate operator, engineer, and vendor roles and apply role-based access control (RBAC) to a described plant network.",
+      "Evaluate the shared-console problem and propose a compensating control that restores individual accountability without disrupting continuous operations.",
+      "Configure, in simulation, a least-privilege access request that matches a PAM and jump-host architecture for a remote vendor session.",
+      "Evaluate where multi-factor authentication is appropriate on a control network and where it introduces unacceptable operational risk.",
+      "Design a provisioning-to-deprovisioning identity lifecycle checklist that closes the OT deprovisioning gaps discussed in this lesson."
+    ]
+  },
+  {
+    title: "Monitoring, Detection & OT Incident Response",
+    day: "Day 5", cluster: "Governance & Operations",
+    concepts: [
+      "Passive asset discovery and monitoring",
+      "Syslog coverage gaps on Level 0/1 field devices",
+      "Network Time Protocol and clock synchronization",
+      "SIEM alert triage weighted by criticality and safety",
+      "Incident lifecycle phases with OT-specific containment decisions",
+      "Comparison of IT vs. OT incident response practices",
+      "Interactive alert-triage simulator and scenario-to-concept mapping lab",
+      "OT-aware playbook design activity"
+    ],
+    objectives: [
+      "Explain why passive monitoring is preferred over active scanning on an OT network, citing the specific risk active scanning poses to legacy field devices.",
+      "Identify syslog coverage gaps common to Level 0/1 field devices and describe compensating telemetry sources for a missing device log.",
+      "Explain the role of time synchronization in event correlation and describe the consequence of clock drift during incident reconstruction.",
+      "Triage, in simulation, a queue of security alerts by weighing asset criticality, safety impact, and confidence rather than alert volume alone.",
+      "Evaluate a containment decision in which isolating the affected host risks a safety or production consequence, and select a defensible compensating action.",
+      "Design an OT-aware incident response playbook section that names who decides on containment and what happens when full isolation isn't an option the plant can accept."
+    ]
+  },
+  {
+    title: "Capstone: Build and Teach Your Own OT Module",
+    day: "Day 5", cluster: "Capstone",
+    concepts: [
+      "Learning Objectives (self-authored)",
+      "Lab Design",
+      "Rubric design",
+      "Peer review"
+    ],
+    objectives: [
+      "Author original learning objectives, a hands-on simulation, an assessment with rubric, and a written safeguards statement for a self-selected OT topic.",
+      "Teach a segment of the module and incorporate peer and instructor feedback."
+    ]
+  }
+];
+
+// ---- Populate lesson dropdown ----
+const lessonSel = document.getElementById('lesson');
+LESSONS.forEach((l, i) => {
+  const opt = document.createElement('option');
+  opt.value = i;
+  opt.textContent = `${l.day} — ${l.title}`;
+  lessonSel.appendChild(opt);
+});
+
+const subjectAreaSel = document.getElementById('subjectArea');
+const conceptsBox = document.getElementById('conceptsBox');
+const conceptsText = document.getElementById('conceptsText');
+const objectivesGrid = document.getElementById('objectivesGrid');
+
+function renderLessonDetails() {
+  const lesson = LESSONS[lessonSel.value];
+  subjectAreaSel.value = lesson.cluster;
+  conceptsText.textContent = lesson.concepts.join(' • ');
+  conceptsBox.classList.add('visible');
+
+  objectivesGrid.innerHTML = '';
+  lesson.objectives.forEach((obj, idx) => {
+    const label = document.createElement('label');
+    label.className = 'check-item';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.dataset.group = 'objectives';
+    input.value = obj;
+    if (idx === 0) input.checked = true;
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(obj));
+    objectivesGrid.appendChild(label);
+    input.addEventListener('change', buildPrompt);
+  });
+  buildPrompt();
+}
+
+lessonSel.addEventListener('change', renderLessonDetails);
+
+// ---- Gather helpers ----
+function checkedValues(groupName) {
+  return Array.from(document.querySelectorAll(`input[data-group="${groupName}"]:checked`)).map(i => i.value);
+}
+function val(id) { return document.getElementById(id).value; }
+
+// ---- Build the prompt text ----
+function buildPrompt() {
+  const lesson = LESSONS[lessonSel.value];
+  const topic = val('customTopic').trim() || lesson.title;
+  const objectives = checkedValues('objectives');
+  const realIncident = val('realIncident').trim();
+  const analysisOptions = checkedValues('analysisOption');
+  const outputOptions = checkedValues('outputOption');
+  const pedConstraints = checkedValues('pedConstraint');
+  const model = val('targetModel').replace(' *', '');
+
+  const lines = [];
+
+  const modelIntros = {
+    Claude: "You are helping design a classroom case study. Generate a scenario-based case study with the following specifications:",
+    ChatGPT: "Design a classroom case study with the following specifications:",
+    Gemini: "Create an educational case study based on these specifications:",
+    Perplexity: "Produce a classroom case study following these specifications:"
+  };
+  lines.push(modelIntros[model] || modelIntros.Claude);
+  lines.push('');
+
+  lines.push('CONTENT');
+  lines.push(`- Lesson: ${lesson.day} — ${topic} (OT-101: Teaching Operational Technologies)`);
+  lines.push(`- Subject area / cluster: ${val('subjectArea')}`);
+  lines.push(`- Audience / skill level: ${val('gradeLevel')}`);
+  if (objectives.length) {
+    lines.push('- Learning objective(s) this case study should anchor:');
+    objectives.forEach(o => lines.push(`  • ${o}`));
+  }
+  lines.push('');
+
+  lines.push('CASE STUDY BASIS');
+  lines.push(`- ${val('caseBasis').replace(' *', '')}`);
+  if (realIncident) lines.push(`- Real incident to model after: ${realIncident}`);
+  lines.push('');
+
+  lines.push('CASE STUDY DESIGN');
+  lines.push(`- Narrative structure: ${val('narrativeStructure').replace(' *', '')}`);
+  lines.push(`- Length: ${val('caseLength').replace(' *', '')}`);
+  lines.push(`- Level of technical detail: ${val('technicalDetail').replace(' *', '')}`);
+  lines.push('');
+
+  if (analysisOptions.length) {
+    lines.push('ANALYSIS COMPONENTS');
+    analysisOptions.forEach(o => lines.push(`- ${o}`));
+    lines.push('');
+  }
+
+  lines.push('OUTPUT SPECIFICATIONS');
+  lines.push(`- Output format: ${val('outputFormat').replace(' *', '')}`);
+  if (outputOptions.length) {
+    outputOptions.forEach(o => lines.push(`- ${o}`));
+  }
+  lines.push('');
+
+  if (pedConstraints.length) {
+    lines.push('PEDAGOGICAL & SAFEGUARD CONSTRAINTS');
+    pedConstraints.forEach(c => lines.push(`- ${c}`));
+    lines.push('');
+  }
+
+  lines.push('This case study is for faculty development / classroom teaching use in a five-day OT cybersecurity course for community college and workforce training instructors.');
+
+  document.getElementById('promptOutput').value = lines.join('\n');
+}
+
+// ---- Wire up every input to rebuild the prompt live ----
+document.querySelectorAll('select, input[type="text"], input[type="checkbox"], input[type="number"]').forEach(el => {
+  el.addEventListener('input', buildPrompt);
+  el.addEventListener('change', buildPrompt);
+});
+
+// ---- Copy / Download / Reset ----
+document.getElementById('copyBtn').addEventListener('click', function () {
+  const ta = document.getElementById('promptOutput');
+  ta.select();
+  document.execCommand('copy');
+  const flash = document.getElementById('copyFlash');
+  flash.textContent = 'Copied to clipboard.';
+  setTimeout(() => flash.textContent = '', 2000);
+});
+
+document.getElementById('downloadBtn').addEventListener('click', function () {
+  const text = document.getElementById('promptOutput').value;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ot101-case-study-prompt.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('resetBtn').addEventListener('click', function () {
+  document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+  document.getElementById('customTopic').value = '';
+  document.getElementById('realIncident').value = '';
+  lessonSel.value = 0;
+  document.querySelectorAll('input[data-group="analysisOption"]').forEach(c => {
+    if (c.value.startsWith('Include discussion') || c.value.startsWith('Include a "what went') || c.value.startsWith('Include a framework')) c.checked = true;
+  });
+  document.querySelectorAll('input[data-group="outputOption"]').forEach(c => {
+    if (c.value.startsWith('Include a one-paragraph') || c.value.startsWith('Include suggested')) c.checked = true;
+  });
+  document.querySelectorAll('input[data-group="pedConstraint"]').forEach((c, i) => { if (i !== 2 && i !== 5) c.checked = true; });
+  renderLessonDetails();
+});
+
+// ---- Theme toggle ----
+document.getElementById('themeToggle').addEventListener('click', function () {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  this.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+});
+
+// ---- Init ----
+lessonSel.value = 0;
+renderLessonDetails();
+</script>
+</body>
+</html>
