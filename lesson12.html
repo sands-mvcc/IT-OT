@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 12 · Capstone: Build and Teach Your Own OT Module — OT-101</title>
+<meta name="description" content="OT-101 Day 5 Lesson 12 (Capstone): Design measurable learning objectives, a simulation-based lab, a rubric, and a safeguards statement for an original OT/ICS teaching module, then micro-teach a segment and complete structured peer and instructor review.">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg:#f4f6f9;
+  --surface:#ffffff;
+  --surface-2:#eef1f6;
+  --text:#1a1e2e;
+  --muted:#5a6480;
+  --accent:#b45309;
+  --accent-2:#92400e;
+  --accent-soft:#fdf3e7;
+  --accent-line:#e7c9a2;
+  --header-bg:#1a1e2e;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#d1d9e6;
+  --table-head-bg:#1a1e2e;
+  --table-head-text:#ffffff;
+  --row-hover:#f7f2ea;
+  --ok-bg:#e8f5ec; --ok-text:#155724; --ok-line:#2e7d4f;
+  --no-bg:#fdeaea; --no-text:#7f1d1d; --no-line:#b91c1c;
+  --warn-bg:#fdf3e7; --warn-text:#7c3a06; --warn-line:#b45309;
+  --shadow:0 1px 2px rgba(26,30,46,.06), 0 6px 18px rgba(26,30,46,.07);
+  --radius:12px;
+  --radius-sm:8px;
+  --focus:#b45309;
+  --maxw:1240px;
+}
+html[data-theme="dark"]{
+  --bg:#0f1117;
+  --surface:#1c1f2e;
+  --surface-2:#161927;
+  --text:#e8ecf4;
+  --muted:#a8b2c8;
+  --accent:#f59e0b;
+  --accent-2:#fbbf24;
+  --accent-soft:#2a2313;
+  --accent-line:#7a5a1c;
+  --header-bg:#0a0c14;
+  --header-text:#ffffff;
+  --header-muted:#c3cade;
+  --border:#333a52;
+  --table-head-bg:#0a0c14;
+  --table-head-text:#ffffff;
+  --row-hover:#242840;
+  --ok-bg:#12281c; --ok-text:#9be6b4; --ok-line:#3fa76b;
+  --no-bg:#2d1414; --no-text:#ffb3b3; --no-line:#e05a5a;
+  --warn-bg:#2a2313; --warn-text:#fbd38d; --warn-line:#f59e0b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.35);
+  --focus:#f59e0b;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:150px;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{line-height:1.25;font-weight:700;color:var(--text);}
+h2{font-size:1.6rem;margin:0 0 .35rem;}
+h3{font-size:1.18rem;margin:1.6rem 0 .5rem;}
+h4{font-size:1.02rem;margin:1.2rem 0 .4rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);}
+p{margin:0 0 1rem;}
+a{color:var(--accent);}
+a:hover{color:var(--accent-2);}
+code{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:4px;padding:.08em .35em;font-size:.9em;
+}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px;}
+
+/* ---------- Skip link ---------- */
+.skip-link{
+  position:absolute;left:8px;top:-60px;z-index:200;
+  background:var(--accent);color:#fff;font-weight:700;
+  padding:.6rem 1rem;border-radius:0 0 8px 8px;text-decoration:none;
+  transition:top .15s ease;
+}
+.skip-link:focus{top:0;color:#fff;}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  font-size:.85rem;color:var(--muted);
+}
+.topbar-inner{
+  max-width:var(--maxw);margin:0 auto;padding:.5rem 1.25rem;
+  display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;align-items:center;justify-content:space-between;
+}
+.topbar a.home-link{font-weight:700;color:var(--accent);text-decoration:none;}
+.topbar a.home-link:hover{text-decoration:underline;}
+
+/* ---------- Header ---------- */
+.lesson-header{background:var(--header-bg);color:var(--header-text);}
+.lesson-header-inner{max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 1.75rem;}
+.eyebrow{
+  font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent-2);font-weight:700;margin:0 0 .6rem;
+}
+html[data-theme="light"] .eyebrow{color:#f0b360;}
+.lesson-header h1{font-size:2.3rem;margin:0 0 .5rem;color:var(--header-text);}
+.tagline{font-size:1.08rem;color:var(--header-muted);max-width:62ch;margin:0 0 1.1rem;}
+.meta-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.meta-chip{
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);
+  color:#fff;border-radius:999px;padding:.28rem .8rem;font-size:.82rem;font-weight:600;
+}
+.header-tools{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.2rem;}
+.btn{
+  font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent;
+  border-radius:999px;padding:.5rem 1.05rem;display:inline-flex;align-items:center;gap:.45rem;
+}
+.btn:hover{background:var(--accent-2);}
+html[data-theme="dark"] .btn{color:#1a1300;}
+html[data-theme="dark"] .btn:hover{background:var(--accent-2);}
+.btn-ghost{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;}
+html[data-theme="dark"] .btn-ghost{color:#fff;}
+
+/* ---------- Section nav ---------- */
+.section-nav{
+  position:sticky;top:0;z-index:60;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(26,30,46,.06);
+}
+.section-nav ul{
+  max-width:var(--maxw);margin:0 auto;padding:0 1.25rem;
+  list-style:none;display:flex;gap:.25rem;overflow-x:auto;
+}
+.section-nav a{
+  display:block;padding:.7rem .8rem;font-size:.83rem;font-weight:600;
+  color:var(--muted);text-decoration:none;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.section-nav a:hover{color:var(--accent);}
+.section-nav a[aria-current="true"]{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ---------- Layout ---------- */
+.layout{
+  max-width:var(--maxw);margin:0 auto;padding:2rem 1.25rem 3rem;
+  display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:2rem;align-items:start;
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static !important;}
+}
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1.5rem 1.6rem;margin:0 0 1.6rem;
+}
+.section-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.9rem;flex-wrap:wrap;}
+.section-icon{
+  flex:0 0 auto;width:42px;height:42px;border-radius:10px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  display:grid;place-items:center;
+}
+.section-icon svg{width:24px;height:24px;}
+.section-head .titles{flex:1 1 240px;min-width:0;}
+.time-pill{
+  flex:0 0 auto;font-size:.75rem;font-weight:700;color:var(--accent);
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:999px;padding:.2rem .65rem;white-space:nowrap;
+}
+.sub{color:var(--muted);font-size:.92rem;margin:.15rem 0 0;}
+
+/* ---------- Part banners ---------- */
+.part-banner{
+  background:var(--header-bg);color:#fff;border-radius:var(--radius);
+  padding:1rem 1.4rem;margin:2.2rem 0 1.4rem;border-left:6px solid var(--accent);
+}
+.part-banner .p-label{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:#f0b360;font-weight:700;}
+html[data-theme="dark"] .part-banner .p-label{color:var(--accent);}
+.part-banner h2{color:#fff;font-size:1.35rem;margin:.15rem 0 .2rem;}
+.part-banner p{margin:0;color:var(--header-muted);font-size:.95rem;}
+
+/* ---------- Callouts / analogy ---------- */
+.analogy-box{
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-left:5px solid var(--accent);border-radius:var(--radius-sm);
+  padding:1rem 1.15rem;margin:1.2rem 0;
+}
+.analogy-box .label{
+  display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:800;color:var(--accent-2);margin-bottom:.4rem;
+}
+html[data-theme="dark"] .analogy-box .label{color:var(--accent);}
+.analogy-box p:last-child{margin-bottom:0;}
+.callout{
+  border:1px solid var(--border);border-left:5px solid var(--muted);
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  padding:.95rem 1.1rem;margin:1.2rem 0;font-size:.95rem;
+}
+.callout.safety{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:var(--warn-line);color:var(--warn-text);}
+.callout strong{color:inherit;}
+.safety-flag{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--warn-bg);color:var(--warn-text);
+  border:1px solid var(--warn-line);border-radius:999px;
+  padding:.25rem .8rem;font-size:.78rem;font-weight:700;margin-bottom:.9rem;
+}
+
+/* ---------- Lists ---------- */
+ul.tight,ol.tight{margin:0 0 1rem;padding-left:1.3rem;}
+ul.tight li,ol.tight li{margin-bottom:.4rem;}
+.lo-list{list-style:none;padding:0;margin:0;counter-reset:lo;}
+.lo-list li{
+  position:relative;padding-left:2.4rem;margin-bottom:.7rem;counter-increment:lo;
+}
+.lo-list li::before{
+  content:"LO" counter(lo);position:absolute;left:0;top:.1rem;
+  font-size:.68rem;font-weight:800;color:#fff;background:var(--accent);
+  border-radius:5px;padding:.15rem .35rem;letter-spacing:.02em;
+}
+html[data-theme="dark"] .lo-list li::before{color:#1a1300;}
+
+/* ---------- Tables ---------- */
+.table-wrap{overflow-x:auto;margin:1.1rem 0 1.3rem;border:1px solid var(--border);border-radius:var(--radius-sm);}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:.92rem;background:var(--surface);}
+caption{caption-side:top;text-align:left;font-size:.88rem;color:var(--muted);padding:.7rem .9rem;font-style:italic;}
+th,td{border:1px solid var(--border);padding:.6rem .75rem;text-align:left;vertical-align:top;}
+thead th{background:var(--table-head-bg);color:var(--table-head-text);font-size:.84rem;letter-spacing:.02em;border-color:rgba(255,255,255,.22);}
+tbody tr:hover{background:var(--row-hover);}
+th[scope="row"]{background:var(--surface-2);font-weight:700;}
+
+/* ---------- Diagram frames ---------- */
+figure{margin:1.3rem 0;}
+.diagram-frame{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:1rem;
+}
+.diagram-frame svg{width:100%;height:auto;display:block;}
+figcaption{font-size:.88rem;color:var(--muted);margin-top:.6rem;}
+
+/* ---------- Flip cards ---------- */
+.flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin:1.2rem 0;}
+.flip-card{
+  perspective:1000px;background:none;border:0;padding:0;font:inherit;
+  text-align:left;cursor:pointer;min-height:180px;
+}
+.flip-inner{
+  display:block;position:relative;width:100%;min-height:180px;height:100%;
+  transition:transform .5s;transform-style:preserve-3d;
+}
+.flip-card[aria-pressed="true"] .flip-inner{transform:rotateY(180deg);}
+.flip-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:1rem;display:flex;flex-direction:column;justify-content:center;
+  background:var(--surface);box-shadow:var(--shadow);overflow:auto;
+}
+.flip-front{border-top:4px solid var(--accent);}
+.flip-front .term{font-weight:800;font-size:1.05rem;}
+.flip-front .hint{font-size:.78rem;color:var(--muted);margin-top:.5rem;}
+.flip-back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent-line);font-size:.9rem;}
+
+/* ---------- Activity blocks ---------- */
+.activity-block{
+  border:2px solid var(--accent);border-radius:var(--radius);
+  overflow:hidden;margin:1.5rem 0;background:var(--surface);
+}
+.activity-header{
+  background:var(--accent);color:#fff;padding:.7rem 1.1rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+html[data-theme="dark"] .activity-header{color:#1a1300;}
+.activity-header h3{margin:0;font-size:1.05rem;color:inherit;}
+.activity-header .t{font-size:.8rem;font-weight:700;}
+.activity-body{padding:1.1rem 1.2rem;}
+.instructions{
+  background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:.85rem 1rem;margin:0 0 1rem;font-size:.93rem;
+}
+.ips{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem;margin:1rem 0;}
+.ips div{border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .85rem;background:var(--surface-2);font-size:.9rem;}
+.ips h4{margin:0 0 .3rem;font-size:.75rem;color:var(--accent);}
+
+/* ---------- Mapping exercise ---------- */
+.mapping-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm);}
+.mapping-table-wrap table{min-width:560px;}
+select{
+  font:inherit;font-size:.88rem;padding:.35rem .5rem;
+  border:1px solid var(--border);border-radius:6px;
+  background:var(--surface);color:var(--text);max-width:100%;
+}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0 .5rem;}
+.btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+.btn-secondary:hover{background:var(--accent-soft);color:var(--accent-2);}
+html[data-theme="dark"] .btn-secondary{color:var(--accent);}
+.result-line{font-weight:700;font-size:.95rem;margin:.4rem 0 0;}
+tr.map-correct td{background:var(--ok-bg);}
+tr.map-wrong td{background:var(--no-bg);}
+.map-note{font-size:.8rem;display:block;margin-top:.3rem;}
+tr.map-correct .map-note{color:var(--ok-text);}
+tr.map-wrong .map-note{color:var(--no-text);}
+
+/* ---------- Simulation ---------- */
+.sim{
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface-2);padding:1.1rem 1.2rem;margin:1.3rem 0;
+}
+.sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.7rem;margin:.8rem 0;}
+.asset{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.65rem .8rem;
+}
+.asset .name{font-weight:700;font-size:.93rem;display:block;}
+.asset .desc{font-size:.8rem;color:var(--muted);display:block;margin-bottom:.4rem;}
+.asset label{font-size:.78rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem;}
+.sim-out{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:.9rem 1rem;margin-top:.9rem;font-size:.92rem;min-height:2.5rem;
+}
+.sim-out ul{margin:.4rem 0 .8rem;padding-left:1.2rem;}
+.finding{border-left:4px solid var(--no-line);background:var(--no-bg);color:var(--no-text);padding:.5rem .7rem;border-radius:6px;margin:.4rem 0;font-size:.88rem;}
+.finding.pass{border-left-color:var(--ok-line);background:var(--ok-bg);color:var(--ok-text);}
+.finding.warn{border-left-color:var(--warn-line);background:var(--warn-bg);color:var(--warn-text);}
+.conduit-item{font-family:"Cascadia Mono",Consolas,monospace;font-size:.85rem;}
+
+/* ---------- Quiz ---------- */
+.quiz-block{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:1.2rem 1.3rem;}
+.q{border-bottom:1px solid var(--border);padding:.9rem 0;}
+.q:last-of-type{border-bottom:0;}
+.q legend{font-weight:700;font-size:1rem;padding:0;margin-bottom:.5rem;}
+.q fieldset{border:0;margin:0;padding:0;}
+.q label{display:block;padding:.32rem .2rem .32rem 0;font-size:.95rem;cursor:pointer;}
+.q input[type="radio"]{margin-right:.5rem;accent-color:var(--accent);}
+.q-feedback{margin-top:.55rem;padding:.6rem .8rem;border-radius:6px;font-size:.9rem;display:none;}
+.q-feedback.show{display:block;}
+.q-feedback.correct{background:var(--ok-bg);color:var(--ok-text);border-left:4px solid var(--ok-line);}
+.q-feedback.incorrect{background:var(--no-bg);color:var(--no-text);border-left:4px solid var(--no-line);}
+.q-feedback.unanswered{background:var(--warn-bg);color:var(--warn-text);border-left:4px solid var(--warn-line);}
+.score{font-weight:800;font-size:1.05rem;margin-top:1rem;}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:sticky;top:64px;display:flex;flex-direction:column;gap:1.1rem;}
+.side-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.1rem;
+}
+.side-card h2{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;}
+.sidebar-toc ul{list-style:none;margin:0;padding:0;font-size:.88rem;}
+.sidebar-toc li{margin-bottom:.4rem;}
+.sidebar-toc a{text-decoration:none;color:var(--text);}
+.sidebar-toc a:hover{color:var(--accent);text-decoration:underline;}
+.sidebar-toc .defn{display:block;color:var(--muted);font-size:.79rem;line-height:1.45;}
+.lo-check{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;margin-bottom:.55rem;}
+.lo-check input{margin-top:.25rem;accent-color:var(--accent);width:16px;height:16px;flex:0 0 auto;}
+.progress-bar{height:9px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;overflow:hidden;margin:.2rem 0 .6rem;}
+.progress-bar span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease;}
+.progress-text{font-size:.8rem;color:var(--muted);margin:0 0 .7rem;}
+.prevnext{display:flex;flex-direction:column;gap:.55rem;font-size:.85rem;}
+.prevnext a{
+  display:block;text-decoration:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.6rem .75rem;color:var(--text);background:var(--surface-2);
+}
+.prevnext a:hover{border-color:var(--accent);color:var(--accent);}
+.prevnext .dir{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:800;}
+
+/* ---------- Resource cards ---------- */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.9rem;margin:1rem 0;}
+.res{
+  border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:var(--radius-sm);padding:.8rem .9rem;background:var(--surface-2);font-size:.9rem;
+}
+.res a{font-weight:700;}
+.res .kind{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800;margin-bottom:.25rem;}
+
+/* ---------- Footer ---------- */
+.footer-nav{border-top:1px solid var(--border);background:var(--surface);}
+.footer-nav-inner{
+  max-width:var(--maxw);margin:0 auto;padding:1rem 1.25rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.9rem;
+}
+.footer-nav a{text-decoration:none;font-weight:700;}
+.footer-nav a:hover{text-decoration:underline;}
+footer.site{background:var(--header-bg);color:var(--header-muted);}
+footer.site .inner{max-width:var(--maxw);margin:0 auto;padding:1.6rem 1.25rem;font-size:.88rem;}
+footer.site strong{color:#fff;}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  .flip-inner{transition:none;}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  html[data-theme="dark"]{--bg:#fff;--surface:#fff;--surface-2:#fff;--text:#000;--muted:#333;--border:#999;}
+  body{background:#fff !important;color:#000 !important;font-size:11.5pt;}
+  .topbar,.section-nav,.sidebar,.header-tools,.skip-link,.footer-nav{display:none !important;}
+  .layout{display:block;max-width:none;padding:0;}
+  .card,.quiz-block,.activity-block,.sim{box-shadow:none;border:1px solid #999;break-inside:avoid;}
+  .lesson-header{background:#fff !important;color:#000 !important;border-bottom:2px solid #000;}
+  .lesson-header h1,.tagline{color:#000 !important;}
+  .meta-chip{color:#000 !important;border-color:#000;}
+  .part-banner{background:#fff !important;color:#000 !important;border:1px solid #000;border-left:6px solid #000;}
+  .part-banner h2,.part-banner p,.part-banner .p-label{color:#000 !important;}
+  .activity-header{background:#eee !important;color:#000 !important;}
+  thead th{background:#ddd !important;color:#000 !important;}
+  .flip-inner{transform:none !important;}
+  .flip-face{position:static;transform:none !important;backface-visibility:visible;min-height:0;margin-bottom:.4rem;}
+  .flip-card{min-height:0;}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#444;}
+  footer.site{background:#fff !important;color:#000 !important;border-top:1px solid #000;}
+  footer.site strong{color:#000 !important;}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home-link" href="index.html">&larr; Course Home</a>
+    <span>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands</span>
+  </div>
+</div>
+
+<!-- ============================ HEADER ============================ -->
+<header class="lesson-header">
+  <div class="lesson-header-inner">
+    <p class="eyebrow">OT-101 &middot; Day 5 &middot; Lesson 12 &middot; 4 contact hours</p>
+    <h1>Capstone: Build and Teach Your Own OT Module</h1>
+    <p class="tagline">Design a teachable OT/ICS module of your own — objectives, a hands-on simulation, a rubric, and a safeguards statement — then teach a segment of it and stand behind it under peer and instructor critique.</p>
+    <div class="meta-row">
+      <span class="meta-chip">Level: Intermediate</span>
+      <span class="meta-chip">Strand: Capstone</span>
+      <span class="meta-chip">Duration: 4 hours</span>
+      <span class="meta-chip">6 learning objectives</span>
+    </div>
+    <div class="header-tools">
+      <button type="button" class="btn btn-ghost" id="themeToggle" aria-pressed="false">
+        <span aria-hidden="true" id="themeIcon">&#9789;</span>
+        <span id="themeLabel">Switch to dark mode</span>
+      </button>
+      <button type="button" class="btn btn-ghost" id="printBtn">
+        <span aria-hidden="true">&#128424;</span> Print / Save as PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ SECTION NAV ============================ -->
+<nav class="section-nav" aria-label="Sections in this lesson">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#objectives">1. Objectives &amp; Backward Design</a></li>
+    <li><a href="#labdesign">2. Lab Design</a></li>
+    <li><a href="#rubric">3. Rubric Design</a></li>
+    <li><a href="#peerreview">4. Peer Review &amp; Safeguards</a></li>
+    <li><a href="#workshop">5. Build Your Module</a></li>
+    <li><a href="#rubricsim">6. Calibration Simulator</a></li>
+    <li><a href="#mapping">7. Feedback Mapping Lab</a></li>
+    <li><a href="#microteach">8. Micro-Teach &amp; Critique</a></li>
+    <li><a href="#deliverable">9. Deliverable &amp; Grading</a></li>
+    <li><a href="#review">10. Knowledge Check</a></li>
+  </ul>
+</nav>
+
+<div class="layout">
+
+<!-- ============================ MAIN ============================ -->
+<main id="main">
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section id="overview" class="card" aria-labelledby="h-overview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M12 2l2.4 6.6L21 9l-5 4.6L17.4 21 12 17.3 6.6 21 8 13.6 3 9l6.6-.4z"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-overview">Lesson Overview</h2>
+        <p class="sub">Orientation, anchoring analogy, and what you should be able to do by the end.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <p>Every earlier lesson in OT-101 handed you a finished module: someone else had already picked the topic, written the objectives, built the simulation, and drafted the quiz. This lesson flips that. You are the instructional designer now. You will take one OT/ICS concept from anywhere in this workshop — or one from your own program — and carry it through the same design process this course's lessons were built with: write objectives before you write content, design the assessment before you design the activity, and build the hands-on piece as a simulation, never as a live-equipment exercise. Then you teach a short segment of what you built to your colleagues and take their critique, and give critique back.</p>
+
+    <p>This capstone has four required artifacts and one required performance:</p>
+    <ul class="tight">
+      <li><strong>Learning objectives</strong> for your module — 4 to 6 of them, each written with an observable, measurable verb.</li>
+      <li><strong>One hands-on simulation or lab activity</strong> that directly practices one of those objectives, built or specified as simulation-only.</li>
+      <li><strong>An assessment with a rubric</strong> — not just a quiz key, but criteria and performance levels a student or a peer reviewer could apply consistently.</li>
+      <li><strong>A written safeguards statement</strong> — the same kind of commitment this course has modeled in every lesson: no live or energized equipment, no offensive tooling, no real vendor or student data.</li>
+      <li><strong>A micro-teach</strong> — you deliver a short segment of your module to a small group of peers and receive structured feedback against a shared rubric.</li>
+    </ul>
+
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 900 260" role="img" aria-labelledby="t-anatomy d-anatomy">
+          <title id="t-anatomy">The four required artifacts of a capstone module, feeding into the micro-teach</title>
+          <desc id="d-anatomy">Four boxes in a row — Learning Objectives, Hands-On Simulation, Rubric, and Safeguards Statement — each connected by an arrow down into a single box below labeled Micro-Teach and Peer Critique, indicating all four artifacts are presented and defended together in the final performance.</desc>
+          <g font-family="Segoe UI, sans-serif">
+            <rect x="20" y="20" width="195" height="80" rx="10" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="117.5" y="55" font-size="14" font-weight="700" fill="var(--text)" text-anchor="middle">Learning</text>
+            <text x="117.5" y="74" font-size="14" font-weight="700" fill="var(--text)" text-anchor="middle">Objectives</text>
+
+            <rect x="238" y="20" width="195" height="80" rx="10" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="335.5" y="55" font-size="14" font-weight="700" fill="var(--text)" text-anchor="middle">Hands-On</text>
+            <text x="335.5" y="74" font-size="14" font-weight="700" fill="var(--text)" text-anchor="middle">Simulation</text>
+
+            <rect x="456" y="20" width="195" height="80" rx="10" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="553.5" y="55" font-size="14" font-weight="700" fill="var(--text)" text-anchor="middle">Rubric</text>
+
+            <rect x="674" y="20" width="206" height="80" rx="10" fill="var(--warn-bg)" stroke="var(--warn-line)" stroke-width="2"/>
+            <text x="777" y="48" font-size="13.5" font-weight="700" fill="var(--warn-text)" text-anchor="middle">Safeguards</text>
+            <text x="777" y="67" font-size="13.5" font-weight="700" fill="var(--warn-text)" text-anchor="middle">Statement</text>
+
+            <path d="M117.5 100 L117.5 130 L450 130 L450 158" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+            <path d="M335.5 100 L335.5 130" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+            <path d="M553.5 100 L553.5 130" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+            <path d="M777 100 L777 130 L450 130" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>
+            <polygon points="450,158 444,148 456,148" fill="currentColor" opacity=".5"/>
+
+            <rect x="300" y="165" width="300" height="70" rx="10" fill="var(--accent-soft)" stroke="var(--accent-line)" stroke-width="1.5"/>
+            <text x="450" y="196" font-size="14.5" font-weight="800" fill="var(--text)" text-anchor="middle">Micro-Teach &amp;</text>
+            <text x="450" y="216" font-size="14.5" font-weight="800" fill="var(--text)" text-anchor="middle">Peer Critique</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 1. All four artifacts are built independently in Part A and Part B, but they are presented and defended together in the final micro-teach — a rubric with no matching objective, or a simulation with no safeguards statement, is an incomplete packet.</figcaption>
+    </figure>
+
+    <div class="analogy-box">
+      <span class="label">Anchoring analogy — building a bridge from the load rating backward</span>
+      <p>A civil engineer doesn't design a bridge by first sketching something that looks nice and then calculating afterward what weight it can hold. They start with the required load rating, work backward to the structural specification that guarantees it, and only then decide on materials and appearance. <strong>Backward design</strong> in teaching works the same way: you don't start by building a fun activity and hope it teaches something. You start with the exact, observable thing a learner must be able to do, work backward to an assessment that would prove they can do it, and only then design the activity that gets them there. Every lesson you've worked through in this course — including this one — was built in that order.</p>
+    </div>
+
+    <h3>Learning objectives</h3>
+    <p>By the end of this 4-hour capstone session, you will be able to:</p>
+    <ol class="lo-list">
+      <li><strong>Write</strong> 4 to 6 measurable learning objectives for an OT/ICS topic of your choosing, each using an observable Bloom's-taxonomy verb.</li>
+      <li><strong>Design</strong> a hands-on, simulation-based lab activity that gives direct practice toward one of those objectives without requiring live or energized equipment.</li>
+      <li><strong>Construct</strong> an analytic rubric with clearly differentiated performance levels for assessing a teachable module.</li>
+      <li><strong>Draft</strong> a safeguards statement addressing equipment safety, offensive-tooling boundaries, and data handling for a module intended for community college students.</li>
+      <li><strong>Deliver</strong> a short micro-teach segment of an original module and give specific, actionable peer feedback in return.</li>
+      <li><strong>Evaluate</strong> a peer's module packet against a shared rubric and justify a rating using rubric language rather than general impression.</li>
+    </ol>
+
+    <div class="callout safety">
+      <span class="safety-flag"><span aria-hidden="true">&#9888;</span> Safeguards &amp; Responsible Use</span>
+      <p style="margin:0">Every module built and taught in this capstone is simulation-only. No activity in your module, or in this lesson's own workshop tools, may touch live or production equipment or an energized panel. Every module teaches defensive concepts, not offensive tooling, and every worked example uses a fictional organization, never a real employer, vendor, or student's data. Your written safeguards statement is graded as part of the rubric in Section 3 — it is not optional paperwork.</p>
+    </div>
+  </section>
+
+  <!-- ===================== PART A BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part A</span>
+    <h2>Lecture — Designing Objectives, Labs, Rubrics, and Feedback</h2>
+    <p>Roughly 1.5 hours covering backward design and measurable objectives, simulation-based lab design, rubric construction, and the peer-review protocol you'll use this afternoon.</p>
+  </div>
+
+  <!-- ===================== 1. OBJECTIVES & BACKWARD DESIGN ===================== -->
+  <section id="objectives" class="card" aria-labelledby="h-objectives">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-objectives">1. Learning Objectives &amp; Backward Design</h2>
+        <p class="sub">If you can't observe someone doing it, you can't grade it — and you probably can't teach toward it either.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p><strong>Learning Objectives</strong> are statements describing what a learner will be able to do — using an observable, measurable verb — by the end of a lesson or module. They are the anchor of <strong>backward design</strong>: the practice of writing the objective first, then the assessment that would prove a learner met it, and only then the activity that gets them there. Every lesson in this course, including this one, was built in that order. A module built the other way around — activity first, objective written afterward to match whatever the activity happened to produce — tends to produce a fun hour with no defensible answer to "what exactly did they learn."</p>
+
+    <p>The single most common failure at this stage is an objective built on a verb that can't be observed. "Understand," "know," "appreciate," and "be familiar with" describe an internal mental state — you cannot watch a student understand something, and you cannot grade understanding directly. You can only grade what they do that you take as evidence of it: <strong>explain</strong> it in their own words, <strong>identify</strong> it in a diagram, <strong>configure</strong> it correctly, <strong>evaluate</strong> a scenario using it. Bloom's taxonomy exists to give you a working vocabulary of verbs at different cognitive levels, from recalling a fact up through creating something new, so that the verb you choose actually matches the depth you intend to teach and assess.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the fitness trainer who writes the finish line first</span>
+      <p>A trainer who tells a client "get healthier" has given them nothing to aim at and nothing anyone could verify later. A trainer who says "by week 8, hold a 60-second plank and run a 12-minute mile" has written something you can watch a client do, time, and confirm. Every workout between now and week 8 gets designed backward from that finish line. A learning objective is the same finish line, written for a classroom instead of a gym — and the lab, the rubric, and the quiz all get designed backward from it.</p>
+    </div>
+
+    <h3>Quick check — four key terms from this capstone</h3>
+    <p>Press each card to reveal how the term functions in this lesson before you read further.</p>
+    <div class="flip-grid">
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Learning Objectives</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Statements of what a learner will observably be able to do — the finish line every other artifact in your module is built backward from.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Lab Design</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">Building a hands-on or simulated activity that gives direct practice toward one specific objective — scoped to be safe, repeatable, and simulation-only.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Rubric</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">A scoring tool naming criteria and performance levels in advance, so any rater applies the same standard to the same evidence.</span>
+        </span>
+      </button>
+      <button type="button" class="flip-card" aria-pressed="false">
+        <span class="flip-inner">
+          <span class="flip-face flip-front"><span class="term">Peer Review</span><span class="hint">Press to reveal</span></span>
+          <span class="flip-face flip-back">A structured process where learners critique each other's work against a shared rubric, giving feedback specific and actionable enough to act on.</span>
+        </span>
+      </button>
+    </div>
+
+    <h3>Worked example — turning a vague goal into measurable objectives</h3>
+    <p>A participant wants to build a module on detecting an unauthorized setpoint change at Ironwood Precision Manufacturing's (fictional) mixing line — the same scenario family this course's own thermal-attack material draws on. Their first draft objective reads: <em>"Students will understand how setpoint attacks work."</em> That sentence cannot be observed or graded as written. Rewritten with Bloom's verbs and scoped to a 90-minute module:</p>
+    <ul class="tight">
+      <li><strong>Explain</strong> why a setpoint change at a thermal-processing PLC can be a safety-relevant event even when no alarm has yet fired. <em>(Understand level, made observable with "explain.")</em></li>
+      <li><strong>Identify</strong>, from a historian trend, the point at which an outlet temperature deviates from its commanded setpoint. <em>(Apply level.)</em></li>
+      <li><strong>Configure</strong> a simulated alarm threshold that would have caught the deviation earlier without producing nuisance alarms during normal operation. <em>(Apply/Analyze level.)</em></li>
+      <li><strong>Evaluate</strong> whether a proposed containment action (pausing the batch vs. alerting the operator only) is appropriate given the process state described in a short scenario. <em>(Evaluate level.)</em></li>
+    </ul>
+    <p>Every one of those four can be watched, timed, and scored. None of them require the grader to guess at an internal mental state.</p>
+
+    <h3>The backward design loop</h3>
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 700 460" role="img" aria-labelledby="t-loop d-loop">
+          <title id="t-loop">The backward design loop: objectives, assessment, activity, and revision</title>
+          <desc id="d-loop">A four-node cycle arranged in a diamond. Top node, Learning Objectives, what the learner must observably be able to do. Right node, Rubric slash Assessment, what evidence would prove they can do it. Bottom node, Lab slash Activity, what experience actually produces that evidence. Left node, Teach and Get Feedback, deliver the module and use peer and instructor critique to revise the objective if the evidence gathered does not match what was intended. An arrow runs clockwise through all four nodes and back to the top, indicating the cycle repeats.</desc>
+          <g font-family="Segoe UI, sans-serif">
+            <rect x="250" y="15" width="200" height="80" rx="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="350" y="50" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">1. Learning</text>
+            <text x="350" y="70" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">Objectives</text>
+
+            <rect x="480" y="190" width="205" height="80" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="582.5" y="225" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">2. Rubric /</text>
+            <text x="582.5" y="245" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">Assessment</text>
+
+            <rect x="250" y="365" width="200" height="80" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="350" y="400" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">3. Lab /</text>
+            <text x="350" y="420" font-size="14" font-weight="800" fill="var(--text)" text-anchor="middle">Activity</text>
+
+            <rect x="15" y="190" width="205" height="80" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+            <text x="117.5" y="218" font-size="13" font-weight="800" fill="var(--text)" text-anchor="middle">4. Teach &amp;</text>
+            <text x="117.5" y="236" font-size="13" font-weight="800" fill="var(--text)" text-anchor="middle">Get Feedback</text>
+            <text x="117.5" y="254" font-size="11" fill="var(--muted)" text-anchor="middle">(revise objective if needed)</text>
+
+            <path d="M450 55 C 520 90, 570 130, 582 190" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" marker-end="url(#arrow12arr)"/>
+            <path d="M582 270 C 540 320, 450 355, 452 395" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" marker-end="url(#arrow12arr)"/>
+            <path d="M250 400 C 180 370, 130 320, 118 270" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" marker-end="url(#arrow12arr)"/>
+            <path d="M118 190 C 130 130, 180 90, 250 55" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" marker-end="url(#arrow12arr)"/>
+            <defs>
+              <marker id="arrow12arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="currentColor" opacity=".6"/>
+              </marker>
+            </defs>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Figure 2. Backward design is a loop, not a line. You write the objective first and design forward from it, but the micro-teach in Part B often surfaces evidence that the objective itself needs revising — that's expected, not a failure of the process.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <strong>A test you can apply to any objective you write today:</strong> cover up everything except the verb. If the verb alone could describe a private mental event nobody else could witness, revise it. If the verb describes something a colleague standing next to your student could watch happen, it's ready to build a rubric against.
+    </div>
+  </section>
+
+  <!-- ===================== 2. LAB DESIGN ===================== -->
+  <section id="labdesign" class="card" aria-labelledby="h-labdesign">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M9 3h6M10 3v5l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3.5L14 8V3"/><path d="M7 14h10"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-labdesign">2. Designing the Hands-On Simulation</h2>
+        <p class="sub">The lab is not the fun part you add afterward — it's the evidence-generating machine for one specific objective.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p><strong>Lab Design</strong> is the process of building a hands-on or simulated activity that gives a learner direct practice with one specific objective, scoped so it is safe, repeatable, and requires nothing beyond a browser. Every simulation embedded in this course — the triage simulators, the mapping labs, the compliance checkers — was designed by picking one objective first and then asking: what is the smallest interaction a learner could perform, entirely client-side, that would produce direct evidence toward that objective? A lab that's engaging but doesn't map back to a specific objective is entertainment, not assessment evidence.</p>
+
+    <p>Three design constraints apply to every lab you build for this course, and they aren't negotiable:</p>
+    <ul class="tight">
+      <li><strong>No live or energized equipment, ever.</strong> If your module concept genuinely requires touching a real PLC or panel, the lab must be redesigned as a simulation or restricted to isolated bench hardware under direct instructor supervision — never assumed to run unsupervised on production equipment.</li>
+      <li><strong>No offensive tooling.</strong> A lab may show the <em>effect</em> of an attack (a setpoint drifting, an alarm firing) as a pre-scripted or simulated scenario. It may never hand a learner a working exploit, a real malware sample, or step-by-step instructions for compromising a real system.</li>
+      <li><strong>Runs entirely client-side.</strong> No live network calls, no real equipment interaction, no dependency the learner has to install. This is what makes a lab shareable as a single self-contained file, and it's what makes the safety guarantee actually true rather than just stated.</li>
+    </ul>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the flight simulator, not the cockpit</span>
+      <p>An airline doesn't train new pilots by handing them a loaded aircraft on their first day. A flight simulator reproduces the exact decision points a pilot needs practice with — an engine failure, a crosswind landing — without any of the physical risk of the real thing, and a pilot can fail safely and try again immediately. A well-designed OT lab is the same trade: it reproduces the decision point (a setpoint drifting, an ambiguous alert) without the physical risk of a real control system, and a learner can get it wrong and immediately understand why, as many times as they need to.</p>
+    </div>
+
+    <h3>Worked example — from objective to lab, at an unnamed water utility</h3>
+    <p>Take the objective <em>"Configure a simulated alarm threshold that would catch a tank-level deviation earlier without producing nuisance alarms."</em> Working backward from that single objective to a lab spec:</p>
+    <ol class="tight">
+      <li><strong>What evidence proves the objective was met?</strong> The learner sets a threshold value; the simulation replays a known deviation event; the chosen threshold either catches it with acceptable lead time or it doesn't, and the simulation says which.</li>
+      <li><strong>What is the smallest interaction that produces that evidence?</strong> One numeric input (the threshold), one "run scenario" button, and a result panel showing where the alarm would have fired against a pre-recorded tank-level trend.</li>
+      <li><strong>What has to be pre-scripted rather than "real"?</strong> The tank-level trend itself — a fixed, fictional data series for a water utility's clearwell level, not a live SCADA feed — so every learner sees the identical scenario and results are comparable.</li>
+      <li><strong>What's the safety flag?</strong> A visible line stating the trend is simulated historical data, not a connection to any real utility's system.</li>
+    </ol>
+
+    <div class="callout">
+      <strong>A lab that fails this test:</strong> "Students connect to the department's live PLC lab bench and try changing setpoints to see what happens." Even on isolated bench hardware, this lacks a scripted, comparable scenario every student experiences identically — which makes it very hard to write a rubric for in Section 3. Redesign it as a simulation with a fixed scenario before it goes further.
+    </div>
+  </section>
+
+  <!-- ===================== 3. RUBRIC DESIGN ===================== -->
+  <section id="rubric" class="card" aria-labelledby="h-rubric">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="4" y="2.5" width="16" height="19" rx="2"/><path d="M8 7h8M8 11l2 2 3-3M8 16h5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-rubric">3. Building a Rubric-Based Assessment</h2>
+        <p class="sub">Write the criteria and the performance levels before you see a single student's work — not after.</p>
+      </div>
+      <span class="time-pill">25 min</span>
+    </div>
+
+    <p>A <strong>Rubric</strong> is a scoring tool that names criteria and describes performance levels for each one, decided in advance, so that any rater — an instructor, a peer, or the student self-assessing — applies the same standard to the same evidence. Without a rubric, two reviewers scoring the same module packet can arrive at wildly different judgments, not because they disagree about quality, but because they never agreed on what "good" meant in the first place. An <strong>analytic rubric</strong> (separate criteria, each scored independently) is preferred over a <strong>holistic rubric</strong> (one overall impression score) whenever you need to tell a learner specifically <em>which</em> part of their work to improve — which is exactly the case for a module packet with four distinct artifacts.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — the recipe judge who scores technique, not just taste</span>
+      <p>A cooking competition judge who only says "8 out of 10, tasted good" gives the contestant nothing to improve next time. A judge scoring separately on knife technique, seasoning balance, plating, and adherence to the assigned brief tells the contestant exactly where the dish succeeded and where it fell short — and two different judges using the same four criteria will land close to the same scores even if they've never spoken to each other. That's the entire value of an analytic rubric: it makes independent raters converge.</p>
+    </div>
+
+    <h3>Worked example — the capstone module rubric</h3>
+    <p>This is the actual rubric your module packet will be scored against in Section 9. Read it now, before you build anything in Part B — a rubric is only useful to the person who sees it in advance.</p>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Table 1. Capstone module packet rubric — four criteria, three performance levels each.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Criterion</th>
+            <th scope="col">Approaching Expectations</th>
+            <th scope="col">Meets Expectations</th>
+            <th scope="col">Exceeds Expectations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Learning Objectives</th>
+            <td>Objectives present but written with unobservable verbs ("understand," "know"), or fewer than 4.</td>
+            <td>4&ndash;6 objectives, each with an observable Bloom's verb, matched to the module's actual content.</td>
+            <td>Meets, and objectives are visibly leveled (recall through evaluate/create) rather than clustered at one cognitive level.</td>
+          </tr>
+          <tr>
+            <th scope="row">Hands-On Simulation</th>
+            <td>Activity described but not clearly tied to a specific objective, or requires live/energized equipment.</td>
+            <td>Simulation-only, client-side, and maps directly to one stated objective with a scripted, comparable scenario.</td>
+            <td>Meets, and includes a visible safety flag plus a result state that gives the learner specific, immediate feedback.</td>
+          </tr>
+          <tr>
+            <th scope="row">Rubric</th>
+            <td>Single overall score with no separated criteria, or criteria present without described performance levels.</td>
+            <td>Analytic rubric with distinct criteria and at least three clearly differentiated performance levels each.</td>
+            <td>Meets, and level descriptions use concrete, observable language a second rater could apply without asking the author to clarify.</td>
+          </tr>
+          <tr>
+            <th scope="row">Safeguards Statement</th>
+            <td>Missing, or a generic one-line disclaimer not specific to the module's own activities.</td>
+            <td>Explicitly addresses equipment safety, offensive-tooling boundaries, and data handling for this specific module.</td>
+            <td>Meets, and names the specific safeguard for each individual activity in the module, not just a blanket statement.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <strong>Notice what this rubric does not score:</strong> production polish, visual design, or how nervous you were during the micro-teach. It scores whether the four required artifacts do the job each is supposed to do. A plain-text module packet that nails all four criteria outscores a beautifully designed one that skips the safeguards statement.
+    </div>
+  </section>
+
+  <!-- ===================== 4. PEER REVIEW & SAFEGUARDS ===================== -->
+  <section id="peerreview" class="card" aria-labelledby="h-peerreview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M8 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M16 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M2 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M12 20c0-3.3 2.7-5.5 6-5.5s4 1.6 4 3.5"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-peerreview">4. Peer Review Protocols &amp; the Safeguards Statement</h2>
+        <p class="sub">"Good job" helps no one revise anything. Specific, rubric-anchored feedback does.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p><strong>Peer Review</strong> is a structured process in which learners critique one another's work against a shared rubric or protocol, rather than offering unstructured opinion. It only works when three conditions hold: reviewers apply the same criteria (the rubric from Section 3), feedback is specific enough that the author knows exactly what to change, and the process has a defined structure — who speaks when, for how long — so it doesn't collapse into whoever talks first or loudest.</p>
+
+    <p>Feedback quality sits on a spectrum. <em>"This was good"</em> and <em>"I liked it"</em> are reinforcing but not actionable — the author learns nothing about what specifically to keep doing. <em>"Your rubric's Meets-level language for the simulation criterion is vague — 'works well' isn't something a second rater could apply the same way twice"</em> is specific, tied to a named rubric criterion, and gives the author an exact next step. The second kind is what a peer-review protocol is designed to produce on purpose, rather than hoping reviewers happen to give it.</p>
+
+    <div class="analogy-box">
+      <span class="label">Analogy — physical therapy notes vs. a passing comment</span>
+      <p>"Your form looked a little off" tells a patient nothing useful. "Your knee is tracking inward on the descent — keep it stacked over your second toe" is something the patient can actually correct on the very next rep, because it names the specific joint, the specific movement, and the specific fix. Peer review feedback anchored to a rubric criterion works the same way: it names the artifact, the criterion, and the fix, instead of a general impression that fades by the next attempt.</p>
+    </div>
+
+    <h3>Worked example — the same lab, two kinds of feedback</h3>
+    <p>A peer reviews a colleague's module built around Cascade Summit Electric's (fictional) substation monitoring scenario:</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Table 2. Contrasting vague feedback with rubric-anchored, actionable feedback on the same module.</caption>
+        <thead>
+          <tr><th scope="col">Vague / non-actionable</th><th scope="col">Rubric-anchored / actionable</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"The lab was cool, nice job on the simulation."</td>
+            <td>"Under the Hands-On Simulation criterion — this Meets 'client-side and scripted,' but to reach Exceeds it needs a visible safety flag; right now nothing on screen tells a learner it's simulated data."</td>
+          </tr>
+          <tr>
+            <td>"I think the objectives could be better."</td>
+            <td>"Objective 3 uses 'understand the risk' — under the Learning Objectives criterion that's an unobservable verb; swapping to 'identify' or 'explain' would move this from Approaching to Meets."</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Your <strong>safeguards statement</strong> — the fourth required artifact — is peer-reviewable the same way. A reviewer checking it against the rubric in Table 1 should be able to point at your module's specific activities and confirm each one's safeguard is named, not just find a single sentence claiming "this is all simulated" at the top of the document with no detail underneath.</p>
+  </section>
+
+  <!-- ===================== PART B BANNER ===================== -->
+  <div class="part-banner">
+    <span class="p-label">Part B</span>
+    <h2>Lab — Build, Calibrate, Teach, and Critique</h2>
+    <p>Roughly 2.5 hours: build your module packet, practice rubric calibration and feedback classification on fictional samples, then micro-teach a segment to your group and complete the knowledge check.</p>
+  </div>
+
+  <!-- ===================== 5. WORKSHOP: BUILD YOUR MODULE ===================== -->
+  <section id="workshop" class="card" aria-labelledby="h-workshop">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M14.7 6.3a1 1 0 0 1 0 1.4l-8 8-3.7 1 1-3.7 8-8a1 1 0 0 1 1.4 0z"/><path d="M13 4l3 3"/><path d="M3 20h18"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-workshop">5. Workshop: Build Your Module</h2>
+        <p class="sub">Individual drafting time, using the four criteria from Section 3 as your outline.</p>
+      </div>
+      <span class="time-pill">60 min</span>
+    </div>
+
+    <p>Choose one OT/ICS concept — from an earlier lesson in this course, or from your own program — narrow enough to teach in 60&ndash;90 minutes. Draft all four artifacts below as plain text; polish and formatting are not scored (Table 1). Work individually for this section; you'll trade drafts with a partner in Section 7.</p>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Module Packet Draft</h3>
+        <span class="t">Individual &middot; 60 min</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Instructions.</strong> Working alone, draft each quadrant below on paper or in your own document. Use the rubric in Table 1 as your checklist — each quadrant maps to one rubric criterion. You do not need to build working code for the simulation; a clear written specification (like the worked example in Section 2) is sufficient for this workshop.
+        </div>
+        <div class="ips">
+          <div>
+            <h4>Learning Objectives</h4>
+            Write 4&ndash;6 objectives for your chosen concept. Circle the verb in each one and confirm it's observable (Section 1).
+          </div>
+          <div>
+            <h4>Hands-On Simulation</h4>
+            Pick one objective. Specify the smallest client-side interaction that would produce evidence toward it (Section 2's three-question test).
+          </div>
+          <div>
+            <h4>Rubric</h4>
+            Name 2&ndash;4 criteria for your own module and write one sentence describing what "Meets Expectations" looks like for each.
+          </div>
+          <div>
+            <h4>Safeguards Statement</h4>
+            For each activity in your module, name the specific safeguard: what equipment is never touched, what offensive technique is never demonstrated, whose data is never used.
+          </div>
+        </div>
+        <p style="margin:0;font-size:.9rem;color:var(--muted)">Keep this draft — you'll use it directly in Sections 7 and 8.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 6. RUBRIC CALIBRATION SIMULATOR ===================== -->
+  <section id="rubricsim" class="card" aria-labelledby="h-rubricsim">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M12 3v4M5 7l14 0M6 7l-3 8a4 4 0 0 0 8 0L8 7M18 7l-3 8a4 4 0 0 0 8 0l-3-8M8 21h8"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-rubricsim">6. Rubric Calibration Simulator</h2>
+        <p class="sub">Before independent raters can trust each other's scores, they practice on the same samples first.</p>
+      </div>
+      <span class="time-pill">20 min</span>
+    </div>
+
+    <p><strong>Calibration</strong> is the practice of multiple raters scoring the same sample against the same rubric and comparing results before rating independently — it's how peer reviewers and instructors converge on what "Meets Expectations" actually looks like in practice, not just on paper. Below are three fictional excerpts of a Safeguards Statement, the fourth rubric criterion from Table 1. Rate each one, then compare your rating to the instructor-calibrated rating and rationale.</p>
+
+    <span class="safety-flag"><span aria-hidden="true">&#9888;</span> Simulation only — fictional practice excerpts, no real student submissions</span>
+
+    <div class="sim">
+      <div class="sim-grid">
+        <div class="asset">
+          <label for="calExcerpt">Excerpt to rate</label>
+          <select id="calExcerpt">
+            <option value="">&mdash; choose an excerpt &mdash;</option>
+            <option value="a">Excerpt A &mdash; Ironwood mixing-line module</option>
+            <option value="b">Excerpt B &mdash; Cascade Summit substation module</option>
+            <option value="c">Excerpt C &mdash; Water utility tank-level module</option>
+          </select>
+        </div>
+        <div class="asset">
+          <label for="calRating">Your rating</label>
+          <select id="calRating">
+            <option value="">&mdash; choose a rating &mdash;</option>
+            <option value="approaching">Approaching Expectations</option>
+            <option value="meets">Meets Expectations</option>
+            <option value="exceeds">Exceeds Expectations</option>
+          </select>
+        </div>
+      </div>
+      <p id="calExcerptText" style="font-style:italic;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;min-height:2.5rem;">Choose an excerpt above to read it here before rating.</p>
+      <div class="btn-row">
+        <button type="button" class="btn" id="calCheck">Compare to Instructor Calibration</button>
+        <button type="button" class="btn btn-secondary" id="calClear">Clear Log</button>
+      </div>
+      <div class="sim-out" id="calFeedback" aria-live="polite">
+        <p style="margin:0;color:var(--muted)">Choose an excerpt and a rating, then compare.</p>
+      </div>
+      <div class="table-wrap" style="margin-top:.9rem;">
+        <table>
+          <caption>Your calibration log for this session.</caption>
+          <thead>
+            <tr><th scope="col">Excerpt</th><th scope="col">Your Rating</th><th scope="col">Instructor Rating</th><th scope="col">Agreement</th></tr>
+          </thead>
+          <tbody id="calLog">
+            <tr><td colspan="4" style="color:var(--muted)">No excerpts rated yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Why this matters for Section 8.</strong> When you critique a peer's actual safeguards statement this afternoon, you're doing exactly this exercise — except the excerpt is real and the author is sitting across from you. Disagreeing with a peer's self-rating is normal and expected; the goal of calibration is to disagree productively, pointing at the specific rubric language, not to always land on the same number.
+    </div>
+  </section>
+
+  <!-- ===================== 7. PEER FEEDBACK MAPPING LAB ===================== -->
+  <section id="mapping" class="card" aria-labelledby="h-mapping">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-mapping">7. Peer Feedback Mapping Lab</h2>
+        <p class="sub">Not all feedback is created equal — and one category below shouldn't stay a peer comment at all.</p>
+      </div>
+      <span class="time-pill">15 min</span>
+    </div>
+
+    <p>Before you give feedback on a partner's draft from Section 5, classify each sample comment below into the category it actually belongs to. One category is not like the others: a comment that flags a genuine safeguards violation needs to go to the instructor, not just sit in a peer's feedback notes.</p>
+
+    <div class="mapping-table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Sample feedback comment</th><th scope="col">Classify it as&hellip;</th></tr>
+        </thead>
+        <tbody id="mapBody"></tbody>
+      </table>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn" id="mapCheck">Check My Mapping</button>
+      <button type="button" class="btn btn-secondary" id="mapReset">Reset</button>
+    </div>
+    <p class="result-line" id="mapResult"></p>
+  </section>
+
+  <!-- ===================== 8. MICRO-TEACH & PEER CRITIQUE ===================== -->
+  <section id="microteach" class="card" aria-labelledby="h-microteach">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><circle cx="12" cy="10" r="2.4"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-microteach">8. Micro-Teach &amp; Peer Critique Protocol</h2>
+        <p class="sub">Teach one small piece of your module for real, then take structured critique against Table 1.</p>
+      </div>
+      <span class="time-pill">75 min</span>
+    </div>
+
+    <p>In groups of four, each participant delivers an 8-minute micro-teach of one segment of their module — typically the analogy, the objectives framing, or a short walkthrough of the simulation concept from Section 5. This is not the full module; it's enough for your group to give you real, rubric-anchored feedback before you finalize your packet.</p>
+
+    <div class="activity-block">
+      <div class="activity-header">
+        <h3>Micro-Teach Rotation</h3>
+        <span class="t">Groups of 4 &middot; 75 min total</span>
+      </div>
+      <div class="activity-body">
+        <div class="instructions">
+          <strong>Instructions.</strong> Assign roles before starting: one <strong>Presenter</strong>, one <strong>Timekeeper</strong>, and two <strong>Reviewers</strong> who each hold a copy of Table 1. Rotate roles each round so everyone presents once.
+        </div>
+        <div class="ips">
+          <div>
+            <h4>Minutes 0&ndash;8</h4>
+            Presenter delivers the micro-teach segment. Reviewers take notes directly against Table 1's four criteria &mdash; not general impressions.
+          </div>
+          <div>
+            <h4>Minutes 8&ndash;12</h4>
+            Each Reviewer gives one specific, rubric-anchored piece of feedback (Section 4's actionable pattern) &mdash; not a summary of what they liked.
+          </div>
+          <div>
+            <h4>Minutes 12&ndash;15</h4>
+            Presenter responds: which piece of feedback will you act on, and how? Timekeeper enforces the switch to the next presenter at minute 15.
+          </div>
+          <div>
+            <h4>Repeat &times; 4</h4>
+            Rotate Presenter, Timekeeper, and both Reviewer roles until everyone in the group has presented once.
+          </div>
+        </div>
+        <div class="callout safety">
+          <span class="safety-flag"><span aria-hidden="true">&#9888;</span> Safeguards &amp; Responsible Use</span>
+          <p style="margin:0">If a Reviewer identifies a genuine safeguards violation in a peer's module (live equipment, offensive tooling, real data) &mdash; not just a weak rubric score, but an actual violation &mdash; that goes to the instructor immediately, the same way the Mapping Lab in Section 7 flagged it. Peer critique improves a draft; it does not clear a safety concern on its own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9. DELIVERABLE & GRADING ===================== -->
+  <section id="deliverable" class="card" aria-labelledby="h-deliverable">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-deliverable">9. Capstone Deliverable &amp; Grading</h2>
+        <p class="sub">What you submit, and exactly what it's scored against.</p>
+      </div>
+      <span class="time-pill">10 min</span>
+    </div>
+
+    <p>Your capstone submission is a single module packet containing the four artifacts from Section 5's workshop, revised using the feedback you received in Section 8: your learning objectives, your hands-on simulation specification, your rubric, and your safeguards statement. It is graded against Table 1 in Section 3 &mdash; the same rubric you practiced calibrating against in Section 6 and applied to a peer in Section 8.</p>
+
+    <ul class="tight">
+      <li>Each of the four criteria in Table 1 is scored independently &mdash; Approaching, Meets, or Exceeds &mdash; the same way you scored the fictional excerpts in Section 6.</li>
+      <li>Your instructor's score and rationale will use rubric language directly, the same pattern modeled in Table 2's actionable-feedback column.</li>
+      <li>The micro-teach itself is not separately graded on delivery polish; it exists to surface feedback you can act on before final submission.</li>
+      <li>Revision based on peer or instructor feedback is expected and rewarded &mdash; a packet that visibly incorporated Section 8's critique is evidence of Objective 6 in action.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Reminder for anything you build past this workshop.</strong> If your finished module will actually be taught to students, this course's own safeguards apply to it exactly as they applied to every lesson you've worked through: simulation-only, defensive content only, and no real vendor, employer, or student data in any example.
+    </div>
+  </section>
+
+  <!-- ===================== 10. KNOWLEDGE CHECK ===================== -->
+  <section id="review" class="card" aria-labelledby="h-review">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent)">
+          <circle cx="12" cy="12" r="9.5"/><path d="M9.2 9a2.8 2.8 0 1 1 3.8 2.6c-.9.4-1.4 1-1.4 2v.4"/><circle cx="12" cy="17" r="0.9" fill="currentColor"/>
+        </svg>
+      </span>
+      <div class="titles">
+        <h2 id="h-review">10. Knowledge Check</h2>
+        <p class="sub">Five questions covering objectives, lab safety, rubric design, feedback quality, and calibration.</p>
+      </div>
+      <span class="time-pill">10 min</span>
+    </div>
+
+    <form class="quiz-block" id="quizForm">
+      <div class="q">
+        <fieldset>
+          <legend>1. Which objective uses an observable, measurable verb appropriate for backward design?</legend>
+          <label><input type="radio" name="q1" value="a"> "Students will understand the risks of setpoint attacks."</label>
+          <label><input type="radio" name="q1" value="b"> "Students will identify a setpoint deviation on a historian trend within 30 seconds of onset."</label>
+          <label><input type="radio" name="q1" value="c"> "Students will appreciate the importance of OT security."</label>
+          <label><input type="radio" name="q1" value="d"> "Students will know the difference between Modbus and DNP3."</label>
+        </fieldset>
+        <div class="q-feedback" id="fb-q1"></div>
+      </div>
+
+      <div class="q">
+        <fieldset>
+          <legend>2. A participant's lab plan has students briefly connect to the department's live PLC bench "just to see a real setpoint change take effect," then switch to simulation for the rest. What's the correct call under this lesson's lab-design constraints (Section 2)?</legend>
+          <label><input type="radio" name="q2" value="a"> Acceptable, since the live connection is brief and only for demonstration.</label>
+          <label><input type="radio" name="q2" value="b"> This must be flagged and either redesigned as simulation-only or restricted to isolated bench hardware under direct instructor supervision &mdash; it cannot run as an unsupervised student activity.</label>
+          <label><input type="radio" name="q2" value="c"> Acceptable, since a screen safety flag is displayed while the live connection is active.</label>
+          <label><input type="radio" name="q2" value="d"> Acceptable, since it's bench hardware rather than a live production plant.</label>
+        </fieldset>
+        <div class="q-feedback" id="fb-q2"></div>
+      </div>
+
+      <div class="q">
+        <fieldset>
+          <legend>3. Why does the capstone rubric (Table 1) use an analytic format &mdash; four separate criteria &mdash; instead of one holistic score?</legend>
+          <label><input type="radio" name="q3" value="a"> Analytic rubrics are always faster for an instructor to grade.</label>
+          <label><input type="radio" name="q3" value="b"> Analytic scoring lets a reviewer tell the author specifically which of the four artifacts needs work, since each is scored independently.</label>
+          <label><input type="radio" name="q3" value="c"> Analytic rubrics guarantee that no two raters will ever disagree.</label>
+          <label><input type="radio" name="q3" value="d"> Analytic rubrics don't require performance levels to be written out in advance.</label>
+        </fieldset>
+        <div class="q-feedback" id="fb-q3"></div>
+      </div>
+
+      <div class="q">
+        <fieldset>
+          <legend>4. In Section 4's Table 2, what makes the right-hand feedback more useful to the author than the left-hand feedback?</legend>
+          <label><input type="radio" name="q4" value="a"> It is longer.</label>
+          <label><input type="radio" name="q4" value="b"> It names the specific rubric criterion at issue and points to an exact, actionable change.</label>
+          <label><input type="radio" name="q4" value="c"> It avoids mentioning anything the author could improve.</label>
+          <label><input type="radio" name="q4" value="d"> It uses more advanced technical vocabulary.</label>
+        </fieldset>
+        <div class="q-feedback" id="fb-q4"></div>
+      </div>
+
+      <div class="q">
+        <fieldset>
+          <legend>5. In the Rubric Calibration Simulator (Section 6), why do raters compare their independent ratings to a calibrated rating on the same sample before scoring real submissions on their own?</legend>
+          <label><input type="radio" name="q5" value="a"> To guarantee every rater will agree exactly with the instructor from that point forward.</label>
+          <label><input type="radio" name="q5" value="b"> To surface where raters interpret the same rubric language differently, before that disagreement affects a real grade.</label>
+          <label><input type="radio" name="q5" value="c"> Because rubrics generally can't be trusted, so calibration replaces the rubric entirely.</label>
+          <label><input type="radio" name="q5" value="d"> To reduce the number of criteria the rubric needs going forward.</label>
+        </fieldset>
+        <div class="q-feedback" id="fb-q5"></div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" id="gradeBtn">Grade My Quiz</button>
+        <button type="button" class="btn btn-secondary" id="quizReset">Reset</button>
+      </div>
+      <p class="score" id="scoreOut" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+</main>
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside class="sidebar" aria-label="Lesson tools and navigation">
+
+  <nav class="side-card sidebar-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On this page</h2>
+    <ul>
+      <li><a href="#overview">Lesson Overview</a></li>
+      <li><a href="#objectives">1. Objectives &amp; Backward Design</a></li>
+      <li><a href="#labdesign">2. Lab Design</a></li>
+      <li><a href="#rubric">3. Rubric Design</a></li>
+      <li><a href="#peerreview">4. Peer Review &amp; Safeguards</a></li>
+      <li><a href="#workshop">5. Build Your Module</a></li>
+      <li><a href="#rubricsim">6. Calibration Simulator</a></li>
+      <li><a href="#mapping">7. Feedback Mapping Lab</a></li>
+      <li><a href="#microteach">8. Micro-Teach &amp; Critique</a></li>
+      <li><a href="#deliverable">9. Deliverable &amp; Grading</a></li>
+      <li><a href="#review">10. Knowledge Check</a></li>
+    </ul>
+  </nav>
+
+  <section class="side-card" aria-labelledby="lo-h">
+    <h2 id="lo-h">Objectives progress</h2>
+    <div class="progress-bar"><span id="loBar"></span></div>
+    <p class="progress-text" id="loText" role="status" aria-live="polite">0 of 6 objectives marked complete</p>
+    <div class="lo-check"><input type="checkbox" id="lo1" class="lo-box"><label for="lo1">Write 4&ndash;6 measurable objectives with observable verbs</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo2" class="lo-box"><label for="lo2">Design a simulation-based lab tied to one objective</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo3" class="lo-box"><label for="lo3">Construct an analytic rubric with differentiated levels</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo4" class="lo-box"><label for="lo4">Draft a specific, activity-by-activity safeguards statement</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo5" class="lo-box"><label for="lo5">Deliver a micro-teach and give actionable peer feedback</label></div>
+    <div class="lo-check"><input type="checkbox" id="lo6" class="lo-box"><label for="lo6">Evaluate a peer's packet against the shared rubric</label></div>
+  </section>
+
+  <nav class="side-card sidebar-toc" aria-labelledby="kt-h">
+    <h2 id="kt-h">Key terms</h2>
+    <ul>
+      <li><a href="#objectives">Learning Objectives</a><span class="defn">Statements of what a learner will observably be able to do, anchoring backward design.</span></li>
+      <li><a href="#labdesign">Lab Design</a><span class="defn">Building a simulation-only hands-on activity that gives direct evidence toward one specific objective.</span></li>
+      <li><a href="#rubric">Rubric</a><span class="defn">A scoring tool naming criteria and performance levels in advance so any rater applies the same standard.</span></li>
+      <li><a href="#peerreview">Peer Review</a><span class="defn">A structured critique process using a shared rubric, aimed at specific, actionable feedback.</span></li>
+    </ul>
+  </nav>
+
+  <nav class="side-card" aria-labelledby="pn-h">
+    <h2 id="pn-h">Lesson navigation</h2>
+    <div class="prevnext">
+      <a href="lesson11.html"><span class="dir">&larr; Previous</span>Day 5 &middot; Lesson 11 &mdash; Monitoring, Detection &amp; OT Incident Response</a>
+      <a href="index.html"><span class="dir">Course complete</span>Return to Course Home</a>
+    </div>
+  </nav>
+
+</aside>
+</div>
+
+<!-- ============================ FOOTER NAV ============================ -->
+<nav class="footer-nav" aria-label="Previous lesson and course home">
+  <div class="footer-nav-inner">
+    <a href="lesson11.html">&larr; Lesson 11 &mdash; Monitoring, Detection &amp; OT Incident Response</a>
+    <a href="index.html">Course Home &middot; Capstone Complete</a>
+  </div>
+</nav>
+
+<footer class="site">
+  <div class="inner">
+    <p><strong>OT-101 &middot; Teaching Operational Technologies and Cybersecurity for Community College Faculty</strong></p>
+    <p>Moraine Valley Community College &middot; NCyTE &nbsp;|&nbsp; Instructor: Dr. John L. Sands &nbsp;|&nbsp; Day 5 &middot; Lesson 12 (Capstone) &mdash; Build and Teach Your Own OT Module</p>
+    <p>All activities are simulation-only using fictional organizations and data. No live or production equipment, no offensive tooling, no vendor or customer data. First AI-generated draft &mdash; pending subject-matter expert review.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Theme toggle (light default, localStorage persisted) --------------- */
+  var root = document.documentElement;
+  var toggle = document.getElementById("themeToggle");
+  var icon = document.getElementById("themeIcon");
+  var label = document.getElementById("themeLabel");
+  var KEY = "ot101-theme";
+
+  function safeGet() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function safeSet(v) { try { localStorage.setItem(KEY, v); } catch (e) { /* storage unavailable */ } }
+
+  function applyTheme(mode) {
+    root.setAttribute("data-theme", mode);
+    var dark = mode === "dark";
+    toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    icon.innerHTML = dark ? "&#9728;" : "&#9789;";
+    label.textContent = dark ? "Switch to light mode" : "Switch to dark mode";
+  }
+  applyTheme(safeGet() === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(next);
+    safeSet(next);
+  });
+
+  /* ---------------- Print ---------------- */
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  /* ---------------- Scrollspy for section nav ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".section-nav a"));
+  var targets = navLinks.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+
+  function setCurrent(id) {
+    navLinks.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "true"); }
+      else { a.removeAttribute("aria-current"); }
+    });
+  }
+  if ("IntersectionObserver" in window && targets.length) {
+    var obs = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; })
+        .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+      if (visible.length) { setCurrent(visible[0].target.id); }
+    }, { rootMargin: "-140px 0px -60% 0px", threshold: 0 });
+    targets.forEach(function (t) { obs.observe(t); });
+  }
+
+  /* ---------------- Flip cards ---------------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".flip-card"), function (card) {
+    card.addEventListener("click", function () {
+      var on = card.getAttribute("aria-pressed") === "true";
+      card.setAttribute("aria-pressed", on ? "false" : "true");
+    });
+  });
+
+  /* ---------------- Objectives progress ---------------- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".lo-box"));
+  var bar = document.getElementById("loBar");
+  var loText = document.getElementById("loText");
+  function updateLO() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    bar.style.width = (done / boxes.length * 100) + "%";
+    loText.textContent = done + " of " + boxes.length + " objectives marked complete";
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", updateLO); });
+  updateLO();
+
+  /* ---------------- Rubric Calibration Simulator ---------------- */
+  var EXCERPTS = {
+    a: {
+      label: "Excerpt A — Ironwood mixing-line module",
+      text: "\u201cThis module uses the department\u2019s live PLC lab bench so students can see a real setpoint change take effect before we switch to the simulation for the rest of the activity. No other equipment is involved.\u201d",
+      calibrated: "approaching",
+      rationale: "Calibrated as Approaching Expectations \u2014 and this is a more serious case than the label suggests. Per Section 2, live or energized equipment is only acceptable as isolated bench hardware under direct instructor supervision; this draft describes an unsupervised student activity on live equipment with no supervision plan named at all. This needs to go back for a full redesign, not a minor rewrite."
+    },
+    b: {
+      label: "Excerpt B — Cascade Summit substation module",
+      text: "\u201cSimulation only. No live equipment is used in the tank-level threshold lab. The module does not include any exploit code or real attack tooling, and all historian data used is fictional, generated for this course.\u201d",
+      calibrated: "meets",
+      rationale: "Calibrated as Meets Expectations \u2014 it explicitly addresses all three required dimensions from Table 1: equipment safety, offensive-tooling boundaries, and data handling, specific to this module. It does not yet reach Exceeds because it speaks in one blanket paragraph rather than naming the safeguard for each individual activity."
+    },
+    c: {
+      label: "Excerpt C — Water utility tank-level module",
+      text: "\u201cActivity 1 (threshold lab) runs entirely against a pre-recorded, fictional clearwell-level trend; it never connects to any real SCADA system. Activity 2 (alert triage) uses pre-scripted example alerts, not live network traffic. Neither activity includes exploit code or offensive tooling. No real utility\u2019s data, network diagram, or credentials appear anywhere in this module.\u201d",
+      calibrated: "exceeds",
+      rationale: "Calibrated as Exceeds Expectations \u2014 it meets all three required dimensions and goes further by naming the specific safeguard for each individual activity by name, exactly what separates Exceeds from Meets in Table 1."
+    }
+  };
+  var RATING_LABELS = { approaching: "Approaching Expectations", meets: "Meets Expectations", exceeds: "Exceeds Expectations" };
+
+  var calExcerptSel = document.getElementById("calExcerpt");
+  var calRatingSel = document.getElementById("calRating");
+  var calExcerptText = document.getElementById("calExcerptText");
+  var calFeedback = document.getElementById("calFeedback");
+  var calLog = document.getElementById("calLog");
+  var calLogged = 0;
+
+  calExcerptSel.addEventListener("change", function () {
+    var key = calExcerptSel.value;
+    calExcerptText.textContent = key ? EXCERPTS[key].text : "Choose an excerpt above to read it here before rating.";
+  });
+
+  document.getElementById("calCheck").addEventListener("click", function () {
+    var key = calExcerptSel.value;
+    var rating = calRatingSel.value;
+    if (!key || !rating) {
+      calFeedback.innerHTML = '<p style="margin:0;color:var(--no-text)">Choose both an excerpt and a rating before comparing.</p>';
+      return;
+    }
+    var ex = EXCERPTS[key];
+    var match = rating === ex.calibrated;
+    var verdictClass = match ? "pass" : "warn";
+    var verdictText = match ? "Your rating matches the instructor calibration." : "Your rating differs from the instructor calibration \u2014 that's a normal and useful outcome of calibration practice.";
+    calFeedback.innerHTML =
+      '<p style="margin:0 0 .5rem"><strong>Instructor calibration: ' + RATING_LABELS[ex.calibrated] + '</strong></p>' +
+      '<div class="finding ' + verdictClass + '">' + verdictText + '</div>' +
+      '<p style="margin:.6rem 0 0">' + ex.rationale + '</p>';
+
+    calLogged++;
+    if (calLogged === 1) { calLog.innerHTML = ""; }
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + ex.label + "</td>" +
+      "<td>" + RATING_LABELS[rating] + "</td>" +
+      "<td>" + RATING_LABELS[ex.calibrated] + "</td>" +
+      "<td>" + (match ? "Match" : "No match") + "</td>";
+    calLog.appendChild(tr);
+  });
+
+  document.getElementById("calClear").addEventListener("click", function () {
+    calLog.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">No excerpts rated yet.</td></tr>';
+    calLogged = 0;
+    calFeedback.innerHTML = '<p style="margin:0;color:var(--muted)">Choose an excerpt and a rating, then compare.</p>';
+  });
+
+  /* ---------------- Peer Feedback Mapping Lab ---------------- */
+  var MAP_OPTIONS = ["Specific & Actionable", "Reinforcing", "Vague / Non-Actionable", "Safety Flag \u2014 Escalate"];
+
+  var MAP_ROWS = [
+    {
+      text: "\u201cObjective 2 uses \u2018know the protocol\u2019 \u2014 swap to \u2018identify\u2019 the protocol\u2019s function codes and this moves from Approaching to Meets.\u201d",
+      answer: "Specific & Actionable",
+      why: "It names the exact objective, the exact problem (an unobservable verb), and the exact fix \u2014 the author can act on it immediately."
+    },
+    {
+      text: "\u201cThis was a really solid draft, I enjoyed reading it.\u201d",
+      answer: "Vague / Non-Actionable",
+      why: "It's positive but names nothing specific \u2014 the author has no idea what to keep doing or what to change."
+    },
+    {
+      text: "\u201cYour safety flag on the simulation is clear and placed right where a learner would see it before starting \u2014 keep that exact pattern.\u201d",
+      answer: "Reinforcing",
+      why: "It's positive feedback, but unlike a generic compliment, it names the specific design choice worth keeping, which is what makes reinforcing feedback useful."
+    },
+    {
+      text: "\u201cYour lab description says students will \u2018briefly connect to the live PLC to confirm the read works\u2019 before switching to simulation \u2014 that needs to go to the instructor before Section 8, not just get noted as feedback.\u201d",
+      answer: "Safety Flag \u2014 Escalate",
+      why: "This is a genuine safeguards violation, not a rubric-quality issue \u2014 Section 8's protocol requires escalating this to the instructor rather than treating it as ordinary peer critique."
+    },
+    {
+      text: "\u201cNeeds more detail.\u201d",
+      answer: "Vague / Non-Actionable",
+      why: "It doesn't say which artifact, which criterion, or what kind of detail \u2014 the author still doesn't know what to do next."
+    },
+    {
+      text: "\u201cYour rubric's Exceeds column for the Objectives criterion doesn't describe anything harder than Meets \u2014 right now it just repeats \u2018and more.\u2019 Try naming what a leveled objective set looks like, the way Table 1 does.\u201d",
+      answer: "Specific & Actionable",
+      why: "It names the exact criterion, the exact gap, and points to a concrete model (Table 1) the author can copy the pattern from."
+    }
+  ];
+
+  var mapBody = document.getElementById("mapBody");
+  var mapResult = document.getElementById("mapResult");
+
+  function buildMap() {
+    mapBody.innerHTML = "";
+    MAP_ROWS.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      var sid = "map-" + i;
+      var opts = ['<option value="">\u2014 select \u2014</option>'].concat(MAP_OPTIONS.map(function (o) {
+        return '<option value="' + o + '">' + o + "</option>";
+      })).join("");
+      tr.innerHTML =
+        "<td><label for='" + sid + "'>" + (i + 1) + ". " + r.text + "</label><span class='map-note'></span></td>" +
+        "<td><select id='" + sid + "' data-row='" + i + "'>" + opts + "</select></td>";
+      mapBody.appendChild(tr);
+    });
+    mapResult.textContent = "";
+  }
+  buildMap();
+
+  document.getElementById("mapCheck").addEventListener("click", function () {
+    var right = 0, blank = 0;
+    Array.prototype.forEach.call(mapBody.querySelectorAll("tr"), function (tr, i) {
+      var sel = tr.querySelector("select");
+      var note = tr.querySelector(".map-note");
+      tr.classList.remove("map-correct", "map-wrong");
+      if (!sel.value) {
+        blank++;
+        note.textContent = "Not answered yet.";
+        return;
+      }
+      if (sel.value === MAP_ROWS[i].answer) {
+        right++;
+        tr.classList.add("map-correct");
+        note.textContent = "Correct. " + MAP_ROWS[i].why;
+      } else {
+        tr.classList.add("map-wrong");
+        note.textContent = "Not quite \u2014 this is " + MAP_ROWS[i].answer + ". " + MAP_ROWS[i].why;
+      }
+    });
+    mapResult.textContent = right + " of " + MAP_ROWS.length + " correct" + (blank ? " (" + blank + " left blank)." : ".");
+  });
+
+  document.getElementById("mapReset").addEventListener("click", function () {
+    buildMap();
+  });
+
+  /* ---------------- Quiz ---------------- */
+  var ANSWERS = {
+    q1: { correct: "b", why: {
+      b: "Correct. \u201cIdentify a deviation on a historian trend within 30 seconds\u201d describes something a colleague could watch a student do and time \u2014 an observable, measurable action.",
+      a: "Not correct. \u201cUnderstand\u201d describes an internal mental state that can't be directly observed or graded.",
+      c: "Not correct. \u201cAppreciate\u201d is an attitude, not an observable action \u2014 there's nothing here a grader could watch happen.",
+      d: "Not correct. \u201cKnow\u201d is the same unobservable-verb problem as \u201cunderstand\u201d \u2014 it describes possessing information, not demonstrating it."
+    }},
+    q2: { correct: "b", why: {
+      b: "Correct. Section 2's constraints require live or energized equipment to be either eliminated in favor of simulation or restricted to isolated bench hardware under direct instructor supervision \u2014 an unsupervised brief connection doesn't meet either condition.",
+      a: "Not correct. Brevity doesn't change the underlying risk \u2014 the constraint is about supervision and equipment state, not duration.",
+      c: "Not correct. An on-screen flag documents the risk but doesn't supervise the activity or eliminate the equipment risk itself.",
+      d: "Not correct. Bench hardware is only acceptable under direct instructor supervision \u2014 being off the production floor alone doesn't satisfy that requirement."
+    }},
+    q3: { correct: "b", why: {
+      b: "Correct. Scoring each of the four artifacts independently lets a reviewer point to exactly which one needs work, which is the entire purpose of choosing analytic over holistic scoring for a multi-artifact packet.",
+      a: "Not correct. Analytic rubrics generally take longer to apply than a single holistic score, not less \u2014 speed isn't the reason it was chosen here.",
+      c: "Not correct. No rubric format eliminates all rater disagreement \u2014 that's exactly why Section 6's calibration practice exists.",
+      d: "Not correct. Performance levels are required in an analytic rubric just as much as a holistic one \u2014 Table 1 defines three levels for every criterion."
+    }},
+    q4: { correct: "b", why: {
+      b: "Correct. Naming the specific rubric criterion and the exact change needed is what lets the author act on the feedback immediately \u2014 the defining feature of actionable feedback in Section 4.",
+      a: "Not correct. Length alone doesn't make feedback useful \u2014 a long comment with no specific criterion or fix is still not actionable.",
+      c: "Not correct. Useful feedback often does name a problem \u2014 avoiding any mention of weaknesses would make it purely reinforcing, not more actionable.",
+      d: "Not correct. Technical vocabulary isn't what distinguishes the two columns in Table 2 \u2014 specificity and a named next step are."
+    }},
+    q5: { correct: "b", why: {
+      b: "Correct. Calibration exists to surface exactly where two raters interpret the same rubric language differently, so that gap gets resolved through discussion before it silently produces two different grades on real work.",
+      a: "Not correct. Calibration narrows disagreement on shared examples; it doesn't guarantee permanent agreement on every future submission.",
+      c: "Not correct. Calibration practices applying the rubric \u2014 it doesn't replace the rubric or suggest rubrics can't be trusted.",
+      d: "Not correct. Calibration doesn't change how many criteria a rubric has \u2014 it improves how consistently raters apply the criteria that already exist."
+    }}
+  };
+
+  document.getElementById("gradeBtn").addEventListener("click", function () {
+    var score = 0, unanswered = 0;
+    Object.keys(ANSWERS).forEach(function (q) {
+      var chosen = document.querySelector('input[name="' + q + '"]:checked');
+      var fb = document.getElementById("fb-" + q);
+      fb.className = "q-feedback show";
+      if (!chosen) {
+        unanswered++;
+        fb.classList.add("unanswered");
+        fb.textContent = "No answer selected. Choose an option and grade again.";
+        return;
+      }
+      if (chosen.value === ANSWERS[q].correct) {
+        score++;
+        fb.classList.add("correct");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      } else {
+        fb.classList.add("incorrect");
+        fb.textContent = ANSWERS[q].why[chosen.value];
+      }
+    });
+    var out = document.getElementById("scoreOut");
+    out.textContent = "Score: " + score + " of 5" +
+      (unanswered ? " \u00b7 " + unanswered + " question(s) not answered." : "") +
+      (score === 5 ? " \u2014 every item correct." : "");
+  });
+
+  document.getElementById("quizReset").addEventListener("click", function () {
+    document.getElementById("quizForm").reset();
+    Array.prototype.forEach.call(document.querySelectorAll(".q-feedback"), function (fb) {
+      fb.className = "q-feedback";
+      fb.textContent = "";
+    });
+    document.getElementById("scoreOut").textContent = "";
+  });
+
+})();
+</script>
+</body>
+</html>
