@@ -3,118 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACT-04 Solenoid Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>ACT-04 Solenoid Physics Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #F2EFE3;
+  --bg-grid: #E6E0CB;
+  --ink: #1D2B3A;
+  --ink-soft: #5B6B7A;
+  --accent: #B5651D;
+  --accent2: #2E6E62;
+  --card: #FBF9F1;
+  --border: #CBC4A8;
+  --shadow: rgba(29,43,58,0.10);
+  --danger: #9B3B2F;
+  --copper: #C86D3B;
+  --iron: #708090;
+  --flux: #2563EB;
+  --gold: #D97706;
+}
 
-:root{
-  --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
-  --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+:root[data-theme="dark"] {
+  --bg: #0D1B24;
+  --bg-grid: #132734;
+  --ink: #DFEFF5;
+  --ink-soft: #8FB2C2;
+  --accent: #E39B57;
+  --accent2: #54D6C6;
+  --card: #10222D;
+  --border: #234456;
+  --shadow: rgba(0,0,0,0.45);
+  --danger: #E27462;
+  --copper: #E07A48;
+  --iron: #8EA0B0;
+  --flux: #38BDF8;
+  --gold: #F59E0B;
 }
-:root[data-theme="dark"]{
-  --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
-  --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
   background:
     linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
     linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
     var(--bg);
-  color:var(--ink);
-  font-family:'IBM Plex Sans', sans-serif;
-  min-height:100vh;
-  transition:background-color .25s ease, color .25s ease;
-}
-h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
-.mono{font-family:'IBM Plex Mono', monospace;}
-a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
-.topbar{
-  display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
-}
-.eyebrow{
-  font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
-  color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
-}
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
-.themebtn{
-  flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
-  background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
-  font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
-  padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
-  box-shadow:2px 2px 0 var(--shadow);
-}
-.themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
-.themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
-.backlink{
-  display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace;
-  font-size:12.5px; text-decoration:none; color:var(--ink-soft); font-weight:600;
-  letter-spacing:.04em; margin-bottom:4px;
-}
-.backlink:hover{color:var(--accent);}
-
-
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
-.stage{
-  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
-  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
-}
-.stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
-}
-.stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
-}
-button.ctl:hover{background:var(--accent);}
-button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
-button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
-.badge{
-  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
-  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  transition: background-color .25s ease, color .25s ease;
 }
 
+h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; margin: 0; letter-spacing: .01em; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+a { color: inherit; }
 
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes plunger{0%,40%{transform:translateX(0);}55%,90%{transform:translateX(150px);}100%{transform:translateX(150px);}}
-@keyframes fieldPulse{0%,40%{opacity:0;}55%,90%{opacity:.7;}100%{opacity:.7;}}
-[data-anim="plunger"]{animation-name:plunger;}
-[data-anim="fieldPulse"]{animation-name:fieldPulse;}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px 20px 60px; }
 
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: .14em;
+  color: var(--accent2);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+h1.title { font-size: clamp(24px, 3.4vw, 38px); line-height: 1.08; }
+.sub { color: var(--ink-soft); max-width: 680px; margin-top: 8px; font-size: 14px; line-height: 1.5; }
+
+.themebtn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: var(--card);
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  padding: 9px 14px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  box-shadow: 2px 2px 0 var(--shadow);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.themebtn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--shadow); }
+.themebtn:active { transform: translate(0, 0); box-shadow: 1px 1px 0 var(--shadow); }
+
+.backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+.backlink:hover { color: var(--accent); }
+
+.simlayout {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 1024px) {
+  .simlayout { grid-template-columns: 1fr; }
+}
+
+.stage-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stage {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  box-shadow: 3px 3px 0 var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.stagelabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 6px;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--border);
+  color: var(--ink);
+  font-weight: 600;
+}
+.status-tag.active { background: var(--accent2); color: #072620; }
+.status-tag.warning { background: var(--danger); color: #FFF; }
+
+canvas.sim-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: rgba(0,0,0,0.02);
+  border-radius: 4px;
+}
+
+.panel {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: 3px 3px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: var(--accent2);
+  color: #0B1A17;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 4px;
+  font-weight: 700;
+  align-self: flex-start;
+}
+
+.panel h2 { font-size: 16px; margin-bottom: 4px; }
+.panel p { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin: 0; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1.5px solid var(--border);
+  margin-bottom: 10px;
+}
+.tab-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Control buttons & Switch */
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+button.ctl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1.5px solid var(--ink);
+  padding: 10px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+button.ctl:hover { background: var(--accent); border-color: var(--accent); color: #FFF; }
+button.ctl.active { background: var(--accent2); border-color: var(--accent2); color: #082823; }
+button.ctl.secondary { background: transparent; color: var(--ink); border-color: var(--border); }
+button.ctl.secondary:hover { border-color: var(--ink); background: rgba(0,0,0,0.03); }
+button.ctl.danger { background: var(--danger); border-color: var(--danger); color: #FFF; }
+
+.trigger-btn {
+  grid-column: span 2;
+  font-size: 14px;
+  padding: 12px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #FFF;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.trigger-btn:active, .trigger-btn.pressed {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: #05221C;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sliderrow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sliderrow-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+.sliderrow label { color: var(--ink-soft); letter-spacing: .04em; text-transform: uppercase; }
+.sliderrow .val { font-weight: 600; color: var(--ink); }
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+  height: 6px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider-toggle {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border);
+  transition: .2s;
+  border-radius: 20px;
+}
+.slider-toggle:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--card);
+  transition: .2s;
+  border-radius: 50%;
+}
+input:checked + .slider-toggle { background-color: var(--accent2); }
+input:checked + .slider-toggle:before { transform: translateX(18px); }
+
+/* Technical Specifications list */
+.specs { list-style: none; margin: 0; padding: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.specs li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--border); color: var(--ink-soft); }
+.specs li span:last-child { color: var(--ink); font-weight: 600; }
+
+.stepsbox ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+.stepsbox li { margin-bottom: 6px; }
+
+/* Oscilloscope section */
+.scope-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.scope-legend {
+  display: flex;
+  gap: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.preset-select {
+  width: 100%;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  padding: 8px;
+  background: var(--card);
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.notice-box {
+  background: rgba(181, 101, 29, 0.08);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.pagefoot {
+  margin-top: 30px;
+  border-top: 1.5px solid var(--border);
+  padding-top: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+}
 </style>
 </head>
 <body>
@@ -122,104 +409,751 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-04 &middot; LINEAR MOTION</div>
-      <h1 class="title">Solenoid</h1>
-      <p class="sub">A compact electromechanical device producing short-stroke linear or angular motion through electromagnetic induction.</p>
+      <div class="eyebrow">ACT-04 &middot; ELECTROMECHANICAL ACTUATION</div>
+      <h1 class="title">Solenoid Physics Simulator</h1>
+      <p class="sub">Dynamic simulation of linear electromechanical solenoids. Models transient coil currents, variable inductance $L(x)$, magnetic reluctance, return spring mechanics, and inductive kickback.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
-  <div class="simlayout">
-    <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<rect x="200" y="80" width="180" height="60" rx="4" fill="none" stroke="var(--ink)" stroke-width="2"/>
-<g stroke="var(--accent)" stroke-width="3" fill="none">
- <ellipse cx="220" cy="110" rx="10" ry="26"/><ellipse cx="245" cy="110" rx="10" ry="26"/>
- <ellipse cx="270" cy="110" rx="10" ry="26"/><ellipse cx="295" cy="110" rx="10" ry="26"/>
- <ellipse cx="320" cy="110" rx="10" ry="26"/><ellipse cx="345" cy="110" rx="10" ry="26"/>
- <ellipse cx="360" cy="110" rx="10" ry="26"/>
-</g>
-<text x="230" y="60" class="lbl small">ENERGIZING COIL</text>
-<g class="moving" data-anim="plunger">
- <rect x="100" y="95" width="130" height="30" fill="var(--ink)"/>
- <rect x="60" y="100" width="40" height="20" fill="var(--ink-soft)"/>
-</g>
-<path d="M60 130 q10 15 0 30" stroke="var(--ink-soft)" stroke-width="2" fill="none"/>
-<path d="M60 130 q-10 15 0 30" stroke="var(--ink-soft)" stroke-width="2" fill="none"/>
-<text x="40" y="175" class="lbl small">RETURN SPRING</text>
-<g class="moving" data-anim="fieldPulse" stroke="var(--accent2)" stroke-width="1.5" fill="none">
- <circle cx="290" cy="110" r="55"/><circle cx="290" cy="110" r="70"/>
-</g>
-<text x="470" y="60" class="lbl small">PLUNGER (CORE)</text>
-</svg>
-    </div>
-    <div class="panel">
-      <span class="badge">LINEAR MOTION</span>
-      <h2>Cycle Controls</h2>
-      <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
-      </div>
-      <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
-      </div>
-      <h2>Typical Purposes</h2>
-      <p>Directional control valves, mechanical latching, high-speed sorting gates, circuit breakers.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>A wire coil wound around a hollow tube surrounds a movable ferromagnetic plunger.</li>
-<li>Energizing the coil creates a magnetic field that pulls the plunger toward the coil's center.</li>
-<li>De-energizing the coil lets an internal return spring push the plunger back to its default position.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Electricity</span></li>
-<li><span>Force output</span><span>Low</span></li>
-<li><span>Speed</span><span>High (short stroke)</span></li>
-<li><span>Precision</span><span>Binary (on/off)</span></li></ul>
-    </div>
-  </div>
-  <footer class="pagefoot">ACT-04 &middot; Solenoid &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
-(function(){
+  <div class="simlayout">
+    <!-- Left Column: Visualizers -->
+    <div class="stage-container">
+      <!-- Sectional Visualizer Canvas -->
+      <div class="stage">
+        <div class="stagelabel">
+          <span>Cross-Sectional View &amp; Magnetic Flux Lines</span>
+          <span class="status-tag" id="solenoidStatusTag">DE-ENERGIZED</span>
+        </div>
+        <canvas id="solenoidCanvas" class="sim-canvas" width="700" height="280"></canvas>
+      </div>
+
+      <!-- Live Oscilloscope Canvas -->
+      <div class="stage">
+        <div class="stagelabel">
+          <span>Real-Time Oscilloscope Trace</span>
+          <div class="scope-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div><span>V(t) [V]</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div><span>I(t) [A]</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#10B981;"></div><span>x(t) [mm]</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div><span>F_m [N]</span></div>
+          </div>
+        </div>
+        <canvas id="scopeCanvas" class="sim-canvas" width="700" height="180"></canvas>
+      </div>
+    </div>
+
+    <!-- Right Column: Controls & Specs Panel -->
+    <div class="panel">
+      <span class="badge">LINEAR ELECTROMECHANICS</span>
+
+      <!-- Navigation Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('controlsTab')">Controls</button>
+        <button class="tab-btn" onclick="switchTab('paramsTab')">Parameters</button>
+        <button class="tab-btn" onclick="switchTab('theoryTab')">Theory &amp; Physics</button>
+      </div>
+
+      <!-- TAB 1: Controls -->
+      <div id="controlsTab" class="tab-content active">
+        <h2>Actuator Operation</h2>
+        <p style="margin-bottom:12px;">Trigger the coil manually or select a drive mode.</p>
+
+        <div class="control-grid" style="margin-bottom:14px;">
+          <button class="ctl trigger-btn" id="mainTriggerBtn" onmousedown="handleTrigger(true)" onmouseup="handleTrigger(false)" onmouseleave="handleTrigger(false)" ontouchstart="handleTrigger(true)" ontouchend="handleTrigger(false)">
+            <span>&#9889; ENERGIZE COIL (PUSH &amp; HOLD)</span>
+          </button>
+
+          <button class="ctl secondary" id="latchToggleBtn" onclick="toggleLatch()">Latch Power: OFF</button>
+          <button class="ctl secondary" onclick="resetSim()">Reset Physics</button>
+        </div>
+
+        <div class="slider-group">
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="presetSelect">Simulation Scenario Preset</label>
+            </div>
+            <select id="presetSelect" class="preset-select" onchange="applyPreset(this.value)">
+              <option value="standard">Standard Industrial DC Solenoid</option>
+              <option value="backemf">Back-EMF Current Dip Focus</option>
+              <option value="kickback">Inductive Kickback Spike (No Diode)</option>
+              <option value="pwm">PWM Proportional Actuation (100 Hz)</option>
+              <option value="ac_chatter">AC Solenoid Chatter (50 Hz AC)</option>
+            </select>
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="powerType">Supply Drive Source</label>
+              <span class="val" id="powerTypeVal">DC Constant</span>
+            </div>
+            <select id="powerType" class="preset-select" onchange="updateDriveMode(this.value)">
+              <option value="DC">DC Constant Voltage</option>
+              <option value="PWM">PWM (Pulse Width Modulation)</option>
+              <option value="AC">AC (50 Hz Sinusoidal)</option>
+            </select>
+          </div>
+
+          <div class="sliderrow" id="pwmDutyRow" style="display:none;">
+            <div class="sliderrow-header">
+              <label for="pwmDuty">PWM Duty Cycle</label>
+              <span class="val" id="pwmDutyVal">60 %</span>
+            </div>
+            <input type="range" id="pwmDuty" min="10" max="100" value="60" oninput="updateParam('pwmDuty', this.value)">
+          </div>
+
+          <div class="toggle-row">
+            <span>Flyback Protection Diode</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="flybackToggle" checked onchange="updateParam('flyback', this.checked)">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+        </div>
+
+        <h2 style="margin-top:16px;">Live State Specs</h2>
+        <ul class="specs">
+          <li><span>Coil Voltage ($V$)</span><span id="specV">0.0 V</span></li>
+          <li><span>Coil Current ($I$)</span><span id="specI">0.00 A</span></li>
+          <li><span>Air Gap ($g$)</span><span id="specG">10.0 mm</span></li>
+          <li><span>Magnetic Pull Force ($F_m$)</span><span id="specFm">0.00 N</span></li>
+          <li><span>Inductance ($L$)</span><span id="specL">25.0 mH</span></li>
+          <li><span>Coil Temperature Est.</span><span id="specTemp">25.0 &deg;C</span></li>
+        </ul>
+      </div>
+
+      <!-- TAB 2: Parameters -->
+      <div id="paramsTab" class="tab-content">
+        <h2>Physical &amp; Coil Tuning</h2>
+        <p style="margin-bottom:12px;">Adjust hardware specs to observe electromechanical tradeoffs.</p>
+
+        <div class="slider-group">
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderV">Supply Voltage ($V_{in}$)</label>
+              <span class="val" id="sliderVVal">24 V</span>
+            </div>
+            <input type="range" id="sliderV" min="5" max="48" value="24" oninput="updateParam('voltage', this.value)">
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderN">Coil Winding Turns ($N$)</label>
+              <span class="val" id="sliderNVal">600 turns</span>
+            </div>
+            <input type="range" id="sliderN" min="100" max="1500" step="50" value="600" oninput="updateParam('turns', this.value)">
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderR">Coil Resistance ($R$)</label>
+              <span class="val" id="sliderRVal">12.0 &Omega;</span>
+            </div>
+            <input type="range" id="sliderR" min="2" max="40" step="0.5" value="12" oninput="updateParam('resistance', this.value)">
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderK">Spring Constant ($k$)</label>
+              <span class="val" id="sliderKVal">800 N/m</span>
+            </div>
+            <input type="range" id="sliderK" min="100" max="2500" step="50" value="800" oninput="updateParam('springK', this.value)">
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderMass">Plunger Mass ($m$)</label>
+              <span class="val" id="sliderMassVal">60 g</span>
+            </div>
+            <input type="range" id="sliderMass" min="10" max="300" step="5" value="60" oninput="updateParam('mass', this.value)">
+          </div>
+
+          <div class="sliderrow">
+            <div class="sliderrow-header">
+              <label for="sliderLoad">Opposing External Load ($F_{load}$)</label>
+              <span class="val" id="sliderLoadVal">2.0 N</span>
+            </div>
+            <input type="range" id="sliderLoad" min="0" max="20" step="0.5" value="2" oninput="updateParam('load', this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Theory & Physics -->
+      <div id="theoryTab" class="tab-content">
+        <h2>How Solenoids Work</h2>
+        <div class="stepsbox" style="margin-bottom:12px;">
+          <ol>
+            <li><strong>Electromagnetic Field Creation:</strong> Electric current flowing through $N$ turns generates a magnetic field $H = \frac{N I}{l_m}$.</li>
+            <li><strong>Reluctance & Air Gap Force:</strong> Magnetic flux preference attracts the soft iron plunger to close the high-reluctance air gap ($g$), producing non-linear force $F_m \approx \frac{(N I)^2 \mu_0 A}{2 (g + g_0)^2}$.</li>
+            <li><strong>Back-EMF Current Dip:</strong> As the plunger accelerates, rapid inductance growth $dL/dt$ induces a opposing back-EMF voltage ($I \cdot v \cdot \frac{dL}{dx}$), creating a characteristic dip in current prior to full seal.</li>
+            <li><strong>De-energization Kickback:</strong> Rapidly cutting off coil current causes magnetic field collapse ($V = -L \frac{di}{dt}$), creating high voltage spikes unless suppressed by a flyback diode.</li>
+          </ol>
+        </div>
+
+        <div class="notice-box">
+          <strong>Key Insight:</strong> Solenoids generate much higher force near the end of stroke (sealed air gap) than at the start. This makes them ideal for snap-action switching, hydraulic spool actuation, and mechanical latching.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="pagefoot">
+    <span>ACT-04 &middot; Solenoid Electromechanical Laboratory Simulation</span>
+    <span>Physics Model: Differential Dynamic Reluctance &amp; Inductance</span>
+  </footer>
+</div>
+
+<script>
+(function() {
   var stored = localStorage.getItem('actuator-theme');
-  if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+  if (stored === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }
 })();
-function toggleTheme(){
+
+function toggleTheme() {
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
-  if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('actuator-theme','light'); }
-  else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
+  if (isDark) {
+    root.removeAttribute('data-theme');
+    localStorage.setItem('actuator-theme', 'light');
+  } else {
+    root.setAttribute('data-theme', 'dark');
+    localStorage.setItem('actuator-theme', 'dark');
+  }
   var btn = document.getElementById('themeLabel');
-  if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  if (btn) { btn.textContent = root.getAttribute('data-theme') === 'dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 }
-document.addEventListener('DOMContentLoaded', function(){
+
+document.addEventListener('DOMContentLoaded', function() {
   var btn = document.getElementById('themeLabel');
-  if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  if (btn) { btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
-
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+const state = {
+  // Physical inputs
+  V_in: 24,           // Volts
+  N: 600,             // Coil turns
+  R_0: 12.0,          // Base Resistance Ohms
+  k_spring: 800,      // Spring constant N/m
+  x_preload: 0.003,   // Spring Preload meters
+  mass: 0.060,        // Plunger mass kg (60g)
+  F_load: 2.0,        // External load force N
+  stroke_max: 0.010,  // Max stroke 10mm
+  
+  // Core magnetic geometry
+  A_core: 0.00015,    // Core cross section area m^2 (150 mm^2)
+  mu_0: 4.0 * Math.PI * 1e-7,
+  g_0: 0.0008,        // Residual equivalent iron gap (0.8mm)
+  
+  // Drive mode & state switches
+  driveMode: 'DC',    // DC, PWM, AC
+  pwmDuty: 0.60,      // PWM Duty cycle
+  hasFlyback: true,
+  isTriggered: false,
+  isLatched: false,
+  
+  // Dynamic state variables
+  x: 0.0,             // Position m (0 = resting fully extended gap = 10mm, stroke_max = sealed gap = 0mm)
+  v: 0.0,             // Velocity m/s
+  i: 0.0,             // Current A
+  V_actual: 0.0,      // Actual applied coil voltage
+  temp: 25.0,         // Coil Temperature °C
+  
+  // Visual effects
+  sparkIntensity: 0.0,
+  
+  // Oscilloscope History Buffer
+  history: [],
+  historyMax: 300,
+  timeSec: 0.0
+};
 
+function calculateInductance(x) {
+  // Air gap g decreases as x goes from 0 to stroke_max
+  const gap = Math.max(0.0001, (state.stroke_max - x) + state.g_0);
+  // Reluctance R_m = gap / (mu_0 * A)
+  // Inductance L = N^2 / R_m = N^2 * mu_0 * A / gap
+  const L = (Math.pow(state.N, 2) * state.mu_0 * state.A_core) / gap;
+  return Math.min(0.2, Math.max(0.002, L)); // Bound between 2mH and 200mH
+}
+
+function calculatedLdx(x) {
+  const gap = Math.max(0.0001, (state.stroke_max - x) + state.g_0);
+  // dL/dx = d/dx [ N^2 mu_0 A / (stroke_max - x + g_0) ]
+  // dL/dx = N^2 mu_0 A / gap^2
+  return (Math.pow(state.N, 2) * state.mu_0 * state.A_core) / Math.pow(gap, 2);
+}
+
+function calculateMagForce(x, i) {
+  const dLdx = calculatedLdx(x);
+  // Reluctance force F_m = 0.5 * i^2 * dL/dx
+  return 0.5 * Math.pow(i, 2) * dLdx;
+}
+
+let lastFrameTime = performance.now();
+
+function updatePhysics(dt) {
+  // Sub-step numerical integration for stability
+  const subSteps = 10;
+  const h = dt / subSteps;
+  
+  for (let s = 0; s < subSteps; s++) {
+    state.timeSec += h;
+
+    // 1. Determine Input Voltage depending on mode
+    let targetV = 0.0;
+    const active = state.isTriggered || state.isLatched;
+    
+    if (active) {
+      if (state.driveMode === 'DC') {
+        targetV = state.V_in;
+      } else if (state.driveMode === 'PWM') {
+        const period = 0.01; // 100 Hz
+        const phase = (state.timeSec % period) / period;
+        targetV = (phase <= state.pwmDuty) ? state.V_in : 0.0;
+      } else if (state.driveMode === 'AC') {
+        const freq = 50.0; // 50 Hz AC
+        targetV = state.V_in * Math.SQRT2 * Math.sin(2 * Math.PI * freq * state.timeSec);
+      }
+    } else {
+      targetV = 0.0;
+    }
+
+    // 2. Electrical Differential Equation:
+    // V = i*R + d(L*i)/dt = i*R + L * di/dt + i * v * dL/dx
+    // di/dt = (V - i*R - i * v * dL/dx) / L
+    const L = calculateInductance(state.x);
+    const dLdx = calculatedLdx(state.x);
+    const R_current = state.R_0 * (1 + 0.00393 * (state.temp - 25)); // Resistance thermal shift
+    
+    let appliedV = targetV;
+    let didSpark = false;
+
+    // Turn-off inductive kickback behavior
+    if (!active && state.i > 0.001) {
+      if (state.hasFlyback) {
+        // Flyback diode clamps voltage to approx -0.7V
+        appliedV = -0.7;
+      } else {
+        // Unprotected coil: High negative voltage spike -L * di/dt
+        const R_snubber = 800; // High breakdown arc resistance
+        appliedV = -state.i * R_snubber;
+        didSpark = true;
+      }
+    }
+
+    state.V_actual = appliedV;
+    state.sparkIntensity = didSpark ? Math.min(1.0, state.i * 0.4) : Math.max(0, state.sparkIntensity - h * 10);
+
+    const backEMF = state.i * state.v * dLdx;
+    const didt = (appliedV - state.i * R_current - backEMF) / L;
+    
+    state.i += didt * h;
+    if (state.i < 0 && state.hasFlyback) state.i = 0; // Diode prevents reverse current
+
+    // 3. Mechanical Differential Equation:
+    // m * a = F_m - F_spring - F_damp - F_friction - F_load
+    const F_m = calculateMagForce(state.x, state.i);
+    const F_spring = state.k_spring * (state.x + state.x_preload);
+    const F_damp = 3.5 * state.v; // Viscous damping
+    const F_fric = 0.8 * Math.tanh(state.v / 0.001); // Solid friction
+    
+    const F_net = F_m - F_spring - F_damp - F_fric - state.F_load;
+    const accel = F_net / state.mass;
+
+    state.v += accel * h;
+    state.x += state.v * h;
+
+    // Hard boundary collision limits (Mechanical Stops)
+    if (state.x <= 0) { // Fully Extended Rest Position
+      state.x = 0;
+      if (state.v < 0) state.v = -state.v * 0.15; // Soft bounce
+    } else if (state.x >= state.stroke_max) { // Sealed / Fully Retracted
+      state.x = state.stroke_max;
+      if (state.v > 0) state.v = -state.v * 0.15; // Hard stop impact bounce
+    }
+
+    // 4. Thermal heating accumulation
+    const P_heat = Math.pow(state.i, 2) * R_current;
+    state.temp += (P_heat * 0.00015 - (state.temp - 25.0) * 0.0002) * h;
+  }
+
+  // Record history for Oscilloscope
+  state.history.push({
+    V: state.V_actual,
+    I: state.i,
+    X: state.x * 1000, // convert to mm
+    Fm: calculateMagForce(state.x, state.i)
+  });
+  if (state.history.length > state.historyMax) state.history.shift();
+}
+
+const simCanvas = document.getElementById('solenoidCanvas');
+const ctx = simCanvas.getContext('2d');
+
+function drawSolenoid() {
+  const w = simCanvas.width;
+  const h = simCanvas.height;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w / 2;
+  const cy = h / 2 - 10;
+
+  // Colors
+  const colYoke = isDark ? '#475569' : '#64748B';
+  const colCoil = isDark ? '#D97706' : '#C86D3B';
+  const colPlunger = isDark ? '#94A3B8' : '#334155';
+  const colPole = isDark ? '#64748B' : '#475569';
+  const colSpring = isDark ? '#CBD5E1' : '#1E293B';
+  const colFlux = isDark ? '#38BDF8' : '#2563EB';
+
+  // Geometry dimensions
+  const yokeW = 320;
+  const yokeH = 150;
+  const boreH = 50;
+  const poleW = 80;
+  const plungerW = 160;
+  const plungerH = 46;
+
+  // Plunger position offset (0 to 100 px corresponding to 0 to stroke_max)
+  const strokeRatio = state.x / state.stroke_max; // 0 to 1
+  const plungerX = cx - 120 + strokeRatio * 65;
+
+  // --- 1. Draw Magnetic Flux Density Overlay Lines ---
+  if (state.i > 0.05) {
+    const fluxAlpha = Math.min(0.85, state.i * 0.3);
+    ctx.strokeStyle = colFlux;
+    ctx.lineWidth = 1.5 + Math.min(3, state.i * 0.8);
+    ctx.globalAlpha = fluxAlpha;
+
+    for (let r = 0; r < 4; r++) {
+      const offset = (r - 1.5) * 22;
+      ctx.beginPath();
+      ctx.roundRect(cx - yokeW/2 + 15, cy - yokeH/2 + 15 - offset, yokeW - 30, yokeH - 30 + offset*2, 12);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+  }
+
+  // --- 2. Outer Iron Yoke (Cutaway Frame) ---
+  ctx.fillStyle = colYoke;
+  ctx.beginPath();
+  // Outer frame rect with inner bore cutout
+  ctx.rect(cx - yokeW/2, cy - yokeH/2, yokeW, yokeH);
+  ctx.rect(cx - yokeW/2 + 16, cy - boreH/2, yokeW - 32, boreH);
+  ctx.fill('evenodd');
+  ctx.strokeStyle = isDark ? '#1E293B' : '#0F172A';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // --- 3. Fixed Magnetic Pole Piece (Right Side) ---
+  ctx.fillStyle = colPole;
+  ctx.fillRect(cx + yokeW/2 - poleW - 16, cy - boreH/2 + 2, poleW, boreH - 4);
+  ctx.strokeRect(cx + yokeW/2 - poleW - 16, cy - boreH/2 + 2, poleW, boreH - 4);
+
+  // --- 4. Copper Coil Cross-Sections (Top & Bottom) ---
+  const coilX = cx - 90;
+  const coilW = 160;
+  const coilH = 34;
+
+  ctx.fillStyle = colCoil;
+  // Top Coil Block
+  ctx.fillRect(coilX, cy - yokeH/2 + 12, coilW, coilH);
+  ctx.strokeRect(coilX, cy - yokeH/2 + 12, coilW, coilH);
+  // Bottom Coil Block
+  ctx.fillRect(coilX, cy + yokeH/2 - 12 - coilH, coilW, coilH);
+  ctx.strokeRect(coilX, cy + yokeH/2 - 12 - coilH, coilW, coilH);
+
+  // Draw Wire Grid Cross Section Dots
+  ctx.fillStyle = isDark ? '#FEF08A' : '#78350F';
+  for (let bx = coilX + 10; bx < coilX + coilW - 5; bx += 14) {
+    for (let by = cy - yokeH/2 + 18; by < cy - yokeH/2 + coilH + 8; by += 12) {
+      ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2); ctx.fill();
+    }
+    for (let by = cy + yokeH/2 - coilH - 6; by < cy + yokeH/2 - 12; by += 12) {
+      ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  // --- 5. Return Spring (Compressed dynamically) ---
+  const springStartX = plungerX + plungerW;
+  const springEndX = cx + yokeW/2 - poleW - 16;
+  const springLength = Math.max(12, springEndX - springStartX);
+
+  ctx.strokeStyle = colSpring;
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  const coils = 9;
+  ctx.moveTo(springStartX, cy);
+  for (let c = 0; c < coils; c++) {
+    const xSegment = springStartX + (c + 0.5) * (springLength / coils);
+    const yDir = (c % 2 === 0) ? -14 : 14;
+    ctx.lineTo(xSegment, cy + yDir);
+  }
+  ctx.lineTo(springEndX, cy);
+  ctx.stroke();
+
+  // --- 6. Movable Ferromagnetic Plunger (Armature) ---
+  ctx.fillStyle = colPlunger;
+  ctx.fillRect(plungerX, cy - plungerH/2, plungerW, plungerH);
+  ctx.strokeStyle = isDark ? '#E2E8F0' : '#020617';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(plungerX, cy - plungerH/2, plungerW, plungerH);
+
+  // Plunger Shaft Extension (Left)
+  ctx.fillStyle = colPole;
+  ctx.fillRect(plungerX - 70, cy - 8, 70, 16);
+  ctx.strokeRect(plungerX - 70, cy - 8, 70, 16);
+
+  // --- 7. Air Gap Dimension Indicator ---
+  const currentGapPx = Math.max(0, springEndX - (plungerX + plungerW));
+  ctx.strokeStyle = isDark ? '#F59E0B' : '#D97706';
+  ctx.lineWidth = 1.5;
+
+  // Dimension line
+  const dimY = cy + yokeH/2 + 22;
+  ctx.beginPath();
+  ctx.moveTo(plungerX + plungerW, dimY);
+  ctx.lineTo(springEndX, dimY);
+  ctx.moveTo(plungerX + plungerW, dimY - 6);
+  ctx.lineTo(plungerX + plungerW, dimY + 6);
+  ctx.moveTo(springEndX, dimY - 6);
+  ctx.lineTo(springEndX, dimY + 6);
+  ctx.stroke();
+
+  ctx.fillStyle = isDark ? '#F59E0B' : '#D97706';
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'center';
+  const gapMM = ((state.stroke_max - state.x) * 1000).toFixed(1);
+  ctx.fillText(`AIR GAP: ${gapMM} mm`, (plungerX + plungerW + springEndX) / 2, dimY + 16);
+
+  // --- 8. Unprotected Inductive Kickback Spark Effect ---
+  if (state.sparkIntensity > 0.05) {
+    ctx.strokeStyle = '#EF4444';
+    ctx.fillStyle = '#FDE047';
+    ctx.lineWidth = 2;
+    const sparkX = coilX + 20;
+    const sparkY = cy - yokeH/2 - 12;
+
+    ctx.beginPath();
+    ctx.arc(sparkX, sparkY, 8 + state.sparkIntensity * 12, 0, Math.PI * 2);
+    ctx.globalAlpha = state.sparkIntensity;
+    ctx.fill();
+    ctx.stroke();
+    ctx.globalAlpha = 1.0;
+
+    ctx.fillStyle = '#EF4444';
+    ctx.font = '600 11px "IBM Plex Mono", monospace';
+    ctx.fillText('HIGH VOLTAGE SPARK!', sparkX + 80, sparkY - 6);
+  }
+
+  // --- 9. Thermal Overheat Glow ---
+  if (state.temp > 50) {
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+    ctx.fillRect(coilX - 5, cy - yokeH/2 + 5, coilW + 10, yokeH - 10);
+  }
+}
+
+const scopeCanvas = document.getElementById('scopeCanvas');
+const sCtx = scopeCanvas.getContext('2d');
+
+function drawOscilloscope() {
+  const w = scopeCanvas.width;
+  const h = scopeCanvas.height;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  sCtx.clearRect(0, 0, w, h);
+
+  // Grid background
+  sCtx.strokeStyle = isDark ? '#1E293B' : '#E2E8F0';
+  sCtx.lineWidth = 1;
+
+  for (let x = 0; x < w; x += 40) {
+    sCtx.beginPath(); sCtx.moveTo(x, 0); sCtx.lineTo(x, h); sCtx.stroke();
+  }
+  for (let y = 0; y < h; y += 30) {
+    sCtx.beginPath(); sCtx.moveTo(0, y); sCtx.lineTo(w, y); sCtx.stroke();
+  }
+
+  // Center reference line
+  sCtx.strokeStyle = isDark ? '#334155' : '#CBD5E1';
+  sCtx.beginPath(); sCtx.moveTo(0, h - 20); sCtx.lineTo(w, h - 20); sCtx.stroke();
+
+  if (state.history.length < 2) return;
+
+  const dx = w / state.historyMax;
+
+  // Function to draw trace
+  function drawTrace(getValue, color, scale, offsetY = h - 20) {
+    sCtx.strokeStyle = color;
+    sCtx.lineWidth = 2;
+    sCtx.beginPath();
+
+    for (let i = 0; i < state.history.length; i++) {
+      const xPos = i * dx;
+      const val = getValue(state.history[i]);
+      const yPos = offsetY - val * scale;
+
+      if (i === 0) sCtx.moveTo(xPos, yPos);
+      else sCtx.lineTo(xPos, yPos);
+    }
+    sCtx.stroke();
+  }
+
+  // Trace 1: Voltage V(t) (Blue) - Scaled 2px/V
+  drawTrace(d => d.V, '#2563EB', 1.8);
+
+  // Trace 2: Current I(t) (Amber/Gold) - Scaled 25px/A
+  drawTrace(d => d.I, '#D97706', 30);
+
+  // Trace 3: Displacement x(t) (Green) - Scaled 8px/mm
+  drawTrace(d => d.X, '#10B981', 10);
+
+  // Trace 4: Mag Force Fm(t) (Red) - Scaled 4px/N
+  drawTrace(d => d.Fm, '#EF4444', 4);
+}
+
+function updateReadouts() {
+  document.getElementById('specV').textContent = `${state.V_actual.toFixed(1)} V`;
+  document.getElementById('specI').textContent = `${state.i.toFixed(2)} A`;
+  
+  const gapMM = (state.stroke_max - state.x) * 1000;
+  document.getElementById('specG').textContent = `${gapMM.toFixed(1)} mm`;
+  
+  const Fm = calculateMagForce(state.x, state.i);
+  document.getElementById('specFm').textContent = `${Fm.toFixed(2)} N`;
+  
+  const L = calculateInductance(state.x);
+  document.getElementById('specL').textContent = `${(L * 1000).toFixed(1)} mH`;
+  
+  document.getElementById('specTemp').textContent = `${state.temp.toFixed(1)} °C`;
+
+  // Status tag update
+  const tag = document.getElementById('solenoidStatusTag');
+  if (state.i > 0.05) {
+    if (gapMM < 0.5) {
+      tag.textContent = 'SEALED & SEALING';
+      tag.className = 'status-tag active';
+    } else {
+      tag.textContent = 'ENERGIZED / PULLING';
+      tag.className = 'status-tag active';
+    }
+  } else {
+    tag.textContent = 'DE-ENERGIZED';
+    tag.className = 'status-tag';
+  }
+
+  if (state.temp > 60) {
+    tag.textContent = 'COIL OVERHEATED';
+    tag.className = 'status-tag warning';
+  }
+}
+
+function handleTrigger(pressed) {
+  state.isTriggered = pressed;
+  const btn = document.getElementById('mainTriggerBtn');
+  if (pressed) btn.classList.add('pressed');
+  else btn.classList.remove('pressed');
+}
+
+function toggleLatch() {
+  state.isLatched = !state.isLatched;
+  const btn = document.getElementById('latchToggleBtn');
+  btn.textContent = `Latch Power: ${state.isLatched ? 'ON' : 'OFF'}`;
+  if (state.isLatched) btn.classList.add('active');
+  else btn.classList.remove('active');
+}
+
+function updateParam(param, val) {
+  val = parseFloat(val);
+  switch (param) {
+    case 'voltage': state.V_in = val; document.getElementById('sliderVVal').textContent = `${val} V`; break;
+    case 'turns': state.N = val; document.getElementById('sliderNVal').textContent = `${val} turns`; break;
+    case 'resistance': state.R_0 = val; document.getElementById('sliderRVal').textContent = `${val} Ω`; break;
+    case 'springK': state.k_spring = val; document.getElementById('sliderKVal').textContent = `${val} N/m`; break;
+    case 'mass': state.mass = val / 1000; document.getElementById('sliderMassVal').textContent = `${val} g`; break;
+    case 'load': state.F_load = val; document.getElementById('sliderLoadVal').textContent = `${val} N`; break;
+    case 'pwmDuty': state.pwmDuty = val / 100; document.getElementById('pwmDutyVal').textContent = `${val} %`; break;
+    case 'flyback': state.hasFlyback = !!val; break;
+  }
+}
+
+function updateDriveMode(mode) {
+  state.driveMode = mode;
+  document.getElementById('powerTypeVal').textContent = mode;
+  document.getElementById('pwmDutyRow').style.display = (mode === 'PWM') ? 'flex' : 'none';
+}
+
+function resetSim() {
+  state.x = 0;
+  state.v = 0;
+  state.i = 0;
+  state.temp = 25.0;
+  state.history = [];
+}
+
+function applyPreset(presetKey) {
+  resetSim();
+  switch (presetKey) {
+    case 'standard':
+      state.V_in = 24; state.N = 600; state.R_0 = 12; state.k_spring = 800; state.F_load = 2;
+      state.hasFlyback = true; updateDriveMode('DC');
+      break;
+    case 'backemf':
+      state.V_in = 36; state.N = 1000; state.R_0 = 8; state.k_spring = 400; state.mass = 0.120;
+      state.hasFlyback = true; updateDriveMode('DC');
+      break;
+    case 'kickback':
+      state.V_in = 24; state.hasFlyback = false; updateDriveMode('DC');
+      document.getElementById('flybackToggle').checked = false;
+      break;
+    case 'pwm':
+      state.V_in = 24; state.pwmDuty = 0.50; updateDriveMode('PWM');
+      break;
+    case 'ac_chatter':
+      state.V_in = 24; updateDriveMode('AC');
+      break;
+  }
+
+  // Update slider UI displays
+  document.getElementById('sliderV').value = state.V_in;
+  document.getElementById('sliderVVal').textContent = `${state.V_in} V`;
+  document.getElementById('sliderN').value = state.N;
+  document.getElementById('sliderNVal').textContent = `${state.N} turns`;
+  document.getElementById('sliderR').value = state.R_0;
+  document.getElementById('sliderRVal').textContent = `${state.R_0} Ω`;
+  document.getElementById('sliderK').value = state.k_spring;
+  document.getElementById('sliderKVal').textContent = `${state.k_spring} N/m`;
+}
+
+function mainLoop(timestamp) {
+  const dt = Math.min(0.033, (timestamp - lastFrameTime) / 1000);
+  lastFrameTime = timestamp;
+
+  updatePhysics(dt);
+  drawSolenoid();
+  drawOscilloscope();
+  updateReadouts();
+
+  requestAnimationFrame(mainLoop);
+}
+
+window.onload = function() {
+  lastFrameTime = performance.now();
+  requestAnimationFrame(mainLoop);
+};
 </script>
 </body>
 </html>
