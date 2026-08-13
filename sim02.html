@@ -1,122 +1,154 @@
+Here is the upgraded, interactive, and physics-driven pneumatic cylinder simulator web application. It retains the signature styling, typography, and responsive visual layout of the original module while replacing the fixed CSS keyframe loop with a dynamic fluid power physics engine, real-time pressure-flow mechanics, and live operational telemetry.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACT-02 Hydraulic Cylinder Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>ACT-01 Pneumatic Cylinder Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 
-:root{
-  --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
-  --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+:root {
+  --bg: #F2EFE3; 
+  --bg-grid: #E6E0CB; 
+  --ink: #1D2B3A; 
+  --ink-soft: #5B6B7A;
+  --accent: #008000; /* White/Green/Black signature theme */
+  --accent-light: #2E6E62;
+  --card: #FBF9F1; 
+  --border: #CBC4A8;
+  --shadow: rgba(29,43,58,0.10); 
+  --danger: #9B3B2F;
+  --press-hi: #D32F2F;
+  --press-lo: #1976D2;
 }
-:root[data-theme="dark"]{
-  --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
-  --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+
+:root[data-theme="dark"] {
+  --bg: #0D1B24; 
+  --bg-grid: #132734; 
+  --ink: #DFEFF5; 
+  --ink-soft: #8FB2C2;
+  --accent: #00FF66; /* High-visibility green on dark */
+  --accent-light: #54D6C6; 
+  --card: #10222D; 
+  --border: #234456;
+  --shadow: rgba(0,0,0,0.45); 
+  --danger: #E27462;
+  --press-hi: #FF5252;
+  --press-lo: #448AFF;
 }
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
   background:
     linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
     linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
     var(--bg);
-  color:var(--ink);
-  font-family:'IBM Plex Sans', sans-serif;
-  min-height:100vh;
-  transition:background-color .25s ease, color .25s ease;
-}
-h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
-.mono{font-family:'IBM Plex Mono', monospace;}
-a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
-.topbar{
-  display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
-}
-.eyebrow{
-  font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
-  color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
-}
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
-.themebtn{
-  flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
-  background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
-  font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
-  padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
-  box-shadow:2px 2px 0 var(--shadow);
-}
-.themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
-.themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
-.backlink{
-  display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace;
-  font-size:12.5px; text-decoration:none; color:var(--ink-soft); font-weight:600;
-  letter-spacing:.04em; margin-bottom:4px;
-}
-.backlink:hover{color:var(--accent);}
-
-
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
-.stage{
-  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
-  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
-}
-.stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
-}
-.stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
-}
-button.ctl:hover{background:var(--accent);}
-button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
-button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
-.badge{
-  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
-  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  transition: background-color .25s ease, color .25s ease;
 }
 
+h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; letter-spacing: .01em; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+a { color: inherit; }
 
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes pumpGear{to{transform:rotate(360deg);}}
-@keyframes oilFill{0%,100%{transform:scaleX(1);}50%{transform:scaleX(2.2);}}
-@keyframes hydRod{0%,100%{transform:translateX(0);}50%{transform:translateX(150px);}}
-[data-anim="pumpGear"]{animation-name:pumpGear; animation-timing-function:linear;}
-[data-anim="oilFill"]{animation-name:oilFill;}
-[data-anim="hydRod"]{animation-name:hydRod;}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 60px; }
 
+.topbar {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;
+  border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 12px;
+}
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .14em;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 6px; font-weight: 600;
+}
+h1.title { font-size: clamp(26px, 3.6vw, 40px); line-height: 1.08; }
+.sub { color: var(--ink-soft); max-width: 640px; margin-top: 10px; font-size: 14.5px; line-height: 1.55; }
+
+.themebtn {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 8px; cursor: pointer;
+  background: var(--card); border: 1.5px solid var(--ink); color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .06em;
+  padding: 9px 14px; border-radius: 3px; text-transform: uppercase; font-weight: 600;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.themebtn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--shadow); }
+.themebtn:active { transform: translate(0, 0); box-shadow: 1px 1px 0 var(--shadow); }
+
+.backlink {
+  display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px; text-decoration: none; color: var(--ink-soft); font-weight: 600;
+  letter-spacing: .04em; margin-bottom: 4px;
+}
+.backlink:hover { color: var(--accent); }
+
+.simlayout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 22px; margin-top: 16px; }
+@media (max-width: 900px) { .simlayout { grid-template-columns: 1fr; } }
+
+.stage {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 5px;
+  padding: 16px; box-shadow: 3px 3px 0 var(--shadow); position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.stage .stagelabel {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+}
+.stage svg { width: 100%; height: auto; display: block; }
+
+.panel { background: var(--card); border: 1.5px solid var(--border); border-radius: 5px; padding: 18px; box-shadow: 3px 3px 0 var(--shadow); }
+.panel h2 { font-size: 15px; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.panel p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 12px; }
+
+.controlrow { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+button.ctl {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; background: var(--ink); color: var(--bg); border: 1.5px solid var(--ink); padding: 8px 12px;
+  border-radius: 3px; cursor: pointer; transition: all 0.15s ease;
+}
+button.ctl:hover { background: var(--accent); border-color: var(--accent); color: #FFF; }
+button.ctl.active { background: var(--accent); border-color: var(--accent); color: #FFF; }
+button.ctl.secondary { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+button.ctl.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.sliderrow { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.sliderrow label { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-soft); }
+.sliderrow label span.val { color: var(--ink); font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+.telemetry-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px;
+  background: var(--bg); padding: 10px; border-radius: 4px; border: 1px solid var(--border);
+}
+.telemetry-item { font-family: 'IBM Plex Mono', monospace; }
+.telemetry-item .lbl { color: var(--ink-soft); text-transform: uppercase; display: block; font-size: 9px; letter-spacing: 0.05em; }
+.telemetry-item .val { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+.specs { list-style: none; margin: 0; padding: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.specs li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--border); color: var(--ink-soft); }
+.specs li span:last-child { color: var(--ink); font-weight: 600; }
+
+.stepsbox ol { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.55; }
+
+.badge {
+  display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .06em;
+  text-transform: uppercase; background: var(--accent); color: #FFF; padding: 3px 9px; border-radius: 20px;
+  margin-bottom: 10px; font-weight: 700;
+}
+
+.lbl-text { font-family: 'IBM Plex Mono', monospace; font-size: 10px; fill: var(--ink-soft); }
+.flow-line { stroke-dasharray: 6 4; animation: flowAnim 0.5s linear infinite; }
+.flow-line.reverse { animation-direction: reverse; }
+@keyframes flowAnim { to { stroke-dashoffset: -10; } }
+
+.pagefoot { margin-top: 28px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); text-align: center; }
 </style>
 </head>
 <body>
@@ -124,98 +156,414 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-02 &middot; LINEAR MOTION</div>
-      <h1 class="title">Hydraulic Cylinder</h1>
-      <p class="sub">A heavy-duty fluid power actuator that uses pressurized, incompressible hydraulic oil to generate very high linear forces.</p>
+      <div class="eyebrow">ACT-01 &middot; LINEAR MOTION SIMULATOR</div>
+      <h1 class="title">Pneumatic Cylinder</h1>
+      <p class="sub">An interactive dynamic fluid-power simulator modeling a double-acting pneumatic actuator powered by a 5/2-way directional control valve with realistic load mechanics and pressure dynamics.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
-  <div class="simlayout">
-    <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<rect x="30" y="150" width="70" height="46" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
-<circle class="moving" data-anim="pumpGear" cx="65" cy="173" r="14" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="4 4"/>
-<text x="20" y="210" class="lbl small">HYDRAULIC PUMP</text>
-<path d="M100 173 L150 173" stroke="var(--ink-soft)" stroke-width="4"/>
-<rect x="150" y="90" width="260" height="80" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
-<rect class="moving" data-anim="oilFill" x="156" y="98" width="80" height="64" fill="var(--accent)" opacity=".55"/>
-<g class="moving rod" data-anim="hydRod">
-  <rect x="380" y="115" width="14" height="50" fill="var(--accent)"/>
-  <rect x="394" y="118" width="180" height="14" fill="var(--ink-soft)"/>
-  <rect x="574" y="102" width="22" height="46" rx="2" fill="var(--ink)"/>
-</g>
-<text x="230" y="185" class="lbl small">OIL CHAMBER</text>
-<text x="500" y="185" class="lbl small">RAM / LOAD FACE</text>
-</svg>
-    </div>
-    <div class="panel">
-      <span class="badge">LINEAR MOTION</span>
-      <h2>Cycle Controls</h2>
-      <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
-      </div>
-      <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
-      </div>
-      <h2>Typical Purposes</h2>
-      <p>Stamping presses, forging, injection-molding clamps, heavy lifting, workpiece manipulation.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>A hydraulic pump forces oil into the cylinder barrel at 1,000-5,000+ PSI.</li>
-<li>Pressurized oil acts directly on the piston face, producing linear thrust.</li>
-<li>Control valves modulate fluid direction; returning oil is routed back to the reservoir.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>High-pressure oil</span></li>
-<li><span>Force output</span><span>Very high</span></li>
-<li><span>Speed</span><span>Low to medium</span></li>
-<li><span>Precision</span><span>Low to medium</span></li></ul>
-    </div>
-  </div>
-  <footer class="pagefoot">ACT-02 &middot; Hydraulic Cylinder &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
+  <div class="simlayout">
+    <!-- LEFT: REAL-TIME GRAPHICAL SIMULATION -->
+    <div class="stage" id="stage01">
+      <div class="stagelabel">
+        <span>Schematic Physics Diagram</span>
+        <span id="simStateBadge" style="font-weight: 600; color: var(--accent);">IDLE</span>
+      </div>
+      
+      <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--bg-grid)" stroke-width="0.8"/>
+          </pattern>
+        </defs>
+        <rect width="640" height="300" fill="url(#grid)" />
+
+        <!-- PNEUMATIC CYLINDER HOUSING -->
+        <!-- Cap End Chamber (Port A side) -->
+        <rect id="chamberA" x="80" y="45" width="0" height="60" fill="var(--press-hi)" opacity="0.25" />
+        <!-- Rod End Chamber (Port B side) -->
+        <rect id="chamberB" x="80" y="45" width="220" height="60" fill="var(--press-lo)" opacity="0.15" />
+
+        <!-- Cylinder Outer Barrel -->
+        <rect x="80" y="45" width="220" height="60" fill="none" stroke="var(--ink)" stroke-width="3" rx="2"/>
+        <line x1="80" y1="45" x2="80" y2="105" stroke="var(--ink)" stroke-width="6"/> <!-- Rear Cap -->
+        <line x1="300" y1="45" x2="300" y2="105" stroke="var(--ink)" stroke-width="6"/> <!-- Front Cap/Bushing -->
+
+        <!-- PISTON & ROD ASSEMBLY -->
+        <g id="pistonAssembly" transform="translate(0, 0)">
+          <!-- Piston Head -->
+          <rect x="80" y="47" width="16" height="56" fill="var(--ink)" rx="1"/>
+          <rect x="85" y="50" width="6" height="50" fill="var(--accent)"/> <!-- Dynamic Seal -->
+          <!-- Piston Rod -->
+          <rect x="96" y="68" width="180" height="14" fill="var(--ink-soft)" stroke="var(--ink)" stroke-width="1"/>
+          <!-- Rod Clevis / Connector -->
+          <rect x="276" y="60" width="20" height="30" rx="3" fill="var(--ink)"/>
+          <circle cx="286" cy="75" r="4" fill="var(--card)"/>
+        </g>
+
+        <!-- EXTERNAL MECHANICAL LOAD & SLIDE -->
+        <line x1="300" y1="90" x2="560" y2="90" stroke="var(--border)" stroke-dasharray="4 4" stroke-width="2"/>
+        <g id="loadBlock" transform="translate(0,0)">
+          <rect x="296" y="50" width="50" height="40" rx="4" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="321" y="74" font-family="'IBM Plex Mono'" font-size="10" font-weight="bold" fill="var(--ink)" text-anchor="middle">LOAD</text>
+        </g>
+
+        <!-- MANIFOLD & FLUID TUBING -->
+        <!-- Port A Tube -->
+        <path id="lineA" d="M 100,105 L 100,185 L 220,185" fill="none" stroke="var(--border)" stroke-width="4" stroke-linejoin="round"/>
+        <!-- Port B Tube -->
+        <path id="lineB" d="M 280,105 L 280,185 L 260,185" fill="none" stroke="var(--border)" stroke-width="4" stroke-linejoin="round"/>
+
+        <!-- Directional Flow Lines -->
+        <path id="flowA" d="M 100,105 L 100,185 L 220,185" fill="none" stroke="var(--press-hi)" stroke-width="2" class="flow-line" opacity="0"/>
+        <path id="flowB" d="M 280,105 L 280,185 L 260,185" fill="none" stroke="var(--press-lo)" stroke-width="2" class="flow-line" opacity="0"/>
+
+        <!-- 5/2-WAY DIRECTIONAL CONTROL VALVE -->
+        <g transform="translate(200, 175)">
+          <rect x="0" y="0" width="80" height="40" fill="var(--card)" stroke="var(--ink)" stroke-width="2" rx="2"/>
+          <line x1="40" y1="0" x2="40" y2="40" stroke="var(--border)" stroke-width="1"/>
+          
+          <!-- Spool State Box -->
+          <rect id="valveSpool" x="3" y="3" width="34" height="34" fill="var(--accent)" opacity="0.3" rx="2"/>
+
+          <!-- Valve Port Identifiers -->
+          <text x="20" y="24" font-family="'IBM Plex Mono'" font-size="10" font-weight="bold" fill="var(--ink)" text-anchor="middle">A</text>
+          <text x="60" y="24" font-family="'IBM Plex Mono'" font-size="10" font-weight="bold" fill="var(--ink)" text-anchor="middle">B</text>
+        </g>
+        
+        <!-- Air Supply Connection -->
+        <line x1="240" y1="215" x2="240" y2="250" stroke="var(--ink)" stroke-width="3"/>
+        <polygon points="235,250 245,250 240,240" fill="var(--ink)"/>
+        <text x="240" y="265" class="lbl-text" text-anchor="middle">COMPRESSED AIR SUPPLY (P)</text>
+
+        <!-- LABELS -->
+        <text x="100" y="38" class="lbl-text" text-anchor="middle">Port A (Cap)</text>
+        <text x="280" y="38" class="lbl-text" text-anchor="middle">Port B (Rod)</text>
+        <text x="190" y="28" class="lbl-text" text-anchor="middle">Bore: 32mm | Stroke: 150mm</text>
+      </svg>
+
+      <!-- LIVE TELEMETRY DASHBOARD -->
+      <div class="telemetry-grid">
+        <div class="telemetry-item">
+          <span class="lbl">Position</span>
+          <span class="val" id="telePos">0.0 mm</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="lbl">Velocity</span>
+          <span class="val" id="teleVel">0.00 m/s</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="lbl">Cap Press ($P_A$)</span>
+          <span class="val" id="telePA">0.0 PSI</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="lbl">Rod Press ($P_B$)</span>
+          <span class="val" id="telePB">0.0 PSI</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="lbl">Net Force Output</span>
+          <span class="val" id="teleForce">0 N</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="lbl">Cycle Time</span>
+          <span class="val" id="teleTime">0.00 s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CONTROLS & INSTRUCTIONAL PANEL -->
+    <div class="panel">
+      <span class="badge">Dynamic Control</span>
+      <h2>Valve & Movement Controls</h2>
+      <div class="controlrow">
+        <button class="ctl" id="btnExtend">Extend</button>
+        <button class="ctl" id="btnRetract">Retract</button>
+        <button class="ctl secondary" id="btnAuto">Auto Cycle</button>
+      </div>
+
+      <h2>Fluid Power Parameters</h2>
+      <div class="sliderrow">
+        <label for="pressSlider">Main Supply Pressure: <span class="val" id="pressVal">6.0 Bar (87 PSI)</span></label>
+        <input type="range" id="pressSlider" min="2" max="10" step="0.5" value="6">
+      </div>
+
+      <div class="sliderrow">
+        <label for="loadSlider">Mechanical Load: <span class="val" id="loadVal">15 kg</span></label>
+        <input type="range" id="loadSlider" min="0" max="50" step="5" value="15">
+      </div>
+
+      <div class="sliderrow">
+        <label for="flowSlider">Flow Throttle (Speed): <span class="val" id="flowVal">80%</span></label>
+        <input type="range" id="flowSlider" min="10" max="100" step="5" value="80">
+      </div>
+
+      <h2>How It Operates</h2>
+      <div class="stepsbox">
+        <ol>
+          <li>Pressurized air entering <strong>Port A</strong> exerts force over full cap surface area ($A_{cap}$).</li>
+          <li>Air in <strong>Port B</strong> exhausts to atmosphere as piston accelerates forward.</li>
+          <li>Due to rod volume, extension force is greater than retraction force ($F = P \cdot A$).</li>
+        </ol>
+      </div>
+
+      <h2>Specifications</h2>
+      <ul class="specs">
+        <li><span>Actuator Type</span><span>Double-Acting</span></li>
+        <li><span>Bore Diameter</span><span>32 mm</span></li>
+        <li><span>Rod Diameter</span><span>12 mm</span></li>
+        <li><span>Max Force @ 6 Bar</span><span>~482 N (Extend)</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="pagefoot">ACT-01 &middot; Pneumatic Cylinder &middot; Educational Simulation Reference</footer>
+</div>
+
+<script>
+// Theme Switcher Logic
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
-  if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('actuator-theme','light'); }
-  else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
-  var btn = document.getElementById('themeLabel');
-  if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  if(isDark){ 
+    root.removeAttribute('data-theme'); 
+    localStorage.setItem('actuator-theme','light'); 
+  } else { 
+    root.setAttribute('data-theme','dark'); 
+    localStorage.setItem('actuator-theme','dark'); 
+  }
+  updateThemeLabel();
 }
-document.addEventListener('DOMContentLoaded', function(){
+
+function updateThemeLabel() {
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
-});
-
-
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+document.addEventListener('DOMContentLoaded', updateThemeLabel);
 
+// PNEUMATIC PHYSICS ENGINE
+(function() {
+  const MAX_STROKE_MM = 150;
+  const PIXELS_PER_MM = 1.1; // Visual scaling factor
+  const BORE_DIA_M = 0.032; 
+  const ROD_DIA_M = 0.012;  
+  
+  const AREA_CAP = (Math.PI * Math.pow(BORE_DIA_M, 2)) / 4; // m^2
+  const AREA_ROD = AREA_CAP - ((Math.PI * Math.pow(ROD_DIA_M, 2)) / 4); // m^2
+
+  let posMM = 0; 
+  let velocity = 0; 
+  let targetValveState = 'RETRACT'; 
+  let isAutoCycling = false;
+  let autoTimer = null;
+  let cycleStartTime = performance.now();
+
+  const pressSlider = document.getElementById('pressSlider');
+  const loadSlider = document.getElementById('loadSlider');
+  const flowSlider = document.getElementById('flowSlider');
+
+  const btnExtend = document.getElementById('btnExtend');
+  const btnRetract = document.getElementById('btnRetract');
+  const btnAuto = document.getElementById('btnAuto');
+
+  const telePos = document.getElementById('telePos');
+  const teleVel = document.getElementById('teleVel');
+  const telePA = document.getElementById('telePA');
+  const telePB = document.getElementById('telePB');
+  const teleForce = document.getElementById('teleForce');
+  const teleTime = document.getElementById('teleTime');
+  const simStateBadge = document.getElementById('simStateBadge');
+
+  const pistonAssembly = document.getElementById('pistonAssembly');
+  const loadBlock = document.getElementById('loadBlock');
+  const chamberA = document.getElementById('chamberA');
+  const chamberB = document.getElementById('chamberB');
+  const flowA = document.getElementById('flowA');
+  const flowB = document.getElementById('flowB');
+  const lineA = document.getElementById('lineA');
+  const lineB = document.getElementById('lineB');
+  const valveSpool = document.getElementById('valveSpool');
+
+  pressSlider.addEventListener('input', () => {
+    const bar = parseFloat(pressSlider.value);
+    const psi = Math.round(bar * 14.5038);
+    document.getElementById('pressVal').textContent = `${bar.toFixed(1)} Bar (${psi} PSI)`;
+  });
+
+  loadSlider.addEventListener('input', () => {
+    document.getElementById('loadVal').textContent = `${loadSlider.value} kg`;
+  });
+
+  flowSlider.addEventListener('input', () => {
+    document.getElementById('flowVal').textContent = `${flowSlider.value}%`;
+  });
+
+  btnExtend.addEventListener('click', () => {
+    stopAutoCycle();
+    setValveState('EXTEND');
+  });
+
+  btnRetract.addEventListener('click', () => {
+    stopAutoCycle();
+    setValveState('RETRACT');
+  });
+
+  btnAuto.addEventListener('click', () => {
+    if(isAutoCycling) {
+      stopAutoCycle();
+    } else {
+      startAutoCycle();
+    }
+  });
+
+  function setValveState(state) {
+    targetValveState = state;
+    if(state === 'EXTEND') {
+      btnExtend.classList.add('active');
+      btnRetract.classList.remove('active');
+    } else {
+      btnRetract.classList.add('active');
+      btnExtend.classList.remove('active');
+    }
+  }
+
+  function startAutoCycle() {
+    isAutoCycling = true;
+    btnAuto.classList.add('active');
+    btnAuto.textContent = "STOP AUTO";
+    runAutoCycleStep();
+  }
+
+  function stopAutoCycle() {
+    isAutoCycling = false;
+    clearTimeout(autoTimer);
+    btnAuto.classList.remove('active');
+    btnAuto.textContent = "AUTO CYCLE";
+  }
+
+  function runAutoCycleStep() {
+    if(!isAutoCycling) return;
+    if(posMM <= 1) setValveState('EXTEND');
+    else if(posMM >= MAX_STROKE_MM - 1) setValveState('RETRACT');
+    autoTimer = setTimeout(runAutoCycleStep, 100);
+  }
+
+  let lastTime = performance.now();
+
+  function updatePhysics(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    const supplyBar = parseFloat(pressSlider.value);
+    const supplyPa = supplyBar * 100000; 
+    const loadMass = parseFloat(loadSlider.value); 
+    const flowFactor = parseFloat(flowSlider.value) / 100; 
+
+    let pA = 0, pB = 0;
+    if (targetValveState === 'EXTEND') {
+      pA = supplyPa;
+      pB = 101325; // Atmosphere
+      valveSpool.setAttribute('x', '3');
+    } else {
+      pA = 101325;
+      pB = supplyPa;
+      valveSpool.setAttribute('x', '43');
+    }
+
+    const forceA = pA * AREA_CAP;
+    const forceB = pB * AREA_ROD;
+    let netForce = forceA - forceB;
+
+    const friction = 25; // N seal friction
+    if (Math.abs(netForce) > friction) {
+      netForce -= Math.sign(netForce) * friction;
+    } else {
+      netForce = 0;
+    }
+
+    const effectiveMass = Math.max(loadMass, 2.0);
+    const acceleration = netForce / effectiveMass;
+
+    const maxVel = 0.8 * flowFactor; 
+    velocity += acceleration * dt;
+    velocity = Math.max(-maxVel, Math.min(maxVel, velocity));
+
+    posMM += (velocity * dt) * 1000;
+
+    if (posMM <= 0) {
+      posMM = 0;
+      velocity = 0;
+    } else if (posMM >= MAX_STROKE_MM) {
+      posMM = MAX_STROKE_MM;
+      velocity = 0;
+    }
+
+    renderGraphics(pA, pB, netForce);
+    requestAnimationFrame(updatePhysics);
+  }
+
+  function renderGraphics(pA, pB, netForce) {
+    const pxOffset = posMM * PIXELS_PER_MM;
+
+    pistonAssembly.setAttribute('transform', `translate(${pxOffset}, 0)`);
+    loadBlock.setAttribute('transform', `translate(${pxOffset}, 0)`);
+
+    chamberA.setAttribute('width', `${pxOffset}`);
+    chamberB.setAttribute('x', `${80 + pxOffset}`);
+    chamberB.setAttribute('width', `${220 - pxOffset}`);
+
+    if (targetValveState === 'EXTEND' && posMM < MAX_STROKE_MM) {
+      flowA.setAttribute('opacity', '1');
+      flowB.setAttribute('opacity', '0.4');
+      flowA.classList.remove('reverse');
+      flowB.classList.add('reverse');
+      lineA.setAttribute('stroke', 'var(--press-hi)');
+      lineB.setAttribute('stroke', 'var(--press-lo)');
+      simStateBadge.textContent = 'EXTENDING';
+      simStateBadge.style.color = 'var(--accent)';
+    } else if (targetValveState === 'RETRACT' && posMM > 0) {
+      flowA.setAttribute('opacity', '0.4');
+      flowB.setAttribute('opacity', '1');
+      flowA.classList.add('reverse');
+      flowB.classList.remove('reverse');
+      lineA.setAttribute('stroke', 'var(--press-lo)');
+      lineB.setAttribute('stroke', 'var(--press-hi)');
+      simStateBadge.textContent = 'RETRACTING';
+      simStateBadge.style.color = 'var(--accent-light)';
+    } else {
+      flowA.setAttribute('opacity', '0');
+      flowB.setAttribute('opacity', '0');
+      simStateBadge.textContent = posMM === MAX_STROKE_MM ? 'EXTENDED' : 'RETRACTED';
+      simStateBadge.style.color = 'var(--ink-soft)';
+    }
+
+    telePos.textContent = `${posMM.toFixed(1)} mm`;
+    teleVel.textContent = `${velocity.toFixed(2)} m/s`;
+    
+    const pA_psi = Math.round((pA / 6894.76));
+    const pB_psi = Math.round((pB / 6894.76));
+    telePA.textContent = `${pA_psi} PSI`;
+    telePB.textContent = `${pB_psi} PSI`;
+
+    teleForce.textContent = `${Math.round(netForce)} N`;
+
+    const elapsedTime = ((performance.now() - cycleStartTime) / 1000).toFixed(2);
+    teleTime.textContent = `${elapsedTime} s`;
+  }
+
+  setValveState('RETRACT');
+  requestAnimationFrame(updatePhysics);
+})();
 </script>
 </body>
 </html>
+
+```
