@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Test Builder | Teaching Operational Technologies</title>
+<meta name="description" content="Build a custom practice test for any OT-101 module: choose the module, question types (multiple choice, multiple answer, match), and number of questions, then get instant grading and feedback.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --warn: #92400e;
+    --warn-bg: #fdf3e3;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+    --warn: #fbbf24;
+    --warn-bg: #2a1c05;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; transition: background 0.3s, color 0.3s; }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .skip-link { position: absolute; left: -9999px; top: 0; z-index: 300; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700; text-decoration: none; }
+  .skip-link:focus { left: 0; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .topbar-inner { max-width: 1000px; margin: 0 auto; padding: 9px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  .lesson-header { background: var(--header-bg); color: var(--header-text); padding: 28px 24px 22px; }
+  .header-inner { max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent2); background: color-mix(in srgb, var(--accent) 22%, transparent); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: var(--header-text); cursor: pointer; padding: 8px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 30px 24px 60px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 26px; }
+  .card h2 { margin-top: 0; font-size: 1.3rem; }
+  .card h2 .icon { margin-right: 8px; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 18px; }
+  @media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
+  .field label { display: block; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+  select, input[type="number"] {
+    width: 100%; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-family: inherit; font-size: 0.92rem;
+  }
+  .type-options { display: flex; flex-direction: column; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; }
+  .type-opt { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+  .type-opt input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+  .type-opt label { cursor: pointer; font-weight: 600; }
+  .type-hint { color: var(--text-muted); font-size: 0.78rem; margin-left: auto; }
+
+  .count-row { display: flex; align-items: center; gap: 14px; }
+  .count-row input[type="number"] { width: 100px; }
+  .avail-note { font-size: 0.82rem; color: var(--text-muted); }
+  .avail-note strong { color: var(--accent2); }
+  [data-theme="dark"] .avail-note strong { color: var(--accent); }
+
+  .btn { background: var(--accent); color: var(--on-accent); border: none; cursor: pointer; padding: 12px 22px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.92rem; font-family: inherit; }
+  .btn:hover { background: var(--accent2); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+
+  .safety-flag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; color: var(--warn); background: var(--warn-bg); border: 1px solid var(--warn); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px; }
+
+  /* Test area */
+  #testArea { display: none; }
+  #testArea.show { display: block; }
+  .test-progress-track { height: 10px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 22px; border: 1px solid var(--border); }
+  .test-progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 20px; }
+  .q-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .q-num-badge { background: var(--header-bg); color: var(--header-text); font-weight: 800; font-size: 0.78rem; border-radius: 14px; padding: 3px 11px; }
+  .q-type-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 10px; }
+  .q-type-badge.mc { color: #1565c0; background: #e3f0fd; }
+  .q-type-badge.ma { color: #6a1b9a; background: #f3e5f5; }
+  .q-type-badge.match { color: #00695c; background: #e0f2f1; }
+  [data-theme="dark"] .q-type-badge.mc { color: #90caf9; background: #0d1f35; }
+  [data-theme="dark"] .q-type-badge.ma { color: #ce93d8; background: #1f0d2a; }
+  [data-theme="dark"] .q-type-badge.match { color: #80cbc4; background: #0d2520; }
+  .q-module-tag { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; }
+  .q-stem { font-weight: 700; font-size: 1rem; margin-bottom: 14px; }
+
+  .q-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .q-opt { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; cursor: pointer; }
+  .q-opt:hover { border-color: var(--accent); }
+  .q-opt input { margin-top: 3px; accent-color: var(--accent); cursor: pointer; }
+  .q-opt.correct-answer { border-color: var(--ok); background: var(--ok-bg); }
+  .q-opt.wrong-answer { border-color: var(--bad); background: var(--bad-bg); }
+  .q-opt.missed-answer { border-color: var(--ok); background: var(--ok-bg); border-style: dashed; }
+
+  table.match-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 4px; }
+  table.match-table th, table.match-table td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+  table.match-table thead th { background: var(--surface2); font-weight: 700; }
+  table.match-table select { width: 100%; }
+  .match-row.row-correct td:first-child { border-left: 4px solid var(--ok); }
+  .match-row.row-incorrect td:first-child { border-left: 4px solid var(--bad); }
+
+  .q-feedback { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 0.87rem; display: none; }
+  .q-feedback.show { display: block; }
+  .q-feedback.full { background: var(--ok-bg); color: var(--ok); }
+  .q-feedback.partial { background: var(--warn-bg); color: var(--warn); }
+  .q-feedback.none { background: var(--bad-bg); color: var(--bad); }
+  .q-feedback .explain { color: var(--text); font-weight: 400; display: block; margin-top: 6px; }
+
+  .results-banner { background: var(--header-bg); color: var(--header-text); border-radius: var(--radius); padding: 26px; margin-bottom: 26px; text-align: center; display: none; }
+  .results-banner.show { display: block; }
+  .results-score { font-size: 2.6rem; font-weight: 800; }
+  .results-sub { opacity: 0.85; font-size: 0.95rem; margin-top: 6px; }
+  .results-breakdown { display: flex; gap: 22px; justify-content: center; margin-top: 16px; flex-wrap: wrap; font-size: 0.85rem; }
+  .results-breakdown span strong { display: block; font-size: 1.2rem; }
+
+  footer { background: var(--header-bg); color: var(--header-text); opacity: 0.85; text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6; }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  @media print {
+    .topbar, .header-actions, .btn-row, .skip-link, #buildCard { display: none !important; }
+    body { background: #fff; color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · NCyTE · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Student Resource · Practice Tests</span>
+    <h1>Practice Test Builder</h1>
+    <p class="tagline">Pick a module, choose your question types and how many questions you want, then take a self-graded practice test with instant feedback on every item.</p>
+    <div class="meta-row">
+      <span class="meta-item">🎯 12 Modules</span>
+      <span class="meta-item">🧩 3 Question Types</span>
+      <span class="meta-item">✅ Instant Grading</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print Results</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" id="main">
+
+  <div class="card" id="buildCard">
+    <h2><span class="icon">📝</span>Build Your Test</h2>
+    <p>Results are graded entirely in your browser — nothing is sent anywhere or shared with your instructor. Use this as often as you like before a quiz or exam.</p>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="moduleSelect">Module</label>
+        <select id="moduleSelect"></select>
+      </div>
+      <div class="field">
+        <label for="countInput">Number of Questions (1–20)</label>
+        <div class="count-row">
+          <input type="number" id="countInput" min="1" max="20" value="10">
+          <span class="avail-note" id="availNote"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:18px;">
+      <label>Question Types</label>
+      <div class="type-options">
+        <div class="type-opt">
+          <input type="checkbox" id="typeMC" checked>
+          <label for="typeMC">Multiple Choice</label>
+          <span class="type-hint">one correct answer</span>
+        </div>
+        <div class="type-opt">
+          <input type="checkbox" id="typeMA" checked>
+          <label for="typeMA">Multiple Answer</label>
+          <span class="type-hint">select all that apply</span>
+        </div>
+        <div class="type-opt">
+          <input type="checkbox" id="typeMatch" checked>
+          <label for="typeMatch">Match</label>
+          <span class="type-hint">term-to-definition matching, partial credit per row</span>
+        </div>
+      </div>
+    </div>
+
+    <span class="safety-flag" id="warnFlag" style="display:none;">⚠ Fewer questions are available for this selection than requested — see the note above.</span>
+
+    <div class="btn-row">
+      <button class="btn" id="startBtn">Start Practice Test →</button>
+    </div>
+  </div>
+
+  <div class="results-banner" id="resultsBanner">
+    <div class="results-score" id="resultsScore">0%</div>
+    <div class="results-sub" id="resultsSub">Score summary</div>
+    <div class="results-breakdown">
+      <span>Full credit<strong id="statFull">0</strong></span>
+      <span>Partial credit<strong id="statPartial">0</strong></span>
+      <span>No credit<strong id="statNone">0</strong></span>
+    </div>
+  </div>
+
+  <div id="testArea">
+    <div class="test-progress-track"><div class="test-progress-fill" id="testProgressFill"></div></div>
+    <div id="questionList"></div>
+    <div class="btn-row">
+      <button class="btn" id="gradeBtn">Grade My Test</button>
+      <button class="btn secondary" id="newTestBtn">Build a New Test</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Practice Test Builder — Student Self-Assessment Tool<br>
+  Teaching Operational Technologies and Cybersecurity &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  Practice only — scores are not recorded or reported to your instructor. Educational use only.
+</footer>
+
+<script>
+/* =====================================================================
+   QUESTION BANK
+   Each module has: mc (multiple choice), ma (multiple answer),
+   match (matching sets). Every item includes feedback/explanation text.
+   ===================================================================== */
+var BANK = {
+
+  m1: { title: "Module 1: From Isolated Plants to Converged Networks", mc: [
+    { q: "What was the primary purpose of the first programmable logic controller (PLC), introduced around 1968?", options: ["Replace relay-based sequential control logic", "Provide wide-area SCADA polling", "Encrypt serial communications", "Run a plant-wide historian database"], answer: 0, explain: "The PLC (the Modicon 084 is the commonly cited first example) was built to replace hard-wired relay logic with reprogrammable solid-state control." },
+    { q: "Which system is best described as an integrated, plant-wide architecture for continuous closed-loop control within a single facility?", options: ["SCADA", "DCS", "HMI", "VLAN"], answer: 1, explain: "A Distributed Control System (DCS) integrates control across a facility, typically for continuous process industries like refining or chemicals." },
+    { q: "SCADA systems are most associated with which use case?", options: ["Continuous control inside one building", "Monitoring and issuing commands to remote sites over a wide geographic area", "Office network file sharing", "Enterprise resource planning"], answer: 1, explain: "SCADA (Supervisory Control and Data Acquisition) was built for geographically distributed assets such as pipelines or water systems, polling remote terminal units (RTUs)." },
+    { q: "An 'air gap' in OT networking originally existed mostly because:", options: ["Regulators required it by law", "OT and IT grew up as separate industries with no need to connect", "Firewalls made connections too slow", "PLCs could not use Ethernet"], answer: 1, explain: "Historically, the air gap was a byproduct of OT and IT evolving as separate industries and vendor ecosystems — not a deliberate security control someone designed in." },
+    { q: "Which of the following is a genuine business pressure that commonly erodes network isolation between IT and OT?", options: ["A requirement for real-time production dashboards", "A decrease in cybersecurity insurance premiums", "A reduction in vendor support contracts", "Slower internet speeds"], answer: 0, explain: "Dashboards, predictive maintenance feeds, remote vendor support, and ERP/MES integration are classic converging pressures — each is individually reasonable but collectively narrows isolation." },
+    { q: "Compared to Ethernet, serial links like RS-232/RS-485 are best characterized as:", options: ["Faster and more secure by default", "Point-to-point or multidrop, low-bandwidth connections common in legacy field devices", "Exclusively wireless", "A form of encryption"], answer: 1, explain: "Serial communication predates Ethernet in OT and is typically point-to-point or multidrop, used heavily by legacy field devices and protocols like Modbus RTU." }
+  ], ma: [
+    { q: "Which of the following are typically cited as business pressures that drive IT/OT convergence? (Select all that apply)", options: ["Real-time production dashboards", "Predictive maintenance data feeds", "ERP/MES integration", "A desire to reduce the number of PLCs on site"], answer: [0,1,2], explain: "Dashboards, predictive maintenance feeds, and ERP/MES integration are all real convergence drivers. Reducing PLC count is a hardware decision, not a convergence driver." },
+    { q: "Which statements about the historical relationship between IT and OT are accurate? (Select all that apply)", options: ["OT technology evolved from relay logic and pneumatics", "IT and OT converged because they were designed together from the start", "DCS and SCADA both predate common use of Ethernet in the plant", "OT vendors historically used proprietary networking protocols"], answer: [0,2,3], explain: "IT and OT evolved separately, not together — that separateness is exactly why convergence is a distinct historical event worth studying." }
+  ], match: [
+    { pairs: [
+        ["Modicon 084 (1968)", "First widely cited commercial PLC, replacing relay logic"],
+        ["DCS", "Integrated, plant-wide continuous control architecture"],
+        ["SCADA", "Wide-area monitoring and control of remote sites"],
+        ["Air Gap", "Absence of any network path between OT and the outside world"]
+      ], explain: "These four terms anchor the Lesson 1 timeline from relay logic through the erosion of isolation." }
+  ]},
+
+  m2: { title: "Module 2: IT/OT Security Principles", mc: [
+    { q: "In most OT environments, which priority typically sits above the traditional CIA triad?", options: ["Confidentiality", "Safety", "Integrity", "Availability"], answer: 1, explain: "OT security commonly frames Safety as the overriding priority, since a compromised control system can cause physical harm, not just data loss." },
+    { q: "In the OT-adapted priority ordering often taught as 'inverting the triad,' which is generally ranked highest after safety?", options: ["Confidentiality", "Availability", "Non-repudiation", "Anonymity"], answer: 1, explain: "OT commonly prioritizes Availability above Confidentiality, since keeping the process running safely matters more than protecting data secrecy in many control contexts." },
+    { q: "Why do 20-year equipment lifecycles complicate standard IT patch management in OT?", options: ["Older devices patch faster than new ones", "Vendors stop making patches available and unplanned downtime for patching may not be acceptable", "OT devices are immune to vulnerabilities", "Patches are always free for legacy hardware"], answer: 1, explain: "Long equipment lifecycles mean vendor support often ends long before the equipment is retired, and any patch requiring downtime has to be weighed against production and safety impact." },
+    { q: "What does 'determinism' refer to in an OT control context?", options: ["Random number generation for encryption", "Predictable, guaranteed timing of control actions and communications", "The ability to determine a device's IP address automatically", "A method for hashing passwords"], answer: 1, explain: "Determinism means a control action or message will occur within a guaranteed, predictable time window — critical for safe control loops." },
+    { q: "The Purdue Model is most useful in an OT security classroom as a:", options: ["Encryption algorithm", "Teaching scaffold for visualizing network levels/zones from the plant floor to the enterprise", "Type of firewall", "Vendor certification program"], answer: 1, explain: "The Purdue (Enterprise Reference Architecture) Model organizes a plant's systems into levels, giving students and engineers a shared vocabulary for zones and data flow." },
+    { q: "'Zones and conduits' as a security concept generally refers to:", options: ["Physical building floor plans only", "Grouping assets with similar security requirements (zones) and controlling the pathways between them (conduits)", "A brand name for a specific PLC vendor", "A backup power scheme"], answer: 1, explain: "Zones group assets by risk/function; conduits are the defined, controllable pathways of communication between zones — a core IEC 62443 concept introduced early using the Purdue model as scaffolding." }
+  ], ma: [
+    { q: "Which of the following are commonly true about OT security priorities compared to typical IT security priorities? (Select all that apply)", options: ["Safety often outranks confidentiality, integrity, and availability", "Uptime/availability is frequently prioritized above confidentiality", "Confidentiality is always the top priority in OT, same as in IT", "Determinism and predictable timing matter more in OT control loops than in typical IT systems"], answer: [0,1,3], explain: "OT does not treat confidentiality as the top priority the way many IT security programs do — safety and availability generally come first." },
+    { q: "Which factors make patching OT systems on an IT-style 'Patch Tuesday' cadence difficult? (Select all that apply)", options: ["Long equipment lifecycles with limited vendor support", "Downtime for patching may conflict with continuous production needs", "OT systems never contain software that requires patching", "Some legacy devices cannot be patched at all"], answer: [0,1,3], explain: "OT systems absolutely contain patchable software/firmware — the challenge is lifecycle, downtime cost, and the existence of genuinely unpatchable legacy gear." }
+  ], match: [
+    { pairs: [
+        ["Safety", "The priority that generally outranks confidentiality, integrity, and availability in OT"],
+        ["Determinism", "Guaranteed, predictable timing of control actions"],
+        ["Purdue Model", "A leveled reference architecture used as a teaching scaffold for OT networks"],
+        ["Zones & Conduits", "Grouping assets by risk and controlling the pathways between groups"]
+      ], explain: "These four concepts form the backbone of how OT security thinking differs from IT security thinking." }
+  ]},
+
+  m3: { title: "Module 3: OT Technologies & Field Devices", mc: [
+    { q: "Which device is typically used to gather and forward data from remote, geographically distributed sites back to a central SCADA system?", options: ["RTU (Remote Terminal Unit)", "HMI", "Historian", "Engineering workstation"], answer: 0, explain: "RTUs are purpose-built for polling and reporting field data at remote sites, classically over serial or radio links back to a SCADA master." },
+    { q: "What is the main function of a Human-Machine Interface (HMI)?", options: ["Store years of historical process data", "Give operators a visual interface to monitor and control a process", "Physically move a valve", "Encrypt network traffic"], answer: 1, explain: "The HMI is the operator-facing screen/interface for monitoring and issuing commands to the process — it doesn't itself move equipment or store long-term history." },
+    { q: "A Historian in an OT environment is best described as:", options: ["A device that logs and archives time-series process data for later analysis", "A safety interlock device", "A type of network switch", "An HMI replacement"], answer: 0, explain: "Historians archive time-series process data (temperatures, flow rates, etc.) so engineers can analyze trends after the fact." },
+    { q: "What is the primary purpose of a Safety Instrumented System (SIS)?", options: ["Provide backup internet connectivity", "Independently monitor a process and take automatic action to prevent a hazardous event", "Generate reports for management", "Replace the HMI during outages"], answer: 1, explain: "An SIS operates independently of the basic process control system specifically to detect unsafe conditions and drive the process to a safe state." },
+    { q: "An IED (Intelligent Electronic Device) is most commonly associated with which sector?", options: ["Electric power/substation automation", "Retail point-of-sale systems", "Cloud storage", "Office productivity software"], answer: 0, explain: "IEDs are widely used in electric power substations for protection, control, and monitoring of equipment like breakers and transformers." },
+    { q: "Which of the following best distinguishes an engineering workstation from an HMI?", options: ["The engineering workstation is used to configure and program controllers, while the HMI is used for day-to-day operator monitoring/control", "They are always the exact same device", "The HMI is used only by vendors, never operators", "Engineering workstations cannot connect to a PLC"], answer: 0, explain: "Engineering workstations carry the programming/configuration software for PLCs and other controllers, a different role than the operator-facing HMI." }
+  ], ma: [
+    { q: "Which of the following are examples of OT field devices or systems discussed in this module? (Select all that apply)", options: ["PLC", "RTU", "HMI", "Web browser plugin"], answer: [0,1,2], explain: "PLCs, RTUs, and HMIs are core OT field/operator devices. A browser plugin is not an OT field device." },
+    { q: "Which statements about Safety Instrumented Systems (SIS) are accurate? (Select all that apply)", options: ["An SIS is designed to act independently of the basic process control system", "An SIS exists to drive a process to a safe state when a hazard is detected", "An SIS is the same thing as an HMI", "An SIS is a category of safety-focused field device/logic solver"], answer: [0,1,3], explain: "An SIS is architecturally independent from the HMI and basic control system — conflating the two is a common but incorrect assumption." }
+  ], match: [
+    { pairs: [
+        ["PLC", "Reprogrammable controller executing control logic at the field level"],
+        ["HMI", "Operator-facing screen for monitoring and controlling a process"],
+        ["Historian", "Archives time-series process data for later analysis"],
+        ["SIS", "Independent system that drives a process to a safe state during a hazard"]
+      ], explain: "These four devices represent distinct layers of function in a typical control architecture." }
+  ]},
+
+  m4: { title: "Module 4: IT Protocols Inside OT Networks", mc: [
+    { q: "Why is static IP addressing still common on OT networks even though DHCP is standard in IT?", options: ["OT devices cannot use IP addresses at all", "Predictability and stability of addressing supports troubleshooting and avoids disruption if a DHCP server fails", "Static addressing is required by international law", "DHCP is faster than static addressing"], answer: 1, explain: "Static addressing gives OT engineers predictable, stable addresses for troubleshooting and avoids a single DHCP server outage taking down device connectivity." },
+    { q: "What is the primary purpose of VLANs in an OT/IT converged network?", options: ["Encrypt all network traffic automatically", "Logically segment traffic on shared physical infrastructure", "Replace the need for a firewall entirely", "Provide wireless connectivity"], answer: 1, explain: "VLANs create logical segmentation on shared switches, which is a foundational (though not sufficient by itself) tool for isolating OT traffic from IT traffic." },
+    { q: "Why might a plant keep a local NTP time source rather than syncing to an internet time server?", options: ["Local time sources are always more accurate", "It avoids depending on an external network path and keeps time synchronization contained within the OT boundary", "NTP does not work with PLCs", "It is required to save electricity"], answer: 1, explain: "Keeping time synchronization local avoids creating an outbound network dependency purely for time sync, consistent with minimizing unnecessary paths out of the OT zone." },
+    { q: "What risk does configuring DNS 'like an office LAN' introduce into an OT network?", options: ["It has no effect on OT networks", "It can create unexpected external dependencies and expose internal naming conventions/structure", "It automatically improves network security", "It removes the need for IP addressing"], answer: 1, explain: "DNS configured with office-style defaults can leak naming/structure information and create dependencies on external resolution paths that don't belong in an isolated OT zone." },
+    { q: "Network segmentation, in the OT/IT context, primarily aims to:", options: ["Make all devices reachable from anywhere for convenience", "Limit the blast radius of a compromise by restricting communication paths between zones", "Eliminate the need for any network monitoring", "Increase overall network speed"], answer: 1, explain: "Segmentation limits how far an attacker or a fault can spread by controlling what can talk to what." }
+  ], ma: [
+    { q: "Which IT protocols/technologies appear inside OT networks, according to this module? (Select all that apply)", options: ["Ethernet", "TCP/IP", "VLAN", "Modbus RTU"], answer: [0,1,2], explain: "Ethernet, TCP/IP, and VLANs are the IT-originated technologies covered in this module. Modbus RTU is an industrial protocol covered in Module 5." },
+    { q: "Which of the following are legitimate reasons OT networks may deviate from typical office-LAN configuration? (Select all that apply)", options: ["A need for predictable, stable addressing", "A desire to minimize unnecessary external network dependencies", "A general dislike of modern networking standards", "Determinism/timing requirements that dynamic configuration could disrupt"], answer: [0,1,3], explain: "The deviations are driven by real operational needs (stability, minimized dependencies, timing) — not simply resistance to modern practices." }
+  ], match: [
+    { pairs: [
+        ["VLAN", "Logical segmentation of traffic on shared physical network infrastructure"],
+        ["DHCP", "Dynamic IP address assignment, often avoided in OT for stability reasons"],
+        ["NTP", "Time synchronization protocol, sometimes kept local to the OT zone"],
+        ["Segmentation", "Restricting communication paths between network zones to limit blast radius"]
+      ], explain: "These four items describe how IT-originated networking technologies are adapted for OT use." }
+  ]},
+
+  m5: { title: "Module 5: Industrial Communication Protocols", mc: [
+    { q: "Modbus TCP is best described as:", options: ["A modern protocol with strong built-in authentication and encryption", "A simple, widely used industrial protocol originally designed for trusted, isolated networks with no built-in authentication", "A protocol used exclusively for building automation", "A wireless-only protocol"], answer: 1, explain: "Modbus (originally serial, later adapted to TCP) is simple and ubiquitous, but was designed assuming a trusted, isolated network — it has no native authentication." },
+    { q: "DNP3 is most commonly associated with which sector?", options: ["Electric and water utilities / SCADA over wide-area networks", "Retail point-of-sale", "Cloud gaming", "Consumer smart-home devices"], answer: 0, explain: "DNP3 (Distributed Network Protocol) is heavily used in utility SCADA systems, particularly electric and water, often over wide-area links." },
+    { q: "What differentiates OPC UA from many legacy industrial protocols like Modbus or DNP3?", options: ["OPC UA has no vendor support", "OPC UA was designed with built-in security features such as authentication and encryption options", "OPC UA only works over serial connections", "OPC UA cannot transmit real-time data"], answer: 1, explain: "OPC UA was designed as a modern, platform-independent standard with security (authentication, encryption) built into the specification, unlike many legacy protocols." },
+    { q: "BACnet/IP is primarily used for:", options: ["Building automation systems such as HVAC, lighting, and access control", "High-frequency financial trading", "Cellular network signaling", "Video game networking"], answer: 0, explain: "BACnet/IP is the dominant protocol family for building automation — HVAC, lighting control, and similar systems." },
+    { q: "EtherNet/IP is most closely associated with which underlying protocol suite?", options: ["CIP (Common Industrial Protocol) running over standard Ethernet", "Bluetooth Low Energy", "SS7 telecom signaling", "IMAP email"], answer: 0, explain: "EtherNet/IP implements CIP (Common Industrial Protocol) over standard Ethernet, widely used in discrete manufacturing and automation, especially with Rockwell/Allen-Bradley equipment." },
+    { q: "A key security concern shared by most legacy industrial protocols (Modbus, DNP3, early EtherNet/IP) is:", options: ["They encrypt everything by default", "They generally lack native authentication, so anyone who can reach the device on the network can issue commands", "They cannot be captured or analyzed by network tools", "They require biometric login"], answer: 1, explain: "Legacy protocols were built for trusted, closed networks — the shared weakness is a general lack of native authentication, meaning network reachability effectively equals command authority." }
+  ], ma: [
+    { q: "Which protocols are covered as 'industrial communication protocols' in this module? (Select all that apply)", options: ["Modbus TCP", "DNP3", "OPC UA", "HTTP"], answer: [0,1,2], explain: "Modbus TCP, DNP3, and OPC UA are the industrial protocols emphasized in this module. HTTP is a general web protocol, not an OT-specific one." },
+    { q: "Which of the following are true about legacy industrial protocols like Modbus and DNP3? (Select all that apply)", options: ["They generally lack built-in authentication", "They were designed assuming a trusted, isolated network", "They are always transmitted with strong encryption by default", "Function codes and simple framing make them relatively easy for students to read in a packet capture"], answer: [0,1,3], explain: "Legacy protocols do not encrypt by default — that's precisely why they're considered risky when exposed beyond their originally trusted network boundary." }
+  ], match: [
+    { pairs: [
+        ["Modbus TCP", "Simple, widely used protocol with no native authentication"],
+        ["DNP3", "Common in electric/water utility SCADA over wide-area links"],
+        ["BACnet/IP", "Dominant protocol for building automation (HVAC, lighting)"],
+        ["OPC UA", "Modern platform-independent standard with built-in security features"]
+      ], explain: "Matching protocol to primary use case is a core skill for reading any OT network capture." }
+  ]},
+
+  m6: { title: "Module 6: The OT Threat Landscape", mc: [
+    { q: "Which best describes 'insider risk' in an OT context?", options: ["Only refers to malicious current employees", "Includes both malicious and unintentional actions by employees or trusted contractors with legitimate access", "Cannot occur in OT environments", "Is the same thing as a supply chain attack"], answer: 1, explain: "Insider risk covers both malicious insiders and honest mistakes by people who have legitimate access — contractors included." },
+    { q: "Why is ransomware crossing from business networks into OT production environments considered especially dangerous?", options: ["It only affects email systems", "It can force plants to shut down production or safety systems as a precaution even if OT itself wasn't directly infected", "Ransomware cannot spread past the business network", "It always improves system performance"], answer: 1, explain: "Even when ransomware technically stays on the IT side, operators often shut down or isolate OT systems out of caution, since visibility into the process (billing, inventory, logistics systems) may be lost." },
+    { q: "A supply chain compromise in an OT context typically means:", options: ["An attacker compromises a trusted vendor, integrator, or software update mechanism to reach the target indirectly", "A truck delivery is delayed", "A PLC runs out of memory", "An HMI screen freezes"], answer: 0, explain: "Supply chain compromise exploits the trust placed in vendors, integrators, or software/firmware updates as an indirect path into the target environment." },
+    { q: "Which of these is most accurately described as a 'threat actor motivation' rather than a 'threat actor type'?", options: ["Nation-state", "Financial gain", "Hacktivist", "Insider"], answer: 1, explain: "Financial gain is a motivation; nation-state, hacktivist, and insider describe categories/types of actors (who), not why they act." },
+    { q: "An 'attack path' analysis in OT security is best used to:", options: ["Design marketing materials", "Trace how an attacker could realistically move from an initial foothold (e.g., a phishing email) to an OT impact", "Replace the need for a firewall", "Calculate electricity costs"], answer: 1, explain: "Attack path analysis (e.g., 'inbox to outage') walks the realistic steps an attacker would need to take, helping prioritize where defenses matter most." }
+  ], ma: [
+    { q: "Which of the following are recognized categories of OT threat actors or vectors discussed in this module? (Select all that apply)", options: ["Nation-state actors", "Insider/contractor risk", "Supply chain compromise", "Weather forecasting errors"], answer: [0,1,2], explain: "Weather forecasting errors are an operational risk, not a threat-actor category or attack vector." },
+    { q: "Which statements about ransomware's relationship to OT environments are accurate? (Select all that apply)", options: ["Ransomware often originates on the IT/business side of the network", "OT systems are sometimes shut down as a precaution even without direct OT infection", "Ransomware exclusively targets safety instrumented systems", "Ransomware crossing from IT to OT is a documented, recurring pattern across incidents"], answer: [0,1,3], explain: "Ransomware doesn't exclusively (or even typically) target SIS directly — the more common pattern is IT-side infection causing precautionary OT shutdowns." }
+  ], match: [
+    { pairs: [
+        ["Ransomware", "Malware that encrypts systems/data and demands payment, sometimes crossing from IT into OT-adjacent systems"],
+        ["Insider Risk", "Risk from employees or contractors with legitimate access, malicious or accidental"],
+        ["Supply Chain Compromise", "Attacker reaches the target indirectly via a trusted vendor or update mechanism"],
+        ["Attack Path", "The realistic sequence of steps from initial foothold to OT impact"]
+      ], explain: "These four terms are the recurring vocabulary for analyzing OT threats as documented case studies." }
+  ]},
+
+  m7: { title: "Module 7: Vulnerabilities & Countermeasures", mc: [
+    { q: "What is meant by 'the patch window that never opens' in OT?", options: ["OT systems are patched every night automatically", "Continuous operations, safety review requirements, and vendor validation needs often mean there is no convenient time to apply a patch", "Patches for OT systems don't exist", "Windows-branded operating systems refuse to patch"], answer: 1, explain: "Unlike IT's regular patch cycles, OT downtime for patching has to be scheduled around production needs, safety reviews, and vendor testing — leaving few practical windows." },
+    { q: "Which of these is a compensating control, as opposed to a direct fix?", options: ["Replacing a vulnerable device with a patched version", "Adding network monitoring and strict segmentation around a device that cannot be patched", "Ignoring the vulnerability entirely", "Deleting all logs"], answer: 1, explain: "A compensating control reduces risk around a vulnerability that can't be directly remediated (e.g., an unpatchable legacy device) rather than fixing the vulnerability itself." },
+    { q: "What is an ICS advisory (such as those published by CISA)?", options: ["A marketing brochure for new PLCs", "A published notice describing a vulnerability affecting industrial control system products, often with mitigation guidance", "A government tax form", "A vendor's product roadmap"], answer: 1, explain: "ICS advisories describe specific vulnerabilities in named ICS products along with recommended mitigations, similar in spirit to general CVE advisories but ICS-focused." },
+    { q: "'Allowlisting' as a countermeasure in OT primarily works by:", options: ["Blocking a known list of malicious files after they're already identified", "Permitting only pre-approved applications or processes to run, denying everything else by default", "Encrypting all outbound traffic", "Automatically updating all software"], answer: 1, explain: "Allowlisting (application allowlisting) is a default-deny approach — a good fit for OT systems where the software running rarely changes." },
+    { q: "Which of the following is a commonly cited 'usual suspect' vulnerability class in OT environments?", options: ["Overly complex password policies", "Default credentials left unchanged on field devices", "Too much network segmentation", "Excessive use of allowlisting"], answer: 1, explain: "Default/unchanged credentials on field devices and legacy systems remain one of the most common and persistent OT vulnerabilities." }
+  ], ma: [
+    { q: "Which of the following are countermeasures discussed as effective in OT environments, even when direct patching isn't possible? (Select all that apply)", options: ["Network segmentation and conduits", "Application allowlisting", "Jump hosts for remote/privileged access", "Removing all network monitoring to reduce noise"], answer: [0,1,2], explain: "Removing monitoring reduces visibility and is the opposite of a recommended countermeasure." },
+    { q: "Which of these are commonly cited root causes of OT vulnerability, according to this module? (Select all that apply)", options: ["Legacy firmware that can't be easily updated", "Flat, unsegmented networks", "Default or unchanged credentials", "Overuse of allowlisting"], answer: [0,1,2], explain: "Allowlisting is a recommended countermeasure, not a root cause of vulnerability." }
+  ], match: [
+    { pairs: [
+        ["CVE", "A standardized identifier for a publicly known cybersecurity vulnerability"],
+        ["Hardening", "Reducing a system's attack surface by removing unnecessary services/access"],
+        ["Allowlisting", "Default-deny approach permitting only pre-approved applications to run"],
+        ["Compensating Control", "A control that reduces risk when the underlying vulnerability can't be directly fixed"]
+      ], explain: "These four terms describe the vulnerability/countermeasure vocabulary used throughout the module." }
+  ]},
+
+  m8: { title: "Module 8: Frameworks for OT Security", mc: [
+    { q: "IEC 62443 organizes security requirements primarily around which concept?", options: ["Zones, conduits, and Security Levels (SL)", "Annual financial audits only", "Employee performance reviews", "Marketing compliance"], answer: 0, explain: "IEC 62443 is built around zones and conduits with graded Security Levels (SL 0–4) describing the rigor of protection required." },
+    { q: "NIST SP 800-82 is best described as:", options: ["A general-purpose password policy standard", "A guide specifically focused on securing industrial control systems", "A cloud billing framework", "An HR compliance checklist"], answer: 1, explain: "NIST SP 800-82, 'Guide to Operational Technology (OT) Security,' is focused specifically on ICS/OT security guidance." },
+    { q: "The NIST Cybersecurity Framework (CSF) organizes activities around which core functions?", options: ["Identify, Protect, Detect, Respond, Recover (Govern also appears in CSF 2.0)", "Plan, Build, Run, Retire", "Buy, Sell, Trade, Hold", "Input, Process, Output, Store"], answer: 0, explain: "The CSF's core functions frame a security program's lifecycle from identifying risk through recovering from incidents." },
+    { q: "ISO/IEC 27001 differs from IEC 62443 primarily because:", options: ["27001 is an OT-only standard", "27001 defines a general information security management system (ISMS), while 62443 is purpose-built for industrial automation and control systems", "62443 has nothing to do with security", "They are identical in scope"], answer: 1, explain: "ISO/IEC 27001 provides a general-purpose ISMS framework, while IEC 62443 is specifically designed for industrial automation and control system environments." },
+    { q: "Why would a program choose one framework as a 'spine' rather than teaching four frameworks in parallel?", options: ["To simplify curriculum and give students one consistent structure and vocabulary to build from", "Because only one framework is legally valid", "Because frameworks are mutually exclusive and can never be mapped to each other", "Because using more than one framework is illegal"], answer: 0, explain: "Frameworks overlap substantially; picking a primary spine avoids overwhelming students with parallel, only-partially-compatible vocabularies." }
+  ], ma: [
+    { q: "Which of these are frameworks or standards discussed as relevant to OT security in this module? (Select all that apply)", options: ["IEC 62443", "NIST SP 800-82", "ISO/IEC 27001", "GAAP (accounting standards)"], answer: [0,1,2], explain: "GAAP is an accounting standard, unrelated to OT security frameworks." },
+    { q: "Which statements about IEC 62443's Security Levels are accurate? (Select all that apply)", options: ["They describe graded levels of protection against different threat capabilities", "They are organized around zones and conduits", "They apply only to enterprise IT networks, never to industrial systems", "Higher security levels generally correspond to more capable/motivated adversaries being defended against"], answer: [0,1,3], explain: "IEC 62443 was built specifically for industrial automation and control systems, not enterprise IT." }
+  ], match: [
+    { pairs: [
+        ["IEC 62443", "Zones, conduits, and graded Security Levels for industrial automation and control systems"],
+        ["NIST SP 800-82", "Guide focused specifically on operational technology / ICS security"],
+        ["NIST CSF", "Identify, Protect, Detect, Respond, Recover framework for cybersecurity programs"],
+        ["ISO/IEC 27001", "General-purpose information security management system (ISMS) standard"]
+      ], explain: "Matching each framework to its defining scope helps decide which one anchors a given course or program." }
+  ]},
+
+  m9: { title: "Module 9: Governance, Risk & Compliance for IT/OT", mc: [
+    { q: "What is the main purpose of a risk register in a GRC program?", options: ["A list of all employees' salaries", "A structured inventory of identified risks, their likelihood/impact, and mitigation status", "A marketing document for customers", "A schedule of holidays"], answer: 1, explain: "A risk register tracks identified risks along with their assessment and mitigation status, forming a core artifact of a governance program." },
+    { q: "A POA&M (Plan of Action and Milestones) is primarily used to:", options: ["Document how and when identified deficiencies will be remediated", "Replace the need for an audit", "Track employee vacation requests", "Design network diagrams"], answer: 0, explain: "A POA&M documents planned remediation steps and target dates for closing identified gaps or deficiencies." },
+    { q: "NERC CIP standards primarily apply to which sector?", options: ["The bulk electric power system in North America", "Retail banking", "Consumer electronics manufacturing", "Higher education accreditation"], answer: 0, explain: "NERC CIP (Critical Infrastructure Protection) standards are mandatory reliability/security standards for the North American bulk electric system." },
+    { q: "Audit evidence in a GRC program is best described as:", options: ["Opinions from staff with no documentation", "Documented proof (logs, records, artifacts) that a control is operating as intended", "A verbal assurance from a vendor", "Marketing collateral"], answer: 1, explain: "Audit evidence must be documented and verifiable — logs, screenshots, records — not just a verbal assurance." },
+    { q: "Why is governance across IT and OT organizations often described as challenging?", options: ["IT and OT typically report to the same executive with identical priorities", "IT and OT often report to different executives with different priorities, budgets, and risk tolerances", "OT organizations have no leadership structure", "There is never any overlap between IT and OT policy"], answer: 1, explain: "IT and OT frequently sit under different leadership with different priorities (uptime/safety vs. confidentiality/agility), making unified governance genuinely hard." }
+  ], ma: [
+    { q: "Which of the following are standard GRC artifacts covered in this module? (Select all that apply)", options: ["Risk register", "POA&M", "Audit evidence", "Marketing brochure"], answer: [0,1,2], explain: "A marketing brochure is not a GRC governance artifact." },
+    { q: "Which statements about NERC CIP are accurate? (Select all that apply)", options: ["It applies to the North American bulk electric system", "It is a set of mandatory reliability/security standards", "It has no connection to OT/ICS security", "Compliance evidence and audits are part of maintaining NERC CIP compliance"], answer: [0,1,3], explain: "NERC CIP is directly connected to OT/ICS security, since it governs control systems supporting the bulk electric grid." }
+  ], match: [
+    { pairs: [
+        ["Governance", "Policy-level direction and oversight of security and risk activities"],
+        ["Risk Register", "Structured inventory of identified risks and mitigation status"],
+        ["POA&M", "Documented plan and timeline for remediating identified deficiencies"],
+        ["NERC CIP", "Mandatory reliability/security standards for the North American bulk electric system"]
+      ], explain: "These four artifacts/standards are the working vocabulary of an IT/OT GRC program." }
+  ]},
+
+  m10: { title: "Module 10: Access Control & Identity Management in OT", mc: [
+    { q: "What does the principle of 'least privilege' mean?", options: ["Every user should have administrator access by default", "Users and systems should be granted only the minimum access necessary to perform their function", "Access should never be granted to anyone", "Privileges should be shared across all accounts equally"], answer: 1, explain: "Least privilege limits each account or process to only the access it genuinely needs, reducing the impact of a compromised credential." },
+    { q: "A PAM (Privileged Access Management) solution is primarily used to:", options: ["Broker, monitor, and control access for privileged/administrative accounts", "Replace all HMIs on a network", "Manage payroll", "Encrypt field device firmware"], answer: 0, explain: "PAM solutions manage, monitor, and often time-limit privileged account access, which is especially important given how much damage a misused admin credential can cause in OT." },
+    { q: "Why is MFA (multi-factor authentication) not universally applied across every OT system?", options: ["MFA is illegal in industrial settings", "Some legacy field devices and safety-critical systems cannot support MFA, or availability concerns during an emergency make it risky to add friction to access", "MFA has never been tested in any environment", "OT systems never require any authentication"], answer: 1, explain: "MFA is valuable where systems can support it, but certain legacy devices lack the capability, and some safety-critical access paths prioritize immediate availability over added authentication friction." },
+    { q: "The 'shared console problem' in OT environments generally refers to:", options: ["Multiple operators using the same shared workstation/login, making individual accountability difficult", "A shortage of physical monitors", "A software licensing issue", "An HMI rendering bug"], answer: 0, explain: "Shared logins on operator consoles are common in OT for operational continuity reasons, but they undermine individual accountability and audit trails." },
+    { q: "Identity lifecycle management in a plant setting includes:", options: ["Provisioning access when someone starts and promptly deprovisioning it when they leave or change roles", "Only creating accounts, never removing them", "A one-time setup with no ongoing maintenance", "Something that applies only to IT staff, never to OT personnel"], answer: 0, explain: "Identity lifecycle covers the full span from provisioning to deprovisioning/role changes — a persistent operational discipline, not a one-time setup." }
+  ], ma: [
+    { q: "Which of the following are core access control concepts covered in this module? (Select all that apply)", options: ["Role-Based Access Control (RBAC)", "Least privilege", "Privileged Access Management (PAM)", "Encryption key length selection"], answer: [0,1,2], explain: "Key length selection is a cryptography topic, not an access-control/identity concept covered here." },
+    { q: "Which statements about remote vendor access in OT are accurate? (Select all that apply)", options: ["Jump hosts are commonly used to broker and monitor vendor sessions", "Remote sessions should ideally be time-limited and logged", "Vendors should always be given permanent, unmonitored direct access for convenience", "Remote access introduces a dependency on the vendor's own security practices"], answer: [0,1,3], explain: "Permanent unmonitored access is exactly the pattern good remote-access practice tries to avoid." }
+  ], match: [
+    { pairs: [
+        ["RBAC", "Access granted based on a user's defined role rather than individually"],
+        ["Least Privilege", "Granting only the minimum access necessary to perform a function"],
+        ["PAM", "Brokering, monitoring, and controlling privileged account access"],
+        ["Provisioning", "The process of granting (and later removing) a user's access as their role changes"]
+      ], explain: "These four terms describe the identity and access management toolkit covered in the module." }
+  ]},
+
+  m11: { title: "Module 11: Monitoring, Detection & OT Incident Response", mc: [
+    { q: "Why is passive network monitoring generally preferred over active scanning in OT environments?", options: ["Passive monitoring is always faster", "Active scanning can disrupt sensitive or fragile field devices, so passive (listening-only) monitoring avoids that risk", "Passive monitoring requires no equipment at all", "Active scanning is illegal everywhere"], answer: 1, explain: "Many OT field devices are fragile or were never designed to handle active probes gracefully, so passive monitoring (just observing traffic) is the safer default." },
+    { q: "A common challenge with syslog coverage in OT environments is:", options: ["Every field device produces excessive, redundant syslog data", "Many legacy field devices don't generate syslog data at all, creating visibility gaps", "Syslog is exclusive to cloud environments", "Syslog cannot be correlated with any other data source"], answer: 1, explain: "Legacy field devices frequently lack logging capability entirely, leaving real gaps in what a SIEM or analyst can see." },
+    { q: "Why does time synchronization (e.g., via NTP) matter for OT incident detection?", options: ["It has no effect on investigations", "Correlating events across multiple devices/logs requires consistent, synchronized timestamps", "It only matters for billing purposes", "It is required only for HMI screen refresh rates"], answer: 1, explain: "Without synchronized clocks, reconstructing a timeline of an incident across multiple systems becomes unreliable or impossible." },
+    { q: "In OT incident response, why might isolating an affected host not be a straightforward decision?", options: ["Isolating a host is always risk-free and instant", "The host may be actively controlling a physical process, so isolating it could itself cause an unsafe or costly disruption", "IT and OT always agree instantly on containment steps", "Physical processes have no bearing on cybersecurity decisions"], answer: 1, explain: "Standard IT containment advice (isolate the host) can conflict with process safety if that host is actively running a physical control function." },
+    { q: "What is the primary purpose of a SIEM (Security Information and Event Management) platform in this context?", options: ["Physically repair damaged field equipment", "Aggregate, correlate, and alert on security-relevant log and event data from multiple sources", "Replace the need for an HMI", "Design network topology diagrams"], answer: 1, explain: "A SIEM centralizes and correlates events from many sources so analysts can detect and triage suspicious activity more efficiently." }
+  ], ma: [
+    { q: "Which of the following are challenges specific to monitoring and detection in OT, according to this module? (Select all that apply)", options: ["Gaps in syslog coverage on legacy field devices", "Risk of active scanning disrupting fragile devices", "Time synchronization gaps complicating correlation", "OT devices always produce perfectly standardized logs"], answer: [0,1,2], explain: "The opposite is generally true — OT devices are notorious for inconsistent or absent logging, not standardized logs." },
+    { q: "Which elements are typically part of an OT incident response lifecycle discussed in this module? (Select all that apply)", options: ["Alert triage", "Containment decision-making that accounts for process safety", "A documented playbook", "Immediately powering down the entire facility regardless of context"], answer: [0,1,2], explain: "Immediately powering down everything regardless of context is not a documented best practice — containment decisions must weigh safety and process impact." }
+  ], match: [
+    { pairs: [
+        ["Passive Monitoring", "Observing network traffic without sending probes that could disrupt fragile devices"],
+        ["Syslog", "System logging protocol/format, often inconsistently supported by legacy field devices"],
+        ["SIEM", "Platform that aggregates and correlates security event data from multiple sources"],
+        ["Containment", "The incident response step of limiting spread, complicated in OT by physical process risk"]
+      ], explain: "These four terms describe the detection-to-response pipeline as it's adapted for OT constraints." }
+  ]},
+
+  m12: { title: "Module 12: Capstone — Build and Teach Your Own OT Module", mc: [
+    { q: "What should come first when designing a teachable module, according to good instructional design practice?", options: ["The final exam", "Clear, measurable learning objectives", "The classroom decorations", "The grading curve"], answer: 1, explain: "Learning objectives should drive the design of activities, labs, and assessments — not be written after the fact to match whatever content already exists." },
+    { q: "A good rubric for a hands-on lab activity should primarily:", options: ["Be kept secret from students until after grading", "Clearly define the criteria and performance levels used to evaluate the work, shared with students in advance", "Only assign a single pass/fail outcome with no detail", "Focus solely on how long the activity took"], answer: 1, explain: "Rubrics work best when they're specific, criterion-based, and shared with students before they begin, so expectations are transparent." },
+    { q: "Why is peer review valuable in a capstone teach-back format?", options: ["It replaces the need for instructor feedback entirely", "It exposes participants to different teaching approaches and surfaces blind spots the presenter may not notice", "It is only useful for grading, not learning", "It guarantees every presentation will be identical"], answer: 1, explain: "Peer review broadens perspective — participants see multiple approaches to the same content and get feedback the original instructor might miss." },
+    { q: "What should a capstone module's written safeguards statement address?", options: ["Marketing language to attract more students", "How the module keeps activities simulation-based, defensive in scope, and safe given the physical risks of OT content", "The instructor's personal biography", "Software licensing costs only"], answer: 1, explain: "Consistent with the course-wide Safeguards & Responsible Use policy, each capstone module should explicitly address how it stays simulation-based, defensive, and safe." },
+    { q: "In lab design for a teachable module, which is the best practice for calibration before using it with students?", options: ["Skip testing and use it live for the first time with students", "Walk through the lab yourself (or with a colleague) end to end before students attempt it", "Assume the lab works because the topic is well understood", "Only test the lab after students report a problem"], answer: 1, explain: "Calibrating a new lab before students see it catches broken steps, unclear instructions, and timing issues while the stakes are still low." }
+  ], ma: [
+    { q: "Which components does a complete capstone deliverable include, according to this module? (Select all that apply)", options: ["Learning objectives", "One hands-on simulation", "An assessment with a rubric", "A written safeguards statement"], answer: [0,1,2,3], explain: "All four are explicitly required components of the capstone deliverable." },
+    { q: "Which practices support a strong teach-back segment during the capstone? (Select all that apply)", options: ["Calibrating the lab or simulation before presenting it", "Being open to peer and instructor critique", "Aligning the activity with the stated learning objectives", "Skipping objectives entirely to save time"], answer: [0,1,2], explain: "Skipping objectives undermines the entire premise of intentional instructional design that the capstone is meant to demonstrate." }
+  ], match: [
+    { pairs: [
+        ["Learning Objectives", "Clear, measurable statements of what a student should be able to do"],
+        ["Lab Design", "Building and calibrating a hands-on activity aligned to objectives"],
+        ["Rubric", "Criteria and performance levels used to evaluate student work, shared in advance"],
+        ["Peer Review", "Structured feedback from colleagues that surfaces blind spots and alternative approaches"]
+      ], explain: "These four terms describe the instructional-design vocabulary the capstone asks participants to apply." }
+  ]}
+};
+
+var MODULE_ORDER = ["m1","m2","m3","m4","m5","m6","m7","m8","m9","m10","m11","m12"];
+
+/* =====================================================================
+   APP STATE & LOGIC
+   ===================================================================== */
+var currentTest = [];
+var currentAnswers = {};
+
+function buildModuleSelect() {
+  var sel = document.getElementById('moduleSelect');
+  var allOpt = document.createElement('option');
+  allOpt.value = 'all';
+  allOpt.textContent = 'All Modules (Comprehensive Review)';
+  sel.appendChild(allOpt);
+  MODULE_ORDER.forEach(function (key) {
+    var opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = BANK[key].title;
+    sel.appendChild(opt);
+  });
+}
+
+function getPool(moduleKey, types) {
+  var pool = [];
+  var keys = moduleKey === 'all' ? MODULE_ORDER : [moduleKey];
+  keys.forEach(function (mk) {
+    var mod = BANK[mk];
+    if (types.mc) mod.mc.forEach(function (item) { pool.push({ type: 'mc', module: mk, data: item }); });
+    if (types.ma) mod.ma.forEach(function (item) { pool.push({ type: 'ma', module: mk, data: item }); });
+    if (types.match) mod.match.forEach(function (item) { pool.push({ type: 'match', module: mk, data: item }); });
+  });
+  return pool;
+}
+
+function getSelectedTypes() {
+  return {
+    mc: document.getElementById('typeMC').checked,
+    ma: document.getElementById('typeMA').checked,
+    match: document.getElementById('typeMatch').checked
+  };
+}
+
+function updateAvailability() {
+  var moduleKey = document.getElementById('moduleSelect').value;
+  var types = getSelectedTypes();
+  var pool = getPool(moduleKey, types);
+  var countInput = document.getElementById('countInput');
+  var avail = pool.length;
+  var cap = Math.min(20, avail);
+  countInput.max = cap > 0 ? cap : 1;
+  if (parseInt(countInput.value, 10) > cap) countInput.value = cap > 0 ? cap : 1;
+  document.getElementById('availNote').innerHTML = avail > 0
+    ? '<strong>' + avail + '</strong> question' + (avail === 1 ? '' : 's') + ' available for this selection'
+    : '<strong>0</strong> available — choose at least one question type';
+  document.getElementById('warnFlag').style.display = (avail > 0 && avail < parseInt(countInput.value, 10)) ? 'inline-flex' : 'none';
+  document.getElementById('startBtn').disabled = avail === 0;
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function moduleTitleShort(key) {
+  var t = BANK[key].title;
+  var idx = t.indexOf(':');
+  return idx > -1 ? t.substring(0, idx) : t;
+}
+
+function renderTest() {
+  var moduleKey = document.getElementById('moduleSelect').value;
+  var types = getSelectedTypes();
+  var count = parseInt(document.getElementById('countInput').value, 10) || 1;
+  var pool = shuffle(getPool(moduleKey, types));
+  currentTest = pool.slice(0, Math.min(count, pool.length));
+  currentAnswers = {};
+
+  var list = document.getElementById('questionList');
+  list.innerHTML = '';
+
+  currentTest.forEach(function (item, idx) {
+    var card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'qcard-' + idx;
+
+    var badgeLabel = item.type === 'mc' ? 'Multiple Choice' : (item.type === 'ma' ? 'Multiple Answer' : 'Match');
+    var head = document.createElement('div');
+    head.className = 'q-head';
+    head.innerHTML = '<span class="q-num-badge">Q' + (idx + 1) + '</span>' +
+      '<span class="q-type-badge ' + item.type + '">' + badgeLabel + '</span>' +
+      '<span class="q-module-tag">' + moduleTitleShort(item.module) + '</span>';
+    card.appendChild(head);
+
+    if (item.type === 'mc') {
+      var stem = document.createElement('div');
+      stem.className = 'q-stem';
+      stem.textContent = item.data.q;
+      card.appendChild(stem);
+
+      var ul = document.createElement('ul');
+      ul.className = 'q-opts';
+      item.data.options.forEach(function (opt, oi) {
+        var li = document.createElement('li');
+        li.className = 'q-opt';
+        li.innerHTML = '<input type="radio" name="q' + idx + '" value="' + oi + '" id="q' + idx + 'o' + oi + '">' +
+          '<label for="q' + idx + 'o' + oi + '">' + opt + '</label>';
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+
+    } else if (item.type === 'ma') {
+      var stemMa = document.createElement('div');
+      stemMa.className = 'q-stem';
+      stemMa.textContent = item.data.q;
+      card.appendChild(stemMa);
+
+      var ulMa = document.createElement('ul');
+      ulMa.className = 'q-opts';
+      item.data.options.forEach(function (opt, oi) {
+        var li = document.createElement('li');
+        li.className = 'q-opt';
+        li.innerHTML = '<input type="checkbox" value="' + oi + '" id="q' + idx + 'o' + oi + '">' +
+          '<label for="q' + idx + 'o' + oi + '">' + opt + '</label>';
+        ulMa.appendChild(li);
+      });
+      card.appendChild(ulMa);
+
+    } else if (item.type === 'match') {
+      var stemM = document.createElement('div');
+      stemM.className = 'q-stem';
+      stemM.textContent = 'Match each term to its correct description.';
+      card.appendChild(stemM);
+
+      var shuffledDefs = shuffle(item.data.pairs.map(function (p, i) { return { text: p[1], correctIdx: i }; }));
+
+      var tableWrap = document.createElement('div');
+      tableWrap.style.overflowX = 'auto';
+      var table = document.createElement('table');
+      table.className = 'match-table';
+      table.id = 'matchtable-' + idx;
+      var thead = document.createElement('thead');
+      thead.innerHTML = '<tr><th scope="col">Term</th><th scope="col">Description</th></tr>';
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+
+      item.data.pairs.forEach(function (pair, rowIdx) {
+        var tr = document.createElement('tr');
+        tr.className = 'match-row';
+        tr.setAttribute('data-correct', rowIdx);
+        var termTd = document.createElement('td');
+        termTd.textContent = pair[0];
+        var selectTd = document.createElement('td');
+        var select = document.createElement('select');
+        select.id = 'q' + idx + 'row' + rowIdx;
+        var blank = document.createElement('option');
+        blank.value = '';
+        blank.textContent = '— Select —';
+        select.appendChild(blank);
+        shuffledDefs.forEach(function (def) {
+          var opt = document.createElement('option');
+          opt.value = def.correctIdx;
+          opt.textContent = def.text;
+          select.appendChild(opt);
+        });
+        selectTd.appendChild(select);
+        tr.appendChild(termTd);
+        tr.appendChild(selectTd);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrap.appendChild(table);
+      card.appendChild(tableWrap);
+    }
+
+    var feedback = document.createElement('div');
+    feedback.className = 'q-feedback';
+    feedback.id = 'feedback-' + idx;
+    card.appendChild(feedback);
+
+    list.appendChild(card);
+  });
+
+  document.getElementById('testArea').classList.add('show');
+  document.getElementById('buildCard').style.display = 'none';
+  document.getElementById('resultsBanner').classList.remove('show');
+  updateTestProgress();
+  window.scrollTo({ top: document.getElementById('testArea').offsetTop - 80, behavior: 'smooth' });
+}
+
+function updateTestProgress() {
+  var total = currentTest.length;
+  var answered = 0;
+  currentTest.forEach(function (item, idx) {
+    if (item.type === 'mc') {
+      if (document.querySelector('input[name="q' + idx + '"]:checked')) answered++;
+    } else if (item.type === 'ma') {
+      if (document.querySelectorAll('#qcard-' + idx + ' input[type="checkbox"]:checked').length > 0) answered++;
+    } else if (item.type === 'match') {
+      var selects = document.querySelectorAll('#matchtable-' + idx + ' select');
+      var allFilled = Array.prototype.every.call(selects, function (s) { return s.value !== ''; });
+      if (allFilled) answered++;
+    }
+  });
+  var pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+  document.getElementById('testProgressFill').style.width = pct + '%';
+}
+
+function gradeTest() {
+  var totalPoints = 0;
+  var fullCredit = 0, partialCredit = 0, noCredit = 0;
+
+  currentTest.forEach(function (item, idx) {
+    var feedbackEl = document.getElementById('feedback-' + idx);
+    var points = 0;
+
+    if (item.type === 'mc') {
+      var checked = document.querySelector('input[name="q' + idx + '"]:checked');
+      var opts = document.querySelectorAll('#qcard-' + idx + ' .q-opt');
+      opts.forEach(function (li, oi) {
+        if (oi === item.data.answer) li.classList.add('correct-answer');
+        else if (checked && parseInt(checked.value, 10) === oi) li.classList.add('wrong-answer');
+      });
+      if (checked && parseInt(checked.value, 10) === item.data.answer) points = 1;
+      feedbackEl.className = 'q-feedback show ' + (points === 1 ? 'full' : 'none');
+      feedbackEl.innerHTML = (points === 1 ? '✅ Correct.' : (checked ? '❌ Not quite.' : '⚠ No answer selected.')) +
+        '<span class="explain">' + item.data.explain + '</span>';
+
+    } else if (item.type === 'ma') {
+      var checkedBoxes = Array.prototype.slice.call(document.querySelectorAll('#qcard-' + idx + ' input[type="checkbox"]:checked')).map(function (cb) { return parseInt(cb.value, 10); });
+      var correctSet = item.data.answer.slice().sort();
+      var checkedSet = checkedBoxes.slice().sort();
+      var isExact = correctSet.length === checkedSet.length && correctSet.every(function (v, i) { return v === checkedSet[i]; });
+      var opts = document.querySelectorAll('#qcard-' + idx + ' .q-opt');
+      opts.forEach(function (li, oi) {
+        var isCorrectOpt = item.data.answer.indexOf(oi) > -1;
+        var wasChecked = checkedBoxes.indexOf(oi) > -1;
+        if (isCorrectOpt && wasChecked) li.classList.add('correct-answer');
+        else if (isCorrectOpt && !wasChecked) li.classList.add('missed-answer');
+        else if (!isCorrectOpt && wasChecked) li.classList.add('wrong-answer');
+      });
+      if (isExact) {
+        points = 1;
+      } else {
+        var correctChecked = checkedBoxes.filter(function (v) { return item.data.answer.indexOf(v) > -1; }).length;
+        var incorrectChecked = checkedBoxes.length - correctChecked;
+        points = Math.max(0, (correctChecked - incorrectChecked) / item.data.answer.length);
+      }
+      var cls = points >= 1 ? 'full' : (points > 0 ? 'partial' : 'none');
+      feedbackEl.className = 'q-feedback show ' + cls;
+      feedbackEl.innerHTML = (points >= 1 ? '✅ Correct — all and only the right options selected.' : (points > 0 ? '◐ Partial credit (' + Math.round(points * 100) + '%). Green = correct, dashed green = missed, red = incorrect selection.' : '❌ No credit.')) +
+        '<span class="explain">' + item.data.explain + '</span>';
+
+    } else if (item.type === 'match') {
+      var rows = document.querySelectorAll('#matchtable-' + idx + ' .match-row');
+      var correctRows = 0;
+      rows.forEach(function (row) {
+        var correctIdx = parseInt(row.getAttribute('data-correct'), 10);
+        var select = row.querySelector('select');
+        var val = select.value === '' ? null : parseInt(select.value, 10);
+        row.classList.remove('row-correct', 'row-incorrect');
+        if (val === correctIdx) {
+          row.classList.add('row-correct');
+          correctRows++;
+        } else {
+          row.classList.add('row-incorrect');
+        }
+      });
+      points = correctRows / rows.length;
+      var clsM = points >= 1 ? 'full' : (points > 0 ? 'partial' : 'none');
+      feedbackEl.className = 'q-feedback show ' + clsM;
+      feedbackEl.innerHTML = (points >= 1 ? '✅ All rows correct.' : '◐ ' + correctRows + ' of ' + rows.length + ' rows correct (' + Math.round(points * 100) + '%). Left border marks each row.') +
+        '<span class="explain">' + item.data.explain + '</span>';
+    }
+
+    totalPoints += points;
+    if (points >= 1) fullCredit++;
+    else if (points > 0) partialCredit++;
+    else noCredit++;
+  });
+
+  var scorePct = currentTest.length > 0 ? Math.round((totalPoints / currentTest.length) * 100) : 0;
+  document.getElementById('resultsScore').textContent = scorePct + '%';
+  document.getElementById('resultsSub').textContent = 'You earned ' + totalPoints.toFixed(1) + ' of ' + currentTest.length + ' points across ' + currentTest.length + ' question' + (currentTest.length === 1 ? '' : 's') + '.';
+  document.getElementById('statFull').textContent = fullCredit;
+  document.getElementById('statPartial').textContent = partialCredit;
+  document.getElementById('statNone').textContent = noCredit;
+  document.getElementById('resultsBanner').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetToBuilder() {
+  document.getElementById('testArea').classList.remove('show');
+  document.getElementById('buildCard').style.display = 'block';
+  document.getElementById('resultsBanner').classList.remove('show');
+  document.getElementById('questionList').innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  buildModuleSelect();
+  updateAvailability();
+
+  document.getElementById('moduleSelect').addEventListener('change', updateAvailability);
+  document.getElementById('typeMC').addEventListener('change', updateAvailability);
+  document.getElementById('typeMA').addEventListener('change', updateAvailability);
+  document.getElementById('typeMatch').addEventListener('change', updateAvailability);
+  document.getElementById('countInput').addEventListener('input', updateAvailability);
+
+  document.getElementById('startBtn').addEventListener('click', renderTest);
+  document.getElementById('gradeBtn').addEventListener('click', gradeTest);
+  document.getElementById('newTestBtn').addEventListener('click', resetToBuilder);
+
+  document.getElementById('questionList').addEventListener('change', updateTestProgress);
+
+  /* THEME — default LIGHT, dark only if the student previously chose it */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+});
+</script>
+</body>
+</html>
