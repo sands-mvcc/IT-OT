@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC SimStudio - Process Engineering & Logic Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        plc: {
+                            dark: '#0f172a',
+                            panel: '#1e293b',
+                            border: '#334155',
+                            accent: '#38bdf8',
+                            green: '#22c55e',
+                            amber: '#f59e0b',
+                            red: '#ef4444',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        .power-rail-left {
+            box-shadow: 2px 0 10px rgba(56, 189, 248, 0.5);
+        }
+        .power-rail-right {
+            box-shadow: -2px 0 10px rgba(239, 68, 68, 0.5);
+        }
+        .energized-line {
+            stroke: #22c55e;
+            stroke-width: 4;
+            filter: drop-shadow(0px 0px 6px #22c55e);
+        }
+        .deenergized-line {
+            stroke: #475569;
+            stroke-width: 2;
+        }
+        .led-indicator {
+            transition: all 0.2s ease-in-out;
+        }
+        .led-on-green, .led-on-emerald {
+            background-color: #22c55e;
+            box-shadow: 0 0 12px #22c55e;
+        }
+        .led-on-red {
+            background-color: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+        }
+        .led-on-amber {
+            background-color: #f59e0b;
+            box-shadow: 0 0 12px #f59e0b;
+        }
+        .led-off {
+            background-color: #334155;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-sm">
+
+    <!-- Application Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-cyan-600 to-blue-600 p-2 rounded-lg text-white shadow-lg">
+                <i class="fa-solid fa-microchip text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-wide text-white flex items-center gap-2">
+                    PLC SimStudio <span class="bg-cyan-950 text-cyan-400 text-xs px-2 py-0.5 rounded border border-cyan-800 font-mono">v2.5 Pro</span>
+                </h1>
+                <p class="text-xs text-slate-400">Process Engineering & Industrial Logic Educational Platform</p>
+            </div>
+        </div>
+
+        <!-- Simulation Controls -->
+        <div class="flex items-center bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 space-x-3">
+            <div class="flex items-center space-x-1">
+                <button id="btn-run" onclick="toggleRun(true)" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-emerald-600 hover:bg-emerald-500 text-white shadow">
+                    <i class="fa-solid fa-play text-xs"></i> RUN
+                </button>
+                <button id="btn-stop" onclick="toggleRun(false)" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    <i class="fa-solid fa-stop text-xs"></i> STOP
+                </button>
+                <button id="btn-step" onclick="singleStep()" class="px-2.5 py-1 rounded font-medium text-xs flex items-center gap-1 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    <i class="fa-solid fa-forward-step text-xs"></i> STEP
+                </button>
+            </div>
+
+            <div class="h-5 w-px bg-slate-800"></div>
+
+            <!-- Scan Time Control -->
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="text-slate-400 font-mono">Scan Rate:</span>
+                <input id="scan-rate" type="range" min="20" max="500" value="100" class="w-20 accent-cyan-500 cursor-pointer" oninput="updateScanRateLabel(this.value)">
+                <span id="scan-rate-val" class="font-mono text-cyan-400 w-12 text-right">100 ms</span>
+            </div>
+
+            <div class="h-5 w-px bg-slate-800"></div>
+
+            <!-- Cycle Status Indicator -->
+            <div class="flex items-center space-x-2">
+                <div id="status-pulse" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span id="status-text" class="text-xs font-mono font-semibold text-emerald-400">EXECUTING</span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+            <button id="tab-btn-sim" onclick="switchTab('sim')" class="px-3 py-1.5 rounded-md font-medium text-xs text-white bg-slate-800 shadow transition flex items-center gap-1.5">
+                <i class="fa-solid fa-network-wired text-cyan-400"></i> Logic Builder & Process
+            </button>
+            <button id="tab-btn-labs" onclick="switchTab('labs')" class="px-3 py-1.5 rounded-md font-medium text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-vial text-amber-400"></i> Interactive Labs
+            </button>
+            <button id="tab-btn-scope" onclick="switchTab('scope')" class="px-3 py-1.5 rounded-md font-medium text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-line text-emerald-400"></i> Signal Scope
+            </button>
+            <button id="tab-btn-theory" onclick="switchTab('theory')" class="px-3 py-1.5 rounded-md font-medium text-xs text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open text-purple-400"></i> Theory & SME Guide
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative overflow-hidden bg-slate-950 flex">
+        
+        <!-- ==================== TAB 1: SIMULATOR & PROCESS ==================== -->
+        <div id="tab-sim" class="w-full h-full flex flex-col md:flex-row overflow-hidden">
+            
+            <!-- Left Panel: Ladder Logic Editor -->
+            <div class="w-full md:w-7/12 h-1/2 md:h-full border-r border-slate-800 flex flex-col bg-slate-900/60">
+                <!-- Toolbar -->
+                <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 flex items-center justify-between shrink-0">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-xs text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-bars-staggered text-cyan-400"></i> Rung Logic Diagram (IEC 61131-3)
+                        </span>
+                        <span id="scan-count" class="font-mono text-xs text-slate-500 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">Scan: 0</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <button onclick="addRung()" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-xs"></i> Add Rung
+                        </button>
+                        <button onclick="clearLadder()" class="px-2.5 py-1 bg-slate-800 hover:bg-red-900/40 text-slate-300 hover:text-red-400 rounded text-xs font-medium border border-slate-700 transition">
+                            <i class="fa-solid fa-trash text-xs"></i> Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Palette / Quick Component Adder -->
+                <div class="bg-slate-950/80 px-4 py-2 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0 custom-scrollbar">
+                    <span class="text-slate-400 font-mono text-[11px] whitespace-nowrap">Add Elements:</span>
+                    <button onclick="insertInstruction('NO')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
+                        <span class="text-cyan-400 font-bold">-[ ]-</span> NO Contact
+                    </button>
+                    <button onclick="insertInstruction('NC')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
+                        <span class="text-cyan-400 font-bold">-[/]-</span> NC Contact
+                    </button>
+                    <button onclick="insertInstruction('COIL')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-emerald-500 transition">
+                        <span class="text-emerald-400 font-bold">-( )-</span> Coil
+                    </button>
+                    <button onclick="insertInstruction('TON')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-amber-500 transition">
+                        <span class="text-amber-400 font-bold">[TON]</span> On-Timer
+                    </button>
+                    <button onclick="insertInstruction('CTU')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-purple-400 transition">
+                        <span class="text-purple-400 font-bold">[CTU]</span> Counter
+                    </button>
+                    <button onclick="insertInstruction('CMP')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-blue-400 transition">
+                        <span class="text-blue-400 font-bold">[CMP >]</span> Analog Compare
+                    </button>
+                </div>
+
+                <!-- Ladder Scrollable Canvas -->
+                <div id="ladder-canvas" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar relative bg-slate-950/40">
+                    <!-- Power Rails & Rungs dynamically rendered here -->
+                </div>
+            </div>
+
+            <!-- Right Panel: Interactive Process Visualization & Hardware I/O Panel -->
+            <div class="w-full md:w-5/12 h-1/2 md:h-full flex flex-col bg-slate-900">
+                
+                <!-- Animated Visual Process Graphic Panel -->
+                <div class="h-1/2 border-b border-slate-800 flex flex-col relative bg-slate-950">
+                    <div class="bg-slate-900/90 px-3 py-1.5 border-b border-slate-800 flex items-center justify-between text-xs z-10">
+                        <span class="font-semibold text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-industry text-amber-400"></i> Interactive Process Animation
+                        </span>
+                        <span id="process-title" class="text-slate-400 font-mono text-[11px]">Industrial Tank & Batch Process</span>
+                    </div>
+                    
+                    <div class="flex-1 relative flex items-center justify-center overflow-hidden p-2">
+                        <!-- Canvas / Dynamic Graphic Container -->
+                        <canvas id="process-canvas" class="w-full h-full block rounded bg-slate-950"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hardware Field I/O Console -->
+                <div class="h-1/2 flex flex-col bg-slate-900 overflow-hidden">
+                    <!-- Console Header Tabs -->
+                    <div class="bg-slate-950 border-b border-slate-800 flex text-xs font-medium">
+                        <button id="io-tab-discrete" onclick="switchIOTab('discrete')" class="flex-1 py-2 text-center text-cyan-400 border-b-2 border-cyan-500 bg-slate-900">
+                            Discrete I/O Modules
+                        </button>
+                        <button id="io-tab-analog" onclick="switchIOTab('analog')" class="flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-white">
+                            Analog I/O Modules (4-20mA / 0-10V)
+                        </button>
+                    </div>
+
+                    <!-- Discrete I/O Module Panel -->
+                    <div id="io-panel-discrete" class="flex-1 p-3 overflow-y-auto custom-scrollbar space-y-3">
+                        <div>
+                            <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Digital Inputs (24V DC Field Devices)</span>
+                                <span class="text-slate-500">I:0/0 - I:0/7</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2" id="discrete-inputs-grid">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-800">
+                            <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Digital Outputs (Relay / Actuators)</span>
+                                <span class="text-slate-500">O:0/0 - O:0/7</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2" id="discrete-outputs-grid">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analog I/O Module Panel -->
+                    <div id="io-panel-analog" class="flex-1 p-3 overflow-y-auto custom-scrollbar space-y-3 hidden">
+                        <div>
+                            <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Analog Transmitters (Input 4-20mA / 0-10V)</span>
+                                <span class="text-slate-500">AI:0 - AI:3</span>
+                            </div>
+                            <div class="space-y-2.5" id="analog-inputs-grid">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-800">
+                            <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Analog Outputs (Control Signal 0-100%)</span>
+                                <span class="text-slate-500">AO:0 - AO:1</span>
+                            </div>
+                            <div class="space-y-2.5" id="analog-outputs-grid">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: GUIDED LABS ==================== -->
+        <div id="tab-labs" class="w-full h-full p-6 overflow-y-auto custom-scrollbar hidden bg-slate-950">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-flask text-amber-400"></i> Instructional Process Engineering Labs
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Select a guided scenario to auto-configure field devices, load ladder logic templates, and practice real-world automation routines.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Lab Card 1 -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-cyan-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-cyan-950 text-cyan-400 text-xs px-2.5 py-1 rounded font-mono border border-cyan-800 font-semibold">LAB 01: DISCRETE</span>
+                                <span class="text-xs text-slate-500"><i class="fa-solid fa-clock mr-1"></i> 10 Mins</span>
+                            </div>
+                            <h3 class="font-bold text-base text-white mb-2">Motor Three-Wire Seal-In Circuit (Start/Stop)</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                                Learn how to construct standard industrial latching (seal-in) logic using discrete Normally Open (Start) and Normally Closed (Stop) pushbuttons to safely energize a motor starter relay.
+                            </p>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
+                                <div><strong class="text-cyan-400">Inputs:</strong> I:0/0 (Stop NC), I:0/1 (Start NO)</div>
+                                <div><strong class="text-emerald-400">Outputs:</strong> O:0/0 (Motor Starter Coil M1)</div>
+                            </div>
+                        </div>
+                        <button onclick="loadLab(1)" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium text-xs transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> Load Lab 1 Environment & Logic
+                        </button>
+                    </div>
+
+                    <!-- Lab Card 2 -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-emerald-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-emerald-950 text-emerald-400 text-xs px-2.5 py-1 rounded font-mono border border-emerald-800 font-semibold">LAB 02: ANALOG & MATH</span>
+                                <span class="text-xs text-slate-500"><i class="fa-solid fa-clock mr-1"></i> 15 Mins</span>
+                            </div>
+                            <h3 class="font-bold text-base text-white mb-2">Automated Level Control with Hysteresis</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                                Process tank control using an Analog Level Sensor (4-20mA). Program compare blocks to activate the fill pump when tank level drops below 25% and turn off when level exceeds 85%.
+                            </p>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
+                                <div><strong class="text-cyan-400">Analog Input:</strong> AI:0 (Level Transmitter 0-100%)</div>
+                                <div><strong class="text-emerald-400">Outputs:</strong> O:0/1 (Fill Pump Valve Solenoid)</div>
+                            </div>
+                        </div>
+                        <button onclick="loadLab(2)" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium text-xs transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> Load Lab 2 Environment & Logic
+                        </button>
+                    </div>
+
+                    <!-- Lab Card 3 -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-amber-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-amber-950 text-amber-400 text-xs px-2.5 py-1 rounded font-mono border border-amber-800 font-semibold">LAB 03: SEQUENTIAL LOGIC</span>
+                                <span class="text-xs text-slate-500"><i class="fa-solid fa-clock mr-1"></i> 20 Mins</span>
+                            </div>
+                            <h3 class="font-bold text-base text-white mb-2">Timed Conveyor Bottle Filling Line</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                                Design a sequential state machine. Proximity switch detects bottle -> Conveyor stops -> Valve opens for 3-second fill timer -> Conveyor resumes -> Counter increments batch tally.
+                            </p>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
+                                <div><strong class="text-cyan-400">Inputs:</strong> I:0/2 (PE-1 Sensor), I:0/3 (Reset Tally)</div>
+                                <div><strong class="text-emerald-400">Outputs:</strong> O:0/2 (Conveyor VFD), O:0/3 (Fill Valve)</div>
+                            </div>
+                        </div>
+                        <button onclick="loadLab(3)" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium text-xs transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> Load Lab 3 Environment & Logic
+                        </button>
+                    </div>
+
+                    <!-- Lab Card 4 -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-purple-500/50 transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-purple-950 text-purple-400 text-xs px-2.5 py-1 rounded font-mono border border-purple-800 font-semibold">LAB 04: CLOSED LOOP</span>
+                                <span class="text-xs text-slate-500"><i class="fa-solid fa-clock mr-1"></i> 25 Mins</span>
+                            </div>
+                            <h3 class="font-bold text-base text-white mb-2">Batch Heating & Agitation Loop</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                                Integrated temperature control. Uses Analog Temp Sensor (RTD/TC) and Modulating Heater Output (AO:0) with timed mixer agitation sequence and safety high-temp interlocks.
+                            </p>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
+                                <div><strong class="text-cyan-400">Analog Input:</strong> AI:1 (Temp Sensor 0-100°C)</div>
+                                <div><strong class="text-emerald-400">Analog Output:</strong> AO:0 (Heater Signal 0-100%)</div>
+                            </div>
+                        </div>
+                        <button onclick="loadLab(4)" class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium text-xs transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-folder-open"></i> Load Lab 4 Environment & Logic
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: SIGNAL SCOPE ==================== -->
+        <div id="tab-scope" class="w-full h-full p-6 overflow-y-auto custom-scrollbar hidden bg-slate-950">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-emerald-400"></i> Signal Trend Scope & Memory Inspector
+                        </h2>
+                        <p class="text-slate-400 text-xs mt-1">Real-time trace visualizer for digital switching waveforms and analog 4-20mA / 0-10V loop currents.</p>
+                    </div>
+                    <button onclick="clearScopeData()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 text-xs">
+                        Clear Waveforms
+                    </button>
+                </div>
+
+                <!-- Live Oscilloscope Canvas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-mono text-cyan-400 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> Analog Channel AI:0 (Level %)
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block ml-4"></span> Output AO:0 (Control %)
+                        </span>
+                        <span class="text-xs text-slate-500 font-mono">Timebase: 500ms/div</span>
+                    </div>
+                    <canvas id="scope-canvas" class="w-full h-64 bg-slate-950 rounded border border-slate-800"></canvas>
+                </div>
+
+                <!-- PLC Internal Bit Table & Register Monitor -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <h3 class="font-bold text-sm text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-database text-purple-400"></i> PLC Memory Table & Data Registers
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <div class="text-xs font-mono text-slate-400 mb-2">Discrete Inputs (I:0)</div>
+                            <div id="table-inputs" class="bg-slate-950 rounded p-2 border border-slate-800 space-y-1 font-mono text-xs"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-mono text-slate-400 mb-2">Discrete Outputs (O:0)</div>
+                            <div id="table-outputs" class="bg-slate-950 rounded p-2 border border-slate-800 space-y-1 font-mono text-xs"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-mono text-slate-400 mb-2">Timers & Counters</div>
+                            <div id="table-timers" class="bg-slate-950 rounded p-2 border border-slate-800 space-y-1 font-mono text-xs"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: THEORY & SME GUIDE ==================== -->
+        <div id="tab-theory" class="w-full h-full p-6 overflow-y-auto custom-scrollbar hidden bg-slate-950">
+            <div class="max-w-4xl mx-auto space-y-8 text-slate-300">
+                
+                <!-- Introduction -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-cyan-950 text-cyan-400 p-3 rounded-lg border border-cyan-800 text-xl">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">Process Engineering & PLC Fundamentals</h2>
+                            <p class="text-xs text-slate-400">Subject Matter Expert (SME) Curriculum Guide</p>
+                        </div>
+                    </div>
+                    <p class="text-xs leading-relaxed text-slate-300">
+                        A <strong>Programmable Logic Controller (PLC)</strong> is an industrial digital computer designed for ruggedized operational technology (OT) applications. PLCs continuously monitor field inputs (sensors, switches, transmitters), execute custom program logic stored in memory, and control field outputs (motors, valves, heaters, alarms) to automate industrial processes.
+                    </p>
+                </div>
+
+                <!-- Discrete vs Analog -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                        <div class="flex items-center gap-2 mb-3 text-cyan-400 font-bold text-sm">
+                            <i class="fa-solid fa-toggle-on text-base"></i> Discrete (Digital) Signals
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Discrete signals exist in binary states: <strong>ON (1 / HIGH / 24VDC)</strong> or <strong>OFF (0 / LOW / 0VDC)</strong>.
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc list-inside font-mono">
+                            <li><strong class="text-slate-200">Pushbuttons:</strong> NO (Normally Open) or NC (Normally Closed)</li>
+                            <li><strong class="text-slate-200">Limit Switches:</strong> Physical object position detection</li>
+                            <li><strong class="text-slate-200">Solenoid Valves:</strong> Open / Close directional control</li>
+                            <li><strong class="text-slate-200">Motor Starters:</strong> Run / Stop contactors</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                        <div class="flex items-center gap-2 mb-3 text-emerald-400 font-bold text-sm">
+                            <i class="fa-solid fa-sliders text-base"></i> Analog Signals
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Analog signals represent continuous physical variables (e.g., Temperature, Pressure, Flow, Level) mapped across standardized electrical ranges.
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc list-inside font-mono">
+                            <li><strong class="text-slate-200">Current Loop:</strong> 4 - 20 mA (Industry standard; offers live zero detection)</li>
+                            <li><strong class="text-slate-200">Voltage Signal:</strong> 0 - 10 VDC</li>
+                            <li><strong class="text-slate-200">Modulating Control:</strong> Control Valve 0-100% opening</li>
+                            <li><strong class="text-slate-200">VFD Speed:</strong> Motor speed command 0-60 Hz</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PLC Scan Cycle -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-rotate text-amber-400"></i> The Three-Step PLC Scan Cycle
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+                            <div class="font-mono text-cyan-400 font-bold mb-1">1. Read Inputs</div>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">The PLC copies physical signal states from input screw terminals into the Input Image Table memory area.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+                            <div class="font-mono text-amber-400 font-bold mb-1">2. Execute Logic</div>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">The CPU solves ladder rungs sequentially from top to bottom, left to right, evaluating Boolean conditions and math blocks.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+                            <div class="font-mono text-emerald-400 font-bold mb-1">3. Update Outputs</div>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">Evaluated states in the Output Image Table are written to physical output relays and analog channels simultaneously.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Global PLC State Store
+        const plcState = {
+            isRunning: true,
+            scanRateMs: 100,
+            scanCount: 0,
+            activeLab: 1,
+            
+            // Discrete Inputs (Bit 0 to 7)
+            discreteInputs: [
+                { id: 'I:0/0', name: 'Stop Switch (NC)', val: true, type: 'toggle', desc: 'Main Emergency / Stop' },
+                { id: 'I:0/1', name: 'Start PB (NO)', val: false, type: 'push', desc: 'Momentary Start Switch' },
+                { id: 'I:0/2', name: 'Proximity Sensor PE-1', val: false, type: 'toggle', desc: 'Bottle / Object Detect' },
+                { id: 'I:0/3', name: 'Reset PB (NO)', val: false, type: 'push', desc: 'Reset Batch Counter' },
+                { id: 'I:0/4', name: 'High Level Switch LSH', val: false, type: 'toggle', desc: 'Float Switch High' },
+                { id: 'I:0/5', name: 'Low Level Switch LSL', val: false, type: 'toggle', desc: 'Float Switch Low' },
+                { id: 'I:0/6', name: 'Auto/Manual Switch', val: true, type: 'toggle', desc: 'Mode Selector' },
+                { id: 'I:0/7', name: 'Fault Reset Switch', val: false, type: 'push', desc: 'Alarm Clear' },
+            ],
+
+            // Discrete Outputs (Bit 0 to 7)
+            discreteOutputs: [
+                { id: 'O:0/0', name: 'Motor Starter M1', val: false, desc: 'Main Pump / Conveyor Motor' },
+                { id: 'O:0/1', name: 'Inlet Valve SOL-101', val: false, desc: 'Tank Supply Solenoid' },
+                { id: 'O:0/2', name: 'Conveyor Drive Run', val: false, desc: 'Bottle Line Conveyor' },
+                { id: 'O:0/3', name: 'Fill Valve SOL-102', val: false, desc: 'Dispenser Solenoid' },
+                { id: 'O:0/4', name: 'Heater Contactor HT-1', val: false, desc: 'Electric Tank Heater' },
+                { id: 'O:0/5', name: 'Agitator Mixer M2', val: false, desc: 'Tank Agitator Motor' },
+                { id: 'O:0/6', name: 'High Level Alarm Light', val: false, desc: 'Red Strobe Beacon' },
+                { id: 'O:0/7', name: 'System Ready Green LED', val: false, desc: 'Panel Indicator' },
+            ],
+
+            // Analog Inputs (0 - 100%)
+            analogInputs: [
+                { id: 'AI:0', name: 'Level Transmitter LT-101', val: 15.0, min: 0, max: 100, unit: '%', rawMa: 6.4 },
+                { id: 'AI:1', name: 'Temp Sensor TT-102', val: 25.0, min: 0, max: 100, unit: '°C', rawMa: 8.0 },
+                { id: 'AI:2', name: 'Pressure Trans PT-103', val: 12.5, min: 0, max: 100, unit: 'PSI', rawMa: 6.0 },
+                { id: 'AI:3', name: 'Flow Sensor FT-104', val: 0.0, min: 0, max: 100, unit: 'GPM', rawMa: 4.0 },
+            ],
+
+            // Analog Outputs (0 - 100%)
+            analogOutputs: [
+                { id: 'AO:0', name: 'Modulating Control Valve FCV-1', val: 0.0, unit: '%' },
+                { id: 'AO:1', name: 'VFD Speed Command', val: 0.0, unit: 'Hz' },
+            ],
+
+            // Internal Data Registers
+            timers: {
+                'TON_1': { pt: 3.0, et: 0.0, dn: false, en: false },
+                'TON_2': { pt: 5.0, et: 0.0, dn: false, en: false }
+            },
+            counters: {
+                'CTU_1': { pv: 5, cv: 0, dn: false }
+            },
+
+            // Ladder Logic Rungs Definition
+            rungs: []
+        };
+
+        let timerInterval = null;
+        let processCanvas, ctx;
+        let scopeCanvas, scopeCtx;
+        let scopeHistory = { ai0: [], ao0: [] };
+
+        window.onload = function() {
+            initIOPanels();
+            setupProcessCanvas();
+            setupScopeCanvas();
+            loadLab(1); // Default to Lab 1
+            startSimLoop();
+            renderLadder();
+            drawScope();
+        };
+
+        function initIOPanels() {
+            // Render Discrete Inputs
+            const dinGrid = document.getElementById('discrete-inputs-grid');
+            dinGrid.innerHTML = plcState.discreteInputs.map((item, idx) => `
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex items-center justify-between text-xs">
+                    <div class="flex items-center space-x-2">
+                        <div id="led-${item.id}" class="w-3 h-3 rounded-full ${item.val ? 'led-on-green' : 'led-off'} border border-slate-700"></div>
+                        <div>
+                            <div class="font-mono font-bold text-slate-200 text-[11px]">${item.id}</div>
+                            <div class="text-[10px] text-slate-400 truncate max-w-[110px]">${item.name}</div>
+                        </div>
+                    </div>
+                    ${item.type === 'push' ? `
+                        <button onmousedown="setDiscreteInput(${idx}, true)" onmouseup="setDiscreteInput(${idx}, false)" onmouseleave="setDiscreteInput(${idx}, false)"
+                            class="px-2 py-1 bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-300 active:text-white rounded text-[10px] font-mono border border-slate-700 select-none">
+                            PRESS
+                        </button>
+                    ` : `
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${item.val ? 'checked' : ''} onchange="toggleDiscreteInput(${idx}, this.checked)" class="sr-only peer">
+                            <div class="w-7 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-600"></div>
+                        </label>
+                    `}
+                </div>
+            `).join('');
+
+            // Render Discrete Outputs
+            const doutGrid = document.getElementById('discrete-outputs-grid');
+            doutGrid.innerHTML = plcState.discreteOutputs.map((item) => `
+                <div class="bg-slate-950 p-2 rounded border border-slate-800 flex items-center justify-between text-xs">
+                    <div class="flex items-center space-x-2">
+                        <div id="led-${item.id}" class="w-3 h-3 rounded-full ${item.val ? 'led-on-emerald' : 'led-off'} border border-slate-700"></div>
+                        <div>
+                            <div class="font-mono font-bold text-slate-200 text-[11px]">${item.id}</div>
+                            <div class="text-[10px] text-slate-400 truncate max-w-[120px]">${item.name}</div>
+                        </div>
+                    </div>
+                    <span id="val-${item.id}" class="font-mono text-[10px] ${item.val ? 'text-emerald-400 font-bold' : 'text-slate-600'}">
+                        ${item.val ? 'ON' : 'OFF'}
+                    </span>
+                </div>
+            `).join('');
+
+            // Render Analog Inputs
+            const ainGrid = document.getElementById('analog-inputs-grid');
+            ainGrid.innerHTML = plcState.analogInputs.map((item, idx) => `
+                <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1.5">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-mono font-bold text-cyan-400">${item.id} - ${item.name}</span>
+                        <span class="font-mono text-slate-300 font-bold text-xs" id="val-${item.id}">${item.val.toFixed(1)} ${item.unit} (${(4 + (item.val/100)*16).toFixed(1)} mA)</span>
+                    </div>
+                    <input type="range" min="${item.min}" max="${item.max}" step="0.5" value="${item.val}"
+                        oninput="updateAnalogInput(${idx}, this.value)" class="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+                </div>
+            `).join('');
+
+            // Render Analog Outputs
+            const aoutGrid = document.getElementById('analog-outputs-grid');
+            aoutGrid.innerHTML = plcState.analogOutputs.map((item) => `
+                <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-mono font-bold text-emerald-400">${item.id} - ${item.name}</span>
+                        <span class="font-mono text-emerald-400 font-bold text-xs" id="val-${item.id}">${item.val.toFixed(1)} ${item.unit}</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div id="bar-${item.id}" class="bg-emerald-500 h-full transition-all duration-150" style="width: ${item.val}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            renderMemoryTables();
+        }
+
+        function toggleDiscreteInput(idx, val) {
+            plcState.discreteInputs[idx].val = val;
+            updateLED(plcState.discreteInputs[idx].id, val, 'green');
+        }
+
+        function setDiscreteInput(idx, val) {
+            plcState.discreteInputs[idx].val = val;
+            updateLED(plcState.discreteInputs[idx].id, val, 'green');
+        }
+
+        function updateAnalogInput(idx, val) {
+            const numVal = parseFloat(val);
+            plcState.analogInputs[idx].val = numVal;
+            const item = plcState.analogInputs[idx];
+            item.rawMa = 4 + (numVal / 100) * 16;
+            const el = document.getElementById(`val-${item.id}`);
+            if (el) el.innerText = `${numVal.toFixed(1)} ${item.unit} (${item.rawMa.toFixed(1)} mA)`;
+        }
+
+        function updateLED(id, state, color) {
+            const led = document.getElementById(`led-${id}`);
+            if (!led) return;
+            if (state) {
+                led.className = `w-3 h-3 rounded-full led-on-${color} border border-slate-700`;
+            } else {
+                led.className = 'w-3 h-3 rounded-full led-off border border-slate-700';
+            }
+        }
+
+        function startSimLoop() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (plcState.isRunning) {
+                    executePLCScanCycle();
+                }
+            }, plcState.scanRateMs);
+        }
+
+        function executePLCScanCycle() {
+            plcState.scanCount++;
+            document.getElementById('scan-count').innerText = `Scan: ${plcState.scanCount}`;
+
+            // Step 1: Physical Process Dynamic Simulation Update (e.g. Tank level change based on output valve/pump)
+            updatePhysicalProcessPhysics();
+
+            // Step 2: Solve Ladder Logic Rungs
+            solveLadderLogic();
+
+            // Step 3: Refresh UI Elements
+            refreshOutputUI();
+            drawProcessCanvas();
+            recordScopeData();
+            renderMemoryTables();
+        }
+
+        function updatePhysicalProcessPhysics() {
+            const deltaSec = plcState.scanRateMs / 1000.0;
+            
+            // Lab 2 & Lab 4 Process Dynamics (Tank Level & Heater Temp)
+            const fillPumpOn = plcState.discreteOutputs[1].val; // O:0/1 Solenoid
+            const drainValvePercent = plcState.analogOutputs[0].val; // AO:0
+            let currentLevel = plcState.analogInputs[0].val;
+
+            if (fillPumpOn) {
+                currentLevel += 8.0 * deltaSec; // Fill rate
+            }
+            // Drain based on manual drain slider or analog output
+            currentLevel -= (2.0 + (drainValvePercent / 100) * 6.0) * deltaSec;
+            if (currentLevel < 0) currentLevel = 0;
+            if (currentLevel > 100) currentLevel = 100;
+            
+            plcState.analogInputs[0].val = currentLevel;
+            const levelEl = document.getElementById('val-AI:0');
+            if (levelEl) {
+                const ma = 4 + (currentLevel/100)*16;
+                levelEl.innerText = `${currentLevel.toFixed(1)} % (${ma.toFixed(1)} mA)`;
+            }
+
+            // Lab 4 Temp Dynamics
+            const heaterPercent = plcState.analogOutputs[0].val;
+            let currentTemp = plcState.analogInputs[1].val;
+            if (heaterPercent > 0) {
+                currentTemp += (heaterPercent / 100.0) * 5.0 * deltaSec;
+            } else {
+                currentTemp -= 1.5 * deltaSec; // Ambient cooling
+            }
+            if (currentTemp < 20) currentTemp = 20;
+            if (currentTemp > 100) currentTemp = 100;
+            plcState.analogInputs[1].val = currentTemp;
+
+            // Bottle Line Conveyor Dynamics (Lab 3)
+            if (plcState.discreteOutputs[2].val) { // Conveyor motor ON
+                // Simulate bottle moving past sensor PE-1 periodically
+                const cycleTime = (Date.now() / 1000) % 4;
+                plcState.discreteInputs[2].val = (cycleTime > 1.8 && cycleTime < 2.2);
+            }
+        }
+
+        function solveLadderLogic() {
+            plcState.rungs.forEach((rung) => {
+                let rungPower = true; // Left Power Rail is always TRUE (24VDC)
+
+                rung.instructions.forEach((inst) => {
+                    if (inst.type === 'NO') {
+                        const bitVal = getBitValue(inst.tag);
+                        rungPower = rungPower && bitVal;
+                        inst.active = rungPower;
+                    } 
+                    else if (inst.type === 'NC') {
+                        const bitVal = getBitValue(inst.tag);
+                        rungPower = rungPower && (!bitVal);
+                        inst.active = rungPower;
+                    } 
+                    else if (inst.type === 'COIL') {
+                        setBitValue(inst.tag, rungPower);
+                        inst.active = rungPower;
+                    }
+                    else if (inst.type === 'TON') {
+                        const timer = plcState.timers[inst.tag] || { pt: 3.0, et: 0.0, dn: false };
+                        if (rungPower) {
+                            if (!timer.dn) {
+                                timer.et += plcState.scanRateMs / 1000.0;
+                                if (timer.et >= timer.pt) {
+                                    timer.et = timer.pt;
+                                    timer.dn = true;
+                                }
+                            }
+                        } else {
+                            timer.et = 0.0;
+                            timer.dn = false;
+                        }
+                        plcState.timers[inst.tag] = timer;
+                        inst.active = timer.dn;
+                    }
+                    else if (inst.type === 'CTU') {
+                        const counter = plcState.counters[inst.tag] || { pv: 5, cv: 0, dn: false };
+                        // Edge detection for count pulse
+                        if (rungPower && !inst.prevRungState) {
+                            counter.cv++;
+                            if (counter.cv >= counter.pv) counter.dn = true;
+                        }
+                        inst.prevRungState = rungPower;
+                        
+                        // Check if Reset Button I:0/3 pressed
+                        if (getBitValue('I:0/3')) {
+                            counter.cv = 0;
+                            counter.dn = false;
+                        }
+
+                        plcState.counters[inst.tag] = counter;
+                        inst.active = counter.dn;
+                    }
+                    else if (inst.type === 'CMP') {
+                        const ainVal = plcState.analogInputs[0].val; // Read AI:0
+                        let compResult = false;
+                        if (inst.op === 'LESS') compResult = ainVal < inst.val;
+                        if (inst.op === 'GREATER') compResult = ainVal > inst.val;
+                        rungPower = rungPower && compResult;
+                        inst.active = rungPower;
+                    }
+                });
+            });
+        }
+
+        function getBitValue(tag) {
+            if (tag.startsWith('I:0/')) {
+                const idx = parseInt(tag.split('/')[1]);
+                return plcState.discreteInputs[idx]?.val || false;
+            }
+            if (tag.startsWith('O:0/')) {
+                const idx = parseInt(tag.split('/')[1]);
+                return plcState.discreteOutputs[idx]?.val || false;
+            }
+            if (tag.startsWith('TON_')) {
+                return plcState.timers[tag]?.dn || false;
+            }
+            if (tag.startsWith('CTU_')) {
+                return plcState.counters[tag]?.dn || false;
+            }
+            return false;
+        }
+
+        function setBitValue(tag, val) {
+            if (tag.startsWith('O:0/')) {
+                const idx = parseInt(tag.split('/')[1]);
+                if (plcState.discreteOutputs[idx]) {
+                    plcState.discreteOutputs[idx].val = val;
+                }
+            }
+        }
+
+        function renderLadder() {
+            const canvas = document.getElementById('ladder-canvas');
+            if (!canvas) return;
+
+            if (plcState.rungs.length === 0) {
+                canvas.innerHTML = `
+                    <div class="h-48 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-800 rounded-lg">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2"></i>
+                        <p class="text-xs">No Ladder Rungs loaded. Click "Add Rung" or choose a Guided Lab.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            canvas.innerHTML = plcState.rungs.map((rung, rIdx) => `
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 relative flex items-center shadow-lg">
+                    <!-- Left Power Rail (24VDC) -->
+                    <div class="w-2 h-16 bg-cyan-500 rounded-l power-rail-left"></div>
+
+                    <!-- Rung Wire Container -->
+                    <div class="flex-1 flex items-center px-4 space-x-2 relative min-h-[60px]">
+                        <!-- Wire line behind instructions -->
+                        <div class="absolute inset-x-0 h-0.5 bg-slate-700 top-1/2 -translate-y-1/2 z-0"></div>
+
+                        <!-- Instructions List -->
+                        <div class="flex items-center justify-between w-full z-10 space-x-2">
+                            ${rung.instructions.map((inst, iIdx) => `
+                                <div class="bg-slate-950 border ${inst.active ? 'border-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 'border-slate-800'} p-2 rounded flex flex-col items-center min-w-[75px] relative group">
+                                    <span class="text-[9px] font-mono ${inst.active ? 'text-emerald-400 font-bold' : 'text-cyan-400'} mb-1">${inst.tag}</span>
+                                    
+                                    <div class="text-sm font-mono font-bold my-0.5">
+                                        ${inst.type === 'NO' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[ ]-</span>` : ''}
+                                        ${inst.type === 'NC' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[/]-</span>` : ''}
+                                        ${inst.type === 'COIL' ? `<span class="${inst.active ? 'text-emerald-400 font-extrabold' : 'text-slate-400'}">-( )-</span>` : ''}
+                                        ${inst.type === 'TON' ? `<span class="text-amber-400 text-xs">[TON ${plcState.timers[inst.tag]?.et.toFixed(1) || 0}s]</span>` : ''}
+                                        ${inst.type === 'CTU' ? `<span class="text-purple-400 text-xs">[CTU ${plcState.counters[inst.tag]?.cv || 0}/${plcState.counters[inst.tag]?.pv || 5}]</span>` : ''}
+                                        ${inst.type === 'CMP' ? `<span class="text-blue-400 text-xs">[AI:0 ${inst.op === 'LESS' ? '<' : '>'} ${inst.val}%]</span>` : ''}
+                                    </div>
+
+                                    <span class="text-[9px] text-slate-500 font-mono">${inst.type}</span>
+
+                                    <!-- Instruction Delete Overlay -->
+                                    <button onclick="removeInstruction(${rIdx}, ${iIdx})" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white w-4 h-4 rounded-full text-[9px] hidden group-hover:flex items-center justify-center">
+                                        ×
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Right Power Rail (0VDC Ground) -->
+                    <div class="w-2 h-16 bg-red-500 rounded-r power-rail-right"></div>
+
+                    <!-- Delete Rung Button -->
+                    <button onclick="deleteRung(${rIdx})" class="ml-2 text-slate-600 hover:text-red-400 p-1">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function refreshOutputUI() {
+            plcState.discreteOutputs.forEach((item) => {
+                updateLED(item.id, item.val, 'emerald');
+                const valEl = document.getElementById(`val-${item.id}`);
+                if (valEl) {
+                    valEl.innerText = item.val ? 'ON' : 'OFF';
+                    valEl.className = `font-mono text-[10px] ${item.val ? 'text-emerald-400 font-bold' : 'text-slate-600'}`;
+                }
+            });
+
+            // Re-render timer values on ladder diagram without destroying DOM focus
+            renderLadder();
+        }
+
+        function setupProcessCanvas() {
+            processCanvas = document.getElementById('process-canvas');
+            ctx = processCanvas.getContext('2d');
+            resizeProcessCanvas();
+            window.addEventListener('resize', resizeProcessCanvas);
+        }
+
+        function resizeProcessCanvas() {
+            if (!processCanvas) return;
+            processCanvas.width = processCanvas.parentElement.clientWidth;
+            processCanvas.height = processCanvas.parentElement.clientHeight;
+        }
+
+        function drawProcessCanvas() {
+            if (!ctx) return;
+            const w = processCanvas.width;
+            const h = processCanvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw Background Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < w; x += 20) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+            }
+            for (let y = 0; y < h; y += 20) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+            }
+
+            // Render Tank Diagram
+            const tankX = w * 0.35;
+            const tankY = h * 0.2;
+            const tankW = w * 0.3;
+            const tankH = h * 0.55;
+
+            // Fluid Level
+            const levelPct = plcState.analogInputs[0].val / 100.0;
+            const fluidH = tankH * levelPct;
+
+            // Draw Fluid
+            ctx.fillStyle = 'rgba(14, 165, 233, 0.6)';
+            ctx.fillRect(tankX + 4, tankY + tankH - fluidH, tankW - 8, fluidH);
+
+            // Draw Tank Outline
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(tankX, tankY, tankW, tankH);
+
+            // Tank Level % Label
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px JetBrains Mono';
+            ctx.fillText(`Level: ${plcState.analogInputs[0].val.toFixed(1)}%`, tankX + 10, tankY + 25);
+            ctx.fillText(`Temp: ${plcState.analogInputs[1].val.toFixed(1)}°C`, tankX + 10, tankY + 45);
+
+            // Draw Inlet Pipe & Pump (Top Left)
+            const fillPumpOn = plcState.discreteOutputs[1].val;
+            ctx.strokeStyle = fillPumpOn ? '#22c55e' : '#475569';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(tankX - 60, tankY + 30);
+            ctx.lineTo(tankX, tankY + 30);
+            ctx.stroke();
+
+            // Pump Icon Circle
+            ctx.fillStyle = fillPumpOn ? '#22c55e' : '#334155';
+            ctx.beginPath();
+            ctx.arc(tankX - 40, tankY + 30, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px Inter';
+            ctx.fillText('SOL1', tankX - 52, tankY + 50);
+
+            // Draw Outlet Pipe & Modulating Valve (Bottom Right)
+            const drainVal = plcState.analogOutputs[0].val;
+            ctx.strokeStyle = drainVal > 0 ? '#38bdf8' : '#475569';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(tankX + tankW, tankY + tankH - 20);
+            ctx.lineTo(tankX + tankW + 60, tankY + tankH - 20);
+            ctx.stroke();
+
+            // Draw Agitator Mixer (Lab 4)
+            const mixerOn = plcState.discreteOutputs[5].val;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(tankX + tankW / 2, tankY - 15);
+            ctx.lineTo(tankX + tankW / 2, tankY + tankH - 30);
+            ctx.stroke();
+
+            // Mixer Blades
+            ctx.fillStyle = mixerOn ? '#f59e0b' : '#64748b';
+            ctx.save();
+            ctx.translate(tankX + tankW / 2, tankY + tankH - 30);
+            if (mixerOn) ctx.rotate((Date.now() / 100) % (Math.PI * 2));
+            ctx.fillRect(-20, -4, 40, 8);
+            ctx.restore();
+        }
+
+        function setupScopeCanvas() {
+            scopeCanvas = document.getElementById('scope-canvas');
+            if (!scopeCanvas) return;
+            scopeCtx = scopeCanvas.getContext('2d');
+            scopeCanvas.width = scopeCanvas.parentElement.clientWidth;
+            scopeCanvas.height = 240;
+        }
+
+        function recordScopeData() {
+            if (!scopeHistory.ai0) scopeHistory.ai0 = [];
+            if (!scopeHistory.ao0) scopeHistory.ao0 = [];
+
+            scopeHistory.ai0.push(plcState.analogInputs[0].val);
+            scopeHistory.ao0.push(plcState.analogOutputs[0].val);
+
+            if (scopeHistory.ai0.length > 100) scopeHistory.ai0.shift();
+            if (scopeHistory.ao0.length > 100) scopeHistory.ao0.shift();
+
+            drawScope();
+        }
+
+        function drawScope() {
+            if (!scopeCtx) return;
+            const w = scopeCanvas.width;
+            const h = scopeCanvas.height;
+
+            scopeCtx.clearRect(0, 0, w, h);
+
+            // Scope Grid lines
+            scopeCtx.strokeStyle = '#1e293b';
+            scopeCtx.lineWidth = 1;
+            for (let y = 0; y < h; y += 30) {
+                scopeCtx.beginPath(); scopeCtx.moveTo(0, y); scopeCtx.lineTo(w, y); scopeCtx.stroke();
+            }
+
+            // Draw AI:0 Signal Line (Cyan)
+            drawTrace(scopeHistory.ai0, '#38bdf8');
+            // Draw AO:0 Signal Line (Emerald)
+            drawTrace(scopeHistory.ao0, '#22c55e');
+        }
+
+        function drawTrace(dataArray, color) {
+            if (!dataArray || dataArray.length < 2) return;
+            const w = scopeCanvas.width;
+            const h = scopeCanvas.height;
+            const stepX = w / 100;
+
+            scopeCtx.strokeStyle = color;
+            scopeCtx.lineWidth = 2;
+            scopeCtx.beginPath();
+
+            dataArray.forEach((val, idx) => {
+                const x = idx * stepX;
+                const y = h - (val / 100.0) * (h - 20) - 10;
+                if (idx === 0) scopeCtx.moveTo(x, y);
+                else scopeCtx.lineTo(x, y);
+            });
+
+            scopeCtx.stroke();
+        }
+
+        function clearScopeData() {
+            scopeHistory.ai0 = [];
+            scopeHistory.ao0 = [];
+        }
+
+        function renderMemoryTables() {
+            const inEl = document.getElementById('table-inputs');
+            if (inEl) {
+                inEl.innerHTML = plcState.discreteInputs.map(i => `
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-400">${i.id} (${i.name})</span>
+                        <span class="${i.val ? 'text-emerald-400 font-bold' : 'text-slate-600'}">${i.val ? '1' : '0'}</span>
+                    </div>
+                `).join('');
+            }
+
+            const outEl = document.getElementById('table-outputs');
+            if (outEl) {
+                outEl.innerHTML = plcState.discreteOutputs.map(o => `
+                    <div class="flex justify-between text-[11px]">
+                        <span class="text-slate-400">${o.id} (${o.name})</span>
+                        <span class="${o.val ? 'text-emerald-400 font-bold' : 'text-slate-600'}">${o.val ? '1' : '0'}</span>
+                    </div>
+                `).join('');
+            }
+
+            const tmrEl = document.getElementById('table-timers');
+            if (tmrEl) {
+                tmrEl.innerHTML = `
+                    <div class="text-[11px] text-amber-400">TON_1 ET: ${plcState.timers['TON_1']?.et.toFixed(1) || 0}s / DN: ${plcState.timers['TON_1']?.dn}</div>
+                    <div class="text-[11px] text-purple-400">CTU_1 CV: ${plcState.counters['CTU_1']?.cv || 0} / DN: ${plcState.counters['CTU_1']?.dn}</div>
+                `;
+            }
+        }
+
+        function loadLab(labId) {
+            plcState.activeLab = labId;
+            
+            // Clear current logic
+            plcState.rungs = [];
+
+            if (labId === 1) {
+                // Lab 1: Motor Seal-In Circuit
+                document.getElementById('process-title').innerText = 'Lab 01: Three-Wire Motor Seal-In Circuit';
+                plcState.discreteInputs[0].val = true; // Stop switch NC
+                plcState.discreteInputs[1].val = false; // Start PB
+
+                // Rung 0: (Stop NC AND Start NO) OR Motor Contact -> Motor Coil O:0/0
+                plcState.rungs.push({
+                    instructions: [
+                        { type: 'NC', tag: 'I:0/0', active: true },
+                        { type: 'NO', tag: 'I:0/1', active: false },
+                        { type: 'COIL', tag: 'O:0/0', active: false }
+                    ]
+                });
+            } 
+            else if (labId === 2) {
+                // Lab 2: Automated Level Control
+                document.getElementById('process-title').innerText = 'Lab 02: Tank Fill Automation (Analog Sensor Compare)';
+                plcState.analogInputs[0].val = 15.0; // Tank at 15%
+
+                // Rung 0: If AI:0 < 25% -> Turn ON Solenoid Fill Valve O:0/1
+                plcState.rungs.push({
+                    instructions: [
+                        { type: 'CMP', op: 'LESS', val: 25, tag: 'AI:0 < 25%', active: true },
+                        { type: 'COIL', tag: 'O:0/1', active: true }
+                    ]
+                });
+            }
+            else if (labId === 3) {
+                // Lab 3: Bottle Fill Conveyor Line
+                document.getElementById('process-title').innerText = 'Lab 03: Timed Bottle Fill & Counter Line';
+                
+                // Rung 0: Proximity Switch I:0/2 triggers Timer TON_1 (3 Secs)
+                plcState.rungs.push({
+                    instructions: [
+                        { type: 'NO', tag: 'I:0/2', active: false },
+                        { type: 'TON', tag: 'TON_1', active: false }
+                    ]
+                });
+                // Rung 1: TON_1 Done triggers Bottle Count CTU_1
+                plcState.rungs.push({
+                    instructions: [
+                        { type: 'NO', tag: 'TON_1', active: false },
+                        { type: 'CTU', tag: 'CTU_1', active: false }
+                    ]
+                });
+            }
+            else if (labId === 4) {
+                // Lab 4: Batch Heat & Agitation Loop
+                document.getElementById('process-title').innerText = 'Lab 04: Chemical Batch Reactor Heating Loop';
+                
+                plcState.rungs.push({
+                    instructions: [
+                        { type: 'NO', tag: 'I:0/6', active: true }, // Auto Switch
+                        { type: 'COIL', tag: 'O:0/5', active: true } // Agitator Motor
+                    ]
+                });
+            }
+
+            renderLadder();
+            switchTab('sim');
+        }
+
+        function switchTab(tabId) {
+            ['sim', 'labs', 'scope', 'theory'].forEach(t => {
+                const page = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    page.classList.remove('hidden');
+                    btn.classList.add('bg-slate-800', 'text-white', 'shadow');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    page.classList.add('hidden');
+                    btn.classList.remove('bg-slate-800', 'text-white', 'shadow');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            if (tabId === 'scope') {
+                setTimeout(setupScopeCanvas, 100);
+            }
+            if (tabId === 'sim') {
+                setTimeout(resizeProcessCanvas, 100);
+            }
+        }
+
+        function switchIOTab(ioType) {
+            const discPanel = document.getElementById('io-panel-discrete');
+            const anaPanel = document.getElementById('io-panel-analog');
+            const discBtn = document.getElementById('io-tab-discrete');
+            const anaBtn = document.getElementById('io-tab-analog');
+
+            if (ioType === 'discrete') {
+                discPanel.classList.remove('hidden');
+                anaPanel.classList.add('hidden');
+                discBtn.className = 'flex-1 py-2 text-center text-cyan-400 border-b-2 border-cyan-500 bg-slate-900';
+                anaBtn.className = 'flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-white';
+            } else {
+                discPanel.classList.add('hidden');
+                anaPanel.classList.remove('hidden');
+                anaBtn.className = 'flex-1 py-2 text-center text-cyan-400 border-b-2 border-cyan-500 bg-slate-900';
+                discBtn.className = 'flex-1 py-2 text-center text-slate-400 border-b-2 border-transparent hover:text-white';
+            }
+        }
+
+        function toggleRun(runState) {
+            plcState.isRunning = runState;
+            const statusPulse = document.getElementById('status-pulse');
+            const statusText = document.getElementById('status-text');
+
+            if (runState) {
+                statusPulse.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse';
+                statusText.innerText = 'EXECUTING';
+                statusText.className = 'text-xs font-mono font-semibold text-emerald-400';
+            } else {
+                statusPulse.className = 'w-2.5 h-2.5 rounded-full bg-red-500';
+                statusText.innerText = 'STOPPED';
+                statusText.className = 'text-xs font-mono font-semibold text-red-400';
+            }
+        }
+
+        function singleStep() {
+            toggleRun(false);
+            executePLCScanCycle();
+        }
+
+        function updateScanRateLabel(val) {
+            plcState.scanRateMs = parseInt(val);
+            document.getElementById('scan-rate-val').innerText = `${val} ms`;
+            startSimLoop();
+        }
+
+        function addRung() {
+            plcState.rungs.push({
+                instructions: [
+                    { type: 'NO', tag: 'I:0/1', active: false },
+                    { type: 'COIL', tag: 'O:0/0', active: false }
+                ]
+            });
+            renderLadder();
+        }
+
+        function deleteRung(idx) {
+            plcState.rungs.splice(idx, 1);
+            renderLadder();
+        }
+
+        function insertInstruction(type) {
+            if (plcState.rungs.length === 0) addRung();
+            const targetRung = plcState.rungs[plcState.rungs.length - 1];
+
+            if (type === 'NO') targetRung.instructions.unshift({ type: 'NO', tag: 'I:0/1', active: false });
+            if (type === 'NC') targetRung.instructions.unshift({ type: 'NC', tag: 'I:0/0', active: true });
+            if (type === 'COIL') targetRung.instructions.push({ type: 'COIL', tag: 'O:0/0', active: false });
+            if (type === 'TON') targetRung.instructions.unshift({ type: 'TON', tag: 'TON_1', active: false });
+            if (type === 'CTU') targetRung.instructions.unshift({ type: 'CTU', tag: 'CTU_1', active: false });
+            if (type === 'CMP') targetRung.instructions.unshift({ type: 'CMP', op: 'LESS', val: 50, tag: 'AI:0 < 50%', active: false });
+
+            renderLadder();
+        }
+
+        function removeInstruction(rungIdx, instIdx) {
+            plcState.rungs[rungIdx].instructions.splice(instIdx, 1);
+            renderLadder();
+        }
+
+        function clearLadder() {
+            plcState.rungs = [];
+            renderLadder();
+        }
+    </script>
+</body>
+</html>
