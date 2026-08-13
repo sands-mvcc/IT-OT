@@ -3,19 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACT-03 Electric Servo Motor & Ball Screw Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>ACT-04 Electro-Pneumatic Cylinder & 5/2 Valve Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
 :root{
   --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
   --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
   --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --press-high: #E24A3B; --press-mid: #E39B57; --press-low: #3B82F6; --press-exhaust: #8FB2C2;
 }
 :root[data-theme="dark"]{
   --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
   --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
   --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --press-high: #FF5A48; --press-mid: #F5A623; --press-low: #60A5FA; --press-exhaust: #475569;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -32,17 +35,18 @@ body{
 h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
 .mono{font-family:'IBM Plex Mono', monospace;}
 a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.wrap{max-width:1240px; margin:0 auto; padding:24px 20px 60px;}
+
 .topbar{
   display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
+  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:12px;
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
   color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
 }
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+h1.title{font-size:clamp(24px,3.4vw,38px); line-height:1.08;}
+.sub{color:var(--ink-soft); max-width:720px; margin-top:8px; font-size:14px; line-height:1.5;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
@@ -59,63 +63,88 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
+.simlayout{display:grid; grid-template-columns:1.45fr 1fr; gap:20px; margin-top:16px;}
+@media (max-width:960px){.simlayout{grid-template-columns:1fr;}}
 
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
 .stage{
   background:var(--card); border:1.5px solid var(--border); border-radius:5px;
   padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:12px;
 }
 .stage .stagelabel{
   font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+  color:var(--ink-soft); display:flex; justify-content:space-between; align-items:center;
 }
-.stage svg{width:100%; height:auto; display:block;}
+.stage svg{width:100%; height:auto; display:block; border-radius:4px; background:rgba(0,0,0,0.02);}
+
 .panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+.panel h2{font-size:15px; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0 0 12px;}
+
+.tabrow{display:flex; gap:6px; margin-bottom:14px; border-bottom:1.5px solid var(--border); padding-bottom:8px;}
+.tabbtn{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; padding:6px 12px;
+  background:transparent; border:1px solid var(--border); color:var(--ink-soft); border-radius:3px;
+  cursor:pointer; text-transform:uppercase; transition:all 0.15s ease;
+}
+.tabbtn.active{background:var(--ink); color:var(--bg); border-color:var(--ink);}
+.tabcontent{display:none;}
+.tabcontent.active{display:block;}
+
+.controlrow{display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
 button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:8px 13px;
+  border-radius:3px; cursor:pointer; transition:all 0.15s ease; display:inline-flex; align-items:center; gap:6px;
 }
 button.ctl:hover{background:var(--accent);}
 button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
 button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
+button.ctl.danger{background:var(--danger); color:#FFF;}
+button.ctl.active-mode{background:var(--accent2); color:#0B1A17;}
+
+.sliderrow{display:flex; flex-direction:column; gap:4px; margin-bottom:12px;}
+.sliderheader{display:flex; justify-content:space-between; align-items:center;}
+.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft);}
+.sliderval{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; color:var(--ink);}
+input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
+
 .specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
 .specs li span:last-child{color:var(--ink); font-weight:600;}
+
 .stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.stepsbox ol{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
   text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
   margin-bottom:10px; font-weight:700;
 }
 
+.graph-container{
+  background:var(--card); border:1px solid var(--border); border-radius:4px; padding:10px;
+  margin-top:8px; position:relative;
+}
+.graph-title{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; margin-bottom:6px; display:flex; justify-content:space-between;}
+canvas.telemetry{width:100%; height:110px; display:block; background:rgba(0,0,0,0.03); border-radius:3px;}
+
+.alertbox{
+  padding:8px 12px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+  margin-top:10px; display:flex; align-items:center; gap:8px; border:1px solid var(--border);
+  background:rgba(46,110,98,0.08); color:var(--accent2);
+}
+.alertbox.warn{background:rgba(181,101,29,0.1); color:var(--accent); border-color:var(--accent);}
+.alertbox.danger{background:rgba(155,59,47,0.1); color:var(--danger); border-color:var(--danger);}
 
 .lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
+.lbl.small{font-size:9.5px;}
+.lbl.bold{font-weight:600; fill:var(--ink);}
 .lbl.mono-big{font-size:13px; fill:var(--accent2); font-weight:600;}
-@keyframes servoSpin{to{transform:rotate(360deg);}}
-@keyframes ballNut{0%,100%{transform:translateX(0);}50%{transform:translateX(360px);}}
-[data-anim="servoSpin"]{animation-name:servoSpin; animation-timing-function:linear;}
-[data-anim="ballNut"]{animation-name:ballNut;}
 
+.pagefoot{
+  margin-top:24px; padding-top:14px; border-top:1px solid var(--border);
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-align:center;
+}
 </style>
 </head>
 <body>
@@ -123,72 +152,359 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-03 &middot; LINEAR MOTION</div>
-      <h1 class="title">Electric Servo Motor & Ball Screw</h1>
-      <p class="sub">A high-precision electromechanical linear actuator: a closed-loop servo motor coupled to a precision ball screw shaft with a recirculating ball nut.</p>
+      <div class="eyebrow">ACT-04 &middot; FLUID POWER & PNEUMATICS</div>
+      <h1 class="title">Electro-Pneumatic Cylinder & 5/2 Valve</h1>
+      <p class="sub">High-fidelity mechanical simulation of a double-acting pneumatic cylinder driven by a 5/2 solenoid directional control valve with meter-out speed regulation and pneumatic cushion damping.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
+
   <div class="simlayout">
     <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<circle cx="60" cy="140" r="34" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
-<circle class="moving" data-anim="servoSpin" cx="60" cy="140" r="24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>
-<line class="moving" data-anim="servoSpin" x1="60" y1="140" x2="60" y2="118" stroke="var(--ink)" stroke-width="2.5"/>
-<text x="18" y="188" class="lbl small">SERVO MOTOR</text>
-<line x1="94" y1="140" x2="560" y2="140" stroke="var(--ink-soft)" stroke-width="3"/>
-<g stroke="var(--border)" stroke-width="1">
- <line x1="110" y1="130" x2="130" y2="150"/><line x1="130" y1="130" x2="150" y2="150"/><line x1="150" y1="130" x2="170" y2="150"/>
- <line x1="170" y1="130" x2="190" y2="150"/><line x1="190" y1="130" x2="210" y2="150"/><line x1="210" y1="130" x2="230" y2="150"/>
- <line x1="230" y1="130" x2="250" y2="150"/><line x1="250" y1="130" x2="270" y2="150"/><line x1="270" y1="130" x2="290" y2="150"/>
- <line x1="290" y1="130" x2="310" y2="150"/><line x1="310" y1="130" x2="330" y2="150"/><line x1="330" y1="130" x2="350" y2="150"/>
- <line x1="350" y1="130" x2="370" y2="150"/><line x1="370" y1="130" x2="390" y2="150"/><line x1="390" y1="130" x2="410" y2="150"/>
- <line x1="410" y1="130" x2="430" y2="150"/><line x1="430" y1="130" x2="450" y2="150"/><line x1="450" y1="130" x2="470" y2="150"/>
- <line x1="470" y1="130" x2="490" y2="150"/><line x1="490" y1="130" x2="510" y2="150"/>
-</g>
-<g class="moving" data-anim="ballNut">
- <rect x="120" y="118" width="56" height="44" rx="4" fill="var(--accent)"/>
- <rect x="130" y="100" width="36" height="18" fill="var(--ink)"/>
-</g>
-<text id="posReadout" x="430" y="90" class="lbl mono-big">POS: 000.0 mm</text>
-<text x="18" y="60" class="lbl small">ENCODER FEEDBACK &#8594; CONTROLLER</text>
-</svg>
+      <div class="stagelabel">
+        <span>Interactive Pneumatic Cutaway & System Schematic</span>
+        <span id="systemStateBadge" class="mono" style="color:var(--accent2); font-weight:700;">READY (RETRACTED)</span>
+      </div>
+
+      <!-- MAIN SVG SYSTEM DIAGRAM -->
+      <svg id="pneuSvg" viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8A9BA8"/>
+            <stop offset="50%" stop-color="#D0D7DE"/>
+            <stop offset="100%" stop-color="#6C7A89"/>
+          </linearGradient>
+          <linearGradient id="rodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#E2E8F0"/>
+            <stop offset="30%" stop-color="#FFFFFF"/>
+            <stop offset="70%" stop-color="#CBD5E1"/>
+            <stop offset="100%" stop-color="#94A3B8"/>
+          </linearGradient>
+          <linearGradient id="brassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#D4AF37"/>
+            <stop offset="50%" stop-color="#FFF2A1"/>
+            <stop offset="100%" stop-color="#AA820A"/>
+          </linearGradient>
+          <pattern id="hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="var(--border)" stroke-width="1.5" />
+          </pattern>
+        </defs>
+
+        <!-- BACKGROUND BASE STRUCTURES -->
+        <rect x="10" y="10" width="700" height="320" rx="6" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+
+        <!-- MAIN CYLINDER BARREL ASSEMBLY (Y: 30 to 140) -->
+        <!-- Cylinder End Cap Rear (Cap End) -->
+        <rect x="50" y="30" width="30" height="90" rx="3" fill="url(#metalGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+        <!-- Cylinder End Cap Front (Rod End) -->
+        <rect x="330" y="30" width="35" height="90" rx="3" fill="url(#metalGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+        <!-- Main Transparent Glass Barrel -->
+        <rect x="80" y="40" width="250" height="70" fill="none" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="80" y="40" width="250" height="70" fill="var(--ink)" fill-opacity="0.03"/>
+
+        <!-- Internal Air Chambers (Dynamic Fill) -->
+        <!-- Cap-End Chamber (A) -->
+        <rect id="chamberA" x="80" y="42" width="10" height="66" fill="var(--press-exhaust)" fill-opacity="0.4"/>
+        <!-- Rod-End Chamber (B) -->
+        <rect id="chamberB" x="90" y="42" width="240" height="66" fill="var(--press-high)" fill-opacity="0.4"/>
+
+        <!-- Cushion Needles & End Pockets Visuals -->
+        <!-- Rear Cushion Pocket -->
+        <rect x="70" y="60" width="10" height="30" fill="none" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="2 2"/>
+        <!-- Front Cushion Pocket -->
+        <rect x="330" y="60" width="10" height="30" fill="none" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="2 2"/>
+
+        <!-- MOVING PISTON & ROD ASSEMBLY -->
+        <g id="pistonAssembly" transform="translate(0, 0)">
+          <!-- Cushion Spears (Deceleration Pins) -->
+          <rect x="66" y="65" width="14" height="20" rx="2" fill="url(#brassGrad)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="110" y="65" width="14" height="20" rx="2" fill="url(#brassGrad)" stroke="var(--ink)" stroke-width="1"/>
+          <!-- Main Piston Head -->
+          <rect x="80" y="42" width="30" height="66" rx="3" fill="url(#metalGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- Piston Wear Rings & Seals -->
+          <rect x="86" y="42" width="5" height="66" fill="var(--ink)"/>
+          <rect x="99" y="42" width="5" height="66" fill="var(--ink)"/>
+          <!-- Internal Magnet (Green band for Reed Switch detection) -->
+          <rect x="92" y="45" width="6" height="60" fill="var(--accent2)"/>
+          <!-- Piston Rod -->
+          <rect x="110" y="62" width="260" height="26" rx="2" fill="url(#rodGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- Rod Clevis / Front Attachment Mount -->
+          <rect x="365" y="58" width="22" height="34" rx="3" fill="url(#metalGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle cx="376" cy="75" r="5" fill="var(--bg)" stroke="var(--ink)" stroke-width="1.5"/>
+
+          <!-- EXTERNAL LOAD MASS -->
+          <g id="loadGroup" transform="translate(387, 35)">
+            <rect x="0" y="0" width="60" height="75" rx="4" fill="var(--accent)" stroke="var(--ink)" stroke-width="2"/>
+            <text x="30" y="40" class="lbl bold" text-anchor="middle" fill="#FFF">LOAD</text>
+            <text id="loadMassText" x="30" y="56" class="lbl small" text-anchor="middle" fill="#FFF">10 kg</text>
+            <!-- Guide Linear Rail Wheels -->
+            <circle cx="10" cy="80" r="5" fill="var(--ink)"/>
+            <circle cx="50" cy="80" r="5" fill="var(--ink)"/>
+          </g>
+        </g>
+
+        <!-- Base Guide Rail for Load -->
+        <line x1="380" y1="120" x2="680" y2="120" stroke="var(--ink)" stroke-width="3"/>
+        <line x1="380" y1="123" x2="680" y2="123" stroke="var(--ink-soft)" stroke-width="1"/>
+
+        <!-- MAGNETIC REED SWITCH POSITION SENSORS -->
+        <g id="sensor1Group" transform="translate(82, 18)">
+          <rect x="0" y="0" width="24" height="10" rx="2" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle id="s1Led" cx="6" cy="5" r="2.5" fill="#475569"/>
+          <text x="12" y="8" class="lbl small bold">S1</text>
+        </g>
+        <g id="sensor2Group" transform="translate(302, 18)">
+          <rect x="0" y="0" width="24" height="10" rx="2" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle id="s2Led" cx="6" cy="5" r="2.5" fill="#475569"/>
+          <text x="12" y="8" class="lbl small bold">S2</text>
+        </g>
+
+        <!-- SPEED CONTROL / METER-OUT THROTTLE VALVES -->
+        <!-- Throttle A (Cap End Line) -->
+        <g transform="translate(100, 150)">
+          <rect x="-18" y="-12" width="36" height="24" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <!-- Throttle Needle Icon -->
+          <path d="M-8,0 L8,0 M0,-8 L0,8" stroke="var(--accent)" stroke-width="2"/>
+          <path d="M-6,6 L6,-6" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <!-- One-way Check Valve parallel line -->
+          <text x="0" y="24" class="lbl small" text-anchor="middle">FC1 (Meter-Out)</text>
+        </g>
+        <!-- Throttle B (Rod End Line) -->
+        <g transform="translate(310, 150)">
+          <rect x="-18" y="-12" width="36" height="24" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M-8,0 L8,0 M0,-8 L0,8" stroke="var(--accent)" stroke-width="2"/>
+          <path d="M-6,6 L6,-6" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="0" y="24" class="lbl small" text-anchor="middle">FC2 (Meter-Out)</text>
+        </g>
+
+        <!-- AIR PIPING / CONDUIT LINES -->
+        <!-- Port A Pipe (Cap to Valve) -->
+        <path id="pipeA" d="M 65 120 L 65 150 L 100 150 M 100 150 L 170 150 L 170 230" fill="none" stroke="var(--press-exhaust)" stroke-width="4.5" stroke-linejoin="round"/>
+        <!-- Port B Pipe (Rod to Valve) -->
+        <path id="pipeB" d="M 345 120 L 345 150 L 310 150 M 310 150 L 230 150 L 230 230" fill="none" stroke="var(--press-high)" stroke-width="4.5" stroke-linejoin="round"/>
+        <!-- Main Supply Pipe (Tank to Valve Port P) -->
+        <path id="pipeP" d="M 100 290 L 200 290 L 200 270" fill="none" stroke="var(--press-high)" stroke-width="4.5"/>
+
+        <!-- DUAL CHAMBER PRESSURE GAUGES -->
+        <!-- Gauge A -->
+        <g transform="translate(35, 175)">
+          <circle cx="0" cy="0" r="16" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <line id="gaugeNeedleA" x1="0" y1="0" x2="-8" y2="-8" stroke="var(--danger)" stroke-width="2" stroke-linecap="round"/>
+          <text x="0" y="26" class="lbl small bold" text-anchor="middle">P_A</text>
+          <text id="gaugeTextA" x="0" y="37" class="lbl small" text-anchor="middle">0.0 bar</text>
+        </g>
+        <!-- Gauge B -->
+        <g transform="translate(375, 175)">
+          <circle cx="0" cy="0" r="16" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <line id="gaugeNeedleB" x1="0" y1="0" x2="8" y2="-8" stroke="var(--danger)" stroke-width="2" stroke-linecap="round"/>
+          <text x="0" y="26" class="lbl small bold" text-anchor="middle">P_B</text>
+          <text id="gaugeTextB" x="0" y="37" class="lbl small" text-anchor="middle">6.0 bar</text>
+        </g>
+
+        <!-- 5/2 DIRECTIONAL CONTROL VALVE HOUSING (Y: 220 to 280) -->
+        <g transform="translate(140, 220)">
+          <!-- Valve Body Housing -->
+          <rect x="0" y="0" width="120" height="50" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          
+          <!-- Moving Spool Inner Visual -->
+          <g id="valveSpool" transform="translate(0, 0)">
+            <!-- Position 1 (Left / Extend): P->A, B->EA -->
+            <g id="spoolPos1" opacity="0.3">
+              <!-- Crossover arrow paths -->
+              <path d="M 60 40 L 30 10 M 30 10 L 34 18 M 30 10 L 38 12" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+              <path d="M 90 10 L 90 40 M 90 40 L 86 32 M 90 40 L 94 32" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+            </g>
+            <!-- Position 2 (Right / Retract): P->B, A->EA -->
+            <g id="spoolPos2" opacity="1.0">
+              <path d="M 30 10 L 30 40 M 30 40 L 26 32 M 30 40 L 34 32" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+              <path d="M 60 40 L 90 10 M 90 10 L 82 12 M 90 10 L 86 18" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
+            </g>
+          </g>
+
+          <!-- Solenoid Coils Y1 (Extend) & Y2 (Retract) -->
+          <!-- Solenoid Y1 -->
+          <rect id="solCoilY1" x="-25" y="10" width="25" height="30" rx="2" fill="var(--ink-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="-12" y="29" class="lbl small bold" text-anchor="middle" fill="#FFF">Y1</text>
+          <!-- Solenoid Y2 -->
+          <rect id="solCoilY2" x="120" y="10" width="25" height="30" rx="2" fill="var(--accent2)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="132" y="29" class="lbl small bold" text-anchor="middle" fill="#0B1A17">Y2</text>
+
+          <!-- Port Labels -->
+          <text x="30" y="-4" class="lbl small bold" text-anchor="middle">A</text>
+          <text x="90" y="-4" class="lbl small bold" text-anchor="middle">B</text>
+          <text x="60" y="62" class="lbl small bold" text-anchor="middle">P (Supply)</text>
+          <text x="20" y="62" class="lbl small" text-anchor="middle">EA</text>
+          <text x="100" y="62" class="lbl small" text-anchor="middle">EB</text>
+        </g>
+
+        <!-- COMPRESSED AIR SUPPLY TANK -->
+        <g transform="translate(40, 265)">
+          <rect x="0" y="0" width="60" height="40" rx="10" fill="url(#metalGrad)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="30" y="22" class="lbl small bold" text-anchor="middle">MAIN AIR</text>
+          <text id="supplyPressLabel" x="30" y="33" class="lbl small" text-anchor="middle">6.0 bar</text>
+        </g>
+
+        <!-- LIVE TELEMETRY OVERLAY READOUTS -->
+        <g transform="translate(490, 160)">
+          <rect x="0" y="0" width="210" height="155" rx="4" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+          <text x="12" y="22" class="lbl bold" fill="var(--ink)">DYNAMIC READOUTS</text>
+          
+          <text x="12" y="45" class="lbl small">Stroke Position (x):</text>
+          <text id="readoutPos" x="198" y="45" class="lbl bold mono" text-anchor="end">0.0 mm</text>
+
+          <text x="12" y="65" class="lbl small">Velocity (v):</text>
+          <text id="readoutVel" x="198" y="65" class="lbl bold mono" text-anchor="end">0.00 m/s</text>
+
+          <text x="12" y="85" class="lbl small">Cap Force (F_A):</text>
+          <text id="readoutForceA" x="198" y="85" class="lbl bold mono" text-anchor="end">0 N</text>
+
+          <text x="12" y="105" class="lbl small">Rod Force (F_B):</text>
+          <text id="readoutForceB" x="198" y="105" class="lbl bold mono" text-anchor="end">0 N</text>
+
+          <text x="12" y="125" class="lbl small">Net Drive Force:</text>
+          <text id="readoutForceNet" x="198" y="125" class="lbl bold mono" text-anchor="end" fill="var(--accent2)">0 N</text>
+
+          <text x="12" y="145" class="lbl small">Air Flow (ANR):</text>
+          <text id="readoutFlow" x="198" y="145" class="lbl bold mono" text-anchor="end">0.0 L/min</text>
+        </g>
+      </svg>
+
+      <div class="graph-container">
+        <div class="graph-title">
+          <span>Real-time Telemetry (Position, Pressures & Net Drive Force)</span>
+          <span id="graphLegend"><span style="color:var(--accent2)">■ Pos</span> &nbsp; <span style="color:var(--press-high)">■ P_A</span> &nbsp; <span style="color:var(--press-low)">■ P_B</span></span>
+        </div>
+        <canvas id="telemetryCanvas" class="telemetry"></canvas>
+      </div>
     </div>
+
     <div class="panel">
-      <span class="badge">LINEAR MOTION</span>
-      <h2>Cycle Controls</h2>
-      <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+      <span class="badge">EIGHTH-GEN PNEUMATIC ENGINE</span>
+      
+      <!-- TAB NAVIGATION -->
+      <div class="tabrow">
+        <button class="tabbtn active" onclick="switchTab('tabControls')">Controls & Tuning</button>
+        <button class="tabbtn" onclick="switchTab('tabPhysics')">Physics & Theory</button>
+        <button class="tabbtn" onclick="switchTab('tabSpecs')">Specs & Data</button>
       </div>
-      <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+
+      <!-- TAB 1: CONTROLS & TUNING -->
+      <div id="tabControls" class="tabcontent active">
+        <h2>Solenoid Valve Actuation</h2>
+        <div class="controlrow">
+          <button class="ctl" id="btnExtend" onclick="triggerSolenoid('EXTEND')">Extend (Y1)</button>
+          <button class="ctl" id="btnRetract" onclick="triggerSolenoid('RETRACT')">Retract (Y2)</button>
+          <button class="ctl secondary" id="btnAuto" onclick="toggleAutoCycle()">Auto Cycle</button>
+        </div>
+
+        <h2 style="margin-top:16px;">Pneumatic Tuning Parameters</h2>
+        
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderPressure">Supply Pressure (P_supply)</label>
+            <span class="sliderval" id="valPressure">6.0 bar</span>
+          </div>
+          <input type="range" id="sliderPressure" min="2.0" max="10.0" step="0.5" value="6.0" oninput="updateParams()">
+        </div>
+
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderMass">Payload Mass (m)</label>
+            <span class="sliderval" id="valMass">10.0 kg</span>
+          </div>
+          <input type="range" id="sliderMass" min="1.0" max="50.0" step="1.0" value="10.0" oninput="updateParams()">
+        </div>
+
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderLoadForce">External Load Resistance (F_ext)</label>
+            <span class="sliderval" id="valLoadForce">0 N</span>
+          </div>
+          <input type="range" id="sliderLoadForce" min="-200" max="400" step="10" value="0" oninput="updateParams()">
+        </div>
+
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderThrottleA">Extend Speed Throttle (Meter-Out FC2)</label>
+            <span class="sliderval" id="valThrottleA">40% Open</span>
+          </div>
+          <input type="range" id="sliderThrottleA" min="5" max="100" step="5" value="40" oninput="updateParams()">
+        </div>
+
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderThrottleB">Retract Speed Throttle (Meter-Out FC1)</label>
+            <span class="sliderval" id="valThrottleB">40% Open</span>
+          </div>
+          <input type="range" id="sliderThrottleB" min="5" max="100" step="5" value="40" oninput="updateParams()">
+        </div>
+
+        <div class="sliderrow">
+          <div class="sliderheader">
+            <label for="sliderCushion">End Cushion Damping Resistance</label>
+            <span class="sliderval" id="valCushion">Medium (70%)</span>
+          </div>
+          <input type="range" id="sliderCushion" min="0" max="100" step="10" value="70" oninput="updateParams()">
+        </div>
+
+        <div id="statusAlert" class="alertbox">
+          <span id="alertIcon">&#9432;</span>
+          <span id="alertText">System nominal. Meter-out flow control providing smooth motion.</span>
+        </div>
       </div>
-      <h2>Typical Purposes</h2>
-      <p>CNC axes, robotic positioning, precision electronic assembly, automated inspection stages.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>The servo motor rotates a threaded screw shaft on command from the controller.</li>
-<li>Recirculating steel balls in the nut ride the helical grooves, converting rotation into linear travel.</li>
-<li>An optical encoder feeds real-time position back to the controller for closed-loop accuracy.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Electricity</span></li>
-<li><span>Force output</span><span>Medium to high</span></li>
-<li><span>Speed</span><span>Medium</span></li>
-<li><span>Precision</span><span>High</span></li></ul>
+
+      <!-- TAB 2: PHYSICS & THEORY -->
+      <div id="tabPhysics" class="tabcontent">
+        <h2>Operating Principles</h2>
+        <p>Pneumatic cylinders convert potential energy of compressed gas into mechanical linear force. Gas compressibility creates unique dynamic stiffness and velocity behavior.</p>
+        
+        <h2>Key Instructional Concepts</h2>
+        <div class="stepsbox">
+          <ol>
+            <li><strong>Meter-Out Speed Control:</strong> Throttling exhaust air (rather than inlet air) creates an opposing back-pressure cushion that prevents lunging, stick-slip, and erratic motion under varying loads.</li>
+            <li><strong>Differential Force Output:</strong> Due to rod area reduction ($A_{rod} < A_{cap}$), extension force is higher than retraction force at identical supply pressure ($F_{ext} = P \cdot A_{cap}$, $F_{ret} = P \cdot A_{rod}$).</li>
+            <li><strong>End-Position Cushioning:</strong> Trapping a volume of air in a small cushion pocket near end-of-stroke forces exhaust through a needle valve, absorbing kinetic energy smoothly ($E_k = \frac{1}{2}m v^2$).</li>
+          </ol>
+        </div>
+
+        <h2 style="margin-top:14px;">Governing Equations</h2>
+        <ul class="specs">
+          <li><span>Cap Area (A_cap)</span><span>π/4 · D² = 8.04 cm²</span></li>
+          <li><span>Rod Area (A_rod)</span><span>π/4 · (D² - d²) = 6.91 cm²</span></li>
+          <li><span>Net Drive Force</span><span>P_A A_cap - P_B A_rod - F_fric</span></li>
+          <li><span>Air Mass Flow</span><span>ṁ = C · P_in · ρ_0 · √(T_0/T)</span></li>
+        </ul>
+      </div>
+
+      <!-- TAB 3: SPECS & DATA -->
+      <div id="tabSpecs" class="tabcontent">
+        <h2>Actuator Specifications</h2>
+        <ul class="specs">
+          <li><span>Cylinder Bore (D)</span><span>32 mm</span></li>
+          <li><span>Piston Rod Diameter (d)</span><span>12 mm</span></li>
+          <li><span>Standard Stroke (S)</span><span>200 mm</span></li>
+          <li><span>Fluid Medium</span><span>Filtered Compressed Air</span></li>
+          <li><span>Cushioning Length</span><span>18 mm (Both Ends)</span></li>
+          <li><span>Valve Type</span><span>5/2 Solenoid / Spring Return</span></li>
+          <li><span>Max Operating Pressure</span><span>10.0 bar (1.0 MPa)</span></li>
+          <li><span>Theoretical Max Force (6 bar)</span><span>482 N (Extend) / 414 N (Retract)</span></li>
+        </ul>
+      </div>
     </div>
   </div>
-  <footer class="pagefoot">ACT-03 &middot; Electric Servo Motor & Ball Screw &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
+  <footer class="pagefoot">ACT-04 &middot; Industrial Electro-Pneumatic Cylinder Simulator &middot; Fluid Power Engineering Reference</footer>
+</div>
+
+<script>
+// Core theme toggle function
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
@@ -197,49 +513,400 @@ function toggleTheme(){
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 }
+
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
-
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
+function switchTab(tabId){
+  var tabs = document.querySelectorAll('.tabcontent');
+  var btns = document.querySelectorAll('.tabbtn');
+  tabs.forEach(t => t.classList.remove('active'));
+  btns.forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+// Physical Constants & System Parameters
+const ATM_PRESS = 1.0; // bar absolute = 101.325 kPa
+const BORE_DIA = 0.032; // 32 mm bore
+const ROD_DIA = 0.012; // 12 mm rod
+const STROKE_LENGTH = 0.200; // 200 mm stroke
+const CUSHION_LENGTH = 0.018; // 18 mm cushion zone
 
-(function(){
- var el = document.getElementById('posReadout');
- if(!el) return;
- var t0 = performance.now();
- function tick(){
-   var dur = parseFloat(getComputedStyle(document.querySelector('.stage')).getPropertyValue('--dur')) || 2.4;
-   var el2 = document.querySelector('.stage.paused');
-   if(!el2){
-     var t = (performance.now()-t0)/1000 % dur;
-     var frac = t/dur;
-     var pos = frac<0.5 ? frac*2*90 : (1-frac)*2*90;
-     el.textContent = 'POS: '+pos.toFixed(1)+' mm';
-   }
-   requestAnimationFrame(tick);
- }
- requestAnimationFrame(tick);
-})();
+const AREA_CAP = (Math.PI / 4) * Math.pow(BORE_DIA, 2); // m^2 (~8.04e-4)
+const AREA_ROD = (Math.PI / 4) * (Math.pow(BORE_DIA, 2) - Math.pow(ROD_DIA, 2)); // m^2 (~6.91e-4)
 
+// State Variables (SI Units)
+let state = {
+  x: 0.0,            // Position (0.0 to 0.200 m)
+  v: 0.0,            // Velocity (m/s)
+  a: 0.0,            // Acceleration (m/s^2)
+  pA: 1.0,           // Pressure Cap End (bar abs)
+  pB: 7.0,           // Pressure Rod End (bar abs)
+  solenoid: 'RETRACT', // 'EXTEND' (Y1) or 'RETRACT' (Y2)
+  autoCycle: false
+};
+
+// User Editable Parameters
+let params = {
+  pSupply: 6.0,      // bar gauge (so abs = 7.0)
+  mass: 10.0,        // kg
+  fLoad: 0.0,        // N
+  throttleA: 0.40,   // Extend throttle ratio (0.05 - 1.0)
+  throttleB: 0.40,   // Retract throttle ratio (0.05 - 1.0)
+  cushionDamp: 0.70  // Cushion needle resistance
+};
+
+function updateParams(){
+  params.pSupply = parseFloat(document.getElementById('sliderPressure').value);
+  params.mass = parseFloat(document.getElementById('sliderMass').value);
+  params.fLoad = parseFloat(document.getElementById('sliderLoadForce').value);
+  params.throttleA = parseFloat(document.getElementById('sliderThrottleA').value) / 100;
+  params.throttleB = parseFloat(document.getElementById('sliderThrottleB').value) / 100;
+  params.cushionDamp = parseFloat(document.getElementById('sliderCushion').value) / 100;
+
+  // Update slider labels
+  document.getElementById('valPressure').textContent = params.pSupply.toFixed(1) + ' bar';
+  document.getElementById('valMass').textContent = params.mass.toFixed(1) + ' kg';
+  document.getElementById('valLoadForce').textContent = params.fLoad.toFixed(0) + ' N';
+  document.getElementById('valThrottleA').textContent = Math.round(params.throttleA * 100) + '% Open';
+  document.getElementById('valThrottleB').textContent = Math.round(params.throttleB * 100) + '% Open';
+  
+  let cushionText = 'Off';
+  if(params.cushionDamp > 0.8) cushionText = 'Hard (90%)';
+  else if(params.cushionDamp > 0.4) cushionText = 'Medium (70%)';
+  else if(params.cushionDamp > 0) cushionText = 'Soft (30%)';
+  document.getElementById('valCushion').textContent = cushionText;
+
+  document.getElementById('supplyPressLabel').textContent = params.pSupply.toFixed(1) + ' bar';
+  document.getElementById('loadMassText').textContent = params.mass.toFixed(1) + ' kg';
+}
+
+function triggerSolenoid(cmd){
+  state.solenoid = cmd;
+  var btnE = document.getElementById('btnExtend');
+  var btnR = document.getElementById('btnRetract');
+  if(cmd === 'EXTEND'){
+    btnE.classList.add('active-mode');
+    btnR.classList.remove('active-mode');
+  } else {
+    btnR.classList.add('active-mode');
+    btnE.classList.remove('active-mode');
+  }
+}
+
+function toggleAutoCycle(){
+  state.autoCycle = !state.autoCycle;
+  var btn = document.getElementById('btnAuto');
+  if(state.autoCycle){
+    btn.classList.add('danger');
+    btn.textContent = 'STOP AUTO';
+  } else {
+    btn.classList.remove('danger');
+    btn.textContent = 'AUTO CYCLE';
+  }
+}
+
+// Telemetry history buffer for graphing
+const GRAPH_MAX_SAMPLES = 200;
+let graphData = {
+  pos: new Array(GRAPH_MAX_SAMPLES).fill(0),
+  pA: new Array(GRAPH_MAX_SAMPLES).fill(0),
+  pB: new Array(GRAPH_MAX_SAMPLES).fill(0),
+  force: new Array(GRAPH_MAX_SAMPLES).fill(0)
+};
+
+let lastTime = performance.now();
+
+function physicsTick(now){
+  let dt = (now - lastTime) / 1000.0;
+  lastTime = now;
+  if(dt > 0.05) dt = 0.05; // Prevent giant leap on lag
+
+  // Sub-stepping for numerical stability
+  const steps = 10;
+  const subDt = dt / steps;
+
+  const pSupplyAbs = params.pSupply + ATM_PRESS;
+
+  for(let i = 0; i < steps; i++){
+    // Calculate Chamber Volumes (m^3)
+    let vDead = 5e-6; // 5 cm^3 dead volume
+    let volA = vDead + AREA_CAP * Math.max(0.0001, state.x);
+    let volB = vDead + AREA_ROD * Math.max(0.0001, STROKE_LENGTH - state.x);
+
+    // Pressures drive airflow rate (Chamber pressure charging/discharging dynamics)
+    let rateA = 0;
+    let rateB = 0;
+
+    if(state.solenoid === 'EXTEND'){
+      // Port P connected to Cap (A), Rod (B) connected to Exhaust (EB) through Throttle B (Meter-out)
+      let dpFill = pSupplyAbs - state.pA;
+      rateA = dpFill * 12.0; // Rapid fill into Cap
+
+      let dpExhaust = state.pB - ATM_PRESS;
+      let effThrottleB = params.throttleB;
+      
+      // End Cushioning check on Extension (x > STROKE_LENGTH - CUSHION_LENGTH)
+      if(state.x > STROKE_LENGTH - CUSHION_LENGTH){
+        effThrottleB *= (1.0 - params.cushionDamp * 0.9); // Severely restrict exhaust
+      }
+      rateB = -dpExhaust * 10.0 * effThrottleB;
+    } else {
+      // Port P connected to Rod (B), Cap (A) connected to Exhaust (EA) through Throttle A (Meter-out)
+      let dpFill = pSupplyAbs - state.pB;
+      rateB = dpFill * 12.0; // Rapid fill into Rod
+
+      let dpExhaust = state.pA - ATM_PRESS;
+      let effThrottleA = params.throttleA;
+
+      // End Cushioning check on Retraction (x < CUSHION_LENGTH)
+      if(state.x < CUSHION_LENGTH){
+        effThrottleA *= (1.0 - params.cushionDamp * 0.9);
+      }
+      rateA = -dpExhaust * 10.0 * effThrottleA;
+    }
+
+    // Volume expansion effect on pressure (dp/dt = - gamma * P / V * dV/dt + charging)
+    let dV_dt_A = AREA_CAP * state.v;
+    let dV_dt_B = -AREA_ROD * state.v;
+
+    state.pA += (rateA - (1.4 * state.pA * dV_dt_A / volA)) * subDt;
+    state.pB += (rateB - (1.4 * state.pB * dV_dt_B / volB)) * subDt;
+
+    // Clamp pressures
+    state.pA = Math.max(ATM_PRESS, Math.min(pSupplyAbs + 2.0, state.pA));
+    state.pB = Math.max(ATM_PRESS, Math.min(pSupplyAbs + 2.0, state.pB));
+
+    // Force Calculation (N)
+    // Convert bar to Pa (1 bar = 100,000 Pa)
+    let forceCap = (state.pA - ATM_PRESS) * 100000 * AREA_CAP;
+    let forceRod = (state.pB - ATM_PRESS) * 100000 * AREA_ROD;
+    
+    // Friction (Coulomb + Viscous + Striction)
+    let fViscous = 25.0 * state.v;
+    let fCoulomb = 15.0 * Math.sign(state.v || 0.001);
+    let netDrivingForce = forceCap - forceRod - params.fLoad;
+
+    // Mechanical End-Stops & Collisions
+    let fNet = netDrivingForce - fViscous - fCoulomb;
+
+    if(state.x <= 0.0 && fNet < 0){
+      state.x = 0.0;
+      state.v = 0.0;
+      state.a = 0.0;
+    } else if(state.x >= STROKE_LENGTH && fNet > 0){
+      state.x = STROKE_LENGTH;
+      state.v = 0.0;
+      state.a = 0.0;
+    } else {
+      state.a = fNet / params.mass;
+      state.v += state.a * subDt;
+      state.x += state.v * subDt;
+    }
+  }
+
+  // Auto Reciprocating Cycle logic triggered by Proximity Reed Switches
+  if(state.autoCycle){
+    if(state.x >= STROKE_LENGTH - 0.002 && state.solenoid === 'EXTEND'){
+      triggerSolenoid('RETRACT');
+    } else if(state.x <= 0.002 && state.solenoid === 'RETRACT'){
+      triggerSolenoid('EXTEND');
+    }
+  }
+
+  // Record Telemetry
+  graphData.pos.push(state.x * 1000); // mm
+  graphData.pos.shift();
+  graphData.pA.push(state.pA - ATM_PRESS); // gauge bar
+  graphData.pA.shift();
+  graphData.pB.push(state.pB - ATM_PRESS); // gauge bar
+  graphData.pB.shift();
+  
+  let netF = ((state.pA - ATM_PRESS) * AREA_CAP - (state.pB - ATM_PRESS) * AREA_ROD) * 100000;
+  graphData.force.push(netF);
+  graphData.force.shift();
+
+  // Render Visual Updates
+  updateSVG();
+  renderGraph();
+  updateReadouts(netF);
+
+  requestAnimationFrame(physicsTick);
+}
+
+function updateSVG(){
+  // Piston linear offset in pixels (0 to 200 mm -> 0 to 220 px)
+  let pxOffset = (state.x / STROKE_LENGTH) * 220;
+  let pistonGroup = document.getElementById('pistonAssembly');
+  pistonGroup.setAttribute('transform', `translate(${pxOffset}, 0)`);
+
+  // Chamber widths expansion
+  let chamberA = document.getElementById('chamberA');
+  let chamberB = document.getElementById('chamberB');
+  let widthA = Math.max(2, pxOffset + 10);
+  let widthB = Math.max(2, 240 - pxOffset);
+  chamberA.setAttribute('width', widthA);
+  chamberB.setAttribute('x', 80 + widthA);
+  chamberB.setAttribute('width', widthB);
+
+  // Pressure color dynamic opacity
+  let pressAGauge = state.pA - ATM_PRESS;
+  let pressBGauge = state.pB - ATM_PRESS;
+
+  chamberA.setAttribute('fill-opacity', Math.min(0.85, 0.15 + (pressAGauge / params.pSupply) * 0.7));
+  chamberB.setAttribute('fill-opacity', Math.min(0.85, 0.15 + (pressBGauge / params.pSupply) * 0.7));
+
+  // Pressure Gauges Needle Rotation (-120deg to +120deg)
+  let angleA = -120 + (pressAGauge / 10.0) * 240;
+  let angleB = -120 + (pressBGauge / 10.0) * 240;
+  document.getElementById('gaugeNeedleA').setAttribute('transform', `rotate(${angleA}, 0, 0)`);
+  document.getElementById('gaugeNeedleB').setAttribute('transform', `rotate(${angleB}, 0, 0)`);
+  document.getElementById('gaugeTextA').textContent = pressAGauge.toFixed(1) + ' bar';
+  document.getElementById('gaugeTextB').textContent = pressBGauge.toFixed(1) + ' bar';
+
+  // Magnetic Reed Switch Status LED
+  let s1Led = document.getElementById('s1Led');
+  let s2Led = document.getElementById('s2Led');
+  if(state.x <= 0.005){
+    s1Led.setAttribute('fill', '#2E6E62');
+  } else {
+    s1Led.setAttribute('fill', '#475569');
+  }
+
+  if(state.x >= STROKE_LENGTH - 0.005){
+    s2Led.setAttribute('fill', '#2E6E62');
+  } else {
+    s2Led.setAttribute('fill', '#475569');
+  }
+
+  // Solenoid Spool Position Visual
+  let spoolPos1 = document.getElementById('spoolPos1');
+  let spoolPos2 = document.getElementById('spoolPos2');
+  let solY1 = document.getElementById('solCoilY1');
+  let solY2 = document.getElementById('solCoilY2');
+
+  if(state.solenoid === 'EXTEND'){
+    spoolPos1.setAttribute('opacity', '1.0');
+    spoolPos2.setAttribute('opacity', '0.2');
+    solY1.setAttribute('fill', '#2E6E62');
+    solY2.setAttribute('fill', '#475569');
+  } else {
+    spoolPos1.setAttribute('opacity', '0.2');
+    spoolPos2.setAttribute('opacity', '1.0');
+    solY1.setAttribute('fill', '#475569');
+    solY2.setAttribute('fill', '#2E6E62');
+  }
+
+  // System Badge Text
+  let badge = document.getElementById('systemStateBadge');
+  if(state.x >= STROKE_LENGTH - 0.002){
+    badge.textContent = 'FULLY EXTENDED';
+    badge.style.color = 'var(--accent2)';
+  } else if(state.x <= 0.002){
+    badge.textContent = 'FULLY RETRACTED';
+    badge.style.color = 'var(--accent2)';
+  } else {
+    badge.textContent = state.solenoid === 'EXTEND' ? 'MOVING OUT →' : '← RETRACTING';
+    badge.style.color = 'var(--accent)';
+  }
+}
+
+function renderGraph(){
+  const canvas = document.getElementById('telemetryCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  // High DPI sizing fix
+  const rect = canvas.getBoundingClientRect();
+  if(canvas.width !== rect.width || canvas.height !== rect.height){
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+  }
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Gridlines
+  ctx.strokeStyle = 'rgba(150,150,150,0.15)';
+  ctx.lineWidth = 1;
+  for(let y = 0; y <= H; y += H/4){
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Plot Position (Green)
+  ctx.strokeStyle = '#2E6E62';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for(let i = 0; i < GRAPH_MAX_SAMPLES; i++){
+    let xPx = (i / (GRAPH_MAX_SAMPLES - 1)) * W;
+    let yPx = H - (graphData.pos[i] / 200.0) * (H - 12) - 6;
+    if(i === 0) ctx.moveTo(xPx, yPx); else ctx.lineTo(xPx, yPx);
+  }
+  ctx.stroke();
+
+  // Plot Pressure A (Red/Orange)
+  ctx.strokeStyle = '#E24A3B';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for(let i = 0; i < GRAPH_MAX_SAMPLES; i++){
+    let xPx = (i / (GRAPH_MAX_SAMPLES - 1)) * W;
+    let yPx = H - (graphData.pA[i] / 10.0) * (H - 12) - 6;
+    if(i === 0) ctx.moveTo(xPx, yPx); else ctx.lineTo(xPx, yPx);
+  }
+  ctx.stroke();
+
+  // Plot Pressure B (Blue)
+  ctx.strokeStyle = '#3B82F6';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for(let i = 0; i < GRAPH_MAX_SAMPLES; i++){
+    let xPx = (i / (GRAPH_MAX_SAMPLES - 1)) * W;
+    let yPx = H - (graphData.pB[i] / 10.0) * (H - 12) - 6;
+    if(i === 0) ctx.moveTo(xPx, yPx); else ctx.lineTo(xPx, yPx);
+  }
+  ctx.stroke();
+}
+
+function updateReadouts(netF){
+  document.getElementById('readoutPos').textContent = (state.x * 1000).toFixed(1) + ' mm';
+  document.getElementById('readoutVel').textContent = state.v.toFixed(2) + ' m/s';
+  
+  let forceCapN = (state.pA - ATM_PRESS) * 100000 * AREA_CAP;
+  let forceRodN = (state.pB - ATM_PRESS) * 100000 * AREA_ROD;
+  
+  document.getElementById('readoutForceA').textContent = Math.round(forceCapN) + ' N';
+  document.getElementById('readoutForceB').textContent = Math.round(forceRodN) + ' N';
+  document.getElementById('readoutForceNet').textContent = Math.round(netF) + ' N';
+
+  let estFlow = Math.abs(state.v) * AREA_CAP * 60000; // L/min
+  document.getElementById('readoutFlow').textContent = estFlow.toFixed(1) + ' L/min';
+
+  // Dynamic Status Diagnostic Alerts
+  let alertBox = document.getElementById('statusAlert');
+  let alertText = document.getElementById('alertText');
+
+  if(Math.abs(state.v) < 0.01 && Math.abs(netF) < 40 && state.x > 0.01 && state.x < 0.19){
+    alertBox.className = 'alertbox warn';
+    alertText.textContent = 'WARNING: High load resistance relative to pressure. Risk of pneumatic stall!';
+  } else if(params.cushionDamp < 0.2 && Math.abs(state.v) > 0.8 && (state.x > 0.19 || state.x < 0.01)){
+    alertBox.className = 'alertbox danger';
+    alertText.textContent = 'DANGER: Low end cushioning! High mechanical end-stop impact energy detected.';
+  } else {
+    alertBox.className = 'alertbox';
+    alertText.textContent = 'System nominal. Meter-out flow control providing smooth motion.';
+  }
+}
+
+// Initialize parameters and start physics loop
+window.onload = function(){
+  updateParams();
+  triggerSolenoid('RETRACT');
+  requestAnimationFrame(physicsTick);
+};
 </script>
 </body>
 </html>
