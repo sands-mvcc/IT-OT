@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructor Guide | Teaching Operational Technologies</title>
+<meta name="description" content="Faculty guide to running the Teaching Operational Technologies (OT-101) course site: how the navigation is organized, how to run a lesson end to end, pacing across the five days, safeguards, and a pre-class link audit.">
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #f0f4ff;
+    --border: #d1d9e6;
+    --text: #1a1e2e;
+    --text-muted: #5a6480;
+    --accent: #b45309;
+    --accent2: #92400e;
+    --accent-light: #fdf3e3;
+    --on-accent: #ffffff;
+    --card-hover: #f3f0e8;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+    --header-bg: #1a1e2e;
+    --header-text: #ffffff;
+    --tag-safety: #b45309;
+    --tag-safety-bg: #fdf3e3;
+    --ok: #276221;
+    --ok-bg: #e8f5e9;
+    --bad: #c0392b;
+    --bad-bg: #fdecea;
+    --warn: #92400e;
+    --warn-bg: #fdf3e3;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1c1f2e;
+    --surface2: #252840;
+    --border: #2e3352;
+    --text: #e8ecf4;
+    --text-muted: #8a92b2;
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --accent-light: #2a1c05;
+    --on-accent: #17130a;
+    --card-hover: #232636;
+    --shadow: 0 2px 8px rgba(0,0,0,0.40);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.55);
+    --header-bg: #0a0c14;
+    --header-text: #e8ecf4;
+    --tag-safety: #fbbf24;
+    --tag-safety-bg: #2a1c05;
+    --ok: #a5d6a7;
+    --ok-bg: #0d2010;
+    --bad: #ef9a9a;
+    --bad-bg: #2a1010;
+    --warn: #fbbf24;
+    --warn-bg: #2a1c05;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  p { margin: 0 0 1em; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 300;
+    background: var(--accent); color: var(--on-accent);
+    padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700;
+    text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .topbar-inner { max-width: 1280px; margin: 0 auto; padding: 9px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; }
+  .back-link:hover { color: var(--accent); }
+  .topbar-inst { color: var(--text-muted); text-align: right; }
+
+  /* ---------- Header ---------- */
+  .lesson-header { background: var(--header-bg); color: var(--header-text); padding: 28px 24px 22px; }
+  .header-inner { max-width: 1280px; margin: 0 auto; }
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+  }
+  [data-theme="dark"] .eyebrow { color: var(--accent); }
+  .lesson-header h1 { font-size: 1.9rem; font-weight: 800; margin: 0 0 8px; max-width: 46rem; }
+  .tagline { font-size: 1.02rem; opacity: 0.82; margin: 0 0 18px; max-width: 44rem; }
+  .meta-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; opacity: 0.9; }
+  .meta-item { display: flex; align-items: center; gap: 6px; }
+  .header-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn-header {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: var(--header-text);
+    cursor: pointer; padding: 8px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.22); }
+
+  /* ---------- Section nav ---------- */
+  .section-nav { position: sticky; top: 0; z-index: 90; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); overflow-x: auto; white-space: nowrap; }
+  .section-nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+  .section-nav a { display: inline-block; padding: 12px 14px; font-size: 0.83rem; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .section-nav a:hover { color: var(--accent); }
+  .section-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1280px; margin: 0 auto; padding: 30px 24px 60px; display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  main { min-width: 0; }
+  .sidebar { position: sticky; top: 60px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .card h2, .card h3 { margin-top: 0; }
+  .sidebar-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin: 0 0 12px; }
+
+  .toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; }
+  .toc-list a { color: var(--text); text-decoration: none; display: block; padding: 4px 0; }
+  .toc-list a:hover { color: var(--accent); }
+
+  .progress-bar-track { height: 8px; background: var(--surface2); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease; }
+  .progress-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .lo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .lo-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.83rem; }
+  .lo-check { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; accent-color: var(--accent); cursor: pointer; }
+  .lo-item label { cursor: pointer; }
+  .lo-item.done label { color: var(--text-muted); text-decoration: line-through; }
+
+  .glossary-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.83rem; }
+  .glossary-term { font-weight: 700; color: var(--accent); }
+  .glossary-list a { text-decoration: none; }
+  .glossary-def { color: var(--text-muted); display: block; margin-top: 2px; }
+
+  .prevnext-links { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .prevnext-links a { text-decoration: none; color: var(--text); font-weight: 600; }
+  .prevnext-links a:hover { color: var(--accent); }
+  .prevnext-links .disabled { color: var(--text-muted); font-weight: 400; }
+
+  .part-banner { background: var(--header-bg); color: var(--header-text); padding: 12px 20px; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; margin: 40px 0 18px; }
+  section.module { margin-bottom: 40px; scroll-margin-top: 80px; }
+  section.module:first-of-type { margin-top: 0; }
+  .module-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .module-icon { font-size: 1.3rem; }
+  .module-head h2 { font-size: 1.4rem; margin: 0; }
+  .module-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+  .overview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .lo-display { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lo-display li { padding-left: 26px; position: relative; font-size: 0.95rem; }
+  .lo-display li::before { content: "▸"; color: var(--accent); position: absolute; left: 0; font-weight: 700; }
+
+  .analogy-box { background: var(--accent-light); border-left: 4px solid var(--accent); border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0; }
+  .analogy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent2); display: block; margin-bottom: 6px; }
+  [data-theme="dark"] .analogy-label { color: var(--accent); }
+  .analogy-box p:last-child { margin-bottom: 0; }
+
+  .worked-example { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 20px; margin: 18px 0; }
+  .worked-example-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .worked-example p:last-child { margin-bottom: 0; }
+
+  .safety-flag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; color: var(--tag-safety); background: var(--tag-safety-bg); border: 1px solid var(--tag-safety); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px; }
+  .warn-flag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; color: var(--warn); background: var(--warn-bg); border: 1px solid var(--warn); border-radius: 8px; padding: 4px 10px; letter-spacing: 0.02em; margin-bottom: 14px; }
+
+  dfn { font-style: normal; font-weight: 700; color: var(--text); border-bottom: 1px dotted var(--accent); }
+
+  table.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  table.compare-table caption { text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+  table.compare-table th, table.compare-table td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+  table.compare-table thead th { background: var(--header-bg); color: var(--header-text); font-weight: 700; }
+  table.compare-table tbody tr:hover { background: var(--card-hover); }
+
+  .activity-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin: 18px 0; }
+  .activity-head { background: var(--surface2); padding: 14px 20px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+  .activity-head h3 { margin: 0; font-size: 1.05rem; }
+  .activity-time { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .activity-structure { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent2); background: var(--accent-light); padding: 3px 9px; border-radius: 12px; }
+  [data-theme="dark"] .activity-structure { color: var(--accent); }
+  .activity-body { padding: 20px; }
+  .activity-instructions { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+  .btn { background: var(--accent); color: var(--on-accent); border: none; cursor: pointer; padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.87rem; font-family: inherit; }
+  .btn:hover { background: var(--accent2); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.secondary:hover { background: var(--accent-light); }
+
+  .resource-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .resource-list li { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.88rem; }
+  .resource-list a { font-weight: 700; text-decoration: none; }
+  .resource-list a:hover { text-decoration: underline; }
+
+  .teach-note { border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 16px; margin: 16px 0; font-size: 0.85rem; color: var(--text-muted); }
+  .teach-label { font-weight: 800; color: var(--accent2); display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  [data-theme="dark"] .teach-label { color: var(--accent); }
+
+  .lesson-nav-bottom { display: flex; justify-content: space-between; gap: 16px; margin-top: 46px; flex-wrap: wrap; }
+  .nav-btn { text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 700; color: var(--text); box-shadow: var(--shadow); font-size: 0.88rem; }
+  .nav-btn:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+  .nav-btn.disabled { opacity: 0.5; pointer-events: none; }
+
+  footer { background: var(--header-bg); color: var(--header-text); opacity: 0.85; text-align: center; padding: 22px 24px; font-size: 0.8rem; line-height: 1.6; }
+  footer a { color: var(--accent2); }
+  [data-theme="dark"] footer a { color: var(--accent); }
+
+  /* audit list */
+  .audit-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .audit-item { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 0.87rem; }
+  .audit-status { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 9px; border-radius: 10px; white-space: nowrap; height: fit-content; }
+  .audit-status.broken { background: var(--bad-bg); color: var(--bad); }
+  .audit-status.mismatch { background: var(--warn-bg); color: var(--warn); }
+  .audit-status.ok { background: var(--ok-bg); color: var(--ok); }
+  .audit-item code { background: var(--surface); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
+
+  /* day agenda accordion */
+  .day-acc { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; background: var(--surface); box-shadow: var(--shadow); }
+  .day-acc-btn { width: 100%; text-align: left; background: var(--surface2); border: none; padding: 14px 18px; font-family: inherit; font-size: 0.95rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .day-acc-btn:hover { color: var(--accent); }
+  .day-acc-hours { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px 10px; }
+  .day-acc-chevron { transition: transform 0.2s ease; }
+  .day-acc-btn[aria-expanded="true"] .day-acc-chevron { transform: rotate(90deg); }
+  .day-acc-panel { padding: 4px 18px 16px; display: none; }
+  .day-acc-panel.open { display: block; }
+  .day-acc-panel ul { margin: 8px 0 0; padding-left: 20px; font-size: 0.88rem; }
+  .day-acc-panel li { margin-bottom: 6px; }
+
+  /* misconceptions */
+  .misconception-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 14px; box-shadow: var(--shadow); }
+  .misconception-card .wrong { color: var(--bad); font-weight: 700; }
+  .misconception-card .right { color: var(--ok); font-weight: 700; }
+  .prompt-chip { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 16px; padding: 6px 12px; font-size: 0.83rem; margin: 4px 6px 0 0; }
+
+  /* FAQ */
+  .faq-item { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; background: var(--surface); overflow: hidden; }
+  .faq-q { width: 100%; text-align: left; background: none; border: none; padding: 14px 16px; font-family: inherit; font-weight: 700; font-size: 0.92rem; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; gap: 12px; }
+  .faq-q:hover { color: var(--accent); }
+  .faq-a { padding: 0 16px 16px; font-size: 0.88rem; color: var(--text-muted); display: none; }
+  .faq-a.open { display: block; }
+
+  .strand-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; margin: 10px 0 0; }
+  .strand-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  @media print {
+    .topbar, .section-nav, .sidebar, .header-actions, .lesson-nav-bottom, .skip-link { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; max-width: 100%; }
+    body { background: #ffffff; color: #000000; }
+    .lesson-header { background: #ffffff; color: #000000; padding: 10px 0; }
+    .eyebrow, .tagline { color: #333333; }
+    .card, .overview-box, .activity-block, .analogy-box, .worked-example, .misconception-card, .day-acc { box-shadow: none; border: 1px solid #999; }
+    .day-acc-panel { display: block !important; }
+    footer { background: #ffffff; color: #000000; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="back-link">← Course Home</a>
+    <span class="topbar-inst">Moraine Valley Community College · NCyTE · Dr. John L. Sands</span>
+  </div>
+</div>
+
+<header class="lesson-header">
+  <div class="header-inner">
+    <span class="eyebrow">OT-101 · Faculty Resource · Instructor Guide</span>
+    <h1>How to Teach With This Site</h1>
+    <p class="tagline">A facilitator's guide to the Teaching Operational Technologies course site — how the navigation is organized, how to run one lesson end to end, how to pace the five days, and what to check before you stand up in front of a class.</p>
+    <div class="meta-row">
+      <span class="meta-item">📖 Pedagogy</span>
+      <span class="meta-item">⏱ ~25 min read</span>
+      <span class="meta-item">🎯 11 sections</span>
+      <div class="header-actions">
+        <button class="btn-header" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn-header" onclick="window.print()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="section-nav" aria-label="Guide sections">
+  <div class="section-nav-inner" id="sectionNav">
+    <a href="#overview" data-section="overview">Overview</a>
+    <a href="#audit" data-section="audit">Pre-Class Link Audit</a>
+    <a href="#sitemap" data-section="sitemap">Site Map</a>
+    <a href="#anatomy" data-section="anatomy">Lesson Anatomy</a>
+    <a href="#pacing" data-section="pacing">Pacing &amp; Agenda</a>
+    <a href="#safeguards" data-section="safeguards">Safeguards</a>
+    <a href="#labs" data-section="labs">Labs &amp; Simulators</a>
+    <a href="#tools" data-section="tools">Dev Tools</a>
+    <a href="#misconceptions" data-section="misconceptions">Misconceptions</a>
+    <a href="#assessment" data-section="assessment">Assessment</a>
+    <a href="#faq" data-section="faq">FAQ</a>
+  </div>
+</nav>
+
+<div class="layout">
+<main id="main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="overview" class="module">
+    <div class="overview-box">
+      <h2>What This Guide Covers</h2>
+      <p>This page is written for the faculty member who is about to teach — or is designing a section around — the <strong>Teaching Operational Technologies</strong> workshop (OT-101): a 12-lesson, 5-day faculty development course covering the history, technology, protocols, threats, governance, and operations of OT/ICS environments. It assumes you already have subject-matter footing and need to know how <em>this particular site</em> is put together so you can run it smoothly in a room full of instructors or students.</p>
+      <p>Work through it once before your first cohort, then keep the sidebar handy as a quick-reference during prep. The <strong>Pre-Class Link Audit</strong> section below is the single most important thing to check first — it will save you from discovering a broken link live in front of a class.</p>
+      <ul class="lo-display">
+        <li>How the course home page and each lesson page are organized, and what every button and widget on them does</li>
+        <li>The generic anatomy of a lesson — content modules, activity, simulation, quiz — and how to facilitate each part</li>
+        <li>A realistic pacing plan across five days, including where the as-authored schedule runs long</li>
+        <li>How to introduce the Safeguards &amp; Responsible Use policy and when to restate it</li>
+        <li>What the lab, simulator, and AI content-generation tools actually contain today, including where the label doesn't yet match the content</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= PRE-CLASS LINK AUDIT ================= -->
+  <section id="audit" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔍</span>
+      <h2>Pre-Class Link Audit</h2>
+      <span class="module-time">Do this first</span>
+    </div>
+    <span class="warn-flag">⚠ Checked against the live site — some Faculty Resources and Dev Tools links are not yet wired up</span>
+    <p>Every link below was actually followed. A few cards on the course home page point to pages that don't exist yet, and two of the "Lab Activities" cards currently open <em>different</em> content than their description promises (they appear to be shared with the electronics/ELT-102 site). None of this breaks the 12 core lessons, which are complete and consistent — but you should know about it before a student clicks a dead link mid-class.</p>
+    <ul class="audit-list">
+      <li class="audit-item">
+        <span class="audit-status ok">Solid</span>
+        <span><strong>Lessons 1–12</strong> (<code>lesson01.html</code>–<code>lesson12.html</code>) — complete, consistent, and internally linked with correct prev/next navigation.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status broken">Missing</span>
+        <span><strong>Instructor Teaching Guide</strong> card → <code>teaching-guide.html</code> does not exist on the site yet. This page is designed to be saved under that exact filename to fill that gap — see the note in the FAQ.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status broken">Missing</span>
+        <span><strong>Safeguards &amp; Responsible Use — "Read the full policy →"</strong> and the matching Faculty Resources card both point to <code>safeguards.html</code>, which does not exist. Until it's built, use the summary box on the course home page as the full policy text and read it aloud or project it for the acknowledgment step.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status broken">Missing</span>
+        <span><strong>Assessment &amp; Rubric Bank</strong> card → <code>assessments.html</code> does not exist. For now, the per-lesson quiz embedded in each lesson's Review section is your assessment bank — see <a href="#assessment">Assessment</a> below.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status broken">Missing</span>
+        <span><strong>Graphics Generation</strong> and <strong>Content Generation</strong> cards link to <code>gen-graphics.html</code> and <code>gen-content.html</code>, which don't exist under those names. The working files are <code>ot-gen-graphics.html</code> and <code>ot-gen-content.html</code> — bookmark those directly, along with the unlinked bonus tools <code>ot-gen-activities.html</code>, <code>ot-gen-casestudies.html</code>, <code>ot-gen-cheatsheets.html</code>, and <code>ot-gen-examples.html</code>.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status mismatch">Content mismatch</span>
+        <span><strong>Hands-on Lab Exercises</strong> card (<code>labs.html</code>) describes Modbus, network-path, and syslog labs, but currently opens an <strong>Arduino sensor lab page</strong> (gas, flex, pressure, and temperature sensors, servo actuator) built for a different course. Preview it before assigning; it may still work as a supplementary hands-on activity, just not the one described.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status mismatch">Content mismatch</span>
+        <span><strong>OT Simulator Suite</strong> card (<code>simulators.html</code>) describes an ICS process, Modbus, syslog, NTP, and access-matrix simulator, but currently opens a <strong>solid-state electronics simulator library</strong> (op-amps, logic gates, flip-flops, a PLC simulator). The lesson-embedded simulations (air gap erosion, attack path, etc. — see <a href="#anatomy">Lesson Anatomy</a>) are unaffected and are what you should rely on in class.</span>
+      </li>
+      <li class="audit-item">
+        <span class="audit-status ok">Solid</span>
+        <span><strong>Actuators &amp; Mechanisms</strong> card (<code>actuators-mechanisms.html</code>) opens correctly and matches its description.</span>
+      </li>
+    </ul>
+    <div class="teach-note">
+      <span class="teach-label">Practical takeaway</span>
+      Click every card on the course home page yourself, in the room you'll teach in, at least once before the workshop. It takes about ten minutes and it's the difference between a smooth session and improvising in front of a class.
+    </div>
+  </section>
+
+  <!-- ================= SITE MAP ================= -->
+  <section id="sitemap" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🗺️</span>
+      <h2>Site Map &amp; Navigation</h2>
+    </div>
+    <p>The site has one hub page and a consistent template for every content page beneath it.</p>
+
+    <div class="worked-example">
+      <span class="worked-example-label">Course Home (index.html)</span>
+      <p>Opens with the dark header and course badge, then a hero panel with six colored "strand pills" showing how many lessons fall into each strand (Foundations, Protocols, Threats, Frameworks, Identity, Operations). Below that is the full <strong>Safeguards &amp; Responsible Use</strong> summary — this is intentionally the first substantial thing on the page, not buried at the bottom, because it's meant to be read before anything else. Then a 12-lesson card grid organized by day, a Faculty Resources row (teaching guide, safeguards policy, assessment bank), a Lab Activities row, and a Content Development Tools row.</p>
+    </div>
+
+    <div class="worked-example">
+      <span class="worked-example-label">Every lesson page (lesson01.html–lesson12.html)</span>
+      <p>Same template throughout: a slim <strong>topbar</strong> with a "← Course Home" link and your institutional credit line; a dark <strong>header band</strong> with the lesson number, title, one-line tagline, and a meta row (difficulty, duration, objective count) plus the dark/light toggle and print button; a sticky <strong>section-nav</strong> strip of in-page tabs that highlights the section currently in view as a student scrolls; a two-column <strong>layout</strong> with the lesson content on the left and a sticky sidebar on the right; and a footer with the AI-assisted-draft disclosure.</p>
+    </div>
+
+    <table class="compare-table">
+      <caption>Sidebar widgets, present on every lesson page</caption>
+      <thead><tr><th scope="col">Widget</th><th scope="col">What it does</th><th scope="col">How to use it while teaching</th></tr></thead>
+      <tbody>
+        <tr><td><strong>On This Page</strong></td><td>Jump-to-section table of contents</td><td>Point students here at the start of the lesson so they can see the shape of the session before you begin.</td></tr>
+        <tr><td><strong>Objectives Progress</strong></td><td>Checkbox list of the lesson's learning objectives with a live progress bar, saved in the browser via <code>localStorage</code></td><td>Have students check items off as you finish each one — it's a built-in, zero-setup formative signal. Progress is per-device, not shared with you, so it's a self-check, not a gradebook.</td></tr>
+        <tr><td><strong>Key Terms</strong></td><td>A mini glossary of the lesson's vocabulary, each term linked back to where it's defined in the body</td><td>Use it as a two-minute pre-lesson vocabulary preview, or as a review tool before the quiz.</td></tr>
+        <tr><td><strong>Lesson Navigation</strong></td><td>Previous/next lesson links</td><td>Mostly useful for students working ahead or catching up asynchronously; in a live session you'll usually navigate from the course home page instead.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="analogy-box">
+      <span class="analogy-label">Header actions, both pages</span>
+      <p>The 🌙/☀️ toggle and 🖨 print button appear in both the course-home header and every lesson header — but see the <a href="#faq">FAQ</a> for an important quirk: the theme choice does <em>not</em> carry over between the course home page and the lessons, because they're saved under two different keys.</p>
+    </div>
+
+    <p><strong>Color-coded strands</strong> run through the whole site as a wayfinding device — each lesson card and its accent bar are tinted by strand, and the same colors appear in the progress strip on the course home page:</p>
+    <div class="strand-key">
+      <span><span class="dot" style="background:#e65100"></span> Foundations (L1–3)</span>
+      <span><span class="dot" style="background:#1565c0"></span> Protocols (L4–5)</span>
+      <span><span class="dot" style="background:#c0392b"></span> Threats (L6–7)</span>
+      <span><span class="dot" style="background:#6a1b9a"></span> Frameworks &amp; Governance (L8–9)</span>
+      <span><span class="dot" style="background:#00695c"></span> Identity (L10)</span>
+      <span><span class="dot" style="background:#276221"></span> Operations (L11)</span>
+      <span><span class="dot" style="background:#b45309"></span> Capstone (L12)</span>
+    </div>
+  </section>
+
+  <!-- ================= LESSON ANATOMY ================= -->
+  <section id="anatomy" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🧩</span>
+      <h2>Lesson Anatomy — How to Run One End to End</h2>
+    </div>
+    <p>Lessons 1–11 share the same internal shape (Lesson 12, the capstone, swaps the activity/simulation/quiz block for a build-teach-critique structure — see the note at the end of this section). Here's the generic run-of-show and how to facilitate each part.</p>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>1. Lesson Overview</h3><span class="activity-time">≈ 5 min</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">A short framing box at the top of the page states the objectives in plain language. Read these aloud or project them — this is also the list that populates the Objectives Progress checklist in the sidebar, so what you say here is literally what students will check off.</p>
+      </div>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>2. Content Modules (s1, s2, s3…)</h3><span class="activity-time">≈ 2–2.5 hrs</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">The bulk of the lesson: numbered sections with body text, analogy boxes (amber-highlighted, for building intuition), worked examples (neutral gray, for concrete cases), comparison tables, and occasional timelines. Treat these as your lecture script, not slides to be read verbatim — the writing is dense enough to support cold-reading, but it lands better if you paraphrase and pause for questions between subsections rather than at the end of the whole block.</p>
+      </div>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>3. Activity</h3><span class="activity-structure">Individual, then pair-share</span><span class="activity-time">≈ 15–25 min</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">An interactive matching, sorting, or scenario exercise embedded right in the page — dropdowns, buttons, or a short table students fill in, graded instantly with a "Check My Mapping"-style button and a per-row correct/incorrect indicator. Run it as designed: individual work first, then a pair-share to argue out disagreements before anyone hits Check. If you're short on time, the pair-share is the part to compress, not the individual attempt — that's where the thinking happens.</p>
+      </div>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>4. Simulation</h3><span class="activity-time">≈ 10–15 min</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">A small, self-contained model — click a control, watch a meter or readout change, read the explanation that appears. These are deliberately labeled <span class="safety-flag" style="margin:0;">⚠ Simulation only — no live equipment</span> and are safe to demo live from your own machine while narrating out loud, or to hand students the room number/URL and have them click through in pairs. They work best as a discussion trigger — stop after each toggle and ask "why did that number move?" rather than letting students click through silently.</p>
+      </div>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>5. Review &amp; Knowledge Check</h3><span class="activity-time">≈ 15 min</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">A short auto-graded quiz with a "Grade My Quiz" button, per-item feedback, and a total score banner. Use it as an exit ticket: have everyone take it in the last ten minutes, then spend two minutes on whichever item the room got wrong most often — you won't know which one until you ask, since the grading is entirely client-side and nothing is reported back to you.</p>
+      </div>
+    </div>
+
+    <div class="activity-block">
+      <div class="activity-head"><h3>6. Further Reading</h3><span class="activity-time">Take-home</span></div>
+      <div class="activity-body">
+        <p class="activity-instructions">A short curated list of external references. Good as an optional assignment before the next session, not as required pre-reading — the lesson itself doesn't assume students have read it.</p>
+      </div>
+    </div>
+
+    <div class="teach-note">
+      <span class="teach-label">Lesson 12 is different</span>
+      The capstone replaces the activity/simulation/quiz sequence with two extended blocks: a lecture on designing objectives, labs, rubrics, and feedback, followed by a hands-on lab where each participant builds, calibrates, teaches a segment of, and receives peer and instructor critique on their own teachable module. Budget it as a full working session, not a lecture day — plan for participants to be presenting to each other for a meaningful chunk of the four hours.
+    </div>
+  </section>
+
+  <!-- ================= PACING ================= -->
+  <section id="pacing" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🗓️</span>
+      <h2>Pacing &amp; Suggested Agenda</h2>
+    </div>
+    <p>Every lesson page is labeled 4 contact hours, and the site groups all 12 lessons into 5 days. Do the math and the day boundaries aren't even: Day 1 and Day 5 carry three lessons apiece (12 hours), while Days 2–4 carry two apiece (8 hours) — 48 hours of authored content spread unevenly across a "5-day" course. Decide up front which of the three options below fits your calendar, rather than discovering the imbalance on Day 1 morning.</p>
+
+    <table class="compare-table">
+      <caption>Three ways to fit this into a real schedule</caption>
+      <thead><tr><th scope="col">Option</th><th scope="col">What it looks like</th><th scope="col">Best for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A. As-authored</strong></td><td>Run Days 1 and 5 as long days (three 4-hour lessons, ~12 hrs with breaks) and Days 2–4 as standard days (two lessons, ~8 hrs).</td><td>Institutes where the first and last day are already expected to run long (opening logistics absorbed elsewhere, capstone presentations extending the last day anyway).</td></tr>
+        <tr><td><strong>B. Six even days</strong></td><td>Two lessons per day across six days (48 hrs ÷ 6 = 8 hrs/day), moving Lesson 3 to its own half-day slot or pairing it with Lesson 4.</td><td>Workshops that can add a day and want a uniform daily rhythm for participants commuting or juggling other duties.</td></tr>
+        <tr><td><strong>C. Compressed five days</strong></td><td>Trim each lesson to ~3.2 hrs by shortening the activity/simulation facilitation (see the compression notes in <a href="#anatomy">Lesson Anatomy</a>) to fit 40 hrs over 5 standard days.</td><td>Grant-funded institutes locked to a Monday–Friday, 8-hour-a-day structure.</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:22px;"><strong>Day-by-day breakdown</strong> (as authored — click to expand):</p>
+
+    <div id="dayAccordion">
+      <div class="day-acc">
+        <button class="day-acc-btn" aria-expanded="false" data-panel="day1">
+          <span>Day 1 — Foundations</span>
+          <span><span class="day-acc-hours">12 hrs</span> <span class="day-acc-chevron">▸</span></span>
+        </button>
+        <div class="day-acc-panel" id="day1">
+          <ul>
+            <li><strong>Lesson 1</strong> — From Isolated Plants to Converged Networks</li>
+            <li><strong>Lesson 2</strong> — IT/OT Security Principles</li>
+            <li><strong>Lesson 3</strong> — OT Technologies &amp; Field Devices</li>
+          </ul>
+          <div class="teach-note"><span class="teach-label">Facilitation note</span>Read the Safeguards policy aloud before Lesson 1 begins and collect the acknowledgment form (see <a href="#safeguards">Safeguards</a>) — this is the day it needs to happen.</div>
+        </div>
+      </div>
+      <div class="day-acc">
+        <button class="day-acc-btn" aria-expanded="false" data-panel="day2">
+          <span>Day 2 — Protocols &amp; Networks</span>
+          <span><span class="day-acc-hours">8 hrs</span> <span class="day-acc-chevron">▸</span></span>
+        </button>
+        <div class="day-acc-panel" id="day2">
+          <ul>
+            <li><strong>Lesson 4</strong> — IT Protocols Inside OT Networks</li>
+            <li><strong>Lesson 5</strong> — Industrial Communication Protocols</li>
+          </ul>
+          <div class="teach-note"><span class="teach-label">Facilitation note</span>These two are the most technically dense lessons for anyone without a networking background. If your cohort skews non-technical, this is the day to slow down rather than Day 1.</div>
+        </div>
+      </div>
+      <div class="day-acc">
+        <button class="day-acc-btn" aria-expanded="false" data-panel="day3">
+          <span>Day 3 — Threats &amp; Countermeasures</span>
+          <span><span class="day-acc-hours">8 hrs</span> <span class="day-acc-chevron">▸</span></span>
+        </button>
+        <div class="day-acc-panel" id="day3">
+          <ul>
+            <li><strong>Lesson 6</strong> — The OT Threat Landscape</li>
+            <li><strong>Lesson 7</strong> — Vulnerabilities &amp; Countermeasures</li>
+          </ul>
+          <div class="teach-note"><span class="teach-label">Facilitation note</span>Lesson 6 leans on documented incidents as case studies — remind the room these are read for cause/impact/lesson-learned, not as attack procedure, consistent with the Safeguards policy's defensive-scope rule.</div>
+        </div>
+      </div>
+      <div class="day-acc">
+        <button class="day-acc-btn" aria-expanded="false" data-panel="day4">
+          <span>Day 4 — Frameworks &amp; Governance</span>
+          <span><span class="day-acc-hours">8 hrs</span> <span class="day-acc-chevron">▸</span></span>
+        </button>
+        <div class="day-acc-panel" id="day4">
+          <ul>
+            <li><strong>Lesson 8</strong> — Frameworks for OT Security</li>
+            <li><strong>Lesson 9</strong> — Governance, Risk &amp; Compliance for IT/OT</li>
+          </ul>
+          <div class="teach-note"><span class="teach-label">Facilitation note</span>The heaviest lessons for a "why does this matter to me" pushback from technical participants. Anchor both in the compliance deadlines and audit evidence their own institutions already face.</div>
+        </div>
+      </div>
+      <div class="day-acc">
+        <button class="day-acc-btn" aria-expanded="false" data-panel="day5">
+          <span>Day 5 — Operations &amp; Capstone</span>
+          <span><span class="day-acc-hours">12 hrs</span> <span class="day-acc-chevron">▸</span></span>
+        </button>
+        <div class="day-acc-panel" id="day5">
+          <ul>
+            <li><strong>Lesson 10</strong> — Access Control &amp; Identity Management in OT</li>
+            <li><strong>Lesson 11</strong> — Monitoring, Detection &amp; OT Incident Response</li>
+            <li><strong>Lesson 12</strong> — Capstone: Build and Teach Your Own OT Module</li>
+          </ul>
+          <div class="teach-note"><span class="teach-label">Facilitation note</span>The heaviest day and the one most likely to run over. If you're going to cut anything under time pressure, protect the capstone's teach-back block first — cut depth from Lesson 10 or 11 instead, since the capstone is the deliverable participants will actually take home.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SAFEGUARDS ================= -->
+  <section id="safeguards" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🛡️</span>
+      <h2>Introducing Safeguards &amp; Responsible Use</h2>
+    </div>
+    <p>The course home page leads with an eight-point safeguards summary (safety outranks the exercise, simulation/isolated equipment only, air-gapped lab segments, defensive scope, incidents as case studies, protecting real-world data, faculty review of AI-generated content, and accessibility). Remember that the "Read the full policy →" link to <code>safeguards.html</code> is currently broken (see <a href="#audit">Pre-Class Link Audit</a>), so the summary box on the course home page <em>is</em> the policy until that page is built.</p>
+    <div class="teach-note">
+      <span class="teach-label">When to cover it</span>
+      Before Lesson 1's activity, not before Lesson 1's lecture content — students should hear the "why" (OT controls physical processes) before the rules land. Restate the isolation and defensive-scope points specifically before the Day 3 threat-landscape case studies and again before the Day 5 capstone, since that's when students are producing content of their own that needs the same review standard applied to it.
+    </div>
+    <div class="teach-note">
+      <span class="teach-label">Acknowledgment form</span>
+      The policy states every student signs an acceptable-use acknowledgment before the first hands-on lab. Since <code>safeguards.html</code> isn't live yet, print or project the summary box and collect a signature on paper or through your LMS before Lesson 1's activity begins — don't wait for the dedicated page.
+    </div>
+  </section>
+
+  <!-- ================= LABS & SIMULATORS ================= -->
+  <section id="labs" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🔬</span>
+      <h2>Labs, Simulators &amp; What They Actually Contain</h2>
+    </div>
+    <p>Your most reliable hands-on material is <strong>embedded in each lesson</strong> — the Activity and Simulation blocks described in <a href="#anatomy">Lesson Anatomy</a>. Treat the three standalone cards under "Lab Activities" on the course home page as a supplementary layer, and preview each one before you rely on it (details in the <a href="#audit">Pre-Class Link Audit</a> above):</p>
+    <ul class="resource-list">
+      <li><strong>Hands-on Lab Exercises</strong> (<code>labs.html</code>) — currently Arduino sensor labs (gas, flex, pressure, temperature, servo), not the Modbus/network-path/syslog labs described. Usable as a physical-computing supplement if you have the hardware; not a substitute for the OT-specific labs the card promises.</li>
+      <li><strong>OT Simulator Suite</strong> (<code>simulators.html</code>) — currently an electronics simulator library (op-amps, logic gates, flip-flops, a PLC simulator), not the bottle-filling ICS/Modbus/syslog/NTP/access-matrix suite described. The PLC simulator may still be worth a five-minute detour in Lesson 3 if you want to show field-device programming concretely.</li>
+      <li><strong>Actuators &amp; Mechanisms</strong> (<code>actuators-mechanisms.html</code>) — matches its description: valves, motors, drives, and cylinders, with failure-mode framing. Pairs well with Lesson 3's field-device tour.</li>
+    </ul>
+  </section>
+
+  <!-- ================= DEV TOOLS ================= -->
+  <section id="tools" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🛠️</span>
+      <h2>Content Development Tools</h2>
+    </div>
+    <p>These are for you, not your students — AI-assisted drafting tools for building or extending lesson material. The course home page links to <code>gen-graphics.html</code> and <code>gen-content.html</code>, which don't currently exist; use the working files directly instead:</p>
+    <ul class="resource-list">
+      <li><code>ot-gen-graphics.html</code> — Purdue model diagrams, network zone drawings, protocol stack illustrations, concept maps.</li>
+      <li><code>ot-gen-content.html</code> — draft lesson text, quiz questions, and scenario descriptions.</li>
+      <li><code>ot-gen-activities.html</code>, <code>ot-gen-casestudies.html</code>, <code>ot-gen-cheatsheets.html</code>, <code>ot-gen-examples.html</code> — additional generators not yet surfaced as cards on the course home page, but present and usable.</li>
+    </ul>
+    <div class="warn-flag">⚠ Faculty review required</div>
+    <p>Everything these tools produce is a first draft. Fact-check every generated diagram against a real reference before projecting it, and review every generated quiz item or scenario for technical accuracy before it reaches a student — this is one of the eight safeguards, not optional cleanup.</p>
+  </section>
+
+  <!-- ================= MISCONCEPTIONS ================= -->
+  <section id="misconceptions" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">💭</span>
+      <h2>Common Misconceptions &amp; Discussion Prompts</h2>
+    </div>
+    <p>Most participants arrive with IT-security instincts that don't transfer cleanly to OT. These are the assumptions worth surfacing and correcting out loud, mapped to the lesson where the content directly addresses them.</p>
+
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "OT security is just IT security applied to factories." <span class="right">Reality (Lesson 2):</span> OT inverts the CIA triad — availability and safety usually outrank confidentiality, and a 20-year equipment lifecycle breaks the patch-and-replace cadence IT relies on.</p>
+      <div class="prompt-chip">Prompt: "What would you do differently if a system couldn't be rebooted for two years?"</div>
+    </div>
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "An air gap means the network truly has no path to the outside." <span class="right">Reality (Lesson 1):</span> Air gaps erode one reasonable-sounding business request at a time — a vendor's remote support link, a dashboard feed — until the "gap" is a policy, not a physical fact.</p>
+      <div class="prompt-chip">Prompt: "Which of your own institution's systems do you assume are isolated — and when did anyone last verify that?"</div>
+    </div>
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "If it uses TCP/IP, standard IT tools and settings will work fine on it." <span class="right">Reality (Lesson 4):</span> Static addressing and local time sources persist in OT for good reasons; DHCP and default NTP configured like an office LAN can break control-loop timing and device discovery.</p>
+      <div class="prompt-chip">Prompt: "Why might a plant engineer refuse a 'simple' DHCP rollout that IT considers routine?"</div>
+    </div>
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "Legacy protocols without authentication are just outdated and need to be patched." <span class="right">Reality (Lesson 5):</span> Protocols like Modbus and DNP3 were designed for trusted, isolated networks; the fix is architectural (segmentation, monitoring) more often than it is a patch, since many field devices can't be patched at all.</p>
+      <div class="prompt-chip">Prompt: "If you can't add authentication to the protocol, where else can you add it?"</div>
+    </div>
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "Incident response means isolate the affected host first, ask questions later." <span class="right">Reality (Lesson 11):</span> Isolating a host that's actively controlling a physical process may not be a choice the plant can accept — the containment decision has to weigh process safety, not just the security playbook.</p>
+      <div class="prompt-chip">Prompt: "What has to be true before you're allowed to pull the plug on a live control system?"</div>
+    </div>
+    <div class="misconception-card">
+      <p><span class="wrong">Assumption:</span> "One compliance framework should cover this, the way one framework often covers IT." <span class="right">Reality (Lesson 8):</span> IEC 62443, NIST SP 800-82/CSF, and ISO/IEC 27001 overlap but diverge in scope and vocabulary — course design means picking one spine deliberately, not teaching all four in parallel.</p>
+      <div class="prompt-chip">Prompt: "If you had to pick one framework as your course's backbone, which would you choose and why?"</div>
+    </div>
+  </section>
+
+  <!-- ================= ASSESSMENT ================= -->
+  <section id="assessment" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">🧪</span>
+      <h2>Assessment, Today and Later</h2>
+    </div>
+    <p>The course home page advertises a dedicated Assessment &amp; Rubric Bank (<code>assessments.html</code>), which isn't built yet (see <a href="#audit">Pre-Class Link Audit</a>). Until it exists, your assessment tools are:</p>
+    <ul class="resource-list">
+      <li><strong>Per-lesson quizzes</strong> — the auto-graded Review &amp; Knowledge Check at the end of each lesson (Lessons 1–11), five questions each with explanatory feedback. Client-side only, so scores aren't reported to you; use them as a student self-check and exit-ticket discussion trigger, not a recorded grade, unless you screen-capture or otherwise collect the result yourself.</li>
+      <li><strong>The capstone</strong> (Lesson 12) — the closest thing to a summative assessment on the site: each participant produces a teachable module with objectives, one hands-on simulation, an assessment with a rubric, and a written safeguards statement, then teaches a segment and takes peer and instructor critique. Build your own simple rubric for this (objectives clarity, simulation design, rubric quality, safeguards statement, delivery) until a shared one is published.</li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar" aria-label="Guide tools">
+
+  <div class="card">
+    <div class="sidebar-title">On This Page</div>
+    <ul class="toc-list">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#audit">Pre-Class Link Audit</a></li>
+      <li><a href="#sitemap">Site Map &amp; Navigation</a></li>
+      <li><a href="#anatomy">Lesson Anatomy</a></li>
+      <li><a href="#pacing">Pacing &amp; Agenda</a></li>
+      <li><a href="#safeguards">Safeguards</a></li>
+      <li><a href="#labs">Labs &amp; Simulators</a></li>
+      <li><a href="#tools">Dev Tools</a></li>
+      <li><a href="#misconceptions">Misconceptions</a></li>
+      <li><a href="#assessment">Assessment</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Facilitator Readiness Checklist</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 of 7 checked off</div>
+    <ul class="lo-list" id="loList" role="group" aria-label="Readiness checklist">
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo1"><label for="lo1">Clicked every card on the course home page and confirmed which links are live</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo2"><label for="lo2">Bookmarked <code>ot-gen-*.html</code> tools directly (broken card links bypassed)</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo3"><label for="lo3">Chosen a pacing option (A, B, or C) for the 5 days</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo4"><label for="lo4">Printed or projected the Safeguards summary and prepared the acknowledgment form</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo5"><label for="lo5">Previewed <code>labs.html</code> and <code>simulators.html</code> and decided whether to use, skip, or replace them</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo6"><label for="lo6">Reviewed the misconception/discussion prompts for the lessons I'm teaching first</label></li>
+      <li class="lo-item"><input type="checkbox" class="lo-check" id="lo7"><label for="lo7">Decided how the capstone (Lesson 12) will be graded</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="sidebar-title">Quick Links</div>
+    <ul class="glossary-list">
+      <li><a href="index.html"><span class="glossary-term">Course Home</span></a><span class="glossary-def">Full lesson grid, strands, and safeguards summary.</span></li>
+      <li><a href="lesson01.html"><span class="glossary-term">Lesson 1</span></a><span class="glossary-def">Start of Day 1 — Foundations.</span></li>
+      <li><a href="lesson12.html"><span class="glossary-term">Lesson 12</span></a><span class="glossary-def">Capstone — Day 5.</span></li>
+    </ul>
+  </div>
+
+</aside>
+</div>
+
+<div class="layout" style="padding-top:0;">
+  <main style="grid-column:1/-1;">
+  <!-- ================= FAQ ================= -->
+  <section id="faq" class="module">
+    <div class="module-head">
+      <span class="module-icon" aria-hidden="true">❓</span>
+      <h2>Troubleshooting &amp; FAQ</h2>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false">Why did the theme go back to light mode when I clicked to a lesson? <span aria-hidden="true">▾</span></button>
+      <div class="faq-a">The course home page saves your dark/light choice under the key <code>otfac-theme</code>; every lesson page saves it under <code>ot101-theme</code>. They don't read each other's setting, so switching to dark mode on one doesn't carry over to the other. If you're presenting on a projector, set dark mode on whichever page you'll actually be showing — don't assume it followed you from the home page.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false">How do I get a clean printout or PDF of a lesson? <span aria-hidden="true">▾</span></button>
+      <div class="faq-a">Use the 🖨 Print / Save as PDF button in the header, or your browser's own print command. The print stylesheet hides the topbar, section-nav, sidebar, and header buttons automatically, leaving just the lesson content in black-on-white — no manual cleanup needed.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false">Do students need an account or login to use any of this? <span aria-hidden="true">▾</span></button>
+      <div class="faq-a">No. Everything is static HTML with client-side JavaScript — no server, no account, no data leaves the browser. Quiz scores, objective checkmarks, and this guide's readiness checklist all live in that browser's <code>localStorage</code> only, which also means none of it is visible to you as the instructor unless a student tells you or shows you their screen.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false">Should I actually save this file as teaching-guide.html? <span aria-hidden="true">▾</span></button>
+      <div class="faq-a">Yes — that's the filename the course home page's "Instructor Teaching Guide" card already expects (see <a href="#audit">Pre-Class Link Audit</a>). Add this file to the repository under that name and the card on the course home page will resolve correctly with no other changes needed.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false">The sidebar disappeared on my phone/tablet — is that a bug? <span aria-hidden="true">▾</span></button>
+      <div class="faq-a">No — below a 900px viewport width, the two-column layout collapses to a single column and the sidebar content moves below the main content instead of floating alongside it. Everything is still there, just reordered.</div>
+    </div>
+  </section>
+
+  <div class="lesson-nav-bottom">
+    <a class="nav-btn" href="index.html">← Course Home</a>
+    <a class="nav-btn" href="lesson01.html">Start Teaching: Lesson 1 →</a>
+  </div>
+  </main>
+</div>
+
+<footer>
+  Instructor Guide · How to Teach With This Site<br>
+  Teaching Operational Technologies and Cybersecurity for Community College Faculty &nbsp;|&nbsp; Moraine Valley Community College &nbsp;|&nbsp; Department of Engineering &amp; Technology &nbsp;|&nbsp; Instructor: Dr. John L. Sands<br>
+  This is an AI-assisted first draft. Verify every link status and content claim above against the live site before relying on it in class. Educational use only — all activities are simulation-based and defensive in scope.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- THEME ---------------- */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    var btn = document.getElementById('themeBtn');
+    if (btn) {
+      btn.textContent = (theme === 'dark') ? '☀️ Light' : '🌙 Dark';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    try { localStorage.setItem('ot101-theme', theme); } catch (e) { /* storage unavailable */ }
+  }
+  window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  };
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('ot101-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  /* ---------------- SECTION NAV SCROLLSPY ---------------- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#sectionNav a'));
+  var sections = navLinks.map(function (a) {
+    return document.getElementById(a.getAttribute('data-section'));
+  }).filter(Boolean);
+
+  function updateActiveSection() {
+    var scrollPos = window.scrollY + 120;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec.offsetTop <= scrollPos) activeIdx = i;
+    });
+    navLinks.forEach(function (a, i) {
+      a.classList.toggle('active', i === activeIdx);
+    });
+  }
+  window.addEventListener('scroll', updateActiveSection, { passive: true });
+  updateActiveSection();
+
+  /* ---------------- READINESS CHECKLIST ---------------- */
+  var loChecks = Array.prototype.slice.call(document.querySelectorAll('.lo-check'));
+  var progressFill = document.getElementById('progressFill');
+  var progressLabel = document.getElementById('progressLabel');
+  var STORAGE_KEY = 'ot101-guide-readiness';
+
+  function saveState() {
+    var state = {};
+    loChecks.forEach(function (c) { state[c.id] = c.checked; });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable */ }
+  }
+  function loadState() {
+    var state = {};
+    try { state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) { state = {}; }
+    loChecks.forEach(function (c) { c.checked = !!state[c.id]; });
+  }
+  function updateProgress() {
+    var checkedCount = loChecks.filter(function (c) { return c.checked; }).length;
+    var pct = Math.round((checkedCount / loChecks.length) * 100);
+    progressFill.style.width = pct + '%';
+    progressLabel.textContent = checkedCount + ' of ' + loChecks.length + ' checked off';
+    loChecks.forEach(function (c) {
+      c.closest('.lo-item').classList.toggle('done', c.checked);
+      c.setAttribute('aria-checked', c.checked ? 'true' : 'false');
+    });
+    saveState();
+  }
+  loadState();
+  loChecks.forEach(function (c) {
+    c.setAttribute('role', 'checkbox');
+    c.addEventListener('change', updateProgress);
+  });
+  updateProgress();
+
+  /* ---------------- DAY AGENDA ACCORDION ---------------- */
+  var accBtns = Array.prototype.slice.call(document.querySelectorAll('.day-acc-btn'));
+  accBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panel = document.getElementById(btn.getAttribute('data-panel'));
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      panel.classList.toggle('open', !isOpen);
+    });
+  });
+
+  /* ---------------- FAQ ACCORDION ---------------- */
+  var faqBtns = Array.prototype.slice.call(document.querySelectorAll('.faq-q'));
+  faqBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var answer = btn.nextElementSibling;
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      answer.classList.toggle('open', !isOpen);
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
