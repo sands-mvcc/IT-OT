@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACT-02 Hydraulic Cylinder Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
+  --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
+  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+}
+:root[data-theme="dark"]{
+  --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
+  --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
+  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/28px 28px,
+    var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Sans', sans-serif;
+  min-height:100vh;
+  transition:background-color .25s ease, color .25s ease;
+}
+h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
+.mono{font-family:'IBM Plex Mono', monospace;}
+a{color:inherit;}
+.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.topbar{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
+  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
+}
+.eyebrow{
+  font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
+  color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
+}
+h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
+.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+.themebtn{
+  flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
+  background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
+  font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
+  padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
+  box-shadow:2px 2px 0 var(--shadow);
+}
+.themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
+.themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
+.backlink{
+  display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace;
+  font-size:12.5px; text-decoration:none; color:var(--ink-soft); font-weight:600;
+  letter-spacing:.04em; margin-bottom:4px;
+}
+.backlink:hover{color:var(--accent);}
+
+
+.stage{ --dur:2.4s; }
+.stage [data-anim]{
+  animation-duration:var(--dur,2.4s);
+  animation-iteration-count:infinite;
+  animation-timing-function:ease-in-out;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.stage.paused [data-anim]{ animation-play-state:paused; }
+
+.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
+@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
+.stage{
+  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
+  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+}
+.stage .stagelabel{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); margin-bottom:6px;
+}
+.stage svg{width:100%; height:auto; display:block;}
+.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
+.panel h2{font-size:15px; margin-bottom:8px;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
+.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+button.ctl{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
+  border-radius:3px; cursor:pointer;
+}
+button.ctl:hover{background:var(--accent);}
+button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
+button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
+.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
+input[type=range]{width:100%; accent-color:var(--accent);}
+.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li span:last-child{color:var(--ink); font-weight:600;}
+.stepsbox{margin-top:6px;}
+.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.badge{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
+  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
+  margin-bottom:10px; font-weight:700;
+}
+
+
+.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
+.lbl.small{font-size:10px;}
+@keyframes pumpGear{to{transform:rotate(360deg);}}
+@keyframes oilFill{0%,100%{transform:scaleX(1);}50%{transform:scaleX(2.2);}}
+@keyframes hydRod{0%,100%{transform:translateX(0);}50%{transform:translateX(150px);}}
+[data-anim="pumpGear"]{animation-name:pumpGear; animation-timing-function:linear;}
+[data-anim="oilFill"]{animation-name:oilFill;}
+[data-anim="hydRod"]{animation-name:hydRod;}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
+      <div class="eyebrow">ACT-02 &middot; LINEAR MOTION</div>
+      <h1 class="title">Hydraulic Cylinder</h1>
+      <p class="sub">A heavy-duty fluid power actuator that uses pressurized, incompressible hydraulic oil to generate very high linear forces.</p>
+    </div>
+    <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
+  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+</button>
+  </div>
+  <div class="simlayout">
+    <div class="stage" id="stage01">
+      <div class="stagelabel">Live simulation &mdash; not to scale</div>
+      
+<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+<rect x="30" y="150" width="70" height="46" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+<circle class="moving" data-anim="pumpGear" cx="65" cy="173" r="14" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="4 4"/>
+<text x="20" y="210" class="lbl small">HYDRAULIC PUMP</text>
+<path d="M100 173 L150 173" stroke="var(--ink-soft)" stroke-width="4"/>
+<rect x="150" y="90" width="260" height="80" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+<rect class="moving" data-anim="oilFill" x="156" y="98" width="80" height="64" fill="var(--accent)" opacity=".55"/>
+<g class="moving rod" data-anim="hydRod">
+  <rect x="380" y="115" width="14" height="50" fill="var(--accent)"/>
+  <rect x="394" y="118" width="180" height="14" fill="var(--ink-soft)"/>
+  <rect x="574" y="102" width="22" height="46" rx="2" fill="var(--ink)"/>
+</g>
+<text x="230" y="185" class="lbl small">OIL CHAMBER</text>
+<text x="500" y="185" class="lbl small">RAM / LOAD FACE</text>
+</svg>
+    </div>
+    <div class="panel">
+      <span class="badge">LINEAR MOTION</span>
+      <h2>Cycle Controls</h2>
+      <div class="controlrow">
+        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+      </div>
+      <div class="sliderrow">
+        <label for="speedSlider">Cycle Speed</label>
+        <input type="range" id="speedSlider" min="1" max="10" value="6">
+      </div>
+      <h2>Typical Purposes</h2>
+      <p>Stamping presses, forging, injection-molding clamps, heavy lifting, workpiece manipulation.</p>
+      <h2>How It Operates</h2>
+      <div class="stepsbox"><ol><li>A hydraulic pump forces oil into the cylinder barrel at 1,000-5,000+ PSI.</li>
+<li>Pressurized oil acts directly on the piston face, producing linear thrust.</li>
+<li>Control valves modulate fluid direction; returning oil is routed back to the reservoir.</li></ol></div>
+      <h2>Specifications</h2>
+      <ul class="specs"><li><span>Power source</span><span>High-pressure oil</span></li>
+<li><span>Force output</span><span>Very high</span></li>
+<li><span>Speed</span><span>Low to medium</span></li>
+<li><span>Precision</span><span>Low to medium</span></li></ul>
+    </div>
+  </div>
+  <footer class="pagefoot">ACT-02 &middot; Hydraulic Cylinder &middot; Manufacturing Floor Reference</footer>
+</div>
+<script>
+
+(function(){
+  var stored = localStorage.getItem('actuator-theme');
+  if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+function toggleTheme(){
+  var root = document.documentElement;
+  var isDark = root.getAttribute('data-theme') === 'dark';
+  if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('actuator-theme','light'); }
+  else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
+  var btn = document.getElementById('themeLabel');
+  if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('themeLabel');
+  if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+});
+
+
+function initStage(stageSel, defaultDur){
+  var stage = document.querySelector(stageSel);
+  var btn = document.getElementById('playPauseBtn');
+  var slider = document.getElementById('speedSlider');
+  stage.style.setProperty('--dur', defaultDur + 's');
+  var playing = true;
+  btn.addEventListener('click', function(){
+    playing = !playing;
+    stage.classList.toggle('paused', !playing);
+    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
+  });
+  slider.addEventListener('input', function(){
+    var v = (11 - parseFloat(slider.value)) * 0.5;
+    stage.style.setProperty('--dur', v.toFixed(2) + 's');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+
+</script>
+</body>
+</html>
