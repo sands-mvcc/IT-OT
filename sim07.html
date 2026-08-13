@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ACT-07 Mechanical Cam & Follower Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
 :root{
   --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
   --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F; --warning:#D97706; --success:#16A34A;
 }
 :root[data-theme="dark"]{
   --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
   --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --shadow: rgba(0,0,0,0.45); --danger:#E27462; --warning:#F59E0B; --success:#34D399;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -29,26 +30,27 @@ body{
   min-height:100vh;
   transition:background-color .25s ease, color .25s ease;
 }
-h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
+h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
 .mono{font-family:'IBM Plex Mono', monospace;}
 a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.wrap{max-width:1240px; margin:0 auto; padding:24px 20px 60px;}
+
 .topbar{
   display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
+  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:16px;
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
   color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
 }
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+h1.title{font-size:clamp(26px,3.6vw,38px); line-height:1.08;}
+.sub{color:var(--ink-soft); max-width:720px; margin-top:8px; font-size:14px; line-height:1.5;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
   font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
   padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
-  box-shadow:2px 2px 0 var(--shadow);
+  box-shadow:2px 2px 0 var(--shadow); user-select:none;
 }
 .themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
 .themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
@@ -59,68 +61,131 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
+.simlayout{display:grid; grid-template-columns:1.35fr 1fr; gap:20px;}
+@media (max-width:960px){.simlayout{grid-template-columns:1fr;}}
 
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
+.stage-column{display:flex; flex-direction:column; gap:16px;}
 .stage{
-  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
+  background:var(--card); border:1.5px solid var(--border); border-radius:6px;
   padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:10px;
 }
-.stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+.stage-header{
+  display:flex; justify-content:space-between; align-items:center;
+  border-bottom:1px solid var(--border); padding-bottom:8px;
 }
-.stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+.stagelabel{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); font-weight:600;
+}
+.badge{
+  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
+  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
+  font-weight:700;
+}
+
+.canvas-container{
+  position:relative; width:100%; height:410px; background:var(--bg);
+  border:1px solid var(--border); border-radius:4px; overflow:hidden;
+}
+canvas#camCanvas{width:100%; height:100%; display:block;}
+
+.overlay-controls{
+  display:flex; flex-wrap:wrap; gap:8px; margin-top:2px;
+}
+.chip-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+  background:transparent; color:var(--ink-soft); border:1px solid var(--border);
+  padding:5px 10px; border-radius:3px; cursor:pointer; user-select:none;
+  display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;
+}
+.chip-btn.active{
+  background:var(--ink); color:var(--bg); border-color:var(--ink);
+}
+.chip-btn:hover:not(.active){
+  border-color:var(--ink); color:var(--ink);
+}
+
+.graph-card{
+  background:var(--card); border:1.5px solid var(--border); border-radius:6px;
+  padding:14px; box-shadow:3px 3px 0 var(--shadow);
+}
+.graph-tabs{
+  display:flex; gap:6px; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;
+}
+.gtab{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+  padding:5px 10px; border-radius:3px; cursor:pointer; background:transparent;
+  border:1px solid transparent; color:var(--ink-soft);
+}
+.gtab.active{
+  background:var(--accent2); color:#0B1A17; font-weight:700;
+}
+.graph-container{
+  position:relative; width:100%; height:150px; background:var(--bg);
+  border:1px solid var(--border); border-radius:4px;
+}
+canvas#graphCanvas{width:100%; height:100%; display:block;}
+
+.panel{background:var(--card); border:1.5px solid var(--border); border-radius:6px; padding:16px; box-shadow:3px 3px 0 var(--shadow); display:flex; flex-direction:column; gap:16px;}
+.panel h2{font-size:15px; margin-bottom:4px; color:var(--ink); border-bottom:1px solid var(--border); padding-bottom:6px;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0;}
+
+.preset-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
+button.preset-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+  background:var(--bg); color:var(--ink); border:1px solid var(--border);
+  padding:7px 8px; border-radius:3px; cursor:pointer; text-align:left;
+  transition:all 0.15s ease;
+}
+button.preset-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+.controlrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
 button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:8px 12px;
+  border-radius:3px; cursor:pointer; transition:all 0.15s ease;
 }
 button.ctl:hover{background:var(--accent);}
 button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
 button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+
+.input-group{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.sliderrow{display:flex; flex-direction:column; gap:4px;}
+.sliderrow label{
+  display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+  font-size:11px; letter-spacing:.03em; color:var(--ink-soft); font-weight:500;
+}
+.sliderrow label span.val{color:var(--ink); font-weight:600;}
+input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
+select.select-ctl{
+  width:100%; font-family:'IBM Plex Mono',monospace; font-size:12px;
+  padding:6px 8px; background:var(--bg); color:var(--ink); border:1px solid var(--border);
+  border-radius:3px; outline:none;
+}
+
+.telemetry-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  background:var(--bg); padding:10px; border-radius:4px; border:1px solid var(--border);
+}
+.titem{display:flex; flex-direction:column; gap:2px;}
+.titem .tlabel{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-transform:uppercase;}
+.titem .tval{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:var(--ink);}
+
+.alert-banner{
+  padding:8px 10px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+  display:flex; align-items:center; gap:8px; font-weight:600;
+}
+.alert-banner.ok{background:rgba(22,163,74,0.12); color:var(--success); border:1px solid var(--success);}
+.alert-banner.warn{background:rgba(217,119,6,0.12); color:var(--warning); border:1px solid var(--warning);}
+.alert-banner.danger{background:rgba(155,59,47,0.12); color:var(--danger); border:1px solid var(--danger);}
+
+.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:11.5px;}
+.specs li{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
 .specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
-.badge{
-  display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
-  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
-}
 
-
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes camSpin{0%{transform:translate(220px,130px) rotate(0deg);}100%{transform:translate(220px,130px) rotate(360deg);}}
-[data-anim="camSpin"]{animation-name:camSpin; animation-timing-function:linear;}
-@keyframes followerRise{0%,20%{transform:translateY(0);}35%,65%{transform:translateY(-40px);}80%,100%{transform:translateY(0);}}
-[data-anim="followerRise"]{animation-name:followerRise;}
-@keyframes dotTrace{
- 0%{transform:translate(0,0);} 14.2%{transform:translate(20px,0);}
- 21.4%{transform:translate(40px,-60px);} 35.7%{transform:translate(70px,-60px);}
- 50%{transform:translate(90px,0);} 100%{transform:translate(140px,0);}
-}
-[data-anim="dotTrace"]{animation-name:dotTrace;}
-
+.stepsbox ol{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+.pagefoot{margin-top:30px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); border-top:1px solid var(--border); padding-top:16px;}
 </style>
 </head>
 <body>
@@ -128,68 +193,166 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-07 &middot; OSCILLATING MOTION</div>
-      <h1 class="title">Mechanical Cam & Follower</h1>
-      <p class="sub">A profiled rotating member (cam) paired with a contacting link (follower) designed to generate a specific, repeatable motion profile.</p>
+      <div class="eyebrow">ACT-07 &middot; OSCILLATING & TRANSLATING KINEMATICS</div>
+      <h1 class="title">Mechanical Cam & Follower Simulator</h1>
+      <p class="sub">High-precision kinematic simulation of custom cam contours and follower mechanisms. Analyzes motion profiles, contact geometry, pressure angles, and dynamic cam-jump boundaries.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
+
   <div class="simlayout">
-    <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<g class="moving" data-anim="camSpin" transform="translate(220 130)">
- <path d="M0,-55 C30,-55 45,-20 45,0 C45,25 20,45 0,45 C-25,45 -40,15 -35,-15 C-32,-35 -20,-55 0,-55 Z"
-   fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
- <circle r="6" fill="var(--ink)"/>
-</g>
-<text x="150" y="205" class="lbl small">CAM (CONSTANT ROTATION)</text>
-<g class="moving" data-anim="followerRise">
- <rect x="256" y="40" width="14" height="130" fill="var(--ink-soft)"/>
- <circle cx="263" cy="40" r="10" fill="var(--accent)"/>
- <rect x="240" y="10" width="46" height="18" fill="var(--ink)"/>
-</g>
-<text x="380" y="35" class="lbl small">FOLLOWER OUTPUT</text>
-<path d="M420 170 L420 40 M420 170 L580 170" stroke="var(--border)" stroke-width="1.5" fill="none"/>
-<path d="M420 150 L440 150 L460 90 L490 90 L510 150 L560 150" stroke="var(--accent2)" stroke-width="2" fill="none"/>
-<circle class="moving" data-anim="dotTrace" cx="420" cy="150" r="5" fill="var(--accent2)"/>
-<text x="440" y="195" class="lbl small">DISPLACEMENT PROFILE</text>
-</svg>
+    <!-- Left Column: Visual Stage & Kinematic Graphs -->
+    <div class="stage-column">
+      <div class="stage" id="stage01">
+        <div class="stage-header">
+          <div class="stagelabel">Kinematic Assembly View (Exact Physics)</div>
+          <span class="badge">OSCILLATING / TRANSLATING</span>
+        </div>
+        
+        <div class="canvas-container">
+          <canvas id="camCanvas" width="600" height="410"></canvas>
+        </div>
+
+        <div class="overlay-controls">
+          <button class="chip-btn active" id="btnShowPitch" onclick="toggleLayer('pitch')">&#10003; Pitch Curve</button>
+          <button class="chip-btn active" id="btnShowBase" onclick="toggleLayer('base')">&#10003; Base Circle</button>
+          <button class="chip-btn active" id="btnShowVectors" onclick="toggleLayer('vectors')">&#10003; Force / α Vector</button>
+          <button class="chip-btn active" id="btnShowSpring" onclick="toggleLayer('spring')">&#10003; Return Spring</button>
+          <button class="chip-btn" id="btnSlowMo" onclick="toggleSlowMo()">0.25x Slow-Mo</button>
+        </div>
+      </div>
+
+      <!-- Real-time Synchronized Kinematic Profile Graphs -->
+      <div class="graph-card">
+        <div class="graph-tabs">
+          <button class="gtab active" onclick="switchGraph('S')">Displacement S(θ)</button>
+          <button class="gtab" onclick="switchGraph('V')">Velocity V(θ)</button>
+          <button class="gtab" onclick="switchGraph('A')">Acceleration A(θ)</button>
+          <button class="gtab" onclick="switchGraph('PA')">Pressure Angle α(θ)</button>
+        </div>
+        <div class="graph-container">
+          <canvas id="graphCanvas" width="600" height="150"></canvas>
+        </div>
+      </div>
     </div>
+
+    <!-- Right Column: Controls, Diagnostics, & Mechanics Theory -->
     <div class="panel">
-      <span class="badge">OSCILLATING MOTION</span>
+      <!-- Quick Presets -->
+      <h2>Engineering Presets</h2>
+      <div class="preset-grid">
+        <button class="preset-btn" onclick="applyPreset('valve')">🏎️ Engine Valve<br><small style="color:var(--ink-soft)">Cycloidal / High Speed</small></button>
+        <button class="preset-btn" onclick="applyPreset('indexer')">📦 Packaging Feed<br><small style="color:var(--ink-soft)">Dwell-Heavy / 3-4-5 Poly</small></button>
+        <button class="preset-btn" onclick="applyPreset('jam')">⚠️ Pressure Hazard<br><small style="color:var(--ink-soft)">High Offset / Steep Rise</small></button>
+        <button class="preset-btn" onclick="applyPreset('undercut')">⚠️ Undercut Hazard<br><small style="color:var(--ink-soft)">Excessive Roller Radius</small></button>
+      </div>
+
+      <!-- Simulation Playback Controls -->
       <h2>Cycle Controls</h2>
       <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+        <button class="ctl" id="playPauseBtn" onclick="togglePlay()">Pause Cycle</button>
+        <button class="ctl secondary" onclick="stepSim(-5)">&laquo; -5&deg;</button>
+        <button class="ctl secondary" onclick="stepSim(5)">+5&deg; &raquo;</button>
+        <button class="ctl secondary" onclick="resetAngle()">Reset 0&deg;</button>
       </div>
+
+      <!-- Geometry & Kinematic Controls -->
+      <h2>Mechanism Parameters</h2>
+      <div class="input-group">
+        <div class="sliderrow">
+          <label>Follower Type</label>
+          <select class="select-ctl" id="followerTypeSelect" onchange="updateParameters()">
+            <option value="roller">Roller Follower</option>
+            <option value="flat">Flat-Face Follower</option>
+            <option value="knife">Knife-Edge Follower</option>
+          </select>
+        </div>
+        <div class="sliderrow">
+          <label>Motion Law Profile</label>
+          <select class="select-ctl" id="motionLawSelect" onchange="updateParameters()">
+            <option value="cycloidal">Cycloidal (Zero-Jerk)</option>
+            <option value="shm">Simple Harmonic (SHM)</option>
+            <option value="poly345">3-4-5 Polynomial</option>
+            <option value="parabolic">Constant Acceleration</option>
+          </select>
+        </div>
+      </div>
+
       <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+        <label for="speedSlider">Cam Shaft Speed <span class="val" id="valRPM">300 RPM</span></label>
+        <input type="range" id="speedSlider" min="10" max="1200" step="10" value="300" oninput="updateParameters()">
       </div>
-      <h2>Typical Purposes</h2>
-      <p>High-speed packaging, stamping feed mechanisms, engine valve actuation, automated bottling lines.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>The cam rotates at a constant velocity on its drive shaft.</li>
-<li>Its contoured profile continuously alters the distance to the follower tip.</li>
-<li>Rotary input is translated directly into a tailored linear or oscillating output with exact velocity and timing.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Mechanical input</span></li>
-<li><span>Force output</span><span>High</span></li>
-<li><span>Speed</span><span>High</span></li>
-<li><span>Precision</span><span>High (fixed profile)</span></li></ul>
+
+      <div class="input-group">
+        <div class="sliderrow">
+          <label for="liftSlider">Stroke Lift (L) <span class="val" id="valLift">30 mm</span></label>
+          <input type="range" id="liftSlider" min="10" max="50" step="1" value="30" oninput="updateParameters()">
+        </div>
+        <div class="sliderrow">
+          <label for="rbSlider">Base Radius (R<sub>b</sub>) <span class="val" id="valRb">45 mm</span></label>
+          <input type="range" id="rbSlider" min="25" max="75" step="1" value="45" oninput="updateParameters()">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="sliderrow">
+          <label for="rrSlider">Roller Radius (r<sub>r</sub>) <span class="val" id="valRr">12 mm</span></label>
+          <input type="range" id="rrSlider" min="4" max="30" step="1" value="12" oninput="updateParameters()">
+        </div>
+        <div class="sliderrow">
+          <label for="offsetSlider">Follower Offset (e) <span class="val" id="valOffset">0 mm</span></label>
+          <input type="range" id="offsetSlider" min="-25" max="25" step="1" value="0" oninput="updateParameters()">
+        </div>
+      </div>
+
+      <!-- Real-Time Telemetry & Engineering Safety Analysis -->
+      <h2>Live Telemetry & Diagnostics</h2>
+      <div class="telemetry-grid">
+        <div class="titem"><span class="tlabel">Cam Angle (&theta;)</span><span class="tval" id="telAngle">0.0&deg;</span></div>
+        <div class="titem"><span class="tlabel">Displacement (s)</span><span class="tval" id="telDisp">0.00 mm</span></div>
+        <div class="titem"><span class="tlabel">Velocity (v)</span><span class="tval" id="telVel">0.00 m/s</span></div>
+        <div class="titem"><span class="tlabel">Acceleration (a)</span><span class="tval" id="telAcc">0.0 m/s&sup2;</span></div>
+        <div class="titem"><span class="tlabel">Pressure Angle (&alpha;)</span><span class="tval" id="telPA">0.0&deg;</span></div>
+        <div class="titem"><span class="tlabel">Min Curvature (&rho;<sub>min</sub>)</span><span class="tval" id="telCurv">45.0 mm</span></div>
+      </div>
+
+      <div class="alert-banner ok" id="statusAlert">
+        <span id="statusIcon">&#10004;</span> <span id="statusText">Profile geometry is nominal and physically stable.</span>
+      </div>
+
+      <!-- How It Operates & Principles -->
+      <h2>Kinematic Operating Phases</h2>
+      <div class="stepsbox">
+        <ol>
+          <li><strong>Rise Phase (0&deg; &rarr; 120&deg;):</strong> Rotating profile converts input torque into axial translation.</li>
+          <li><strong>Top Dwell (120&deg; &rarr; 180&deg;):</strong> Circular arc profile holds output stationary at peak lift.</li>
+          <li><strong>Fall Phase (180&deg; &rarr; 300&deg;):</strong> Return spring maintains continuous follower contact during descent.</li>
+          <li><strong>Bottom Dwell (300&deg; &rarr; 360&deg;):</strong> Base circle arc maintains zero displacement baseline.</li>
+        </ol>
+      </div>
+
+      <!-- Specifications Table -->
+      <h2>Mechanism Specifications</h2>
+      <ul class="specs">
+        <li><span>Input Shaft Motion</span><span>Continuous Rotation (&omega;)</span></li>
+        <li><span>Output Motion Type</span><span>Linear Reciprocating</span></li>
+        <li><span>Max Allowable &alpha;</span><span>30&deg; (Translating Stem)</span></li>
+        <li><span>Contact Geometry</span><span>Analytical Pitch Offset</span></li>
+      </ul>
     </div>
   </div>
-  <footer class="pagefoot">ACT-07 &middot; Mechanical Cam & Follower &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
+  <footer class="pagefoot">ACT-07 &middot; Mechanical Cam & Follower Kinematic Simulator &middot; Advanced Engineering Reference</footer>
+</div>
+
+<script>
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
@@ -197,32 +360,749 @@ function toggleTheme(){
   else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  drawSimulation();
+  drawGraph();
 }
+
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  initSimulation();
 });
 
+// Global simulation state
+var state = {
+  playing: true,
+  slowMo: false,
+  theta: 0, // current angle in radians (0 to 2PI)
+  rpm: 300,
+  lift: 30, // mm
+  Rb: 45,   // mm
+  rr: 12,   // mm
+  offset: 0, // mm (e)
+  followerType: 'roller', // 'roller', 'flat', 'knife'
+  motionLaw: 'cycloidal', // 'shm', 'cycloidal', 'poly345', 'parabolic'
+  
+  // Phase angles (in radians)
+  bRise: (120 * Math.PI) / 180,
+  bDwell1: (60 * Math.PI) / 180,
+  bFall: (120 * Math.PI) / 180,
+  bDwell2: (60 * Math.PI) / 180,
 
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
+  // Layers visibility
+  showPitch: true,
+  showBase: true,
+  showVectors: true,
+  showSpring: true,
+
+  // Current selected tab for graph
+  activeGraph: 'S', // 'S', 'V', 'A', 'PA'
+
+  // Precalculated cam profile arrays
+  camProfile: [],
+  pitchProfile: [],
+  kinematicsData: []
+};
+
+// Compute motion law displacement s(theta) in mm, ds/dtheta in mm/rad, d2s/dtheta2 in mm/rad2
+function getKinematicAtAngle(th, L, bR, bD1, bF, bD2, law) {
+  // Normalize theta to [0, 2PI)
+  th = th % (2 * Math.PI);
+  if (th < 0) th += 2 * Math.PI;
+
+  var s = 0, ds = 0, d2s = 0;
+
+  if (th <= bR) {
+    // Rise Phase
+    var phi = th / bR;
+    if (law === 'shm') {
+      s = (L / 2) * (1 - Math.cos(Math.PI * phi));
+      ds = (Math.PI * L / (2 * bR)) * Math.sin(Math.PI * phi);
+      d2s = (Math.PI * Math.PI * L / (2 * bR * bR)) * Math.cos(Math.PI * phi);
+    } else if (law === 'cycloidal') {
+      s = L * (phi - (1 / (2 * Math.PI)) * Math.sin(2 * Math.PI * phi));
+      ds = (L / bR) * (1 - Math.cos(2 * Math.PI * phi));
+      d2s = (2 * Math.PI * L / (bR * bR)) * Math.sin(2 * Math.PI * phi);
+    } else if (law === 'poly345') {
+      var p3 = Math.pow(phi, 3), p4 = Math.pow(phi, 4), p5 = Math.pow(phi, 5);
+      s = L * (10 * p3 - 15 * p4 + 6 * p5);
+      ds = (L / bR) * (30 * Math.pow(phi, 2) - 60 * p3 + 30 * p4);
+      d2s = (L / (bR * bR)) * (60 * phi - 180 * Math.pow(phi, 2) + 120 * p3);
+    } else if (law === 'parabolic') {
+      if (phi <= 0.5) {
+        s = 2 * L * phi * phi;
+        ds = (4 * L * phi) / bR;
+        d2s = (4 * L) / (bR * bR);
+      } else {
+        s = L * (1 - 2 * Math.pow(1 - phi, 2));
+        ds = (4 * L * (1 - phi)) / bR;
+        d2s = (-4 * L) / (bR * bR);
+      }
+    }
+  } else if (th <= bR + bD1) {
+    // Top Dwell Phase
+    s = L;
+    ds = 0;
+    d2s = 0;
+  } else if (th <= bR + bD1 + bF) {
+    // Fall Phase
+    var phi = (th - bR - bD1) / bF;
+    if (law === 'shm') {
+      s = (L / 2) * (1 + Math.cos(Math.PI * phi));
+      ds = -(Math.PI * L / (2 * bF)) * Math.sin(Math.PI * phi);
+      d2s = -(Math.PI * Math.PI * L / (2 * bF * bF)) * Math.cos(Math.PI * phi);
+    } else if (law === 'cycloidal') {
+      s = L * (1 - phi + (1 / (2 * Math.PI)) * Math.sin(2 * Math.PI * phi));
+      ds = -(L / bF) * (1 - Math.cos(2 * Math.PI * phi));
+      d2s = -(2 * Math.PI * L / (bF * bF)) * Math.sin(2 * Math.PI * phi);
+    } else if (law === 'poly345') {
+      var p3 = Math.pow(phi, 3), p4 = Math.pow(phi, 4), p5 = Math.pow(phi, 5);
+      s = L * (1 - 10 * p3 + 15 * p4 - 6 * p5);
+      ds = -(L / bF) * (30 * Math.pow(phi, 2) - 60 * p3 + 30 * p4);
+      d2s = -(L / (bF * bF)) * (60 * phi - 180 * Math.pow(phi, 2) + 120 * p3);
+    } else if (law === 'parabolic') {
+      if (phi <= 0.5) {
+        s = L * (1 - 2 * phi * phi);
+        ds = -(4 * L * phi) / bF;
+        d2s = -(4 * L) / (bF * bF);
+      } else {
+        s = 2 * L * Math.pow(1 - phi, 2);
+        ds = -(4 * L * (1 - phi)) / bF;
+        d2s = (4 * L) / (bF * bF);
+      }
+    }
+  } else {
+    // Bottom Dwell Phase
+    s = 0;
+    ds = 0;
+    d2s = 0;
+  }
+
+  return { s: s, ds: ds, d2s: d2s };
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+function recalculateCamGeometry() {
+  var N = 360;
+  state.camProfile = [];
+  state.pitchProfile = [];
+  state.kinematicsData = [];
 
+  var minRadiusCurvature = Infinity;
+  var maxPressureAngle = 0;
+
+  var Rb = state.Rb;
+  var rr = (state.followerType === 'roller') ? state.rr : ((state.followerType === 'knife') ? 0 : 0);
+  var e = state.offset;
+  var L = state.lift;
+
+  for (var i = 0; i < N; i++) {
+    var th = (i * 2 * Math.PI) / N;
+    var kin = getKinematicAtAngle(th, L, state.bRise, state.bDwell1, state.bFall, state.bDwell2, state.motionLaw);
+
+    var s = kin.s;
+    var ds = kin.ds;
+    var d2s = kin.d2s;
+
+    // Pitch Point Coordinates in cam reference frame
+    var xp, yp, xc, yc, pa = 0;
+
+    if (state.followerType === 'roller' || state.followerType === 'knife') {
+      // Pressure angle tan(alpha) = (ds/dtheta - e) / (Rb + rr + s)
+      var denom = (Rb + rr + s);
+      var tanAlpha = (ds - e) / denom;
+      pa = Math.atan(tanAlpha);
+
+      // Pitch point in cam coordinate frame
+      xp = e * Math.cos(th) + (Rb + rr + s) * Math.sin(th);
+      yp = -e * Math.sin(th) + (Rb + rr + s) * Math.cos(th);
+
+      // Cam profile point by offsetting roller radius along pitch normal
+      xc = xp - rr * Math.sin(th + pa);
+      yc = yp - rr * Math.cos(th + pa);
+
+      // Radius of curvature of pitch curve:
+      var numR = Math.pow(denom * denom + ds * ds, 1.5);
+      var denR = denom * denom + 2 * ds * ds - denom * d2s;
+      var rho_pitch = Math.abs(denR) > 1e-5 ? numR / denR : 999;
+      var rho_cam = rho_pitch - rr;
+      if (rho_cam < minRadiusCurvature) minRadiusCurvature = rho_cam;
+
+    } else if (state.followerType === 'flat') {
+      // Flat face follower profile
+      // xc = (Rb + s)*sin(th) + ds*cos(th)
+      // yc = (Rb + s)*cos(th) - ds*sin(th)
+      pa = Math.atan2(ds, Rb + s); // effective angle
+      xp = (Rb + s) * Math.sin(th);
+      yp = (Rb + s) * Math.cos(th);
+
+      xc = (Rb + s) * Math.sin(th) + ds * Math.cos(th);
+      yc = (Rb + s) * Math.cos(th) - ds * Math.sin(th);
+
+      var rho_cam = Rb + s + d2s;
+      if (rho_cam < minRadiusCurvature) minRadiusCurvature = rho_cam;
+    }
+
+    if (Math.abs(pa) > maxPressureAngle) maxPressureAngle = Math.abs(pa);
+
+    state.pitchProfile.push({ x: xp, y: yp });
+    state.camProfile.push({ x: xc, y: yc });
+
+    // Angular velocity omega = 2*PI*RPM/60
+    var omega = (2 * Math.PI * state.rpm) / 60;
+    var v_ms = (ds * omega) / 1000; // m/s
+    var a_ms2 = (d2s * omega * omega) / 1000; // m/s2
+
+    state.kinematicsData.push({
+      theta: th,
+      s: s,
+      ds: ds,
+      d2s: d2s,
+      v: v_ms,
+      a: a_ms2,
+      paDeg: (pa * 180) / Math.PI
+    });
+  }
+
+  // Update diagnostic alerts
+  updateDiagnostics(maxPressureAngle * 180 / Math.PI, minRadiusCurvature);
+}
+
+function updateDiagnostics(maxPA, minCurv) {
+  var alertBox = document.getElementById('statusAlert');
+  var icon = document.getElementById('statusIcon');
+  var text = document.getElementById('statusText');
+
+  if (minCurv <= 0) {
+    alertBox.className = "alert-banner danger";
+    icon.innerHTML = "&#9888;";
+    text.innerHTML = "CRITICAL: Cam profile undercutting detected (&rho;<sub>min</sub> &le; 0). Cutter will destroy contour!";
+  } else if (maxPA > 30 && state.followerType !== 'flat') {
+    alertBox.className = "alert-banner warn";
+    icon.innerHTML = "&#9888;";
+    text.innerHTML = "WARNING: Max pressure angle (&alpha; = " + maxPA.toFixed(1) + "&deg;) exceeds 30&deg; limit. Excessive side thrust / binding risk!";
+  } else {
+    alertBox.className = "alert-banner ok";
+    icon.innerHTML = "&#10004;";
+    text.innerHTML = "Nominal kinematics: Smooth motion with safe contact stress and profile curvature.";
+  }
+}
+
+function drawSimulation() {
+  var canvas = document.getElementById('camCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  
+  var w = canvas.width;
+  var h = canvas.height;
+
+  // Read current color tokens
+  var style = getComputedStyle(document.documentElement);
+  var colorInk = style.getPropertyValue('--ink').trim() || '#1D2B3A';
+  var colorInkSoft = style.getPropertyValue('--ink-soft').trim() || '#5B6B7A';
+  var colorCard = style.getPropertyValue('--card').trim() || '#FBF9F1';
+  var colorAccent = style.getPropertyValue('--accent').trim() || '#B5651D';
+  var colorAccent2 = style.getPropertyValue('--accent2').trim() || '#2E6E62';
+  var colorBorder = style.getPropertyValue('--border').trim() || '#CBC4A8';
+  var colorDanger = style.getPropertyValue('--danger').trim() || '#9B3B2F';
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Center of cam shaft
+  var cx = w * 0.42;
+  var cy = h * 0.62;
+  var scale = 1.8; // pixels per mm
+
+  var th = state.theta;
+  var kin = getKinematicAtAngle(th, state.lift, state.bRise, state.bDwell1, state.bFall, state.bDwell2, state.motionLaw);
+  
+  var Rb = state.Rb;
+  var rr = (state.followerType === 'roller') ? state.rr : 0;
+  var e = state.offset;
+  var s = kin.s;
+  var ds = kin.ds;
+
+  // Draw Grid / Axis Lines
+  ctx.save();
+  ctx.strokeStyle = colorBorder;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(cx - 150, cy); ctx.lineTo(cx + 150, cy);
+  ctx.moveTo(cx, cy - 200); ctx.lineTo(cx, cy + 100);
+  ctx.moveTo(cx + e * scale, cy - 220); ctx.lineTo(cx + e * scale, cy + 80);
+  ctx.stroke();
+  ctx.restore();
+
+  // 1. Draw Base Circle
+  if (state.showBase) {
+    ctx.save();
+    ctx.strokeStyle = colorInkSoft;
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Rb * scale, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 2. Draw Pitch Curve
+  if (state.showPitch && state.followerType === 'roller') {
+    ctx.save();
+    ctx.strokeStyle = colorAccent2;
+    ctx.setLineDash([2, 2]);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (var i = 0; i < state.pitchProfile.length; i++) {
+      var pt = state.pitchProfile[i];
+      // Rotate point by -theta around (0,0) then transform to canvas coords
+      var rx = pt.x * Math.cos(-th) - pt.y * Math.sin(-th);
+      var ry = pt.x * Math.sin(-th) + pt.y * Math.cos(-th);
+      var px = cx + rx * scale;
+      var py = cy - ry * scale;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 3. Draw Solid Rotating Cam Body
+  ctx.save();
+  ctx.fillStyle = colorCard;
+  ctx.strokeStyle = colorInk;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (var i = 0; i < state.camProfile.length; i++) {
+    var pt = state.camProfile[i];
+    var rx = pt.x * Math.cos(-th) - pt.y * Math.sin(-th);
+    var ry = pt.x * Math.sin(-th) + pt.y * Math.cos(-th);
+    var px = cx + rx * scale;
+    var py = cy - ry * scale;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Cam Shaft Hub & Keyway
+  ctx.fillStyle = colorInk;
+  ctx.beginPath(); ctx.arc(cx, cy, 14, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = colorCard;
+  ctx.fillRect(cx - 3, cy - 18, 6, 8);
+  ctx.beginPath(); ctx.arc(cx, cy, 5, 0, 2 * Math.PI); ctx.fill();
+  ctx.restore();
+
+  // 4. Calculate Follower Center & Position
+  var followerX = cx + e * scale;
+  var followerRollerY = cy - (Rb + rr + s) * scale;
+
+  // 5. Draw Follower Assembly (Stem, Tip/Roller, Guides, Mass, Spring)
+  ctx.save();
+  
+  // Follower Tip / Roller Wheel / Flat-face
+  if (state.followerType === 'roller') {
+    // Wheel
+    ctx.fillStyle = colorAccent;
+    ctx.strokeStyle = colorInk;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(followerX, followerRollerY, state.rr * scale, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    // Pin Center
+    ctx.fillStyle = colorInk;
+    ctx.beginPath(); ctx.arc(followerX, followerRollerY, 3, 0, 2 * Math.PI); ctx.fill();
+  } else if (state.followerType === 'flat') {
+    // Flat face foot plate
+    var footY = cy - (Rb + s) * scale;
+    ctx.fillStyle = colorAccent;
+    ctx.strokeStyle = colorInk;
+    ctx.lineWidth = 2;
+    ctx.fillRect(followerX - 35, footY - 6, 70, 6);
+    ctx.strokeRect(followerX - 35, footY - 6, 70, 6);
+  } else if (state.followerType === 'knife') {
+    var tipY = cy - (Rb + s) * scale;
+    ctx.fillStyle = colorAccent;
+    ctx.beginPath();
+    ctx.moveTo(followerX, tipY);
+    ctx.lineTo(followerX - 8, tipY - 16);
+    ctx.lineTo(followerX + 8, tipY - 16);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Follower Stem Shaft
+  var stemBottomY = (state.followerType === 'roller') ? followerRollerY - state.rr * scale : cy - (Rb + s) * scale - 10;
+  var stemTopY = cy - 230;
+  ctx.fillStyle = colorInkSoft;
+  ctx.fillRect(followerX - 5, stemTopY, 10, stemBottomY - stemTopY);
+
+  // Linear Bearing Bushing Guides
+  var g1Y = cy - 140;
+  var g2Y = cy - 190;
+  ctx.fillStyle = colorInk;
+  ctx.fillRect(followerX - 16, g1Y, 32, 14);
+  ctx.fillRect(followerX - 16, g2Y, 32, 14);
+  
+  // Hatching on bearings
+  ctx.strokeStyle = colorCard;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(followerX - 12, g1Y + 3); ctx.lineTo(followerX - 4, g1Y + 11);
+  ctx.moveTo(followerX + 4, g1Y + 3); ctx.lineTo(followerX + 12, g1Y + 11);
+  ctx.moveTo(followerX - 12, g2Y + 3); ctx.lineTo(followerX - 4, g2Y + 11);
+  ctx.moveTo(followerX + 4, g2Y + 3); ctx.lineTo(followerX + 12, g2Y + 11);
+  ctx.stroke();
+
+  // Top Load Output Weight
+  ctx.fillStyle = colorAccent2;
+  ctx.strokeStyle = colorInk;
+  ctx.lineWidth = 2;
+  ctx.fillRect(followerX - 22, stemTopY - 16, 44, 16);
+  ctx.strokeRect(followerX - 22, stemTopY - 16, 44, 16);
+  ctx.fillStyle = colorCard;
+  ctx.font = 'bold 9px "IBM Plex Mono"';
+  ctx.fillText("LOAD", followerX - 12, stemTopY - 5);
+
+  // 6. Draw Animated Helical Return Spring
+  if (state.showSpring) {
+    var springTop = g1Y + 14;
+    var springBottom = stemBottomY - 5;
+    var coils = 10;
+    var springW = 14;
+    var len = springBottom - springTop;
+
+    ctx.strokeStyle = colorAccent;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(followerX, springTop);
+    for (var c = 0; c <= coils; c++) {
+      var yC = springTop + (len * c) / coils;
+      var xC = followerX + ((c % 2 === 0) ? springW : -springW);
+      if (c === 0 || c === coils) xC = followerX;
+      ctx.lineTo(xC, yC);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 7. Force Vectors and Pressure Angle Overlay
+  if (state.showVectors && state.followerType === 'roller') {
+    var pa = Math.atan2(ds - e, Rb + rr + s);
+    
+    ctx.save();
+    // Pressure Angle Line & Normal Force
+    var contactX = followerX - rr * Math.sin(pa) * scale;
+    var contactY = followerRollerY + rr * Math.cos(pa) * scale;
+
+    // Normal force vector direction
+    var vLen = 45;
+    var nx = Math.sin(pa);
+    var ny = -Math.cos(pa);
+
+    ctx.strokeStyle = colorDanger;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(contactX, contactY);
+    ctx.lineTo(contactX + nx * vLen, contactY + ny * vLen);
+    ctx.stroke();
+
+    // Arrowhead
+    ctx.fillStyle = colorDanger;
+    ctx.beginPath();
+    ctx.arc(contactX + nx * vLen, contactY + ny * vLen, 4, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Angle label arc
+    ctx.strokeStyle = colorAccent;
+    ctx.beginPath();
+    ctx.arc(contactX, contactY, 24, -Math.PI/2, -Math.PI/2 + pa, pa < 0);
+    ctx.stroke();
+
+    ctx.fillStyle = colorInk;
+    ctx.font = 'bold 11px "IBM Plex Mono"';
+    ctx.fillText("α=" + (pa * 180 / Math.PI).toFixed(1) + "°", contactX + 15, contactY - 15);
+    ctx.restore();
+  }
+
+  // 8. Rotation Indicator & Angle Annotations
+  ctx.save();
+  ctx.strokeStyle = colorAccent2;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, -th, true);
+  ctx.stroke();
+
+  ctx.fillStyle = colorInk;
+  ctx.font = 'bold 11px "IBM Plex Mono"';
+  ctx.fillText("θ = " + (th * 180 / Math.PI).toFixed(0) + "°", cx + 32, cy + 18);
+  ctx.restore();
+}
+
+function switchGraph(type) {
+  state.activeGraph = type;
+  var tabs = document.querySelectorAll('.gtab');
+  tabs.forEach(function(t){ t.classList.remove('active'); });
+  event.target.classList.add('active');
+  drawGraph();
+}
+
+function drawGraph() {
+  var canvas = document.getElementById('graphCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var w = canvas.width;
+  var h = canvas.height;
+
+  var style = getComputedStyle(document.documentElement);
+  var colorInk = style.getPropertyValue('--ink').trim() || '#1D2B3A';
+  var colorInkSoft = style.getPropertyValue('--ink-soft').trim() || '#5B6B7A';
+  var colorAccent = style.getPropertyValue('--accent').trim() || '#B5651D';
+  var colorAccent2 = style.getPropertyValue('--accent2').trim() || '#2E6E62';
+  var colorBorder = style.getPropertyValue('--border').trim() || '#CBC4A8';
+  var colorDanger = style.getPropertyValue('--danger').trim() || '#9B3B2F';
+
+  ctx.clearRect(0, 0, w, h);
+
+  var padL = 40, padR = 20, padT = 20, padB = 25;
+  var plotW = w - padL - padR;
+  var plotH = h - padT - padB;
+
+  // Draw Grid Axes
+  ctx.strokeStyle = colorBorder;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.lineTo(w - padR, h - padB);
+  ctx.stroke();
+
+  // Axis Labels
+  ctx.fillStyle = colorInkSoft;
+  ctx.font = '10px "IBM Plex Mono"';
+  ctx.fillText("0°", padL, h - 8);
+  ctx.fillText("120°", padL + plotW * (120/360) - 10, h - 8);
+  ctx.fillText("180°", padL + plotW * (180/360) - 10, h - 8);
+  ctx.fillText("300°", padL + plotW * (300/360) - 10, h - 8);
+  ctx.fillText("360°", w - padR - 15, h - 8);
+
+  // Extract metric based on active tab
+  var data = state.kinematicsData;
+  if (!data || data.length === 0) return;
+
+  var minV = Infinity, maxV = -Infinity;
+  data.forEach(function(d){
+    var val = 0;
+    if (state.activeGraph === 'S') val = d.s;
+    else if (state.activeGraph === 'V') val = d.v;
+    else if (state.activeGraph === 'A') val = d.a;
+    else if (state.activeGraph === 'PA') val = d.paDeg;
+
+    if (val < minV) minV = val;
+    if (val > maxV) maxV = val;
+  });
+
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  var range = maxV - minV;
+
+  // Zero axis line if applicable
+  if (minV < 0 && maxV > 0) {
+    var zeroY = h - padB - ((0 - minV) / range) * plotH;
+    ctx.strokeStyle = colorBorder;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(padL, zeroY); ctx.lineTo(w - padR, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Plot Curve
+  ctx.strokeStyle = (state.activeGraph === 'A') ? colorDanger : (state.activeGraph === 'PA' ? colorAccent : colorAccent2);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (var i = 0; i < data.length; i++) {
+    var d = data[i];
+    var val = (state.activeGraph === 'S') ? d.s : ((state.activeGraph === 'V') ? d.v : ((state.activeGraph === 'A') ? d.a : d.paDeg));
+    var x = padL + (i / (data.length - 1)) * plotW;
+    var y = h - padB - ((val - minV) / range) * plotH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Y-Max / Y-Min Readouts
+  ctx.fillStyle = colorInk;
+  var unit = (state.activeGraph === 'S') ? 'mm' : ((state.activeGraph === 'V') ? 'm/s' : ((state.activeGraph === 'A') ? 'm/s²' : '°'));
+  ctx.fillText(maxV.toFixed(1) + " " + unit, padL + 5, padT + 10);
+  ctx.fillText(minV.toFixed(1) + " " + unit, padL + 5, h - padB - 5);
+
+  // Dynamic Sweeping Cursor Line at current state.theta
+  var curX = padL + ((state.theta % (2 * Math.PI)) / (2 * Math.PI)) * plotW;
+  ctx.strokeStyle = colorInk;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(curX, padT); ctx.lineTo(curX, h - padB);
+  ctx.stroke();
+
+  // Cursor Dot
+  var curKin = getKinematicAtAngle(state.theta, state.lift, state.bRise, state.bDwell1, state.bFall, state.bDwell2, state.motionLaw);
+  var omega = (2 * Math.PI * state.rpm) / 60;
+  var curVal = 0;
+  if (state.activeGraph === 'S') curVal = curKin.s;
+  else if (state.activeGraph === 'V') curVal = (curKin.ds * omega) / 1000;
+  else if (state.activeGraph === 'A') curVal = (curKin.d2s * omega * omega) / 1000;
+  else if (state.activeGraph === 'PA') {
+    var pa = Math.atan2(curKin.ds - state.offset, state.Rb + state.rr + curKin.s);
+    curVal = (pa * 180) / Math.PI;
+  }
+
+  var curY = h - padB - ((curVal - minV) / range) * plotH;
+  ctx.fillStyle = colorDanger;
+  ctx.beginPath();
+  ctx.arc(curX, curY, 4, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
+var lastTime = 0;
+function animateLoop(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  var dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  if (state.playing) {
+    var speedMult = state.slowMo ? 0.25 : 1.0;
+    var omega = (2 * Math.PI * state.rpm) / 60; // rad/s
+    state.theta += omega * dt * speedMult;
+    if (state.theta >= 2 * Math.PI) state.theta %= (2 * Math.PI);
+  }
+
+  // Update telemetry text DOM
+  updateTelemetryUI();
+
+  // Draw Viewports
+  drawSimulation();
+  drawGraph();
+
+  requestAnimationFrame(animateLoop);
+}
+
+function updateTelemetryUI() {
+  var kin = getKinematicAtAngle(state.theta, state.lift, state.bRise, state.bDwell1, state.bFall, state.bDwell2, state.motionLaw);
+  var omega = (2 * Math.PI * state.rpm) / 60;
+  var v = (kin.ds * omega) / 1000;
+  var a = (kin.d2s * omega * omega) / 1000;
+  var pa = Math.atan2(kin.ds - state.offset, state.Rb + state.rr + kin.s) * 180 / Math.PI;
+
+  document.getElementById('telAngle').textContent = ((state.theta * 180 / Math.PI) % 360).toFixed(1) + "°";
+  document.getElementById('telDisp').textContent = kin.s.toFixed(2) + " mm";
+  document.getElementById('telVel').textContent = v.toFixed(2) + " m/s";
+  document.getElementById('telAcc').textContent = a.toFixed(1) + " m/s²";
+  document.getElementById('telPA').textContent = pa.toFixed(1) + "°";
+  
+  var Rb = state.Rb, rr = state.rr, s = kin.s, ds = kin.ds, d2s = kin.d2s;
+  var denom = (Rb + rr + s);
+  var numR = Math.pow(denom * denom + ds * ds, 1.5);
+  var denR = denom * denom + 2 * ds * ds - denom * d2s;
+  var rho = Math.abs(denR) > 1e-5 ? (numR / denR) - rr : 999;
+  document.getElementById('telCurv').textContent = rho > 0 ? rho.toFixed(1) + " mm" : "CUTTER UNDERCUT!";
+}
+
+function updateParameters() {
+  state.rpm = parseFloat(document.getElementById('speedSlider').value);
+  state.lift = parseFloat(document.getElementById('liftSlider').value);
+  state.Rb = parseFloat(document.getElementById('rbSlider').value);
+  state.rr = parseFloat(document.getElementById('rrSlider').value);
+  state.offset = parseFloat(document.getElementById('offsetSlider').value);
+  state.followerType = document.getElementById('followerTypeSelect').value;
+  state.motionLaw = document.getElementById('motionLawSelect').value;
+
+  document.getElementById('valRPM').textContent = state.rpm + " RPM";
+  document.getElementById('valLift').textContent = state.lift + " mm";
+  document.getElementById('valRb').textContent = state.Rb + " mm";
+  document.getElementById('valRr').textContent = state.rr + " mm";
+  document.getElementById('valOffset').textContent = state.offset + " mm";
+
+  recalculateCamGeometry();
+}
+
+function togglePlay() {
+  state.playing = !state.playing;
+  document.getElementById('playPauseBtn').textContent = state.playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
+}
+
+function stepSim(deg) {
+  state.playing = false;
+  document.getElementById('playPauseBtn').textContent = 'RUN CYCLE';
+  state.theta += (deg * Math.PI) / 180;
+  if (state.theta < 0) state.theta += 2 * Math.PI;
+  state.theta %= (2 * Math.PI);
+}
+
+function resetAngle() {
+  state.theta = 0;
+}
+
+function toggleLayer(layer) {
+  if (layer === 'pitch') {
+    state.showPitch = !state.showPitch;
+    document.getElementById('btnShowPitch').classList.toggle('active', state.showPitch);
+  } else if (layer === 'base') {
+    state.showBase = !state.showBase;
+    document.getElementById('btnShowBase').classList.toggle('active', state.showBase);
+  } else if (layer === 'vectors') {
+    state.showVectors = !state.showVectors;
+    document.getElementById('btnShowVectors').classList.toggle('active', state.showVectors);
+  } else if (layer === 'spring') {
+    state.showSpring = !state.showSpring;
+    document.getElementById('btnShowSpring').classList.toggle('active', state.showSpring);
+  }
+}
+
+function toggleSlowMo() {
+  state.slowMo = !state.slowMo;
+  document.getElementById('btnSlowMo').classList.toggle('active', state.slowMo);
+}
+
+function applyPreset(type) {
+  if (type === 'valve') {
+    document.getElementById('followerTypeSelect').value = 'roller';
+    document.getElementById('motionLawSelect').value = 'cycloidal';
+    document.getElementById('speedSlider').value = 800;
+    document.getElementById('liftSlider').value = 25;
+    document.getElementById('rbSlider').value = 40;
+    document.getElementById('rrSlider').value = 10;
+    document.getElementById('offsetSlider').value = 0;
+  } else if (type === 'indexer') {
+    document.getElementById('followerTypeSelect').value = 'roller';
+    document.getElementById('motionLawSelect').value = 'poly345';
+    document.getElementById('speedSlider').value = 200;
+    document.getElementById('liftSlider').value = 35;
+    document.getElementById('rbSlider').value = 55;
+    document.getElementById('rrSlider').value = 14;
+    document.getElementById('offsetSlider').value = 0;
+  } else if (type === 'jam') {
+    document.getElementById('followerTypeSelect').value = 'roller';
+    document.getElementById('motionLawSelect').value = 'parabolic';
+    document.getElementById('speedSlider').value = 300;
+    document.getElementById('liftSlider').value = 45;
+    document.getElementById('rbSlider').value = 30;
+    document.getElementById('rrSlider').value = 8;
+    document.getElementById('offsetSlider').value = 18;
+  } else if (type === 'undercut') {
+    document.getElementById('followerTypeSelect').value = 'roller';
+    document.getElementById('motionLawSelect').value = 'shm';
+    document.getElementById('speedSlider').value = 300;
+    document.getElementById('liftSlider').value = 45;
+    document.getElementById('rbSlider').value = 30;
+    document.getElementById('rrSlider').value = 28;
+    document.getElementById('offsetSlider').value = 0;
+  }
+  updateParameters();
+}
+
+function initSimulation() {
+  updateParameters();
+  requestAnimationFrame(animateLoop);
+}
 </script>
 </body>
 </html>
