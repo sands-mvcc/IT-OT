@@ -388,6 +388,85 @@
   .progress-strip { display: flex; gap: 4px; margin-bottom: 28px; align-items: center; }
   .progress-block { height: 6px; border-radius: 3px; flex: 1; }
 
+  /* CORE FRAMEWORKS ACCORDION */
+  .framework-accordion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--tag-gov);
+    border-radius: 14px;
+    margin-bottom: 40px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .framework-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface2);
+    border: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    font-family: inherit;
+    color: var(--text);
+    text-align: left;
+  }
+  .framework-toggle:hover { background: var(--card-hover); }
+  .framework-toggle-left { display: flex; align-items: center; gap: 12px; }
+  .toggle-caret {
+    font-size: 0.9rem;
+    color: var(--tag-gov);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 1em;
+    display: inline-block;
+  }
+  .framework-toggle-title { font-size: 1.02rem; font-weight: 800; }
+  .framework-toggle-title .subtitle {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: normal;
+    margin-top: 2px;
+  }
+  .toggle-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: var(--tag-gov);
+    background: var(--tag-gov-bg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .framework-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .framework-content.open { max-height: 2400px; }
+  .framework-content-inner { padding: 4px 22px 22px; }
+  .framework-intro {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    max-width: 84ch;
+    margin: 14px 0 18px;
+  }
+  .framework-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 520px) {
+    .framework-toggle { padding: 16px; }
+  }
+
   /* FOOTER */
   footer {
     text-align: center;
@@ -729,6 +808,91 @@
 
   </div>
 
+  <!-- CORE FRAMEWORKS (ACCORDION) -->
+  <section class="framework-accordion" aria-labelledby="frameworks-title">
+    <button class="framework-toggle" id="frameworksToggle" aria-expanded="false" aria-controls="frameworksContent" onclick="toggleFrameworks()">
+      <span class="framework-toggle-left">
+        <span class="toggle-caret" id="frameworksCaret" aria-hidden="true">▸</span>
+        <span class="framework-toggle-title" id="frameworks-title">🗺️ Core Frameworks — Explore the Standards
+          <span class="subtitle">The four reference frameworks used throughout Lessons 8 &amp; 9 — click to expand</span>
+        </span>
+      </span>
+      <span class="toggle-badge" id="frameworksBadge">4 Frameworks · Collapsed</span>
+    </button>
+    <div class="framework-content" id="frameworksContent" aria-hidden="true" inert>
+      <div class="framework-content-inner">
+        <p class="framework-intro">These are the four frameworks students need fluency in to work an OT security role: a design-time standard for building secure control systems, a U.S. government guide for managing OT risk end to end, a threat-intelligence knowledge base for understanding how ICS incidents actually unfold, and a mandatory compliance standard from a specific regulated sector. Each card opens a dedicated page with the concepts, structure, and classroom framing for that framework.</p>
+        <div class="framework-grid">
+          <!-- ISA/IEC 62443 -->
+          <a class="card strand-gov" href="iec62443.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Design Standard</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">ISA/IEC 62443 — Industrial Automation &amp; Control Systems Security</div>
+              <div class="card-desc">The zones-and-conduits standard family for IACS: security levels 0–4, seven foundational requirements, and lifecycle guidance split across policy (2-x), system (3-x), and component (4-x) parts.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> Zones &amp; Conduits, Security Levels, ISASecure</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- NIST SP 800-82 -->
+          <a class="card strand-gov" href="nist80082.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">U.S. Federal Guide</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">NIST SP 800-82 Rev. 3 — Guide to OT Security</div>
+              <div class="card-desc">The 2023 rewrite that widens ICS guidance to all of OT, tailors SP 800-53 controls into OT-specific overlays, and aligns OT risk management with the NIST Cybersecurity Framework.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> OT Overlays, NIST CSF, Risk Management</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- MITRE ATT&CK for ICS -->
+          <a class="card strand-gov" href="attack-ics.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Threat Intel</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">MITRE ATT&amp;CK for ICS</div>
+              <div class="card-desc">A knowledge base of real-world adversary tactics and techniques against control systems — from Initial Access to Impair Process Control — built from documented incidents like Stuxnet, Industroyer, and TRITON.</div>
+              <span class="safety-flag">⚠ Case study analysis only</span>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> Tactics, Techniques, Detection Engineering</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+          <!-- NERC CIP-008 -->
+          <a class="card strand-gov" href="nerc-cip008.html">
+            <div class="card-accent-bar"></div>
+            <div class="card-body">
+              <div class="card-header-row">
+                <span class="lesson-num">Sector Compliance</span>
+                <span class="strand-tag tag-gov">Framework</span>
+              </div>
+              <div class="card-title">NERC CIP-008 — Incident Reporting &amp; Response Planning</div>
+              <div class="card-desc">The mandatory, enforceable standard requiring Bulk Electric System operators to plan, test, and report cyber security incidents — including attempts — to the E-ISAC and DHS/CISA.</div>
+            </div>
+            <div class="card-footer">
+              <span class="card-terms"><strong>Key terms:</strong> BES Cyber Systems, IR Plan, E-ISAC Reporting</span>
+              <span class="card-arrow">→</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="acc-section" id="faculty-resources-acc">
     <h3>
       <button class="acc-trigger" aria-expanded="true" aria-controls="faculty-resources-panel" id="faculty-resources-trigger">
@@ -1025,6 +1189,29 @@
     window.addEventListener('hashchange', expandForHash);
     expandForHash();
   })();
+
+  // Core Frameworks accordion — default contracted, independent of the .acc-trigger system above
+  function toggleFrameworks() {
+    var btn = document.getElementById('frameworksToggle');
+    var content = document.getElementById('frameworksContent');
+    var caret = document.getElementById('frameworksCaret');
+    var badge = document.getElementById('frameworksBadge');
+    var expanded = btn.getAttribute('aria-expanded') === 'true';
+    var next = !expanded;
+    btn.setAttribute('aria-expanded', String(next));
+    content.setAttribute('aria-hidden', String(!next));
+    if (next) {
+      content.classList.add('open');
+      content.removeAttribute('inert');
+      caret.textContent = '▾';
+      badge.textContent = '4 Frameworks · Expanded';
+    } else {
+      content.classList.remove('open');
+      content.setAttribute('inert', '');
+      caret.textContent = '▸';
+      badge.textContent = '4 Frameworks · Collapsed';
+    }
+  }
 </script>
 </body>
 </html>
