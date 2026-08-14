@@ -3,19 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ACT-11 Harmonic Drive (Strain Wave Gearing) Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>ACT-11 Harmonic Drive (Strain Wave Gearing) High-Precision Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
 :root{
   --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
-  --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --accent:#B5651D; --accent-light:#D98236; --accent2:#2E6E62; --accent2-light:#429B8B;
+  --card:#FBF9F1; --border:#CBC4A8; --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --stress-low:#2E6E62; --stress-mid:#E5A93C; --stress-high:#C0392B;
 }
 :root[data-theme="dark"]{
   --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
-  --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --accent:#E39B57; --accent-light:#F3B375; --accent2:#54D6C6; --accent2-light:#7EE2D5;
+  --card:#10222D; --border:#234456; --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --stress-low:#369B8B; --stress-mid:#F3C159; --stress-high:#E74C3C;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -29,26 +32,27 @@ body{
   min-height:100vh;
   transition:background-color .25s ease, color .25s ease;
 }
-h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
+h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
 .mono{font-family:'IBM Plex Mono', monospace;}
 a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.wrap{max-width:1280px; margin:0 auto; padding:24px 20px 60px;}
+
 .topbar{
   display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
+  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:16px;
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
   color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
 }
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+h1.title{font-size:clamp(24px,3.4vw,38px); line-height:1.08;}
+.sub{color:var(--ink-soft); max-width:720px; margin-top:8px; font-size:14px; line-height:1.5;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
   font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
   padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
-  box-shadow:2px 2px 0 var(--shadow);
+  box-shadow:2px 2px 0 var(--shadow); user-select:none;
 }
 .themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
 .themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
@@ -59,62 +63,126 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
+.simlayout{display:grid; grid-template-columns:1.55fr 1fr; gap:20px; margin-top:16px;}
+@media (max-width:980px){.simlayout{grid-template-columns:1fr;}}
 
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
 .stage{
-  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
-  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  background:var(--card); border:1.5px solid var(--border); border-radius:6px;
+  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; display:flex; flex-direction:column; gap:10px;
 }
-.stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+.stagetop{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  border-bottom:1px solid var(--border); padding-bottom:8px;
 }
-.stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
+.stagelabel{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); font-weight:600; display:flex; align-items:center; gap:8px;
 }
-button.ctl:hover{background:var(--accent);}
-button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
-button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.live-dot{width:8px; height:8px; background:var(--accent2); border-radius:50%; display:inline-block; animation:pulse 1.8s infinite;}
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.4; transform:scale(0.85);} }
+
+.viewtabs{display:flex; gap:4px; background:var(--bg); padding:3px; border-radius:4px; border:1px solid var(--border);}
+.viewtab{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 10px; border:none;
+  background:transparent; color:var(--ink-soft); cursor:pointer; border-radius:3px; font-weight:600;
+  transition:all 0.15s ease;
+}
+.viewtab.active{background:var(--card); color:var(--ink); box-shadow:0 1px 3px var(--shadow);}
+.viewtab:hover:not(.active){color:var(--ink);}
+
+.canvas-container{
+  position:relative; width:100%; aspect-ratio:4/3; min-height:360px; max-height:560px;
+  background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden;
+  cursor:grab; user-select:none;
+}
+.canvas-container:active{cursor:grabbing;}
+canvas{display:block; width:100%; height:100%;}
+
+.hud-overlay{
+  position:absolute; bottom:12px; left:12px; right:12px; pointer-events:none;
+  display:flex; justify-content:space-between; align-items:flex-end; gap:8px;
+}
+.hud-card{
+  background:rgba(251,249,241,0.88); border:1px solid var(--border); border-radius:4px;
+  padding:8px 12px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+  backdrop-filter:blur(4px); pointer-events:auto; box-shadow:0 2px 6px rgba(0,0,0,0.06);
+}
+:root[data-theme="dark"] .hud-card{background:rgba(16,34,45,0.88);}
+.hud-val{font-size:14px; font-weight:700; color:var(--accent);}
+
+.canvas-controls{
+  position:absolute; top:12px; right:12px; display:flex; flex-direction:column; gap:6px;
+  pointer-events:auto;
+}
+.icon-btn{
+  width:32px; height:32px; border-radius:4px; border:1px solid var(--border);
+  background:var(--card); color:var(--ink); font-family:'IBM Plex Mono',monospace;
+  font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 2px 4px var(--shadow); transition:all 0.15s;
+}
+.icon-btn:hover{background:var(--accent); color:var(--bg); border-color:var(--accent);}
+
+.panel{background:var(--card); border:1.5px solid var(--border); border-radius:6px; padding:18px; box-shadow:3px 3px 0 var(--shadow); display:flex; flex-direction:column; gap:16px;}
+.panel h2{font-size:15px; border-bottom:1px solid var(--border); padding-bottom:6px; margin:0;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0;}
+
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
   text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
+  font-weight:700; width:fit-content;
 }
 
+.controlrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+button.ctl{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:1.5px solid var(--ink); padding:8px 12px;
+  border-radius:3px; cursor:pointer; transition:all 0.15s ease; display:inline-flex; align-items:center; gap:6px;
+}
+button.ctl:hover{background:var(--accent); border-color:var(--accent); color:#fff;}
+button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
+button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
+button.ctl.active{background:var(--accent2); border-color:var(--accent2); color:#0B1A17;}
 
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes waveGenFast{to{transform:rotate(360deg);}}
-[data-anim="waveGenFast"]{animation-name:waveGenFast; animation-timing-function:linear; transform-box:fill-box; transform-origin:center; animation-duration:var(--dur,2.4s);}
-@keyframes flexRotate{to{transform:rotate(360deg);}}
-[data-anim="flexRotate"]{animation-name:flexRotate; animation-timing-function:linear; transform-box:fill-box; transform-origin:center; animation-duration:calc(var(--dur,2.4s) * 24);}
+.sliderrow{display:flex; flex-direction:column; gap:4px;}
+.sliderhead{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
+.sliderhead .val{color:var(--ink); font-weight:700;}
+input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
 
+.radio-group{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
+.radio-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:6px 8px; border:1px solid var(--border);
+  border-radius:3px; background:var(--bg); color:var(--ink-soft); text-align:center; cursor:pointer;
+  transition:all 0.15s; font-weight:600;
+}
+.radio-btn.active{background:var(--accent2); color:#0B1A17; border-color:var(--accent2);}
+
+.toggle-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.toggle-item{
+  display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace;
+  font-size:11px; color:var(--ink-soft); cursor:pointer; user-select:none;
+}
+.toggle-item input{accent-color:var(--accent); cursor:pointer;}
+
+.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:11.5px;}
+.specs li{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li span:last-child{color:var(--ink); font-weight:600;}
+
+.stepsbox ol{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+.stepsbox li{margin-bottom:6px;}
+.stepsbox li::marker{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--accent);}
+
+.equation-box{
+  background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:10px;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.6; color:var(--ink);
+}
+.equation-box .eq-title{font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;}
+.equation-box .eq-highlight{color:var(--accent); font-weight:700;}
+
+.legend-box{display:flex; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; flex-wrap:wrap;}
+.legend-item{display:flex; align-items:center; gap:5px;}
+.legend-swatch{width:12px; height:12px; border-radius:2px;}
+
+.pagefoot{margin-top:30px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); border-top:1px solid var(--border); padding-top:16px;}
 </style>
 </head>
 <body>
@@ -122,64 +190,153 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-11 &middot; ROTARY MOTION</div>
+      <div class="eyebrow">ACT-11 &middot; ROTARY MOTION &middot; KINEMATIC SIMULATOR</div>
       <h1 class="title">Harmonic Drive (Strain Wave Gearing)</h1>
-      <p class="sub">A gear-reduction mechanism built from a wave generator, a flexible flexspline, and a rigid circular spline, delivering high ratios with zero backlash.</p>
+      <p class="sub">Precision elastic strain gearing mechanism with multi-member fixed/driven modes, dynamic tooth mesh deformation, von Mises stress heatmap, and real-time torsional stiffness telemetry.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
+
   <div class="simlayout">
     <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<circle cx="320" cy="110" r="90" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="4 5"/>
-<text x="380" y="26" class="lbl small">CIRCULAR SPLINE (FIXED)</text>
-<g class="moving" data-anim="flexRotate">
- <ellipse cx="320" cy="110" rx="80" ry="60" fill="none" stroke="var(--accent2)" stroke-width="4"/>
-</g>
-<text x="150" y="196" class="lbl small">FLEXSPLINE (SLOW OUTPUT)</text>
-<g class="moving" data-anim="waveGenFast">
- <ellipse cx="320" cy="110" rx="46" ry="24" fill="var(--accent)" opacity=".85"/>
- <line x1="320" y1="110" x2="366" y2="110" stroke="var(--ink)" stroke-width="3"/>
-</g>
-<text x="270" y="118" class="lbl small" fill="var(--card)">WG</text>
-<text x="245" y="60" class="lbl small">WAVE GENERATOR (FAST INPUT)</text>
-</svg>
+      <div class="stagetop">
+        <div class="stagelabel">
+          <span class="live-dot"></span> Dynamic Mechanical Physics Model
+        </div>
+        <div class="viewtabs">
+          <button class="viewtab active" onclick="setViewMode('2d')" id="tab2d">2D Mesh View</button>
+          <button class="viewtab" onclick="setViewMode('3d')" id="tab3d">3D Perspective</button>
+          <button class="viewtab" onclick="setViewMode('telemetry')" id="tabTel">Stiffness & Strain</button>
+        </div>
+      </div>
+
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="simCanvas"></canvas>
+        
+        <div class="canvas-controls">
+          <button class="icon-btn" onclick="zoomIn()" title="Zoom In">+</button>
+          <button class="icon-btn" onclick="zoomOut()" title="Zoom Out">&minus;</button>
+          <button class="icon-btn" onclick="resetView()" title="Reset Camera">&#8634;</button>
+        </div>
+
+        <div class="hud-overlay" id="hudOverlay">
+          <div class="hud-card">
+            <div style="color:var(--ink-soft); font-size:10px; text-transform:uppercase;">Input Shaft (WG)</div>
+            <div class="hud-val" id="hudSpeedWG">+60.0 RPM</div>
+          </div>
+          <div class="hud-card">
+            <div style="color:var(--ink-soft); font-size:10px; text-transform:uppercase;">Output Shaft</div>
+            <div class="hud-val" id="hudSpeedOut">-1.22 RPM</div>
+          </div>
+          <div class="hud-card">
+            <div style="color:var(--ink-soft); font-size:10px; text-transform:uppercase;">Gear Ratio</div>
+            <div class="hud-val" id="hudRatio">-49 : 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend-box" id="legendBox">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--accent);"></div> Wave Generator (WG)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--accent2);"></div> Flexspline (FS)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--ink-soft);"></div> Circular Spline (CS)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--danger);"></div> High Tooth Engagement Zone</div>
+      </div>
     </div>
+
     <div class="panel">
-      <span class="badge">ROTARY MOTION</span>
-      <h2>Cycle Controls</h2>
+      <span class="badge">ROTARY STRAIN WAVE</span>
+      <h2>Kinematic Controls</h2>
+
       <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+        <button class="ctl" id="playPauseBtn" onclick="togglePlay()">Pause Cycle</button>
+        <button class="ctl secondary" onclick="stepSim(1)">Step &gt;</button>
+        <button class="ctl secondary" onclick="reverseDirection()">Reverse</button>
       </div>
+
       <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+        <div class="sliderhead">
+          <span>Input Speed (RPM)</span>
+          <span class="val" id="speedVal">+60 RPM</span>
+        </div>
+        <input type="range" id="speedSlider" min="-120" max="120" value="60" step="5" oninput="updateSpeed(this.value)">
       </div>
-      <h2>Typical Purposes</h2>
-      <p>Industrial robot-arm joints, cobot elbow/wrist axes, precision tracking systems, compact rotary positioning.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>The elliptical wave generator rotates inside the flexible flexspline.</li>
-<li>It forces the flexspline's external teeth to engage the fixed circular spline at two opposite points.</li>
-<li>Because the flexspline has slightly fewer teeth, one wave-generator revolution advances it by only the tooth difference, yielding 30:1 to 320:1 reduction.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Mechanical input</span></li>
-<li><span>Force output</span><span>High torque</span></li>
-<li><span>Speed</span><span>Low to medium</span></li>
-<li><span>Precision</span><span>Extremely high</span></li></ul>
+
+      <div class="sliderrow">
+        <div class="sliderhead">
+          <span>Applied Torque Load (Nm)</span>
+          <span class="val" id="torqueVal">25 Nm</span>
+        </div>
+        <input type="range" id="torqueSlider" min="0" max="100" value="25" step="1" oninput="updateTorque(this.value)">
+      </div>
+
+      <h2>Operational Mode</h2>
+      <div class="radio-group">
+        <div class="radio-btn active" id="modeCS" onclick="setOpMode('CS_FIXED')">CS Fixed (Reducer)</div>
+        <div class="radio-btn" id="modeFS" onclick="setOpMode('FS_FIXED')">FS Fixed (Direct)</div>
+      </div>
+
+      <h2>Tooth Count & Reduction Ratio</h2>
+      <div class="radio-group">
+        <div class="radio-btn active" id="ratio49" onclick="setToothRatio(98, 100)">98 / 100 (49:1)</div>
+        <div class="radio-btn" id="ratio79" onclick="setToothRatio(158, 160)">158 / 160 (79:1)</div>
+        <div class="radio-btn" id="ratio99" onclick="setToothRatio(198, 200)">198 / 200 (99:1)</div>
+        <div class="radio-btn" id="ratio119" onclick="setToothRatio(238, 240)">238 / 240 (119:1)</div>
+      </div>
+
+      <h2>Visual Overlays</h2>
+      <div class="toggle-grid">
+        <label class="toggle-item"><input type="checkbox" id="chkStress" checked onchange="requestRender()"> Stress Heatmap</label>
+        <label class="toggle-item"><input type="checkbox" id="chkBalls" checked onchange="requestRender()"> Bearing Balls</label>
+        <label class="toggle-item"><input type="checkbox" id="chkZoom" checked onchange="requestRender()"> Mesh Magnifier</label>
+        <label class="toggle-item"><input type="checkbox" id="chkPitch" checked onchange="requestRender()"> Pitch Ellipse</label>
+        <label class="toggle-item"><input type="checkbox" id="chkVectors" onchange="requestRender()"> Force Vectors</label>
+        <label class="toggle-item"><input type="checkbox" id="chkSlowMotion" onchange="toggleSlowMo(this.checked)"> Slow Motion</label>
+      </div>
+
+      <h2>Kinematic Formula</h2>
+      <div class="equation-box">
+        <div class="eq-title">Speed Reduction Equation</div>
+        <div id="eqDisplay">
+          $R = \frac{N_{FS}}{N_{FS} - N_{CS}} = \frac{98}{98 - 100} = \mathbf{-49 : 1}$
+        </div>
+        <div style="font-size:10.5px; color:var(--ink-soft); margin-top:6px;">
+          Note: Negative sign indicates counter-rotation relative to wave generator input.
+        </div>
+      </div>
+
+      <h2>How Strain Wave Gearing Works</h2>
+      <div class="stepsbox">
+        <ol>
+          <li><b>Wave Generator (Input):</b> Elliptical cam surrounded by a flexible ball bearing rotates, continuously flexing the thin flexspline.</li>
+          <li><b>Tooth Engagement:</b> Deforms external flexspline teeth to engage fixed circular spline teeth along the major elliptical axis ($180^\circ$ apart).</li>
+          <li><b>Tooth Disengagement:</b> At the minor elliptical axis, teeth completely disengage, permitting smooth differential motion.</li>
+          <li><b>Differential Tooth Count:</b> Flexspline has 2 fewer teeth than Circular Spline ($\Delta N = -2$). Each WG turn rotates Flexspline backward by 2 teeth.</li>
+        </ol>
+      </div>
+
+      <h2>Engineering Specs</h2>
+      <ul class="specs">
+        <li><span>Backlash</span><span style="color:var(--accent2); font-weight:700;">Zero Backlash (&lt; 1 arcmin)</span></li>
+        <li><span>Positioning Accuracy</span><span>&lt; 30 arcsec</span></li>
+        <li><span>Single Stage Ratio</span><span>30:1 to 320:1</span></li>
+        <li><span>Torsional Stiffness</span><span>High (~1.2 Nm/arcmin)</span></li>
+        <li><span>Efficiency</span><span>up to 85% at rated load</span></li>
+      </ul>
     </div>
   </div>
-  <footer class="pagefoot">ACT-11 &middot; Harmonic Drive (Strain Wave Gearing) &middot; Manufacturing Floor Reference</footer>
+  
+  <footer class="pagefoot">ACT-11 &middot; Harmonic Drive (Strain Wave Gearing) Simulation Environment &middot; Mechanical Systems Engineering Reference</footer>
 </div>
-<script>
 
+<script>
+// --- Theme Handling ---
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
@@ -187,31 +344,889 @@ function toggleTheme(){
   else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  requestRender();
 }
+
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
+var state = {
+  playing: true,
+  viewMode: '2d', // '2d', '3d', 'telemetry'
+  opMode: 'CS_FIXED', // 'CS_FIXED', 'FS_FIXED'
+  
+  // Speed and time
+  speedRPM: 60,
+  slowMo: false,
+  torqueNm: 25,
+  
+  // Angles (radians)
+  thetaWG: 0,
+  thetaFS: 0,
+  thetaCS: 0,
+  
+  // Gear parameters
+  N_FS: 98,
+  N_CS: 100,
+  deltaN: 2, // N_CS - N_FS
+  
+  // Camera & View
+  zoom: 1.0,
+  panX: 0,
+  panY: 0,
+  isDragging: false,
+  dragStart: {x:0, y:0},
 
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
+  // Telemetry buffer for stiffness curve
+  telemetryHistory: []
+};
+
+var canvas, ctx;
+var lastTime = 0;
+
+// Initialize Canvas
+window.addEventListener('load', function(){
+  canvas = document.getElementById('simCanvas');
+  ctx = canvas.getContext('2d');
+  
+  setupCanvasDimensions();
+  window.addEventListener('resize', setupCanvasDimensions);
+  setupPanZoom();
+
+  lastTime = performance.now();
+  requestAnimationFrame(animLoop);
+});
+
+function setupCanvasDimensions(){
+  var container = document.getElementById('canvasContainer');
+  var rect = container.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  requestRender();
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.0); });
+function setupPanZoom(){
+  var container = document.getElementById('canvasContainer');
+  
+  container.addEventListener('mousedown', function(e){
+    if(e.button === 0){
+      state.isDragging = true;
+      state.dragStart = {x: e.clientX - state.panX, y: e.clientY - state.panY};
+    }
+  });
+
+  window.addEventListener('mousemove', function(e){
+    if(state.isDragging){
+      state.panX = e.clientX - state.dragStart.x;
+      state.panY = e.clientY - state.dragStart.y;
+      requestRender();
+    }
+  });
+
+  window.addEventListener('mouseup', function(){ state.isDragging = false; });
+
+  container.addEventListener('wheel', function(e){
+    e.preventDefault();
+    var zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+    state.zoom = Math.max(0.5, Math.min(4.0, state.zoom * zoomFactor));
+    requestRender();
+  }, {passive:false});
+
+  // Touch Support
+  var touchStartDist = 0;
+  container.addEventListener('touchstart', function(e){
+    if(e.touches.length === 1){
+      state.isDragging = true;
+      state.dragStart = {x: e.touches[0].clientX - state.panX, y: e.touches[0].clientY - state.panY};
+    } else if(e.touches.length === 2){
+      touchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  });
+
+  container.addEventListener('touchmove', function(e){
+    if(state.isDragging && e.touches.length === 1){
+      state.panX = e.touches[0].clientX - state.dragStart.x;
+      state.panY = e.touches[0].clientY - state.dragStart.y;
+      requestRender();
+    } else if(e.touches.length === 2){
+      var dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if(touchStartDist > 0){
+        state.zoom = Math.max(0.5, Math.min(4.0, state.zoom * (dist / touchStartDist)));
+        touchStartDist = dist;
+        requestRender();
+      }
+    }
+  });
+
+  container.addEventListener('touchend', function(){ state.isDragging = false; touchStartDist = 0; });
+}
+
+function zoomIn(){ state.zoom = Math.min(4.0, state.zoom * 1.25); requestRender(); }
+function zoomOut(){ state.zoom = Math.max(0.5, state.zoom / 1.25); requestRender(); }
+function resetView(){ state.zoom = 1.0; state.panX = 0; state.panY = 0; requestRender(); }
+
+function setViewMode(mode){
+  state.viewMode = mode;
+  document.getElementById('tab2d').classList.toggle('active', mode==='2d');
+  document.getElementById('tab3d').classList.toggle('active', mode==='3d');
+  document.getElementById('tabTel').classList.toggle('active', mode==='telemetry');
+  
+  var legend = document.getElementById('legendBox');
+  if(legend){ legend.style.display = (mode === '2d') ? 'flex' : 'none'; }
+  requestRender();
+}
+
+function setOpMode(opMode){
+  state.opMode = opMode;
+  document.getElementById('modeCS').classList.toggle('active', opMode==='CS_FIXED');
+  document.getElementById('modeFS').classList.toggle('active', opMode==='FS_FIXED');
+  updateEquationDisplay();
+  requestRender();
+}
+
+function setToothRatio(nFS, nCS){
+  state.N_FS = nFS;
+  state.N_CS = nCS;
+  state.deltaN = nCS - nFS;
+  
+  document.getElementById('ratio49').classList.toggle('active', nFS===98);
+  document.getElementById('ratio79').classList.toggle('active', nFS===158);
+  document.getElementById('ratio99').classList.toggle('active', nFS===198);
+  document.getElementById('ratio119').classList.toggle('active', nFS===238);
+  
+  updateEquationDisplay();
+  requestRender();
+}
+
+function updateSpeed(val){
+  state.speedRPM = parseFloat(val);
+  document.getElementById('speedVal').textContent = (state.speedRPM >= 0 ? '+' : '') + state.speedRPM + ' RPM';
+  requestRender();
+}
+
+function updateTorque(val){
+  state.torqueNm = parseFloat(val);
+  document.getElementById('torqueVal').textContent = state.torqueNm + ' Nm';
+  requestRender();
+}
+
+function togglePlay(){
+  state.playing = !state.playing;
+  document.getElementById('playPauseBtn').textContent = state.playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
+}
+
+function reverseDirection(){
+  updateSpeed(-state.speedRPM);
+  document.getElementById('speedSlider').value = state.speedRPM;
+}
+
+function stepSim(steps){
+  var dt = (steps * 0.05);
+  advanceKinematics(dt);
+  requestRender();
+}
+
+function toggleSlowMo(checked){ state.slowMo = checked; }
+
+function updateEquationDisplay(){
+  var eqBox = document.getElementById('eqDisplay');
+  var ratioVal = getGearRatio();
+  var ratioStr = (ratioVal > 0 ? '+' : '') + ratioVal.toFixed(1) + ' : 1';
+  
+  if(state.opMode === 'CS_FIXED'){
+    eqBox.innerHTML = `Circular Spline Fixed (Reducer):<br>` +
+      `$R = \\frac{N_{FS}}{N_{FS} - N_{CS}} = \\frac{${state.N_FS}}{${state.N_FS} - ${state.N_CS}} = \\mathbf{${ratioStr}}$`;
+  } else {
+    eqBox.innerHTML = `Flexspline Fixed (Direct Reducer):<br>` +
+      `$R = \\frac{N_{CS}}{N_{CS}} = 1 + \\frac{N_{FS}}{\\Delta N} = \\mathbf{+${(state.N_CS / state.deltaN).toFixed(1)} : 1}$`;
+  }
+}
+
+function getGearRatio(){
+  if(state.opMode === 'CS_FIXED'){
+    return -state.N_FS / state.deltaN;
+  } else {
+    return state.N_CS / state.deltaN;
+  }
+}
+
+function advanceKinematics(dt){
+  var speedMult = state.slowMo ? 0.2 : 1.0;
+  var radPerSecWG = (state.speedRPM * 2 * Math.PI / 60) * speedMult;
+  
+  state.thetaWG += radPerSecWG * dt;
+  
+  // Calculate dependent angles based on operational mode
+  var ratio = getGearRatio();
+  if(state.opMode === 'CS_FIXED'){
+    state.thetaCS = 0;
+    // FS rotates relative to WG
+    var radPerSecFS = radPerSecWG / ratio;
+    state.thetaFS += radPerSecFS * dt;
+  } else if(state.opMode === 'FS_FIXED'){
+    state.thetaFS = 0;
+    var radPerSecCS = radPerSecWG / ratio;
+    state.thetaCS += radPerSecCS * dt;
+  }
+
+  // Record Telemetry
+  var torsionalWindup = (state.torqueNm / 100) * (0.015); // radians of windup deflection
+  if(state.telemetryHistory.length > 200) state.telemetryHistory.shift();
+  state.telemetryHistory.push({
+    time: performance.now(),
+    wg: state.thetaWG,
+    fs: state.thetaFS,
+    torque: state.torqueNm,
+    strain: Math.abs(Math.sin(state.thetaWG * 2)) * (state.torqueNm / 100)
+  });
+
+  // Update HUD
+  var hudWG = document.getElementById('hudSpeedWG');
+  var hudOut = document.getElementById('hudSpeedOut');
+  var hudR = document.getElementById('hudRatio');
+  
+  if(hudWG) hudWG.textContent = (state.speedRPM >= 0 ? '+' : '') + state.speedRPM.toFixed(1) + ' RPM';
+  if(hudOut){
+    var outRPM = state.speedRPM / ratio;
+    hudOut.textContent = (outRPM >= 0 ? '+' : '') + outRPM.toFixed(2) + ' RPM';
+  }
+  if(hudR) hudR.textContent = (ratio > 0 ? '+' : '') + ratio.toFixed(1) + ' : 1';
+}
+
+function animLoop(timestamp){
+  var dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  if(dt > 0.1) dt = 0.1; // cap frame jump
+
+  if(state.playing){
+    advanceKinematics(dt);
+  }
+
+  render();
+  requestAnimationFrame(animLoop);
+}
+
+function requestRender(){ render(); }
+
+function render(){
+  if(!ctx || !canvas) return;
+
+  var rect = canvas.getBoundingClientRect();
+  var w = rect.width;
+  var h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Background Grid inside Canvas
+  drawCanvasGrid(w, h);
+
+  ctx.save();
+  // Apply Zoom and Pan
+  ctx.translate(w/2 + state.panX, h/2 + state.panY);
+  ctx.scale(state.zoom, state.zoom);
+
+  if(state.viewMode === '2d'){
+    draw2DStrainWaveGearing(w, h);
+  } else if(state.viewMode === '3d'){
+    draw3DIsometricExploded(w, h);
+  } else if(state.viewMode === 'telemetry'){
+    drawTelemetryGraphs(w, h);
+  }
+
+  ctx.restore();
+}
+
+function drawCanvasGrid(w, h){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  ctx.save();
+  ctx.strokeStyle = isDark ? 'rgba(35, 68, 86, 0.4)' : 'rgba(203, 196, 168, 0.4)';
+  ctx.lineWidth = 1;
+  
+  var gridSize = 28;
+  for(var x = 0; x < w; x += gridSize){
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+  }
+  for(var y = 0; y < h; y += gridSize){
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function draw2DStrainWaveGearing(w, h){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  var accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim();
+  var cardBg = getComputedStyle(document.documentElement).getPropertyValue('--card').trim();
+
+  // Radii Specs
+  var R_CS_outer = 175;
+  var R_CS_inner = 145; // Circular spline tooth tip radius
+  var h_tooth = 10;     // Tooth height
+  var R_FS_neutral = 138; // Un-deformed neutral axis radius of flexspline
+  var w0 = h_tooth + 0.8; // Radial deformation amplitude
+  var R_WG_minor = R_FS_neutral - w0 - 12; // Wave generator inner core radius
+
+  var chkStress = document.getElementById('chkStress').checked;
+  var chkBalls = document.getElementById('chkBalls').checked;
+  var chkZoom = document.getElementById('chkZoom').checked;
+  var chkPitch = document.getElementById('chkPitch').checked;
+  var chkVectors = document.getElementById('chkVectors').checked;
+
+  // ----------------------------------------------------
+  // 1. Draw Fixed Outer Housing / Circular Spline (CS)
+  // ----------------------------------------------------
+  ctx.save();
+  ctx.rotate(state.thetaCS);
+
+  // Outer Ring
+  ctx.fillStyle = isDark ? '#162C38' : '#E8E2CD';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, R_CS_outer, 0, Math.PI * 2);
+  ctx.arc(0, 0, R_CS_inner, 0, Math.PI * 2, true);
+  ctx.fill();
+  ctx.stroke();
+
+  // Draw CS Teeth (Internal Trapezoidal Teeth)
+  ctx.fillStyle = isDark ? '#1F3C4D' : '#DBCFAD';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 1;
+
+  for(var i = 0; i < state.N_CS; i++){
+    var angle = (i / state.N_CS) * Math.PI * 2;
+    var halfPitch = (Math.PI / state.N_CS) * 0.45;
+    
+    var rInner = R_CS_inner;
+    var rOuter = R_CS_inner + h_tooth;
+
+    var a1 = angle - halfPitch;
+    var a2 = angle + halfPitch;
+
+    ctx.beginPath();
+    ctx.arc(0, 0, rOuter, a1, a2);
+    ctx.lineTo(rInner * Math.cos(angle + halfPitch*0.5), rInner * Math.sin(angle + halfPitch*0.5));
+    ctx.lineTo(rInner * Math.cos(angle - halfPitch*0.5), rInner * Math.sin(angle - halfPitch*0.5));
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // ----------------------------------------------------
+  // 2. Draw Deformed Flexspline (FS) & Strain Heatmap
+  // ----------------------------------------------------
+  ctx.save();
+  // Flexspline radial deformation formula: r(phi) = R_0 + w0 * cos(2*(phi - thetaWG))
+  var numFSTeeth = state.N_FS;
+  var fsPoints = [];
+
+  for(var j = 0; j < numFSTeeth; j++){
+    var materialAngle = (j / numFSTeeth) * Math.PI * 2 + state.thetaFS;
+    var phi = materialAngle; // spatial angle
+    var localDeform = w0 * Math.cos(2 * (phi - state.thetaWG));
+    
+    var rNeutral = R_FS_neutral + localDeform;
+    var x = rNeutral * Math.cos(phi);
+    var y = rNeutral * Math.sin(phi);
+
+    // Normal direction for tooth alignment
+    var dr_dphi = -2 * w0 * Math.sin(2 * (phi - state.thetaWG));
+    var normalAngle = phi - Math.atan2(dr_dphi, rNeutral);
+
+    // von Mises strain magnitude (proportional to curvature changes)
+    var strain = Math.abs(Math.cos(2 * (phi - state.thetaWG)));
+
+    fsPoints.push({
+      x: x, y: y,
+      r: rNeutral,
+      phi: phi,
+      normalAngle: normalAngle,
+      strain: strain,
+      index: j
+    });
+  }
+
+  // Render Flexspline Flexible Cup Wall
+  ctx.lineWidth = 4;
+  for(var k = 0; k < fsPoints.length; k++){
+    var p1 = fsPoints[k];
+    var p2 = fsPoints[(k + 1) % fsPoints.length];
+
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+
+    if(chkStress){
+      // Heatmap gradient based on local bending strain
+      var s = p1.strain;
+      if(s > 0.65){
+        ctx.strokeStyle = `rgba(192, 57, 43, ${0.4 + s*0.6})`; // High bending strain
+      } else if(s > 0.35){
+        ctx.strokeStyle = `rgba(229, 169, 60, ${0.4 + s*0.6})`;
+      } else {
+        ctx.strokeStyle = accent2;
+      }
+    } else {
+      ctx.strokeStyle = accent2;
+    }
+    ctx.stroke();
+  }
+
+  // Render Flexspline External Teeth
+  ctx.fillStyle = accent2;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 0.8;
+
+  for(var k = 0; k < fsPoints.length; k++){
+    var pt = fsPoints[k];
+    var tLen = h_tooth * 0.95;
+    var halfP = (Math.PI / numFSTeeth) * 0.45;
+
+    ctx.save();
+    ctx.translate(pt.x, pt.y);
+    ctx.rotate(pt.normalAngle);
+
+    // External Tooth Trapezoid facing outward
+    ctx.beginPath();
+    ctx.moveTo(-halfP * R_FS_neutral * 0.5, 0);
+    ctx.lineTo(halfP * R_FS_neutral * 0.5, 0);
+    ctx.lineTo(halfP * R_FS_neutral * 0.3, tLen);
+    ctx.lineTo(-halfP * R_FS_neutral * 0.3, tLen);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // ----------------------------------------------------
+  // 3. Pitch Ellipse & Center Lines Overlay
+  // ----------------------------------------------------
+  if(chkPitch){
+    ctx.save();
+    ctx.rotate(state.thetaWG);
+    ctx.strokeStyle = 'rgba(227, 155, 87, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, R_FS_neutral + w0, R_FS_neutral - w0, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.restore(); // End FS transform
+
+  // ----------------------------------------------------
+  // 4. Wave Generator (Elliptical Cam + Bearing)
+  // ----------------------------------------------------
+  ctx.save();
+  ctx.rotate(state.thetaWG);
+
+  var wgSemiMajor = R_FS_neutral + w0 - 8;
+  var wgSemiMinor = R_FS_neutral - w0 - 8;
+
+  // Elliptical WG Hub Fill
+  ctx.fillStyle = isDark ? '#2B1A0E' : '#F5E6D3';
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, wgSemiMajor, wgSemiMinor, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Wave Generator Input Shaft Hub
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(0, 0, 24, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Shaft Keyway
+  ctx.fillStyle = ink;
+  ctx.fillRect(-4, -20, 8, 10);
+
+  // Flexible Ball Bearings around Wave Generator Ellipse
+  if(chkBalls){
+    var numBalls = 24;
+    for(var b = 0; b < numBalls; b++){
+      var bAngle = (b / numBalls) * Math.PI * 2;
+      var bx = (wgSemiMajor + 4) * Math.cos(bAngle);
+      var by = (wgSemiMinor + 4) * Math.sin(bAngle);
+
+      ctx.fillStyle = isDark ? '#E0EAEF' : '#ffffff';
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  // Major Axis Direction Arrow
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-wgSemiMajor - 10, 0); ctx.lineTo(wgSemiMajor + 10, 0);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // ----------------------------------------------------
+  // 5. Force Vectors Overlay
+  // ----------------------------------------------------
+  if(chkVectors){
+    ctx.save();
+    // High pressure contact vectors along major axis
+    for(var sign of [-1, 1]){
+      var vx = sign * (R_CS_inner - 5) * Math.cos(state.thetaWG);
+      var vy = sign * (R_CS_inner - 5) * Math.sin(state.thetaWG);
+
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--danger').trim();
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(vx, vy);
+      ctx.lineTo(vx + sign * 25 * Math.cos(state.thetaWG), vy + sign * 25 * Math.sin(state.thetaWG));
+      ctx.stroke();
+
+      // Arrowhead
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--danger').trim();
+      ctx.beginPath();
+      ctx.arc(vx + sign * 25 * Math.cos(state.thetaWG), vy + sign * 25 * Math.sin(state.thetaWG), 4, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ----------------------------------------------------
+  // 6. Mesh Magnifier Lens (Tooth Engagement Zone)
+  // ----------------------------------------------------
+  if(chkZoom){
+    drawToothMagnifierLens(w, h, R_CS_inner, state.thetaWG);
+  }
+}
+
+function drawToothMagnifierLens(w, h, rTarget, thetaWG){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+
+  // Focus target point: Major axis tooth mesh engagement point
+  var targetX = rTarget * Math.cos(thetaWG);
+  var targetY = rTarget * Math.sin(thetaWG);
+
+  // Position magnifier lens box in top-left corner
+  var lensRadius = 65;
+  var lensCenterX = -w/2 + lensRadius + 20;
+  var lensCenterY = -h/2 + lensRadius + 20;
+
+  ctx.save();
+
+  // Draw Connector Line from target mesh zone to Lens
+  ctx.strokeStyle = 'rgba(181, 101, 29, 0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(targetX, targetY);
+  ctx.lineTo(lensCenterX, lensCenterY);
+  ctx.stroke();
+
+  // Lens Circle Highlight around target zone
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'var(--accent)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(targetX, targetY, 18, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Magnifier Lens Outer Frame
+  ctx.fillStyle = isDark ? '#10222D' : '#FBF9F1';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(lensCenterX, lensCenterY, lensRadius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Clip content inside magnifier
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(lensCenterX, lensCenterY, lensRadius - 1, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Magnified View rendering
+  ctx.translate(lensCenterX, lensCenterY);
+  ctx.scale(2.8, 2.8); // 2.8x magnification
+  ctx.translate(-targetX, -targetY);
+
+  // Re-draw localized CS and FS teeth inside magnifier
+  var accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim();
+
+  // CS Teeth segment
+  ctx.fillStyle = isDark ? '#1F3C4D' : '#DBCFAD';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 0.5;
+  for(var i = 0; i < state.N_CS; i++){
+    var angle = (i / state.N_CS) * Math.PI * 2 + state.thetaCS;
+    // only render teeth near target
+    if(Math.abs(angle - thetaWG) < 0.4 || Math.abs(angle - thetaWG - Math.PI*2) < 0.4){
+      ctx.beginPath();
+      ctx.arc(0, 0, rTarget + 8, angle - 0.02, angle + 0.02);
+      ctx.lineTo(rTarget * Math.cos(angle), rTarget * Math.sin(angle));
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  // FS Teeth segment
+  ctx.fillStyle = accent2;
+  for(var j = 0; j < state.N_FS; j++){
+    var mAngle = (j / state.N_FS) * Math.PI * 2 + state.thetaFS;
+    if(Math.abs(mAngle - thetaWG) < 0.4 || Math.abs(mAngle - thetaWG - Math.PI*2) < 0.4){
+      var rFS = 138 + (10.8) * Math.cos(2*(mAngle - thetaWG));
+      ctx.beginPath();
+      ctx.arc(0, 0, rFS + 6, mAngle - 0.02, mAngle + 0.02);
+      ctx.lineTo(rFS * Math.cos(mAngle), rFS * Math.sin(mAngle));
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore(); // End clip
+
+  // Lens Label
+  ctx.fillStyle = ink;
+  ctx.font = '700 9px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('MESH ZOOM (2.8X)', lensCenterX, lensCenterY + lensRadius - 10);
+
+  ctx.restore();
+}
+
+function draw3DIsometricExploded(w, h){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  var accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim();
+
+  // 3D Isometric Projection Helpers
+  function project3D(x, y, z){
+    var isoX = (x - y) * Math.cos(Math.PI / 6);
+    var isoY = (x + y) * Math.sin(Math.PI / 6) - z;
+    return {x: isoX, y: isoY};
+  }
+
+  ctx.save();
+  ctx.translate(0, 30);
+
+  // Exploded Axial Offsets (Z axis)
+  var zWG = -80;
+  var zFS = 0;
+  var zCS = 90;
+
+  // ----------------------------------------------------
+  // 1. Wave Generator Disk (Z = zWG)
+  // ----------------------------------------------------
+  var pWG = project3D(0, 0, zWG);
+  ctx.save();
+  ctx.translate(pWG.x, pWG.y);
+
+  // Elliptical Ring Projection
+  ctx.fillStyle = isDark ? 'rgba(227, 155, 87, 0.3)' : 'rgba(181, 101, 29, 0.2)';
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  
+  ctx.beginPath();
+  for(var a = 0; a <= Math.PI*2; a += 0.1){
+    var rx = 70 * Math.cos(a + state.thetaWG);
+    var ry = 45 * Math.sin(a + state.thetaWG);
+    var pt = project3D(rx, ry, 0);
+    if(a === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Center Shaft
+  ctx.fillStyle = accent;
+  ctx.fillRect(-6, -40, 12, 50);
+  ctx.restore();
+
+  // ----------------------------------------------------
+  // 2. Flexspline Flexible Cup (Z = zFS)
+  // ----------------------------------------------------
+  var pFS = project3D(0, 0, zFS);
+  ctx.save();
+  ctx.translate(pFS.x, pFS.y);
+
+  // Render Cylindrical Cup Body tapering to Output Hub
+  ctx.strokeStyle = accent2;
+  ctx.fillStyle = isDark ? 'rgba(84, 214, 198, 0.15)' : 'rgba(46, 110, 98, 0.15)';
+  ctx.lineWidth = 2;
+
+  // Cup Rim (Deformed Ellipse)
+  ctx.beginPath();
+  for(var a = 0; a <= Math.PI*2; a += 0.08){
+    var r = 72 + 8 * Math.cos(2 * (a - state.thetaWG));
+    var rx = r * Math.cos(a + state.thetaFS);
+    var ry = (r*0.6) * Math.sin(a + state.thetaFS);
+    var pt = project3D(rx, ry, 0);
+    if(a === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Cup Base Cylindrical Wall
+  var ptBase = project3D(0, 0, 40);
+  ctx.beginPath();
+  ctx.arc(ptBase.x, ptBase.y, 20, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // ----------------------------------------------------
+  // 3. Circular Spline Ring (Z = zCS)
+  // ----------------------------------------------------
+  var pCS = project3D(0, 0, zCS);
+  ctx.save();
+  ctx.translate(pCS.x, pCS.y);
+
+  ctx.strokeStyle = ink;
+  ctx.fillStyle = isDark ? 'rgba(31, 60, 77, 0.5)' : 'rgba(219, 207, 173, 0.5)';
+  ctx.lineWidth = 2.5;
+
+  ctx.beginPath();
+  for(var a = 0; a <= Math.PI*2; a += 0.1){
+    var rx = 90 * Math.cos(a + state.thetaCS);
+    var ry = 55 * Math.sin(a + state.thetaCS);
+    var pt = project3D(rx, ry, 0);
+    if(a === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Annotations
+  ctx.fillStyle = ink;
+  ctx.font = '600 11px "IBM Plex Mono", monospace';
+  ctx.fillText('1. WAVE GENERATOR (INPUT)', pWG.x + 85, pWG.y);
+  ctx.fillText('2. FLEXSPLINE (FLEXIBLE CUP)', pFS.x + 95, pFS.y);
+  ctx.fillText('3. CIRCULAR SPLINE (RIGID RING)', pCS.x + 105, pCS.y);
+
+  ctx.restore();
+}
+
+function drawTelemetryGraphs(w, h){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  var accent2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim();
+
+  ctx.save();
+  ctx.translate(-w/2 + 40, -h/2 + 30);
+
+  var graphW = w - 80;
+  var graphH = (h - 100) / 2;
+
+  // Graph 1: Torsional Stiffness & Torque Windup Curve
+  drawSingleGraph(0, 0, graphW, graphH, 'TORSIONAL WINDUP CURVE (TORQUE vs DEFLECTION ANGLE)', 'Deflection Angle (arcmin)', 'Torque (Nm)', function(){
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for(var t = -50; t <= 50; t += 2){
+      // Non-linear torsional stiffness characteristic curve
+      var arcmin = (t / 50) * 8;
+      var torque = Math.sign(t) * Math.pow(Math.abs(t)/50, 1.4) * 100;
+      
+      var gx = (arcmin + 8) / 16 * graphW;
+      var gy = graphH/2 - (torque / 100) * (graphH/2 - 20);
+      
+      if(t === -50) ctx.moveTo(gx, gy); else ctx.lineTo(gx, gy);
+    }
+    ctx.stroke();
+
+    // Current operating point dot
+    var curTorque = state.torqueNm;
+    var curArcmin = Math.pow(curTorque / 100, 1/1.4) * 8;
+    var curX = (curArcmin + 8) / 16 * graphW;
+    var curY = graphH/2 - (curTorque / 100) * (graphH/2 - 20);
+
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--danger').trim();
+    ctx.beginPath();
+    ctx.arc(curX, curY, 6, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // Graph 2: Flexspline Dynamic Strain Wave Distribution (360 deg)
+  drawSingleGraph(0, graphH + 40, graphW, graphH, 'FLEXSPLINE WALL BENDING STRAIN OVER 360° RIM', 'Rim Angle φ (deg)', 'von Mises Strain (με)', function(){
+    ctx.strokeStyle = accent2;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    for(var deg = 0; deg <= 360; deg += 2){
+      var rad = deg * Math.PI / 180;
+      var strainVal = Math.abs(Math.cos(2 * (rad - state.thetaWG)));
+      
+      var gx = (deg / 360) * graphW;
+      var gy = graphH - (strainVal * (graphH - 30)) - 10;
+
+      if(deg === 0) ctx.moveTo(gx, gy); else ctx.lineTo(gx, gy);
+    }
+    ctx.stroke();
+  });
+
+  ctx.restore();
+}
+
+function drawSingleGraph(x, y, gw, gh, title, xLabel, yLabel, drawCurveCallback){
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Background card
+  ctx.fillStyle = isDark ? '#10222D' : '#FBF9F1';
+  ctx.strokeStyle = 'var(--border)';
+  ctx.lineWidth = 1;
+  ctx.fillRect(0, 0, gw, gh);
+  ctx.strokeRect(0, 0, gw, gh);
+
+  // Title
+  ctx.fillStyle = ink;
+  ctx.font = '700 11px "Space Grotesk", sans-serif';
+  ctx.fillText(title, 12, 18);
+
+  // Axes
+  ctx.strokeStyle = 'rgba(91, 107, 122, 0.4)';
+  ctx.beginPath();
+  ctx.moveTo(0, gh/2); ctx.lineTo(gw, gh/2); // Horizontal center axis
+  ctx.stroke();
+
+  // Draw Curve
+  drawCurveCallback();
+
+  ctx.restore();
+}
 
 </script>
 </body>
