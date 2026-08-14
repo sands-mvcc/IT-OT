@@ -4,19 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ACT-10 Direct-Drive Rotary Table (Torque Motor) Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-
 :root{
-  --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
-  --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --bg:#FFFFFF; 
+  --bg-grid:#F0F2F1; 
+  --ink:#111827; 
+  --ink-soft:#4B5563;
+  --accent:#00A86B; 
+  --accent2:#1E3A2B; 
+  --card:#FAFAFA; 
+  --border:#D1D5DB;
+  --shadow: rgba(0, 0, 0, 0.06); 
+  --danger:#DC2626;
+  --phase-u:#EF4444;
+  --phase-v:#10B981;
+  --phase-w:#3B82F6;
 }
 :root[data-theme="dark"]{
-  --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
-  --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --bg:#0D1712; 
+  --bg-grid:#13241B; 
+  --ink:#E5E7EB; 
+  --ink-soft:#9CA3AF;
+  --accent:#00C853; 
+  --accent2:#2E6E62; 
+  --card:#111E17; 
+  --border:#2A3F33;
+  --shadow: rgba(0,0,0,0.5); 
+  --danger:#EF4444;
 }
+
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -32,17 +51,18 @@ body{
 h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
 .mono{font-family:'IBM Plex Mono', monospace;}
 a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.wrap{max-width:1240px; margin:0 auto; padding:28px 22px 60px;}
+
 .topbar{
   display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
   border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
-  color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
+  color:var(--accent); text-transform:uppercase; margin-bottom:6px; font-weight:700;
 }
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+h1.title{font-size:clamp(26px,3.6vw,38px); line-height:1.08; color:var(--ink);}
+.sub{color:var(--ink-soft); max-width:680px; margin-top:10px; font-size:14.5px; line-height:1.55;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
@@ -59,62 +79,78 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
+.simlayout{display:grid; grid-template-columns:1.35fr 1fr; gap:22px; margin-top:20px;}
+@media (max-width:960px){.simlayout{grid-template-columns:1fr;}}
 
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
 .stage{
-  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
-  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  background:var(--card); border:1.5px solid var(--border); border-radius:6px;
+  padding:16px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:12px;
 }
-.stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+.stagelabel{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); font-weight:600; display:flex; justify-content:space-between; align-items:center;
 }
 .stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
+
+.panel{
+  background:var(--card); border:1.5px solid var(--border); border-radius:6px; 
+  padding:18px; box-shadow:3px 3px 0 var(--shadow); display:flex; flex-direction:column; gap:14px;
 }
-button.ctl:hover{background:var(--accent);}
-button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
-button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.panel h2{font-size:15px; margin-bottom:4px; color:var(--ink); border-bottom:1px solid var(--border); padding-bottom:4px;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0;}
+
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
-  text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
+  text-transform:uppercase; background:var(--accent); color:#FFFFFF; padding:4px 10px; border-radius:20px;
+  font-weight:700; align-self:flex-start;
 }
 
+.controlrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+button.ctl{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:1.5px solid var(--ink); padding:8px 12px;
+  border-radius:4px; cursor:pointer; transition:all 0.15s ease;
+}
+button.ctl:hover{background:var(--accent); border-color:var(--accent); color:#FFF;}
+button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--border);}
+button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
+button.ctl.active{background:var(--accent); border-color:var(--accent); color:#FFF;}
 
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes tableSpin{to{transform:rotate(360deg);}}
-[data-anim="tableSpin"]{animation-name:tableSpin; animation-timing-function:linear; transform-box:fill-box; transform-origin:center;}
-@keyframes phaseA{to{stroke-dashoffset:-240;}}
-[data-anim="phaseA"]{animation-name:phaseA; animation-timing-function:linear;}
+.sliderrow{display:flex; flex-direction:column; gap:4px;}
+.sliderrow label{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; 
+  color:var(--ink-soft); display:flex; justify-content:space-between;
+}
+input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer;}
 
+.readout-grid{
+  display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;
+  background:var(--bg); border:1px solid var(--border); padding:10px; border-radius:4px;
+}
+.readout-item{display:flex; flex-direction:column;}
+.readout-item .lbl{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); text-transform:uppercase;}
+.readout-item .val{font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:var(--accent);}
+
+.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+.specs li{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li span:last-child{color:var(--ink); font-weight:600;}
+
+.stepsbox{margin-top:2px;}
+.stepsbox ol{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+
+.scope-container{
+  background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:8px; margin-top:4px;
+}
+.scope-header{
+  font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; 
+  color:var(--ink-soft); margin-bottom:4px; display:flex; justify-content:space-between;
+}
+
+.pagefoot{
+  margin-top:24px; padding-top:12px; border-top:1px solid var(--border);
+  font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-align:center;
+}
 </style>
 </head>
 <body>
@@ -122,100 +158,525 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-10 &middot; ROTARY MOTION</div>
+      <div class="eyebrow">ACT-10 &middot; ROTARY MOTION & SERVO DYNAMICS</div>
       <h1 class="title">Direct-Drive Rotary Table (Torque Motor)</h1>
-      <p class="sub">A high-torque, permanent-magnet synchronous motor directly integrated with a rotary worktable bearing, eliminating gears or belts.</p>
+      <p class="sub">High-torque Frameless Brushless AC Synchronous Servo Motor directly integrated with an optical rotary encoder and precision cross-roller bearing platen.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
+
   <div class="simlayout">
     <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
+      <div class="stagelabel">
+        <span>Electromagnetic & Kinematic Simulation</span>
+        <span id="statusIndicator" style="color:var(--accent); font-weight:bold;">● RUNNING</span>
+      </div>
       
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<g stroke="var(--border)" stroke-width="10" fill="none">
- <circle cx="320" cy="110" r="86"/>
-</g>
-<g class="moving" data-anim="phaseA" stroke="var(--accent2)" stroke-width="10" fill="none" stroke-dasharray="30 210">
- <circle cx="320" cy="110" r="86"/>
-</g>
-<g class="moving" data-anim="tableSpin">
- <circle cx="320" cy="110" r="60" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
- <g stroke="var(--ink)" stroke-width="4">
-  <line x1="320" y1="50" x2="320" y2="70"/><line x1="380" y1="110" x2="360" y2="110"/>
-  <line x1="320" y1="170" x2="320" y2="150"/><line x1="260" y1="110" x2="280" y2="110"/>
- </g>
- <circle cx="320" cy="110" r="8" fill="var(--accent)"/>
-</g>
-<text x="240" y="205" class="lbl small">STATOR (FIXED COILS)</text>
-</svg>
+      <!-- Interactive Main Motor Vector Canvas Diagram -->
+      <svg viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        <!-- Stator Housing Outer Ring -->
+        <circle cx="300" cy="240" r="220" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <circle cx="300" cy="240" r="210" fill="none" stroke="var(--border)" stroke-width="2"/>
+
+        <!-- High Resolution Optical Encoder Scale Grid Ring -->
+        <circle cx="300" cy="240" r="200" fill="none" stroke="var(--border)" stroke-dasharray="2, 4" stroke-width="8"/>
+        
+        <!-- Stator Magnetic Iron Core -->
+        <circle cx="300" cy="240" r="185" fill="none" stroke="var(--ink)" stroke-width="20" opacity="0.15"/>
+
+        <!-- Stator 12 Electromagnetic Coils -->
+        <g id="statorCoils"></g>
+
+        <!-- Air Gap Boundary -->
+        <circle cx="300" cy="240" r="148" fill="none" stroke="var(--border)" stroke-dasharray="3,3" stroke-width="1.5"/>
+
+        <!-- ROTOR ASSEMBLY (Rotates Dynamically) -->
+        <g id="rotorGroup">
+          <!-- Permanent Magnet Ring -->
+          <circle cx="300" cy="240" r="138" fill="none" stroke="var(--ink)" stroke-width="16"/>
+          
+          <!-- Alternating N/S Permanent Magnets -->
+          <g id="rotorMagnets"></g>
+
+          <!-- T-Slot Table Surface (Rotary Platen) -->
+          <circle cx="300" cy="240" r="115" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
+          <circle cx="300" cy="240" r="105" fill="none" stroke="var(--border)" stroke-width="1"/>
+
+          <!-- Machining T-Slots -->
+          <g stroke="var(--ink)" stroke-width="3" stroke-linecap="round">
+            <line x1="300" y1="135" x2="300" y2="175"/>
+            <line x1="300" y1="305" x2="300" y2="345"/>
+            <line x1="195" y1="240" x2="235" y2="240"/>
+            <line x1="365" y1="240" x2="405" y2="240"/>
+            <!-- T-Bolt Cross Slits -->
+            <line x1="292" y1="145" x2="308" y2="145"/>
+            <line x1="292" y1="335" x2="308" y2="335"/>
+            <line x1="205" y1="232" x2="205" y2="248"/>
+            <line x1="395" y1="232" x2="395" y2="248"/>
+          </g>
+
+          <!-- Precision Workpiece Reference Notch / Home Alignment Pointer -->
+          <polygon points="300,127 294,118 306,118" fill="var(--accent)"/>
+          <circle cx="300" cy="170" r="5" fill="var(--accent)"/>
+
+          <!-- Center Spindle Bore -->
+          <circle cx="300" cy="240" r="30" fill="var(--bg)" stroke="var(--ink)" stroke-width="3"/>
+          <circle cx="300" cy="240" r="8" fill="var(--accent)"/>
+        </g>
+
+        <!-- Fixed Optical Encoder Readhead Sensor -->
+        <g transform="translate(300, 20)">
+          <rect x="-18" y="0" width="36" height="24" fill="var(--ink)" rx="3"/>
+          <text x="0" y="15" font-family="IBM Plex Mono" font-size="9" fill="var(--bg)" text-anchor="middle" font-weight="bold">ENCODER</text>
+          <line x1="0" y1="24" x2="0" y2="40" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2,2"/>
+        </g>
+
+        <!-- Torque & Rotation Dynamic Overlay Vectors -->
+        <g id="vectorOverlay"></g>
+
+        <!-- Static Legends on SVG Base -->
+        <text x="25" y="475" font-family="IBM Plex Mono" font-size="10" fill="var(--ink-soft)">3-PHASE STATOR Winding (U, V, W)</text>
+        <text x="380" y="475" font-family="IBM Plex Mono" font-size="10" fill="var(--ink-soft)">DIRECT AIR-GAP MAGNETIC COUPLING</text>
+      </svg>
+
+      <!-- Real-time Oscilloscope Signal Graph -->
+      <div class="scope-container">
+        <div class="scope-header">
+          <span>Real-Time Servo Dynamics (Position Tracking Error & Current)</span>
+          <span id="scopeLegend" style="color:var(--accent);">■ θ Angle | ■ Error</span>
+        </div>
+        <canvas id="scopeCanvas" width="560" height="70" style="width:100%; height:70px; display:block;"></canvas>
+      </div>
     </div>
+
+    <!-- Right Control Panel -->
     <div class="panel">
-      <span class="badge">ROTARY MOTION</span>
-      <h2>Cycle Controls</h2>
+      <span class="badge">DIRECT-DRIVE TORQUE MOTOR</span>
+      
+      <!-- Live Telemetry Readout Box -->
+      <div class="readout-grid">
+        <div class="readout-item">
+          <span class="lbl">Actual Pos (&theta;)</span>
+          <span class="val" id="valPos">0.0°</span>
+        </div>
+        <div class="readout-item">
+          <span class="lbl">Target Pos (&theta;*)</span>
+          <span class="val" id="valTarget">0.0°</span>
+        </div>
+        <div class="readout-item">
+          <span class="lbl">Angular Vel (&omega;)</span>
+          <span class="val" id="valVel">0.0 RPM</span>
+        </div>
+        <div class="readout-item">
+          <span class="lbl">Motor Torque (T)</span>
+          <span class="val" id="valTorque">0.0 Nm</span>
+        </div>
+      </div>
+
+      <h2>Operational Mode</h2>
       <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+        <button class="ctl active" id="btnModeVel">Continuous Velocity</button>
+        <button class="ctl secondary" id="btnModePos">Position Indexing</button>
+        <button class="ctl secondary" id="btnPause">Pause</button>
       </div>
+
+      <h2>Control Inputs</h2>
+      
+      <!-- Speed / Target Control Sliders -->
+      <div class="sliderrow" id="rowSpeed">
+        <label for="sliderSpeed"><span>Target Velocity</span><span id="lblSpeed">30 RPM</span></label>
+        <input type="range" id="sliderSpeed" min="-100" max="100" value="30" step="1">
+      </div>
+
+      <div class="sliderrow" id="rowTargetPos" style="display:none;">
+        <label for="sliderTarget"><span>Set Target Index Angle</span><span id="lblTarget">0°</span></label>
+        <input type="range" id="sliderTarget" min="0" max="360" value="0" step="1">
+      </div>
+
       <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+        <label for="sliderLoad"><span>Disturbance / Machining Load</span><span id="lblLoad">0.0 Nm</span></label>
+        <input type="range" id="sliderLoad" min="0" max="50" value="0" step="1">
       </div>
-      <h2>Typical Purposes</h2>
-      <p>5-axis CNC machining centers, high-speed rotary indexing, robotic wrist joints, semiconductor turntables.</p>
+
+      <h2>Position Presets</h2>
+      <div class="controlrow">
+        <button class="ctl secondary" onclick="setPresetAngle(0)">0° Index</button>
+        <button class="ctl secondary" onclick="setPresetAngle(90)">90° Index</button>
+        <button class="ctl secondary" onclick="setPresetAngle(180)">180° Index</button>
+        <button class="ctl secondary" onclick="setPresetAngle(270)">270° Index</button>
+      </div>
+
+      <h2>Direct-Drive Characteristics</h2>
+      <p>Direct-drive torque motors couple high-pole PM synchronous motors straight to the load. Eliminating gears eliminates backlash, elasticity, and wear, yielding extreme dynamic responsiveness.</p>
+
       <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>The stator coils are fixed to the machine body; the rotor magnets form the rotating table face.</li>
-<li>Multiphase AC current is applied to the stator in a rotating pattern.</li>
-<li>Direct magnetic coupling turns the table with no gear backlash, wear, or torsional compliance.</li></ol></div>
+      <div class="stepsbox">
+        <ol>
+          <li><strong>3-Phase Commutation:</strong> Digital driver synthesizes sinusoidal AC currents ($U, V, W$) creating a seamless rotating stator field.</li>
+          <li><strong>Direct Synchronous Coupling:</strong> Permanent magnet rotor aligns instantly with the stator vector without mechanical backlash.</li>
+          <li><strong>Closed-Loop Servo Control:</strong> Optical encoder delivers sub-arcsecond feedback to counteract dynamic machining forces.</li>
+        </ol>
+      </div>
+
       <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Electricity</span></li>
-<li><span>Force output</span><span>High torque</span></li>
-<li><span>Speed</span><span>Medium to high</span></li>
-<li><span>Precision</span><span>Very high</span></li></ul>
+      <ul class="specs">
+        <li><span>Drive Architecture</span><span>Direct-Drive Permanent Magnet</span></li>
+        <li><span>Peak Torque Output</span><span>120 Nm</span></li>
+        <li><span>Backlash / Elasticity</span><span>0 Arcsec (Zero Backlash)</span></li>
+        <li><span>Encoder Feedback</span><span>26-bit Optical Absolute</span></li>
+      </ul>
     </div>
   </div>
-  <footer class="pagefoot">ACT-10 &middot; Direct-Drive Rotary Table (Torque Motor) &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
+  <footer class="pagefoot">
+    ACT-10 &middot; Direct-Drive Rotary Table (Torque Motor) &middot; Advanced Manufacturing & Motion Control Simulation
+  </footer>
+</div>
+
+<script>
+// Theme Toggle Script
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
-  if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('actuator-theme','light'); }
-  else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
+  if(isDark){ 
+    root.removeAttribute('data-theme'); 
+    localStorage.setItem('actuator-theme','light'); 
+  } else { 
+    root.setAttribute('data-theme','dark'); 
+    localStorage.setItem('actuator-theme','dark'); 
+  }
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 }
+
 document.addEventListener('DOMContentLoaded', function(){
   var btn = document.getElementById('themeLabel');
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
+// Simulation Physics and Rendering Engine
+(function(){
+  // SVG Elements
+  const statorCoilsGroup = document.getElementById('statorCoils');
+  const rotorMagnetsGroup = document.getElementById('rotorMagnets');
+  const rotorGroup = document.getElementById('rotorGroup');
+  const vectorOverlay = document.getElementById('vectorOverlay');
+  
+  // Canvas Graph
+  const canvas = document.getElementById('scopeCanvas');
+  const ctx = canvas.getContext('2d');
 
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
+  // Interactive UI Controls
+  const btnModeVel = document.getElementById('btnModeVel');
+  const btnModePos = document.getElementById('btnModePos');
+  const btnPause = document.getElementById('btnPause');
+  const rowSpeed = document.getElementById('rowSpeed');
+  const rowTargetPos = document.getElementById('rowTargetPos');
+  const sliderSpeed = document.getElementById('sliderSpeed');
+  const sliderTarget = document.getElementById('sliderTarget');
+  const sliderLoad = document.getElementById('sliderLoad');
+  
+  // Readout displays
+  const valPos = document.getElementById('valPos');
+  const valTarget = document.getElementById('valTarget');
+  const valVel = document.getElementById('valVel');
+  const valTorque = document.getElementById('valTorque');
+  const lblSpeed = document.getElementById('lblSpeed');
+  const lblTarget = document.getElementById('lblTarget');
+  const lblLoad = document.getElementById('lblLoad');
+  const statusIndicator = document.getElementById('statusIndicator');
+
+  // Simulation State Variables
+  let isRunning = true;
+  let mode = 'vel'; // 'vel' or 'pos'
+  
+  // Physics Model State
+  let theta = 0;           // Actual rotor angle (degrees)
+  let targetTheta = 0;     // Target angle in position mode (degrees)
+  let omega = 0;           // Actual angular velocity (degrees/sec)
+  let targetVelocity = 30; // Set velocity (RPM) converted to deg/sec later
+  let loadTorque = 0;      // External torque disturbance (Nm)
+  let motorTorque = 0;     // Generated electrical torque (Nm)
+  
+  // Control Parameters (PID Servo Loop)
+  const Kp = 8.0;          // Proportional gain
+  const Kd = 1.2;          // Derivative gain
+  const inertia = 0.08;    // Rotational inertia kg*m^2
+  
+  // Graphing History Data Buffer
+  const maxHistory = 140;
+  const historyPos = new Array(maxHistory).fill(0);
+  const historyErr = new Array(maxHistory).fill(0);
+
+  // Initialize Static SVG Graphics (Stator Coils & Rotor Magnets)
+  const numCoils = 12;
+  const coilRadius = 185;
+  const numPoles = 12;
+  const magnetRadius = 138;
+
+  // Build 12 Stator Coils (3 Phase: U, V, W)
+  const phaseColors = ['var(--phase-u)', 'var(--phase-v)', 'var(--phase-w)'];
+  const coilElements = [];
+
+  for(let i = 0; i < numCoils; i++){
+    let angleRad = (i * 360 / numCoils) * Math.PI / 180;
+    let cx = 300 + coilRadius * Math.sin(angleRad);
+    let cy = 240 - coilRadius * Math.cos(angleRad);
+    
+    let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', cx);
+    circle.setAttribute('cy', cy);
+    circle.setAttribute('r', '16');
+    circle.setAttribute('fill', 'var(--card)');
+    circle.setAttribute('stroke', phaseColors[i % 3]);
+    circle.setAttribute('stroke-width', '4');
+
+    let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', cy + 4);
+    text.setAttribute('font-family', 'IBM Plex Mono');
+    text.setAttribute('font-size', '10');
+    text.setAttribute('font-weight', 'bold');
+    text.setAttribute('fill', 'var(--ink)');
+    text.setAttribute('text-anchor', 'middle');
+    text.textContent = (i % 3 === 0) ? 'U' : (i % 3 === 1) ? 'V' : 'W';
+
+    g.appendChild(circle);
+    g.appendChild(text);
+    statorCoilsGroup.appendChild(g);
+
+    coilElements.push({ element: circle, phase: i % 3, angle: i * 360 / numCoils });
+  }
+
+  // Build Rotor Magnets (Alternating N & S)
+  for(let i = 0; i < numPoles; i++){
+    let angleDeg = i * (360 / numPoles);
+    let angleRad = angleDeg * Math.PI / 180;
+    let cx = 300 + magnetRadius * Math.sin(angleRad);
+    let cy = 240 - magnetRadius * Math.cos(angleRad);
+
+    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', cx - 10);
+    rect.setAttribute('y', cy - 8);
+    rect.setAttribute('width', '20');
+    rect.setAttribute('height', '16');
+    rect.setAttribute('rx', '2');
+    rect.setAttribute('transform', `rotate(${angleDeg}, ${cx}, ${cy})`);
+    
+    let isNorth = (i % 2 === 0);
+    rect.setAttribute('fill', isNorth ? 'var(--accent)' : 'var(--ink)');
+    
+    rotorMagnetsGroup.appendChild(rect);
+  }
+
+  // Mode Handlers
+  btnModeVel.addEventListener('click', () => {
+    mode = 'vel';
+    btnModeVel.classList.add('active'); btnModeVel.classList.remove('secondary');
+    btnModePos.classList.remove('active'); btnModePos.classList.add('secondary');
+    rowSpeed.style.display = 'flex';
+    rowTargetPos.style.display = 'none';
   });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
+
+  btnModePos.addEventListener('click', () => {
+    mode = 'pos';
+    btnModePos.classList.add('active'); btnModePos.classList.remove('secondary');
+    btnModeVel.classList.remove('active'); btnModeVel.classList.add('secondary');
+    rowSpeed.style.display = 'none';
+    rowTargetPos.style.display = 'flex';
+    targetTheta = parseFloat(sliderTarget.value);
   });
-}
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+  btnPause.addEventListener('click', () => {
+    isRunning = !isRunning;
+    btnPause.textContent = isRunning ? 'PAUSE' : 'RUN';
+    statusIndicator.textContent = isRunning ? '● RUNNING' : '⏸ PAUSED';
+    statusIndicator.style.color = isRunning ? 'var(--accent)' : 'var(--danger)';
+  });
 
+  // Slider Event Listeners
+  sliderSpeed.addEventListener('input', (e) => {
+    targetVelocity = parseFloat(e.target.value);
+    lblSpeed.textContent = `${targetVelocity} RPM`;
+  });
+
+  sliderTarget.addEventListener('input', (e) => {
+    targetTheta = parseFloat(e.target.value);
+    lblTarget.textContent = `${targetTheta.toFixed(0)}°`;
+  });
+
+  sliderLoad.addEventListener('input', (e) => {
+    loadTorque = parseFloat(e.target.value);
+    lblLoad.textContent = `${loadTorque.toFixed(1)} Nm`;
+  });
+
+  window.setPresetAngle = function(angle){
+    if(mode !== 'pos'){
+      btnModePos.click();
+    }
+    targetTheta = angle;
+    sliderTarget.value = angle;
+    lblTarget.textContent = `${angle}°`;
+  };
+
+  // Physics Simulation Loop
+  let lastTime = performance.now();
+
+  function animate(now){
+    requestAnimationFrame(animate);
+
+    let dt = (now - lastTime) / 1000;
+    lastTime = now;
+    if(dt > 0.1) dt = 0.1; // Cap frame time step for stability
+
+    if(isRunning){
+      // Servo Control Physics
+      if(mode === 'vel'){
+        let targetDegPerSec = targetVelocity * 6; // 1 RPM = 6 deg/sec
+        let velErr = targetDegPerSec - omega;
+        motorTorque = velErr * 0.15; // Velocity proportional drive
+      } else {
+        // Closed loop servo position control
+        let posError = targetTheta - theta;
+        // Shortest path angle wrapping (-180 to 180)
+        posError = Math.atan2(Math.sin(posError * Math.PI / 180), Math.cos(posError * Math.PI / 180)) * 180 / Math.PI;
+        
+        motorTorque = (posError * Kp) - (omega * Kd);
+      }
+
+      // Dynamic Limits (Max Motor Torque limit = 120 Nm)
+      motorTorque = Math.max(-120, Math.min(120, motorTorque));
+
+      // Net Torque calculation (Motor Torque minus direction-sensitive friction and load)
+      let netTorque = motorTorque - (Math.sign(omega) * loadTorque * 0.5) - (omega * 0.02);
+      
+      // Rotational acceleration: alpha = T / I
+      let alpha = netTorque / inertia;
+      
+      // Integrate velocity and position
+      omega += alpha * dt;
+      theta += omega * dt;
+
+      // Wrap theta within 0 - 360 range
+      theta = (theta % 360 + 360) % 360;
+
+      // Update Data History Buffers
+      historyPos.push(theta);
+      historyPos.shift();
+      
+      let currentError = (mode === 'pos') ? Math.abs(targetTheta - theta) : Math.abs(targetVelocity * 6 - omega) / 10;
+      historyErr.push(currentError);
+      historyErr.shift();
+    }
+
+    // Render Visuals
+    renderRotor();
+    renderStatorFields();
+    renderOverlayVectors();
+    renderReadouts();
+    renderScope();
+  }
+
+  function renderRotor(){
+    rotorGroup.setAttribute('transform', `rotate(${theta}, 300, 240)`);
+  }
+
+  function renderStatorFields(){
+    // Dynamically pulse stator coils according to electrical phase angle
+    let elecAngle = (theta * 6) * Math.PI / 180; // 6 pole pairs
+    coilElements.forEach((coil) => {
+      let phaseShift = coil.phase * (2 * Math.PI / 3);
+      let phaseCurrent = Math.sin(elecAngle - phaseShift);
+      let strokeWidth = 3 + Math.abs(phaseCurrent) * 5;
+      coil.element.setAttribute('stroke-width', strokeWidth.toFixed(1));
+      coil.element.setAttribute('opacity', (0.4 + Math.abs(phaseCurrent) * 0.6).toFixed(2));
+    });
+  }
+
+  function renderOverlayVectors(){
+    // Draw Torque / Force Direction Vectors over the table
+    vectorOverlay.innerHTML = '';
+    if(Math.abs(motorTorque) > 1.0){
+      let isCW = motorTorque > 0;
+      let arcPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      
+      // Draw torque arc arrow
+      let strokeColor = 'var(--accent)';
+      let d = isCW 
+        ? "M 300 100 A 140 140 0 0 1 440 240" 
+        : "M 300 100 A 140 140 0 0 0 160 240";
+        
+      arcPath.setAttribute('d', d);
+      arcPath.setAttribute('fill', 'none');
+      arcPath.setAttribute('stroke', strokeColor);
+      arcPath.setAttribute('stroke-width', Math.min(8, 2 + Math.abs(motorTorque) * 0.08).toFixed(1));
+      arcPath.setAttribute('stroke-linecap', 'round');
+      arcPath.setAttribute('filter', 'url(#glow)');
+      vectorOverlay.appendChild(arcPath);
+    }
+  }
+
+  function renderReadouts(){
+    valPos.textContent = `${theta.toFixed(1)}°`;
+    valTarget.textContent = (mode === 'pos') ? `${targetTheta.toFixed(0)}°` : 'N/A';
+    valVel.textContent = `${(omega / 6).toFixed(1)} RPM`;
+    valTorque.textContent = `${motorTorque.toFixed(1)} Nm`;
+  }
+
+  function renderScope(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background grid lines
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#CCCCCC';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, 35); ctx.lineTo(canvas.width, 35);
+    ctx.stroke();
+
+    // Plot Angular Position Curve
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00A86B';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i = 0; i < historyPos.length; i++){
+      let x = (i / (maxHistory - 1)) * canvas.width;
+      let y = canvas.height - (historyPos[i] / 360) * canvas.height;
+      if(i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Plot Servo Error Curve
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--danger').trim() || '#DC2626';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for(let i = 0; i < historyErr.length; i++){
+      let x = (i / (maxHistory - 1)) * canvas.width;
+      let y = canvas.height - Math.min(canvas.height, (historyErr[i] / 45) * canvas.height);
+      if(i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // Start Animation Loop
+  requestAnimationFrame(animate);
+})();
 </script>
 </body>
 </html>
