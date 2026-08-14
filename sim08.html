@@ -4,18 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ACT-08 Rack and Pinion Simulator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 
 :root{
   --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
   --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F; --highlight:#3A7CA5;
 }
 :root[data-theme="dark"]{
   --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
   --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --shadow: rgba(0,0,0,0.45); --danger:#E27462; --highlight:#64B5F6;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -29,26 +31,27 @@ body{
   min-height:100vh;
   transition:background-color .25s ease, color .25s ease;
 }
-h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
+h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:.01em;}
 .mono{font-family:'IBM Plex Mono', monospace;}
 a{color:inherit;}
-.wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px;}
+.wrap{max-width:1240px; margin:0 auto; padding:24px 20px 60px;}
+
 .topbar{
   display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
-  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:8px;
+  border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:14px;
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.14em;
   color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
 }
-h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+h1.title{font-size:clamp(26px,3.6vw,38px); line-height:1.08;}
+.sub{color:var(--ink-soft); max-width:680px; margin-top:8px; font-size:14.5px; line-height:1.5;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
   font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.06em;
   padding:9px 14px; border-radius:3px; text-transform:uppercase; font-weight:600;
-  box-shadow:2px 2px 0 var(--shadow);
+  box-shadow:2px 2px 0 var(--shadow); user-select:none;
 }
 .themebtn:hover{transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--shadow);}
 .themebtn:active{transform:translate(0,0); box-shadow:1px 1px 0 var(--shadow);}
@@ -59,62 +62,109 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
+.simlayout{display:grid; grid-template-columns:1.5fr 1fr; gap:20px; margin-top:10px;}
+@media (max-width:960px){.simlayout{grid-template-columns:1fr;}}
 
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
 .stage{
   background:var(--card); border:1.5px solid var(--border); border-radius:5px;
-  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
+  padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; display:flex;
+  flex-direction:column; gap:10px;
+}
+.stage .stagetop{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
 }
 .stage .stagelabel{
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-soft); font-weight:600;
 }
-.stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
-.panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-button.ctl{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
-  border-radius:3px; cursor:pointer;
+.canvas-holder{
+  width:100%; position:relative; background:var(--bg); border:1px solid var(--border);
+  border-radius:4px; overflow:hidden; min-height:380px; cursor:grab;
 }
-button.ctl:hover{background:var(--accent);}
-button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
-button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
-.sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
-input[type=range]{width:100%; accent-color:var(--accent);}
-.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
-.stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.canvas-holder:active{cursor:grabbing;}
+canvas{display:block; width:100%; height:100%;}
+
+.stage-toolbar{
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+}
+.mode-group{display:flex; gap:4px; background:var(--bg); padding:3px; border-radius:4px; border:1px solid var(--border);}
+.mode-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; padding:5px 10px;
+  border:none; background:transparent; color:var(--ink-soft); cursor:pointer; border-radius:3px;
+  transition:all .15s ease;
+}
+.mode-btn.active{background:var(--card); color:var(--ink); box-shadow:0 1px 3px var(--shadow);}
+.mode-btn:hover:not(.active){color:var(--ink);}
+
+.toggle-chip{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:4px 8px; border-radius:3px;
+  border:1px solid var(--border); background:var(--card); color:var(--ink-soft); cursor:pointer;
+  user-select:none; display:inline-flex; align-items:center; gap:5px; font-weight:500;
+}
+.toggle-chip.active{border-color:var(--accent2); background:rgba(46,110,98,0.12); color:var(--accent2); font-weight:600;}
+
+.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:18px; box-shadow:3px 3px 0 var(--shadow);}
+.panel h2{font-size:16px; margin-bottom:10px; color:var(--ink);}
+.panel h3{font-size:13.5px; margin:14px 0 8px; color:var(--ink); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.04em;}
+.panel p{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0 0 12px;}
+
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
   text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
   margin-bottom:10px; font-weight:700;
 }
 
+.controlrow{display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+button.ctl{
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:8px 14px;
+  border-radius:3px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  transition:background .15s ease;
+}
+button.ctl:hover{background:var(--accent);}
+button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
+button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
+button.ctl.danger{background:var(--danger); color:#fff;}
 
-.lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
-@keyframes pinionTravel{0%,100%{transform:translateX(80px);}50%{transform:translateX(500px);}}
-@keyframes pinionSpin{to{transform:rotate(360deg);}}
-[data-anim="pinionTravel"]{animation-name:pinionTravel;}
-[data-anim="pinionSpin"]{animation-name:pinionSpin; animation-timing-function:linear;}
+.slidergrid{display:grid; grid-template-columns:1fr 1fr; gap:10px 12px; margin-bottom:14px;}
+@media(max-width:520px){.slidergrid{grid-template-columns:1fr;}}
+.sliderrow{display:flex; flex-direction:column; gap:4px;}
+.sliderrow label{
+  display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+  font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft);
+}
+.sliderrow label span.val{color:var(--ink); font-weight:600;}
+input[type=range]{width:100%; accent-color:var(--accent); height:16px;}
 
+.preset-bar{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;}
+.preset-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:5px 9px; border:1px solid var(--border);
+  background:var(--bg); color:var(--ink); border-radius:3px; cursor:pointer; font-weight:500;
+}
+.preset-btn:hover{border-color:var(--accent); color:var(--accent);}
+
+.specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:11.5px;}
+.specs li{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li span:last-child{color:var(--ink); font-weight:600;}
+
+.tabs{display:flex; border-bottom:1.5px solid var(--border); margin-bottom:12px;}
+.tab-btn{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; padding:7px 12px; border:none;
+  background:transparent; color:var(--ink-soft); cursor:pointer; font-weight:600;
+  border-bottom:2px solid transparent; margin-bottom:-1.5px;
+}
+.tab-btn.active{color:var(--accent); border-bottom-color:var(--accent);}
+
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.stepsbox ol{margin:0; padding-left:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.55;}
+.stepsbox li{margin-bottom:6px;}
+
+.pagefoot{
+  margin-top:28px; padding-top:14px; border-top:1px solid var(--border); font-family:'IBM Plex Mono',monospace;
+  font-size:11px; color:var(--ink-soft); text-align:center;
+}
 </style>
 </head>
 <body>
@@ -122,100 +172,744 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-08 &middot; LINEAR MOTION</div>
-      <h1 class="title">Rack and Pinion</h1>
-      <p class="sub">A gear pair consisting of a circular gear (pinion) engaging a flat, straight-toothed gear track (rack).</p>
+      <div class="eyebrow">ACT-08 &middot; LINEAR MOTION SIMULATION</div>
+      <h1 class="title">Rack and Pinion Simulator</h1>
+      <p class="sub">A precision interactive kinematic & force analysis tool for circular pinion gear engagement with a flat toothed rack track.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
-  <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
-</button>
+      <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
+    </button>
   </div>
+
   <div class="simlayout">
     <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<rect x="40" y="150" width="560" height="20" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
-<g fill="var(--ink-soft)">
-<rect x="48" y="150" width="8" height="20"/><rect x="68" y="150" width="8" height="20"/><rect x="88" y="150" width="8" height="20"/><rect x="108" y="150" width="8" height="20"/><rect x="128" y="150" width="8" height="20"/><rect x="148" y="150" width="8" height="20"/><rect x="168" y="150" width="8" height="20"/><rect x="188" y="150" width="8" height="20"/><rect x="208" y="150" width="8" height="20"/><rect x="228" y="150" width="8" height="20"/><rect x="248" y="150" width="8" height="20"/><rect x="268" y="150" width="8" height="20"/><rect x="288" y="150" width="8" height="20"/><rect x="308" y="150" width="8" height="20"/><rect x="328" y="150" width="8" height="20"/><rect x="348" y="150" width="8" height="20"/><rect x="368" y="150" width="8" height="20"/><rect x="388" y="150" width="8" height="20"/><rect x="408" y="150" width="8" height="20"/><rect x="428" y="150" width="8" height="20"/><rect x="448" y="150" width="8" height="20"/><rect x="468" y="150" width="8" height="20"/><rect x="488" y="150" width="8" height="20"/><rect x="508" y="150" width="8" height="20"/><rect x="528" y="150" width="8" height="20"/><rect x="548" y="150" width="8" height="20"/><rect x="568" y="150" width="8" height="20"/><rect x="588" y="150" width="8" height="20"/>
-</g>
-<text x="260" y="195" class="lbl small">RACK (FIXED, TOOTHED)</text>
-<g class="moving" data-anim="pinionTravel">
- <circle cx="0" cy="122" r="28" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
- <g class="moving" data-anim="pinionSpin">
-  <line x1="0" y1="122" x2="0" y2="98" stroke="var(--accent)" stroke-width="4"/>
-  <line x1="0" y1="122" x2="20" y2="134" stroke="var(--accent)" stroke-width="4"/>
-  <line x1="0" y1="122" x2="-20" y2="134" stroke="var(--accent)" stroke-width="4"/>
- </g>
- <rect x="-14" y="90" width="28" height="14" fill="var(--ink)"/>
-</g>
-<text x="10" y="70" class="lbl small">DRIVE PINION</text>
-</svg>
+      <div class="stagetop">
+        <div class="stagelabel">Kinematic & Force Canvas &mdash; Real-Time Calculation</div>
+        <div class="mode-group">
+          <button class="mode-btn active" id="modeFixedRack" onclick="setSimMode('fixed_rack')">Fixed Rack (Gantry)</button>
+          <button class="mode-btn" id="modeFixedPinion" onclick="setSimMode('fixed_pinion')">Fixed Pinion (Steering)</button>
+        </div>
+      </div>
+
+      <div class="canvas-holder" id="canvasHolder">
+        <canvas id="simCanvas"></canvas>
+      </div>
+
+      <div class="stage-toolbar">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="toggle-chip active" id="btnPitchOverlay" onclick="toggleOverlay('pitch')">&#9673; Pitch Circles</button>
+          <button class="toggle-chip active" id="btnForceOverlay" onclick="toggleOverlay('force')">&#10140; Force Vectors</button>
+          <button class="toggle-chip active" id="btnVelocityOverlay" onclick="toggleOverlay('velocity')">&#11157; Speed Vector</button>
+          <button class="toggle-chip active" id="btnInsetOverlay" onclick="toggleOverlay('inset')">&#128269; Mesh Zoom</button>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft);">
+          Click & Drag to manual drive
+        </div>
+      </div>
     </div>
+
     <div class="panel">
-      <span class="badge">LINEAR MOTION</span>
-      <h2>Cycle Controls</h2>
-      <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+      <span class="badge">MECHANICAL MOTION</span>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('controlsTab', this)">Controls & Specs</button>
+        <button class="tab-btn" onclick="switchTab('theoryTab', this)">Physics & Mesh Theory</button>
+        <button class="tab-btn" onclick="switchTab('applicationsTab', this)">Applications</button>
       </div>
-      <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+
+      <!-- TAB 1: CONTROLS & SPECS -->
+      <div id="controlsTab" class="tab-content active">
+        <div class="controlrow">
+          <button class="ctl" id="playPauseBtn" onclick="togglePlayPause()">&#10074;&#10074; Pause Cycle</button>
+          <button class="ctl secondary" onclick="reverseDirection()">&#8646; Reverse</button>
+          <button class="ctl secondary" onclick="resetSim()">&#215; Reset</button>
+        </div>
+
+        <h3>Industrial Engineering Presets</h3>
+        <div class="preset-bar">
+          <button class="preset-btn" onclick="applyPreset('cnc')">CNC Router</button>
+          <button class="preset-btn" onclick="applyPreset('steering')">Car Steering</button>
+          <button class="preset-btn" onclick="applyPreset('cogtrain')">Cog Train</button>
+          <button class="preset-btn" onclick="applyPreset('shuttle')">Heavy Shuttle</button>
+        </div>
+
+        <h3>Kinematic Parameters</h3>
+        <div class="slidergrid">
+          <div class="sliderrow">
+            <label>Pinion Teeth (<span class="mono">Z</span>) <span class="val" id="valTeeth">18</span></label>
+            <input type="range" id="slideTeeth" min="12" max="32" value="18" step="1" oninput="updateParams()">
+          </div>
+          <div class="sliderrow">
+            <label>Gear Module (<span class="mono">m</span>) <span class="val" id="valModule">4.0 mm</span></label>
+            <input type="range" id="slideModule" min="2.0" max="6.0" value="4.0" step="0.5" oninput="updateParams()">
+          </div>
+          <div class="sliderrow">
+            <label>Pinion Speed <span class="val" id="valSpeed">60 RPM</span></label>
+            <input type="range" id="slideSpeed" min="-180" max="180" value="60" step="5" oninput="updateParams()">
+          </div>
+          <div class="sliderrow">
+            <label>Input Torque (<span class="mono">T</span>) <span class="val" id="valTorque">15 N&middot;m</span></label>
+            <input type="range" id="slideTorque" min="1" max="50" value="15" step="1" oninput="updateParams()">
+          </div>
+          <div class="sliderrow">
+            <label>Pressure Angle (&alpha;) <span class="val" id="valAlpha">20&deg;</span></label>
+            <input type="range" id="slideAlpha" min="14.5" max="25" value="20" step="5.5" oninput="updateParams()">
+          </div>
+          <div class="sliderrow">
+            <label>Backlash Gap <span class="val" id="valBacklash">0.15 mm</span></label>
+            <input type="range" id="slideBacklash" min="0.0" max="0.5" value="0.15" step="0.05" oninput="updateParams()">
+          </div>
+        </div>
+
+        <h3>Live Mechanical Telemetry</h3>
+        <ul class="specs">
+          <li><span>Pitch Circle Dia. (d<sub>p</sub>)</span><span id="specPCD">72.0 mm</span></li>
+          <li><span>Circular Pitch (p)</span><span id="specPitch">12.57 mm</span></li>
+          <li><span>Linear Pitch Speed (v)</span><span id="specVel">0.226 m/s</span></li>
+          <li><span>Tangential Force (F<sub>t</sub>)</span><span id="specFt">416.7 N</span></li>
+          <li><span>Radial Separating Force (F<sub>r</sub>)</span><span id="specFr">151.7 N</span></li>
+          <li><span>Resultant Tooth Force (F<sub>n</sub>)</span><span id="specFn">443.4 N</span></li>
+          <li><span>Mechanical Power (P)</span><span id="specPower">94.2 W</span></li>
+          <li><span>Travel per Turn (S<sub>rev</sub>)</span><span id="specStroke">226.2 mm</span></li>
+        </ul>
       </div>
-      <h2>Typical Purposes</h2>
-      <p>Gantry cranes, large-format CNC routers, laser/plasma cutting beds, transfer shuttles.</p>
-      <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>Rotational torque from a motor is applied to the drive pinion.</li>
-<li>The pinion teeth mesh with the fixed rack's teeth.</li>
-<li>Rotational effort forces the pinion carriage to travel linearly along the rack axis with constant stiffness over long distances.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Mechanical input</span></li>
-<li><span>Force output</span><span>Medium to high</span></li>
-<li><span>Speed</span><span>High</span></li>
-<li><span>Precision</span><span>Medium to high</span></li></ul>
+
+      <!-- TAB 2: THEORY & CALCULATIONS -->
+      <div id="theoryTab" class="tab-content">
+        <h2>Physics & Governing Equations</h2>
+        <p>A rack and pinion converts rotational torque into linear drive force through intermeshing gear teeth.</p>
+
+        <div class="stepsbox">
+          <ol>
+            <li><strong>Pitch Circle Diameter ($d_p$):</strong><br>
+                <code class="mono">d<sub>p</sub> = m &times; Z</code> where <code class="mono">m</code> is gear module and <code class="mono">Z</code> is pinion tooth count.</li>
+            <li><strong>Circular Pitch ($p$):</strong><br>
+                <code class="mono">p = &pi; &times; m</code> (Distance between consecutive teeth centers along the rack).</li>
+            <li><strong>Linear Speed ($v$):</strong><br>
+                <code class="mono">v = &omega; &times; r<sub>p</sub> = (2&pi; N / 60) &times; (d<sub>p</sub> / 2000)</code> in m/s.</li>
+            <li><strong>Tangential Drive Force ($F_t$):</strong><br>
+                <code class="mono">F<sub>t</sub> = 2000 &times; T / d<sub>p</sub></code> in Newtons.</li>
+            <li><strong>Separating Radial Force ($F_r$):</strong><br>
+                <code class="mono">F<sub>r</sub> = F<sub>t</sub> &times; tan(&alpha;)</code> pushing pinion and rack apart.</li>
+            <li><strong>Line of Action & Pressure Angle ($\alpha$):</strong><br>
+                The normal contact force acts along the pressure angle vector ($\alpha = 20^\circ$).</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- TAB 3: INDUSTRIAL APPLICATIONS -->
+      <div id="applicationsTab" class="tab-content">
+        <h2>Primary Industrial Uses</h2>
+        <p>Rack and pinion systems provide high positioning accuracy, zero slip, and unlimited linear stroke capability.</p>
+
+        <div class="stepsbox">
+          <ol>
+            <li><strong>CNC Routers & Laser Cutters:</strong> High-speed fixed rack drives enable long travel gantries without the rotational whip of lead screws.</li>
+            <li><strong>Automotive Steering Gearbox:</strong> The steering wheel rotates the pinion, sliding the tie-rod rack left and right to turn wheels.</li>
+            <li><strong>Mountain Cog Railways:</strong> Steep mountain trains use a center rack track and driven pinion cog to prevent sliding on steep grades.</li>
+            <li><strong>Linear Actuator Lifters:</strong> High load vertical lifting shuttles and heavy industrial transfer tables.</li>
+          </ol>
+        </div>
+      </div>
+
     </div>
   </div>
-  <footer class="pagefoot">ACT-08 &middot; Rack and Pinion &middot; Manufacturing Floor Reference</footer>
-</div>
-<script>
 
+  <footer class="pagefoot">ACT-08 &middot; Rack and Pinion &middot; Manufacturing & Mechanical Engineering Floor Reference</footer>
+</div>
+
+<script>
 (function(){
   var stored = localStorage.getItem('actuator-theme');
   if(stored === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); }
 })();
+
 function toggleTheme(){
   var root = document.documentElement;
   var isDark = root.getAttribute('data-theme') === 'dark';
   if(isDark){ root.removeAttribute('data-theme'); localStorage.setItem('actuator-theme','light'); }
   else{ root.setAttribute('data-theme','dark'); localStorage.setItem('actuator-theme','dark'); }
-  var btn = document.getElementById('themeLabel');
-  if(btn){ btn.textContent = root.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
+  updateThemeButtonLabel();
+  if(window.renderSim) window.renderSim();
 }
-document.addEventListener('DOMContentLoaded', function(){
+
+function updateThemeButtonLabel(){
   var btn = document.getElementById('themeLabel');
-  if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
-});
+  if(btn){
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? 'LIGHT MODE' : 'DARK MODE';
+  }
+}
+document.addEventListener('DOMContentLoaded', updateThemeButtonLabel);
 
+function switchTab(tabId, btnElem){
+  var contents = document.querySelectorAll('.tab-content');
+  contents.forEach(function(c){ c.classList.remove('active'); });
+  var buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(function(b){ b.classList.remove('active'); });
+  
+  document.getElementById(tabId).classList.add('active');
+  btnElem.classList.add('active');
+}
 
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
+var simState = {
+  mode: 'fixed_rack', // 'fixed_rack' or 'fixed_pinion'
+  playing: true,
+  teeth: 18,
+  module: 4.0, // mm
+  rpm: 60, // RPM
+  torque: 15.0, // N*m
+  alpha: 20.0, // deg pressure angle
+  backlash: 0.15, // mm
+  pinionAngle: 0, // rad
+  rackOffset: 0, // mm
+  
+  // Overlays
+  showPitch: true,
+  showForce: true,
+  showVelocity: true,
+  showInset: true,
+  
+  // Dragging state
+  isDragging: false,
+  dragStartX: 0,
+  dragStartAngle: 0,
+  dragStartRackOffset: 0,
+  
+  // Time keeping
+  lastTime: performance.now()
+};
+
+var canvas, ctx, canvasHolder;
+
+function initCanvas(){
+  canvas = document.getElementById('simCanvas');
+  canvasHolder = document.getElementById('canvasHolder');
+  ctx = canvas.getContext('2d');
+  
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  
+  // Drag handling
+  canvasHolder.addEventListener('mousedown', startDrag);
+  window.addEventListener('mousemove', handleDrag);
+  window.addEventListener('mouseup', endDrag);
+  
+  canvasHolder.addEventListener('touchstart', function(e){
+    if(e.touches.length === 1) startDrag(e.touches[0]);
+  }, {passive: false});
+  window.addEventListener('touchmove', function(e){
+    if(simState.isDragging && e.touches.length === 1){
+      handleDrag(e.touches[0]);
+      e.preventDefault();
+    }
+  }, {passive: false});
+  window.addEventListener('touchend', endDrag);
+}
+
+function resizeCanvas(){
+  var rect = canvasHolder.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  renderSim();
+}
+
+function updateParams(){
+  simState.teeth = parseInt(document.getElementById('slideTeeth').value);
+  simState.module = parseFloat(document.getElementById('slideModule').value);
+  simState.rpm = parseFloat(document.getElementById('slideSpeed').value);
+  simState.torque = parseFloat(document.getElementById('slideTorque').value);
+  simState.alpha = parseFloat(document.getElementById('slideAlpha').value);
+  simState.backlash = parseFloat(document.getElementById('slideBacklash').value);
+  
+  document.getElementById('valTeeth').textContent = simState.teeth;
+  document.getElementById('valModule').textContent = simState.module.toFixed(1) + ' mm';
+  document.getElementById('valSpeed').textContent = simState.rpm + ' RPM';
+  document.getElementById('valTorque').textContent = simState.torque + ' N·m';
+  document.getElementById('valAlpha').textContent = simState.alpha.toFixed(1) + '°';
+  document.getElementById('valBacklash').textContent = simState.backlash.toFixed(2) + ' mm';
+  
+  updateTelemetry();
+  renderSim();
+}
+
+function applyPreset(type){
+  if(type === 'cnc'){
+    setSliderValues(20, 2.5, 120, 8, 20, 0.05);
+  } else if(type === 'steering'){
+    setSliderValues(14, 3.5, 45, 25, 20, 0.10);
+    setSimMode('fixed_pinion');
+  } else if(type === 'cogtrain'){
+    setSliderValues(16, 5.5, 30, 45, 25, 0.30);
+    setSimMode('fixed_rack');
+  } else if(type === 'shuttle'){
+    setSliderValues(24, 4.0, 90, 30, 20, 0.15);
+    setSimMode('fixed_rack');
+  }
+}
+
+function setSliderValues(teeth, module, speed, torque, alpha, backlash){
+  document.getElementById('slideTeeth').value = teeth;
+  document.getElementById('slideModule').value = module;
+  document.getElementById('slideSpeed').value = speed;
+  document.getElementById('slideTorque').value = torque;
+  document.getElementById('slideAlpha').value = alpha;
+  document.getElementById('slideBacklash').value = backlash;
+  updateParams();
+}
+
+function setSimMode(m){
+  simState.mode = m;
+  document.getElementById('modeFixedRack').classList.toggle('active', m === 'fixed_rack');
+  document.getElementById('modeFixedPinion').classList.toggle('active', m === 'fixed_pinion');
+  renderSim();
+}
+
+function toggleOverlay(key){
+  if(key === 'pitch'){
+    simState.showPitch = !simState.showPitch;
+    document.getElementById('btnPitchOverlay').classList.toggle('active', simState.showPitch);
+  } else if(key === 'force'){
+    simState.showForce = !simState.showForce;
+    document.getElementById('btnForceOverlay').classList.toggle('active', simState.showForce);
+  } else if(key === 'velocity'){
+    simState.showVelocity = !simState.showVelocity;
+    document.getElementById('btnVelocityOverlay').classList.toggle('active', simState.showVelocity);
+  } else if(key === 'inset'){
+    simState.showInset = !simState.showInset;
+    document.getElementById('btnInsetOverlay').classList.toggle('active', simState.showInset);
+  }
+  renderSim();
+}
+
+function togglePlayPause(){
+  simState.playing = !simState.playing;
   var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
+  btn.innerHTML = simState.playing ? '&#10074;&#10074; Pause Cycle' : '&#9654; Run Cycle';
 }
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 2.4); });
+function reverseDirection(){
+  simState.rpm = -simState.rpm;
+  document.getElementById('slideSpeed').value = simState.rpm;
+  document.getElementById('valSpeed').textContent = simState.rpm + ' RPM';
+  updateTelemetry();
+}
 
+function resetSim(){
+  simState.pinionAngle = 0;
+  simState.rackOffset = 0;
+  renderSim();
+}
+
+function updateTelemetry(){
+  var dp = simState.teeth * simState.module; // Pitch circle dia (mm)
+  var p = Math.PI * simState.module; // Circular pitch (mm)
+  
+  var omega = (2 * Math.PI * simState.rpm) / 60; // rad/s
+  var v = Math.abs(omega * (dp / 2000)); // m/s
+  
+  var Ft = (2000 * simState.torque) / dp; // Tangential force N
+  var alphaRad = (simState.alpha * Math.PI) / 180;
+  var Fr = Ft * Math.tan(alphaRad); // Radial force N
+  var Fn = Ft / Math.cos(alphaRad); // Resultant force N
+  var power = Ft * v; // W
+  var strokePerRev = Math.PI * dp; // mm
+  
+  document.getElementById('specPCD').textContent = dp.toFixed(1) + ' mm';
+  document.getElementById('specPitch').textContent = p.toFixed(2) + ' mm';
+  document.getElementById('specVel').textContent = v.toFixed(3) + ' m/s';
+  document.getElementById('specFt').textContent = Ft.toFixed(1) + ' N';
+  document.getElementById('specFr').textContent = Fr.toFixed(1) + ' N';
+  document.getElementById('specFn').textContent = Fn.toFixed(1) + ' N';
+  document.getElementById('specPower').textContent = power.toFixed(1) + ' W';
+  document.getElementById('specStroke').textContent = strokePerRev.toFixed(1) + ' mm';
+}
+
+function startDrag(e){
+  var rect = canvasHolder.getBoundingClientRect();
+  simState.isDragging = true;
+  simState.dragStartX = e.clientX - rect.left;
+  simState.dragStartAngle = simState.pinionAngle;
+  simState.dragStartRackOffset = simState.rackOffset;
+}
+
+function handleDrag(e){
+  if(!simState.isDragging) return;
+  var rect = canvasHolder.getBoundingClientRect();
+  var currentX = e.clientX - rect.left;
+  var dx = currentX - simState.dragStartX;
+  
+  var dp = simState.teeth * simState.module;
+  var scale = 2.8; // screen px per mm
+  var pitchRadiusPx = (dp / 2) * scale;
+  
+  // Angle change = dx / pitchRadiusPx
+  var dAngle = dx / pitchRadiusPx;
+  simState.pinionAngle = simState.dragStartAngle + dAngle;
+  renderSim();
+}
+
+function endDrag(){
+  simState.isDragging = false;
+}
+
+function drawPinion(ctx, cx, cy, radiusPx, teeth, modulePx, angle, colors){
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
+  
+  var ha = 1.0 * modulePx; // addendum
+  var hd = 1.25 * modulePx; // dedendum
+  var rOuter = radiusPx + ha;
+  var rRoot = radiusPx - hd;
+  
+  var angleStep = (2 * Math.PI) / teeth;
+  var halfTooth = angleStep * 0.25;
+  
+  ctx.beginPath();
+  for(var i = 0; i < teeth; i++){
+    var aCenter = i * angleStep;
+    var a1 = aCenter - angleStep * 0.42;
+    var a2 = aCenter - halfTooth;
+    var a3 = aCenter + halfTooth;
+    var a4 = aCenter + angleStep * 0.42;
+    
+    var x1 = Math.cos(a1) * rRoot, y1 = Math.sin(a1) * rRoot;
+    var x2 = Math.cos(a2) * rOuter, y2 = Math.sin(a2) * rOuter;
+    var x3 = Math.cos(a3) * rOuter, y3 = Math.sin(a3) * rOuter;
+    var x4 = Math.cos(a4) * rRoot, y4 = Math.sin(a4) * rRoot;
+    
+    if(i === 0) ctx.moveTo(x1, y1);
+    else ctx.lineTo(x1, y1);
+    
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.lineTo(x4, y4);
+  }
+  ctx.closePath();
+  
+  ctx.fillStyle = colors.card;
+  ctx.fill();
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Pinion inner hub and keyway spoke indicator
+  ctx.beginPath();
+  ctx.arc(0, 0, radiusPx * 0.3, 0, Math.PI * 2);
+  ctx.fillStyle = colors.bg;
+  ctx.fill();
+  ctx.stroke();
+
+  // Spoke indicator line
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(radiusPx * 0.85, 0);
+  ctx.strokeStyle = colors.accent;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(0, 0, 4, 0, Math.PI * 2);
+  ctx.fillStyle = colors.ink;
+  ctx.fill();
+  
+  ctx.restore();
+}
+
+function drawRack(ctx, pitchY, rackOffsetX, width, modulePx, alphaDeg, colors){
+  var pPx = Math.PI * modulePx; // Rack pitch in px
+  var ha = 1.0 * modulePx;
+  var hd = 1.25 * modulePx;
+  
+  var topWidth = pPx * 0.35;
+  var rootWidth = pPx * 0.65;
+  
+  ctx.save();
+  
+  // Base rack rail bar
+  ctx.fillStyle = colors.card;
+  ctx.fillRect(-100, pitchY + hd, width + 200, 24);
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(-100, pitchY + hd, width + 200, 24);
+  
+  // Draw rack teeth
+  ctx.beginPath();
+  ctx.moveTo(-100, pitchY + hd);
+  
+  var startIdx = Math.floor((-100 - rackOffsetX) / pPx) - 1;
+  var endIdx = Math.ceil((width + 100 - rackOffsetX) / pPx) + 1;
+  
+  for(var i = startIdx; i <= endIdx; i++){
+    var xCenter = rackOffsetX + i * pPx;
+    var x1 = xCenter - rootWidth / 2;
+    var x2 = xCenter - topWidth / 2;
+    var x3 = xCenter + topWidth / 2;
+    var x4 = xCenter + rootWidth / 2;
+    
+    ctx.lineTo(x1, pitchY + hd);
+    ctx.lineTo(x2, pitchY - ha);
+    ctx.lineTo(x3, pitchY - ha);
+    ctx.lineTo(x4, pitchY + hd);
+  }
+  
+  ctx.lineTo(width + 100, pitchY + hd);
+  ctx.fillStyle = colors.card;
+  ctx.fill();
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Mounting bolt holes on rack rail
+  ctx.fillStyle = colors.inkSoft;
+  for(var bx = -50 + (rackOffsetX % 60); bx < width + 50; bx += 60){
+    ctx.beginPath();
+    ctx.arc(bx, pitchY + hd + 12, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  ctx.restore();
+}
+
+function drawOverlays(ctx, cx, cy, radiusPx, pitchY, rackOffsetX, colors){
+  var dp = simState.teeth * simState.module;
+  var modulePx = (radiusPx * 2) / simState.teeth;
+  
+  // 1. Pitch Circle & Pitch Line Overlay
+  if(simState.showPitch){
+    ctx.save();
+    // Pinion pitch circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = colors.accent2;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    
+    // Pitch line on rack
+    ctx.beginPath();
+    ctx.moveTo(0, pitchY);
+    ctx.lineTo(ctx.canvas.width, pitchY);
+    ctx.strokeStyle = colors.accent2;
+    ctx.stroke();
+    ctx.restore();
+    
+    // Label
+    ctx.font = '500 10.5px "IBM Plex Mono", monospace';
+    ctx.fillStyle = colors.accent2;
+    ctx.fillText('PITCH LINE / CONTACT LINE', cx + radiusPx + 15, pitchY + 4);
+  }
+  
+  // 2. Velocity Vector Overlay
+  if(simState.showVelocity){
+    ctx.save();
+    var vLen = Math.min(80, Math.max(20, Math.abs(simState.rpm) * 0.5));
+    var dir = simState.rpm >= 0 ? 1 : -1;
+    if(simState.mode === 'fixed_pinion') dir = -dir; // opposite for rack motion
+    
+    var vX = cx;
+    var vY = pitchY;
+    
+    ctx.beginPath();
+    ctx.moveTo(vX, vY);
+    ctx.lineTo(vX + dir * vLen, vY);
+    ctx.strokeStyle = colors.highlight;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Arrow head
+    ctx.beginPath();
+    ctx.moveTo(vX + dir * vLen, vY);
+    ctx.lineTo(vX + dir * vLen - dir * 8, vY - 5);
+    ctx.lineTo(vX + dir * vLen - dir * 8, vY + 5);
+    ctx.fillStyle = colors.highlight;
+    ctx.fill();
+    
+    ctx.font = '600 11px "IBM Plex Mono", monospace';
+    ctx.fillStyle = colors.highlight;
+    ctx.fillText('v = ' + (Math.abs(simState.rpm)*0.0038).toFixed(2) + ' m/s', vX + dir * (vLen + 10) - 20, vY - 10);
+    ctx.restore();
+  }
+  
+  // 3. Force Vector Diagrams (Ft, Fr, Fn)
+  if(simState.showForce){
+    ctx.save();
+    var contactX = cx;
+    var contactY = pitchY;
+    var scaleF = Math.min(1.2, 30 / simState.torque);
+    
+    var Ft = (2000 * simState.torque) / dp;
+    var alphaRad = (simState.alpha * Math.PI) / 180;
+    var Fr = Ft * Math.tan(alphaRad);
+    
+    var ftPx = Math.min(60, Ft * scaleF * 0.15);
+    var frPx = Math.min(40, Fr * scaleF * 0.15);
+    
+    // Ft (Tangential Driving Force)
+    ctx.beginPath();
+    ctx.moveTo(contactX, contactY);
+    ctx.lineTo(contactX + ftPx, contactY);
+    ctx.strokeStyle = colors.accent;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    
+    // Fr (Radial Separating Force)
+    ctx.beginPath();
+    ctx.moveTo(contactX, contactY);
+    ctx.lineTo(contactX, contactY - frPx);
+    ctx.strokeStyle = colors.danger;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    
+    // Resultant Normal Force (Fn)
+    ctx.beginPath();
+    ctx.moveTo(contactX, contactY);
+    ctx.lineTo(contactX + ftPx, contactY - frPx);
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = colors.ink;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
+    ctx.fillStyle = colors.accent;
+    ctx.fillText('Ft (' + Ft.toFixed(0) + 'N)', contactX + ftPx + 4, contactY + 3);
+    ctx.fillStyle = colors.danger;
+    ctx.fillText('Fr (' + Fr.toFixed(0) + 'N)', contactX - 22, contactY - frPx - 4);
+    
+    ctx.restore();
+  }
+}
+
+function drawInset(ctx, cx, cy, radiusPx, pitchY, rackOffsetX, colors){
+  if(!simState.showInset) return;
+  
+  var w = 150, h = 110;
+  var x = ctx.canvas.width / (window.devicePixelRatio||1) - w - 14;
+  var y = 14;
+  
+  ctx.save();
+  // Frame box
+  ctx.fillStyle = colors.card;
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x, y, w, h);
+  
+  // Header title
+  ctx.fillStyle = colors.inkSoft;
+  ctx.font = '600 9.5px "IBM Plex Mono", monospace';
+  ctx.fillText('MESH ZOOM (4X)', x + 8, y + 14);
+  
+  // Clip inset region
+  ctx.beginPath();
+  ctx.rect(x + 4, y + 20, w - 8, h - 24);
+  ctx.clip();
+  
+  // Render zoomed view around contact point
+  ctx.translate(x + w/2, y + h/2 + 10);
+  ctx.scale(3.2, 3.2);
+  ctx.translate(-cx, -pitchY);
+  
+  var modulePx = (radiusPx * 2) / simState.teeth;
+  drawRack(ctx, pitchY, rackOffsetX, cx * 2, modulePx, simState.alpha, colors);
+  drawPinion(ctx, cx, cy, radiusPx, simState.teeth, modulePx, simState.pinionAngle, colors);
+  
+  // Pressure angle line in inset
+  var alphaRad = (simState.alpha * Math.PI) / 180;
+  ctx.beginPath();
+  ctx.moveTo(cx - 15, pitchY - 15 * Math.tan(alphaRad));
+  ctx.lineTo(cx + 15, pitchY + 15 * Math.tan(alphaRad));
+  ctx.strokeStyle = colors.danger;
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+function renderSim(){
+  if(!canvas || !ctx) return;
+  
+  var dpr = window.devicePixelRatio || 1;
+  var width = canvas.width / dpr;
+  var height = canvas.height / dpr;
+  
+  // Get computed styling variables for active theme
+  var styles = getComputedStyle(document.documentElement);
+  var colors = {
+    bg: styles.getPropertyValue('--bg').trim() || '#F2EFE3',
+    card: styles.getPropertyValue('--card').trim() || '#FBF9F1',
+    ink: styles.getPropertyValue('--ink').trim() || '#1D2B3A',
+    inkSoft: styles.getPropertyValue('--ink-soft').trim() || '#5B6B7A',
+    accent: styles.getPropertyValue('--accent').trim() || '#B5651D',
+    accent2: styles.getPropertyValue('--accent2').trim() || '#2E6E62',
+    border: styles.getPropertyValue('--border').trim() || '#CBC4A8',
+    danger: styles.getPropertyValue('--danger').trim() || '#9B3B2F',
+    highlight: styles.getPropertyValue('--highlight').trim() || '#3A7CA5'
+  };
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  // Mechanical layout positioning
+  var dp = simState.teeth * simState.module;
+  var scale = 2.6; // px per mm
+  var radiusPx = (dp / 2) * scale;
+  var modulePx = simState.module * scale;
+  
+  var pitchY = height * 0.62;
+  var cy = pitchY - radiusPx; // Pinion sits directly above rack pitch line
+  
+  var cx = width * 0.5;
+  var rackOffsetX = 0;
+  
+  if(simState.mode === 'fixed_rack'){
+    // Fixed rack: Pinion moves horizontally across screen
+    var travelRange = width * 0.35;
+    cx = width * 0.5 + (simState.pinionAngle * radiusPx) % travelRange - (travelRange / 2);
+    rackOffsetX = width * 0.5;
+  } else {
+    // Fixed pinion: Pinion stationary at center, rack slides underneath
+    cx = width * 0.5;
+    rackOffsetX = width * 0.5 - (simState.pinionAngle * radiusPx);
+  }
+  
+  // Draw background reference grid lines on canvas
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  for(var gx = 0; gx < width; gx += 28){ ctx.moveTo(gx, 0); ctx.lineTo(gx, height); }
+  for(var gy = 0; gy < height; gy += 28){ ctx.moveTo(0, gy); ctx.lineTo(width, gy); }
+  ctx.stroke();
+  
+  // Draw core mechanical gear pair
+  drawRack(ctx, pitchY, rackOffsetX, width, modulePx, simState.alpha, colors);
+  drawPinion(ctx, cx, cy, radiusPx, simState.teeth, modulePx, simState.pinionAngle, colors);
+  
+  // Draw interactive overlays and picture-in-picture inset
+  drawOverlays(ctx, cx, cy, radiusPx, pitchY, rackOffsetX, colors);
+  drawInset(ctx, cx, cy, radiusPx, pitchY, rackOffsetX, colors);
+}
+
+function animate(time){
+  var dt = (time - simState.lastTime) / 1000;
+  simState.lastTime = time;
+
+  if(simState.playing && !simState.isDragging){
+    var omega = (2 * Math.PI * simState.rpm) / 60; // rad/s
+    simState.pinionAngle += omega * dt;
+    renderSim();
+  }
+  
+  requestAnimationFrame(animate);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  initCanvas();
+  updateParams();
+  requestAnimationFrame(animate);
+});
 </script>
 </body>
 </html>
