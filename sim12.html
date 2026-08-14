@@ -10,12 +10,12 @@
 :root{
   --bg:#F2EFE3; --bg-grid:#E6E0CB; --ink:#1D2B3A; --ink-soft:#5B6B7A;
   --accent:#B5651D; --accent2:#2E6E62; --card:#FBF9F1; --border:#CBC4A8;
-  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F;
+  --shadow: rgba(29,43,58,0.10); --danger:#9B3B2F; --volt:#7A4FB5; --curr:#B5651D; --pos:#2E6E62;
 }
 :root[data-theme="dark"]{
   --bg:#0D1B24; --bg-grid:#132734; --ink:#DFEFF5; --ink-soft:#8FB2C2;
   --accent:#E39B57; --accent2:#54D6C6; --card:#10222D; --border:#234456;
-  --shadow: rgba(0,0,0,0.45); --danger:#E27462;
+  --shadow: rgba(0,0,0,0.45); --danger:#E27462; --volt:#B79CE0; --curr:#E39B57; --pos:#54D6C6;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -42,7 +42,7 @@ a{color:inherit;}
   color:var(--accent2); text-transform:uppercase; margin-bottom:6px; font-weight:600;
 }
 h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
-.sub{color:var(--ink-soft); max-width:640px; margin-top:10px; font-size:14.5px; line-height:1.55;}
+.sub{color:var(--ink-soft); max-width:660px; margin-top:10px; font-size:14.5px; line-height:1.55;}
 .themebtn{
   flex:0 0 auto; display:flex; align-items:center; gap:8px; cursor:pointer;
   background:var(--card); border:1.5px solid var(--ink); color:var(--ink);
@@ -59,32 +59,35 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
-
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
+.simlayout{
+  display:grid; grid-template-columns:1.4fr 1fr; grid-template-rows:auto auto; gap:22px; margin-top:20px;
+  grid-template-areas:"stage panel" "scope panel";
 }
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
-.simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
-@media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
+@media (max-width:880px){.simlayout{grid-template-columns:1fr; grid-template-areas:"stage" "scope" "panel";}}
 .stage{
+  grid-area:stage;
   background:var(--card); border:1.5px solid var(--border); border-radius:5px;
   padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
 }
-.stage .stagelabel{
+.scopebox{
+  grid-area:scope;
+  background:var(--card); border:1.5px solid var(--border); border-radius:5px;
+  padding:14px; box-shadow:3px 3px 0 var(--shadow);
+}
+.stage .stagelabel, .scopebox .stagelabel{
   font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
   color:var(--ink-soft); margin-bottom:6px;
 }
 .stage svg{width:100%; height:auto; display:block;}
-.panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
+#scopeCanvas{width:100%; height:auto; display:block; border-radius:3px; background:var(--bg-grid);}
+.scopelegend{display:flex; gap:16px; margin-top:9px; flex-wrap:wrap;}
+.scopelegend span{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;}
+.dot{display:inline-block; width:9px; height:9px; border-radius:50%;}
+.panel{grid-area:panel; background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
+.panel h2{font-size:15px; margin-bottom:8px; margin-top:18px;}
+.panel h2:first-of-type{margin-top:0;}
 .panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
-.controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+.controlrow{display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
 button.ctl{
   font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:.04em;
   text-transform:uppercase; background:var(--ink); color:var(--bg); border:none; padding:9px 14px;
@@ -93,28 +96,32 @@ button.ctl{
 button.ctl:hover{background:var(--accent);}
 button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
 button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
+button.ctl.secondary.active{background:var(--accent); color:var(--card); border-color:var(--accent);}
+button.ctl.wide{flex:1 1 auto;}
 .sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
+.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); display:flex; justify-content:space-between;}
+.sliderrow label b{color:var(--ink); font-weight:600;}
 input[type=range]{width:100%; accent-color:var(--accent);}
 .specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
 .specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
 .specs li span:last-child{color:var(--ink); font-weight:600;}
 .stepsbox{margin-top:6px;}
 .stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.stepsbox ol li{margin-bottom:6px;}
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
   text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
   margin-bottom:10px; font-weight:700;
 }
-
-
+.note{
+  font-size:12px; color:var(--ink-soft); border-left:2.5px solid var(--accent); padding:8px 10px;
+  background:var(--bg-grid); border-radius:0 3px 3px 0; line-height:1.55; margin-top:6px;
+}
 .lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
 .lbl.small{font-size:10px;}
-@keyframes vcCoil{0%,100%{transform:translateX(-70px);}50%{transform:translateX(70px);}}
-@keyframes vcArrow{0%,49%{transform:translate(-70px,0) rotate(0deg);}50%,99%{transform:translate(70px,0) rotate(180deg);}100%{transform:translate(-70px,0) rotate(0deg);}}
-[data-anim="vcCoil"]{animation-name:vcCoil;}
-[data-anim="vcArrow"]{animation-name:vcArrow; transform-box:fill-box; transform-origin:center; animation-timing-function:steps(1,end);}
-
+.lbl.tiny{font-size:9px;}
+.caption{font-family:'IBM Plex Mono',monospace; fill:var(--ink-soft); font-size:11px; letter-spacing:.03em;}
+.pagefoot{margin-top:26px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-align:center; letter-spacing:.05em;}
 </style>
 </head>
 <body>
@@ -122,61 +129,155 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-12 &middot; OSCILLATING MOTION</div>
+      <div class="eyebrow">ACT-12 &middot; OSCILLATING MOTION &middot; PHYSICS MODEL</div>
       <h1 class="title">Voice Coil Actuator</h1>
-      <p class="sub">A single-phase, direct-drive electromagnetic linear actuator using a permanent-magnet field structure and a lightweight coil winding.</p>
+      <p class="sub">A single-phase, direct-drive electromagnetic linear actuator using a permanent-magnet field structure and a lightweight coil winding. This model drives an actual R&ndash;L electrical circuit coupled to a mass&ndash;spring&ndash;damper mechanical load, so current lag, back-EMF, and inertia all behave the way they do in a real actuator.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
   <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
 </button>
   </div>
   <div class="simlayout">
+
     <div class="stage" id="stage01">
       <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<rect x="150" y="60" width="20" height="120" fill="var(--ink)"/>
-<rect x="440" y="60" width="20" height="120" fill="var(--ink)"/>
-<text x="150" y="50" class="lbl small">N</text><text x="450" y="50" class="lbl small">S</text>
-<g stroke="var(--border)" stroke-width="1">
-<line x1="180" y1="70" x2="440" y2="70"/><line x1="180" y1="88" x2="440" y2="88"/><line x1="180" y1="106" x2="440" y2="106"/><line x1="180" y1="124" x2="440" y2="124"/><line x1="180" y1="142" x2="440" y2="142"/><line x1="180" y1="160" x2="440" y2="160"/><line x1="180" y1="178" x2="440" y2="178"/>
-</g>
-<g class="moving" data-anim="vcCoil">
- <rect x="270" y="80" width="40" height="80" fill="var(--accent)"/>
- <rect x="262" y="80" width="8" height="80" fill="var(--accent2)"/>
- <rect x="310" y="80" width="8" height="80" fill="var(--accent2)"/>
-</g>
-<g class="moving" data-anim="vcArrow">
- <polygon points="300,40 292,54 308,54" fill="var(--accent2)"/>
- <text x="285" y="30" class="lbl small">I (CURRENT)</text>
-</g>
-<text x="230" y="205" class="lbl small">COIL TRAVELS INSTANTLY ON CURRENT REVERSAL</text>
-</svg>
+      <svg id="mainSvg" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- driver / source -->
+        <g>
+          <rect x="265" y="8" width="110" height="28" rx="3" fill="none" stroke="var(--ink-soft)" stroke-width="1.2"/>
+          <text x="320" y="26" text-anchor="middle" class="lbl small">DRIVER &middot; <tspan id="vtLabel">0.0 V</tspan></text>
+          <line x1="297" y1="36" x2="297" y2="58" stroke="var(--ink-soft)" stroke-width="1.4"/>
+          <line x1="343" y1="36" x2="343" y2="58" stroke="var(--ink-soft)" stroke-width="1.4"/>
+          <text x="292" y="52" class="lbl tiny">+</text>
+          <text x="348" y="52" class="lbl tiny">&#8722;</text>
+        </g>
+
+        <!-- pole pieces (permanent magnet structure) -->
+        <rect x="150" y="65" width="20" height="150" fill="var(--ink)"/>
+        <rect x="440" y="65" width="20" height="150" fill="var(--ink)"/>
+        <text x="152" y="58" class="lbl small">N</text><text x="452" y="58" class="lbl small">S</text>
+
+        <!-- radial flux lines, N to S -->
+        <g stroke="var(--border)" stroke-width="1.1">
+          <line x1="180" y1="80" x2="440" y2="80"/>
+          <line x1="180" y1="100" x2="440" y2="100"/>
+          <line x1="180" y1="120" x2="440" y2="120"/>
+          <line x1="180" y1="140" x2="440" y2="140"/>
+          <line x1="180" y1="160" x2="440" y2="160"/>
+          <line x1="180" y1="180" x2="440" y2="180"/>
+          <line x1="180" y1="200" x2="440" y2="200"/>
+        </g>
+        <g fill="var(--ink-soft)">
+          <polygon points="300,80 293,76 293,84"/>
+          <polygon points="300,200 293,196 293,204"/>
+        </g>
+        <text x="185" y="72" class="lbl tiny">B (FIELD, N&#8594;S)</text>
+
+        <!-- mechanical stop markers -->
+        <line x1="235" y1="60" x2="235" y2="220" stroke="var(--danger)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>
+        <line x1="375" y1="60" x2="375" y2="220" stroke="var(--danger)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>
+        <text x="200" y="230" class="lbl tiny">END STOP</text>
+        <text x="380" y="230" class="lbl tiny">END STOP</text>
+
+        <!-- coil assembly (moving) -->
+        <g id="coilGroup" transform="translate(0,0)">
+          <line x1="297" y1="58" x2="297" y2="95" stroke="var(--ink-soft)" stroke-width="1.4"/>
+          <line x1="313" y1="58" x2="313" y2="95" stroke="var(--ink-soft)" stroke-width="1.4"/>
+          <rect x="281" y="95" width="48" height="80" fill="var(--accent)"/>
+          <rect x="273" y="95" width="8" height="80" fill="var(--accent2)"/>
+          <rect x="329" y="95" width="8" height="80" fill="var(--accent2)"/>
+          <g stroke="var(--card)" stroke-width="1" opacity=".55">
+            <line x1="281" y1="107" x2="329" y2="107"/>
+            <line x1="281" y1="121" x2="329" y2="121"/>
+            <line x1="281" y1="135" x2="329" y2="135"/>
+            <line x1="281" y1="149" x2="329" y2="149"/>
+            <line x1="281" y1="163" x2="329" y2="163"/>
+          </g>
+          <g id="curArrow" transform="translate(305,88)">
+            <polygon points="0,-7 -6,4 6,4" fill="var(--danger)"/>
+          </g>
+        </g>
+
+        <text x="230" y="252" class="caption" id="modeCaption">SQUARE DRIVE &middot; NO SPRING RETURN</text>
+      </svg>
     </div>
+
+    <div class="scopebox" id="scope01">
+      <div class="stagelabel">Live telemetry &mdash; drive voltage / coil current / position vs. time</div>
+      <canvas id="scopeCanvas" width="1280" height="200"></canvas>
+      <div class="scopelegend">
+        <span><i class="dot" style="background:var(--volt)"></i>Voltage V(t)</span>
+        <span><i class="dot" style="background:var(--curr)"></i>Current I(t)</span>
+        <span><i class="dot" style="background:var(--pos)"></i>Position x(t)</span>
+      </div>
+    </div>
+
     <div class="panel">
       <span class="badge">OSCILLATING MOTION</span>
+
       <h2>Cycle Controls</h2>
       <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+        <button class="ctl wide" id="playPauseBtn">Pause Cycle</button>
+        <button class="ctl secondary" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="sliderrow">
+        <label for="voltSlider">Drive Voltage &nbsp;<b id="voltVal">14 V</b></label>
+        <input type="range" id="voltSlider" min="2" max="24" step="1" value="14">
       </div>
       <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="6">
+        <label for="freqSlider">Cycle Rate &nbsp;<b id="freqVal">1.0 Hz</b></label>
+        <input type="range" id="freqSlider" min="1" max="10" step="1" value="4">
       </div>
+
+      <div class="controlrow" id="waveGroup">
+        <button class="ctl secondary active" data-wave="square">Square</button>
+        <button class="ctl secondary" data-wave="sine">Sine</button>
+        <button class="ctl secondary" data-wave="trap">Trapezoid</button>
+      </div>
+      <div class="controlrow">
+        <button class="ctl secondary wide" id="springToggle">Spring Return: OFF</button>
+      </div>
+
+      <h2>Live Telemetry</h2>
+      <ul class="specs">
+        <li><span>Drive voltage V(t)</span><span id="telV">0.0 V</span></li>
+        <li><span>Coil current I(t)</span><span id="telI">0.00 A</span></li>
+        <li><span>Force F = Bl&middot;I</span><span id="telF">0.00 N</span></li>
+        <li><span>Velocity</span><span id="telVel">0.0 mm/s</span></li>
+        <li><span>Position</span><span id="telX">0.00 mm</span></li>
+      </ul>
+
       <h2>Typical Purposes</h2>
-      <p>High-frequency sorting, micro-stamping, optical focusing, force-feedback controls, wire bonding.</p>
+      <p>High-frequency sorting, micro-stamping, optical/camera focusing, force-feedback controls (haptics), wire bonding, vibration testing.</p>
+
       <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>Current (I) flows through a coil of length (L) placed inside a magnetic field (B).</li>
-<li>The Lorentz force F = B·I·L generates a proportional mechanical force on the coil.</li>
-<li>Reversing current direction instantly reverses the direction of movement, with no mechanical hysteresis.</li></ol></div>
-      <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>Electricity</span></li>
-<li><span>Force output</span><span>Low to medium</span></li>
-<li><span>Speed</span><span>Extremely high</span></li>
-<li><span>Precision</span><span>Very high</span></li></ul>
+      <div class="stepsbox"><ol>
+        <li>The driver applies a voltage V(t). Because the coil has inductance L and resistance R, current builds up on a delay set by V = I&middot;R + L&middot;dI/dt + Bl&middot;v &mdash; it does <em>not</em> jump instantly to its final value.</li>
+        <li>The Lorentz force F = Bl&middot;I acts on the coil, where Bl is the motor constant (field strength &times; wire length in the gap).</li>
+        <li>Moving through the field also generates a back-EMF (Bl&middot;v) that opposes the applied voltage &mdash; this is why current dips as the coil speeds up.</li>
+        <li>Newton's law (m&middot;dv/dt = F &minus; damping &minus; spring force) governs how force actually turns into motion; coil mass and any centering spring set the response time and, if present, a resonant frequency.</li>
+        <li>Reversing current reverses force direction immediately, but velocity and position change smoothly because of mechanical inertia &mdash; unlike a mechanical linkage, there is no backlash or hysteresis.</li>
+      </ol></div>
+
+      <h2>Specifications (model values)</h2>
+      <ul class="specs">
+        <li><span>Motor constant (Bl)</span><span>3.2 N/A</span></li>
+        <li><span>Coil resistance (R)</span><span>5.4 &Omega;</span></li>
+        <li><span>Coil inductance (L)</span><span>0.38 mH</span></li>
+        <li><span>Moving mass (m)</span><span>8 g</span></li>
+        <li><span>Mechanical damping (c)</span><span>0.30 N&middot;s/m</span></li>
+        <li><span>Spring constant (k, if ON)</span><span>1.9 N/m</span></li>
+        <li><span>Stroke (&plusmn;)</span><span>6.0 mm</span></li>
+        <li><span>Peak force @ 24 V stall</span><span>~14.2 N</span></li>
+        <li><span>Power source</span><span>DC / PWM electricity</span></li>
+        <li><span>Precision</span><span>Very high, no mechanical backlash</span></li>
+      </ul>
+      <div class="note">Model note: real voice coil actuators use much stiffer springs and run at tens to thousands of Hz. Bl, R, L, and k above are scaled down so the electrical lag, resonance, and end-stop behavior stay visible at a demonstration speed. Try setting Spring Return ON and matching Cycle Rate to about 2&ndash;3 Hz to see the resonance peak in the position trace.</div>
     </div>
   </div>
-  <footer class="pagefoot">ACT-12 &middot; Voice Coil Actuator &middot; Manufacturing Floor Reference</footer>
+  <footer class="pagefoot">ACT-12 &middot; Voice Coil Actuator &middot; R&ndash;L Electrical / Mass&ndash;Spring&ndash;Damper Mechanical Model</footer>
 </div>
 <script>
 
@@ -197,26 +298,210 @@ document.addEventListener('DOMContentLoaded', function(){
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
+/* ---------------------------------------------------------------
+   Physics model
+   Electrical:  L dI/dt = V(t) - I*R - Bl*v      (back-EMF term)
+   Mechanical:  m dv/dt = Bl*I - c*v - k*x        (spring optional)
+                dx/dt = v
+   Integrated with small sub-steps (explicit Euler) for stability
+   given the short electrical time constant L/R.
+------------------------------------------------------------------*/
+(function(){
+  var Bl = 3.2;        // N/A  (motor / back-EMF constant)
+  var R  = 5.4;        // ohms
+  var L  = 0.00038;     // H
+  var m  = 0.008;      // kg moving mass
+  var c  = 0.30;        // N*s/m mechanical damping
+  var kSpring = 1.9;    // N/m, used only when spring return is ON
+  var strokeLimit = 0.006; // m, +-6mm mechanical end stop
 
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
+  var I = 0, v = 0, x = 0, simTime = 0;
   var playing = true;
-  btn.addEventListener('click', function(){
+  var springOn = false;
+  var waveType = 'square';
+  var Vamp = 14;   // volts
+  var freqHz = 1.0;
+
+  var pxPerM = 70 / strokeLimit; // maps +-6mm stroke to +-70px svg travel
+
+  function driveVoltage(t){
+    var w = 2*Math.PI*freqHz;
+    if(waveType === 'sine'){
+      return Vamp * Math.sin(w*t);
+    } else if(waveType === 'square'){
+      return Vamp * Math.sign(Math.sin(w*t) || 1);
+    } else { // trapezoid: clipped triangle wave
+      var period = 1/freqHz;
+      var phase = (t % period)/period;
+      var tri = phase < 0.5 ? (4*phase - 1) : (3 - 4*phase); // -1..1
+      var trap = tri * 1.6;
+      if(trap > 1) trap = 1; if(trap < -1) trap = -1;
+      return Vamp * trap;
+    }
+  }
+
+  function step(dt){
+    var k = springOn ? kSpring : 0;
+    var Vt = driveVoltage(simTime);
+    var dIdt = (Vt - I*R - Bl*v) / L;
+    I += dIdt*dt;
+    var dvdt = (Bl*I - c*v - k*x) / m;
+    v += dvdt*dt;
+    x += v*dt;
+    if(x > strokeLimit){ x = strokeLimit; v = -v*0.15; }
+    if(x < -strokeLimit){ x = -strokeLimit; v = -v*0.15; }
+    simTime += dt;
+    return Vt;
+  }
+
+  function resetState(){
+    I=0; v=0; x=0; simTime=0;
+  }
+
+  // ---- DOM refs ----
+  var coilGroup = document.getElementById('coilGroup');
+  var curArrow = document.getElementById('curArrow');
+  var vtLabel = document.getElementById('vtLabel');
+  var modeCaption = document.getElementById('modeCaption');
+  var telV = document.getElementById('telV');
+  var telI = document.getElementById('telI');
+  var telF = document.getElementById('telF');
+  var telVel = document.getElementById('telVel');
+  var telX = document.getElementById('telX');
+  var playBtn = document.getElementById('playPauseBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var voltSlider = document.getElementById('voltSlider');
+  var voltVal = document.getElementById('voltVal');
+  var freqSlider = document.getElementById('freqSlider');
+  var freqVal = document.getElementById('freqVal');
+  var springToggle = document.getElementById('springToggle');
+  var waveButtons = document.querySelectorAll('#waveGroup .ctl');
+
+  function freqFromSlider(v){ return 0.2 + ((v-1)/9) * 2.8; } // 0.2Hz .. 3.0Hz
+
+  voltSlider.addEventListener('input', function(){
+    Vamp = parseFloat(voltSlider.value);
+    voltVal.textContent = Vamp.toFixed(0) + ' V';
+  });
+  freqSlider.addEventListener('input', function(){
+    freqHz = freqFromSlider(parseFloat(freqSlider.value));
+    freqVal.textContent = freqHz.toFixed(1) + ' Hz';
+  });
+  playBtn.addEventListener('click', function(){
     playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
+    playBtn.textContent = playing ? 'Pause Cycle' : 'Run Cycle';
   });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
+  resetBtn.addEventListener('click', function(){ resetState(); });
+  springToggle.addEventListener('click', function(){
+    springOn = !springOn;
+    springToggle.textContent = 'Spring Return: ' + (springOn ? 'ON' : 'OFF');
+    resetState();
+    updateCaption();
   });
-}
+  waveButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      waveButtons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      waveType = btn.getAttribute('data-wave');
+      resetState();
+      updateCaption();
+    });
+  });
 
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 1.4); });
+  function updateCaption(){
+    var waveLabel = waveType==='square' ? 'SQUARE DRIVE' : (waveType==='sine' ? 'SINE DRIVE' : 'TRAPEZOID DRIVE');
+    modeCaption.textContent = waveLabel + ' \u00B7 ' + (springOn ? 'SPRING RETURN ON' : 'NO SPRING RETURN');
+  }
+  updateCaption();
 
+  // ---- scope ----
+  var canvas = document.getElementById('scopeCanvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var maxSamples = 320;
+  var bufV = [], bufI = [], bufX = [];
+
+  function pushSample(vN, iN, xN){
+    bufV.push(vN); bufI.push(iN); bufX.push(xN);
+    if(bufV.length > maxSamples){ bufV.shift(); bufI.shift(); bufX.shift(); }
+  }
+
+  function styleColor(varName){
+    return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+
+  function drawScope(){
+    ctx.clearRect(0,0,W,H);
+    // center line + grid
+    ctx.strokeStyle = styleColor('--border');
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+    for(var gx=0; gx<W; gx+=W/8){
+      ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.strokeStyle='rgba(128,128,128,0.12)'; ctx.stroke();
+    }
+    function drawLine(buf, color){
+      if(buf.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      for(var i=0;i<buf.length;i++){
+        var px = (i/(maxSamples-1)) * W;
+        var py = H/2 - buf[i]*(H/2-8);
+        if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    }
+    drawLine(bufV, styleColor('--volt'));
+    drawLine(bufI, styleColor('--curr'));
+    drawLine(bufX, styleColor('--pos'));
+  }
+
+  // ---- main loop ----
+  var lastT = null;
+  var subDt = 0.00004; // 40 microseconds, stable for L/R time constant here
+  var sampleAccum = 0;
+  var sampleInterval = 1/40; // scope sample rate
+
+  function frame(tsMs){
+    if(lastT === null) lastT = tsMs;
+    var dtReal = (tsMs - lastT)/1000;
+    lastT = tsMs;
+    if(dtReal > 0.05) dtReal = 0.05;
+
+    var lastVt = driveVoltage(simTime);
+    if(playing){
+      var nSub = Math.max(1, Math.ceil(dtReal/subDt));
+      var dtSub = dtReal/nSub;
+      for(var s=0;s<nSub;s++){ lastVt = step(dtSub); }
+      sampleAccum += dtReal;
+    }
+
+    // visuals
+    var xPx = x*pxPerM;
+    coilGroup.setAttribute('transform','translate(' + xPx.toFixed(2) + ',0)');
+    var arrowScale = Math.max(0.35, Math.min(1.3, Math.abs(I)/3));
+    var rot = I < 0 ? 180 : 0;
+    curArrow.setAttribute('transform','translate(' + (305+xPx).toFixed(2) + ',88) rotate(' + rot + ') scale(' + arrowScale.toFixed(2) + ')');
+    curArrow.setAttribute('opacity', (0.35 + 0.65*Math.min(1,Math.abs(I)/4)).toFixed(2));
+
+    vtLabel.textContent = lastVt.toFixed(1) + ' V';
+    telV.textContent = lastVt.toFixed(1) + ' V';
+    telI.textContent = I.toFixed(2) + ' A';
+    telF.textContent = (Bl*I).toFixed(2) + ' N';
+    telVel.textContent = (v*1000).toFixed(1) + ' mm/s';
+    telX.textContent = (x*1000).toFixed(2) + ' mm';
+
+    if(playing && sampleAccum >= sampleInterval){
+      sampleAccum = 0;
+      pushSample(lastVt/24, I/4, x/strokeLimit);
+      drawScope();
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
