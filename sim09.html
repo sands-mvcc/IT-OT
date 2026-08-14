@@ -59,30 +59,21 @@ h1.title{font-size:clamp(26px,3.6vw,40px); line-height:1.08;}
 }
 .backlink:hover{color:var(--accent);}
 
-
-.stage{ --dur:2.4s; }
-.stage [data-anim]{
-  animation-duration:var(--dur,2.4s);
-  animation-iteration-count:infinite;
-  animation-timing-function:ease-in-out;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-.stage.paused [data-anim]{ animation-play-state:paused; }
-
 .simlayout{display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-top:20px;}
 @media (max-width:880px){.simlayout{grid-template-columns:1fr;}}
+.stagecol{display:flex; flex-direction:column; gap:16px;}
 .stage{
   background:var(--card); border:1.5px solid var(--border); border-radius:5px;
   padding:14px; box-shadow:3px 3px 0 var(--shadow); position:relative; overflow:hidden;
 }
 .stage .stagelabel{
   font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ink-soft); margin-bottom:6px;
+  color:var(--ink-soft); margin-bottom:6px; display:flex; justify-content:space-between; gap:8px;
 }
 .stage svg{width:100%; height:auto; display:block;}
 .panel{background:var(--card); border:1.5px solid var(--border); border-radius:5px; padding:16px; box-shadow:3px 3px 0 var(--shadow);}
-.panel h2{font-size:15px; margin-bottom:8px;}
+.panel h2{font-size:15px; margin-bottom:8px; margin-top:18px;}
+.panel h2:first-of-type{margin-top:0;}
 .panel p{font-size:13px; color:var(--ink-soft); line-height:1.55; margin:0 0 12px;}
 .controlrow{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
 button.ctl{
@@ -94,27 +85,36 @@ button.ctl:hover{background:var(--accent);}
 button.ctl.secondary{background:transparent; color:var(--ink); border:1.5px solid var(--ink);}
 button.ctl.secondary:hover{border-color:var(--accent); color:var(--accent);}
 .sliderrow{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
-.sliderrow label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
+.sliderrow label{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft);}
+.sliderrow label span.val{color:var(--accent2); font-weight:700;}
 input[type=range]{width:100%; accent-color:var(--accent);}
 .specs{list-style:none; margin:0; padding:0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
-.specs li{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
-.specs li span:last-child{color:var(--ink); font-weight:600;}
+.specs li{display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px dashed var(--border); color:var(--ink-soft);}
+.specs li span:last-child{color:var(--ink); font-weight:600; text-align:right;}
 .stepsbox{margin-top:6px;}
-.stepsbox ol{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.stepsbox ol,.stepsbox ul{margin:0; padding-left:19px; font-size:12.8px; color:var(--ink-soft); line-height:1.6;}
+.stepsbox li{margin-bottom:6px;}
 .badge{
   display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.06em;
   text-transform:uppercase; background:var(--accent2); color:#0B1A17; padding:3px 9px; border-radius:20px;
-  margin-bottom:10px; font-weight:700;
+  margin-right:6px; margin-bottom:10px; font-weight:700;
 }
-
+.badge.alt{background:var(--accent); color:#2A1200;}
+.livegrid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px;}
+.livecell{background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:7px 8px; text-align:center;}
+.livecell .k{font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+.livecell .v{font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:700; color:var(--accent2); margin-top:2px;}
+.note{font-size:11.5px; color:var(--ink-soft); font-style:italic; margin-top:-4px;}
+.legend{display:flex; gap:16px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); margin-top:6px; flex-wrap:wrap;}
+.legend span{display:inline-flex; align-items:center; gap:5px;}
+.legend i{width:14px; height:3px; display:inline-block; border-radius:2px;}
+.pagefoot{margin-top:26px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); letter-spacing:.05em; text-align:center;}
 
 .lbl{font-family:'IBM Plex Mono',monospace; font-size:11px; fill:var(--ink-soft); letter-spacing:.04em;}
-.lbl.small{font-size:10px;}
+.lbl.small{font-size:9.5px;}
+.lbl.tiny{font-size:8.5px;}
 .lbl.mono-big{font-size:13px; fill:var(--accent2); font-weight:600;}
-@keyframes piezoPulse{0%,100%{transform:scaleX(1);}50%{transform:scaleX(1.18);}}
-@keyframes voltBlink{0%,100%{opacity:1;}50%{opacity:.25;}}
-[data-anim="piezoPulse"]{animation-name:piezoPulse;}
-[data-anim="voltBlink"]{animation-name:voltBlink;}
+.lbl.axis{font-size:10px; fill:var(--ink-soft);}
 
 </style>
 </head>
@@ -123,55 +123,137 @@ input[type=range]{width:100%; accent-color:var(--accent);}
   <div class="topbar">
     <div>
       <a class="backlink" href="index.html">&#8592; BACK TO CATALOG</a>
-      <div class="eyebrow">ACT-09 &middot; MICRO MOTION</div>
+      <div class="eyebrow">ACT-09 &middot; PRECISION MOTION</div>
       <h1 class="title">Piezoelectric Actuator</h1>
-      <p class="sub">A solid-state actuator that uses ferroelectric ceramics to produce precise sub-nanometer displacement when exposed to an electric voltage.</p>
+      <p class="sub">A preloaded ferroelectric ceramic stack that converts a high-voltage DC field into precise, high-force, sub-millisecond displacement &mdash; with real nonlinear hysteresis and a displacement/force trade-off you can explore below.</p>
     </div>
     <button class="themebtn" onclick="toggleTheme()" aria-label="Toggle color theme">
   <span aria-hidden="true">&#9680;</span><span id="themeLabel">DARK MODE</span>
 </button>
   </div>
   <div class="simlayout">
-    <div class="stage" id="stage01">
-      <div class="stagelabel">Live simulation &mdash; not to scale</div>
-      
-<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-<text x="230" y="40" class="lbl small">HIGH-VOLTAGE DC SOURCE</text>
-<path d="M270 50 L280 65 L272 65 L282 82" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round" class="moving" data-anim="voltBlink"/>
-<rect x="260" y="90" width="120" height="16" fill="var(--ink-soft)"/>
-<g class="moving" data-anim="piezoPulse" transform-origin="320 130">
- <rect x="270" y="98" width="20" height="64" fill="var(--accent)"/>
- <rect x="294" y="98" width="20" height="64" fill="var(--accent2)"/>
- <rect x="318" y="98" width="20" height="64" fill="var(--accent)"/>
- <rect x="342" y="98" width="20" height="64" fill="var(--accent2)"/>
-</g>
-<rect x="260" y="162" width="120" height="16" fill="var(--ink-soft)"/>
-<line x1="390" y1="130" x2="440" y2="130" stroke="var(--ink)" stroke-width="1.5"/>
-<text id="dispReadout" x="400" y="115" class="lbl mono-big">&#916;: 0.0 &#956;m</text>
-<text x="230" y="205" class="lbl small">CERAMIC STACK (PZT LAYERS)</text>
-</svg>
+    <div class="stagecol">
+      <div class="stage" id="stage01">
+        <div class="stagelabel"><span>Live simulation &mdash; motion exaggerated for visibility</span><span>Not to scale</span></div>
+        <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- Fixed outer frame -->
+          <line x1="185" y1="54" x2="300" y2="54" stroke="var(--ink)" stroke-width="3"/>
+          <line x1="340" y1="54" x2="455" y2="54" stroke="var(--ink)" stroke-width="3"/>
+          <text x="130" y="46" class="lbl small">FRAME (FIXED)</text>
+
+          <!-- Output plate + rigid rod -->
+          <rect id="plateRect" x="295" y="24" width="50" height="10" fill="var(--ink)"/>
+          <line id="rodLine" x1="320" y1="34" x2="320" y2="125" stroke="var(--ink)" stroke-width="4"/>
+          <text x="352" y="20" class="lbl small">OUTPUT TIP</text>
+
+          <!-- Preload spring -->
+          <path id="springPath" d="M380 54 L380 125" stroke="var(--accent)" stroke-width="2.25" fill="none" stroke-linejoin="round"/>
+          <text x="392" y="66" class="lbl small">PRELOAD</text>
+          <text x="392" y="78" class="lbl small">SPRING</text>
+
+          <!-- Preload cap -->
+          <rect id="capRect" x="255" y="125" width="130" height="9" fill="var(--ink-soft)"/>
+
+          <!-- Multilayer stack -->
+          <g id="stackLayers"></g>
+          <text x="207" y="272" class="lbl small">MULTILAYER PZT STACK &middot; 50&ndash;150&#181;m LAYERS</text>
+
+          <!-- Base -->
+          <rect x="250" y="245" width="140" height="14" fill="var(--ink-soft)"/>
+          <text x="218" y="278" class="lbl small">BASE MOUNT (FIXED)</text>
+
+          <!-- Electrode leads -->
+          <line x1="268" y1="105" x2="452" y2="105" stroke="var(--ink)" stroke-width="1.5"/>
+          <line x1="268" y1="192" x2="452" y2="192" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="459" y="109" class="lbl">+</text>
+          <text x="459" y="196" class="lbl">&#8722;</text>
+          <text x="405" y="94" class="lbl small">HV DRIVE</text>
+          <path id="sourceIcon" d="M480 100 L490 116 L482 116 L492 134" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+          <!-- Live readouts -->
+          <text id="vReadout" x="459" y="148" class="lbl mono-big">V: 0 V</text>
+          <text id="dispReadout" x="459" y="166" class="lbl mono-big">&#916;: 0.00 &#181;m</text>
+          <text id="forceReadout" x="459" y="184" class="lbl mono-big">F: 0 N</text>
+        </svg>
+      </div>
+      <div class="stage" id="stage02">
+        <div class="stagelabel"><span>Voltage &ndash; displacement hysteresis loop (live trace)</span><span id="cycleCount">0 cycles</span></div>
+        <svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">
+          <line x1="60" y1="20" x2="60" y2="200" stroke="var(--ink-soft)" stroke-width="1.5"/>
+          <line x1="60" y1="200" x2="600" y2="200" stroke="var(--ink-soft)" stroke-width="1.5"/>
+          <text x="0" y="204" class="lbl axis">0</text>
+          <text x="230" y="222" class="lbl axis">200</text>
+          <text x="580" y="222" class="lbl axis">DRIVE VOLTAGE (V)</text>
+          <text x="16" y="204" class="lbl axis">0</text>
+          <text x="8" y="118" class="lbl axis">20</text>
+          <text x="8" y="28" class="lbl axis">40</text>
+          <text x="10" y="14" class="lbl axis" transform="rotate(0 10 14)">&#181;m</text>
+          <polyline id="risingLine" points="" fill="none" stroke="var(--accent2)" stroke-width="2"/>
+          <polyline id="fallingLine" points="" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <circle id="hystDot" cx="60" cy="200" r="4.5" fill="var(--ink)"/>
+        </svg>
+        <div class="legend">
+          <span><i style="background:var(--accent2)"></i> Rising voltage (lags &mdash; needs more field for same strain)</span>
+          <span><i style="background:var(--accent)"></i> Falling voltage (retains more strain &mdash; classic butterfly loop)</span>
+        </div>
+      </div>
     </div>
     <div class="panel">
-      <span class="badge">MICRO MOTION</span>
-      <h2>Cycle Controls</h2>
-      <div class="controlrow">
-        <button class="ctl" id="playPauseBtn">Pause Cycle</button>
+      <span class="badge">HYSTERETIC</span><span class="badge alt">PRELOADED STACK</span>
+      <h2>Drive &amp; Load Controls</h2>
+      <div class="sliderrow">
+        <label for="voltageSlider">Drive Voltage <span class="val" id="voltageVal">0 V</span></label>
+        <input type="range" id="voltageSlider" min="0" max="150" value="0" step="1">
       </div>
       <div class="sliderrow">
-        <label for="speedSlider">Cycle Speed</label>
+        <label for="loadSlider">Mechanical Load / Constraint <span class="val" id="loadVal">0%</span></label>
+        <input type="range" id="loadSlider" min="0" max="100" value="0" step="1">
+      </div>
+      <div class="controlrow">
+        <button class="ctl" id="playPauseBtn">Run Auto Sweep</button>
+        <button class="ctl secondary" id="clearBtn">Clear Trace</button>
+      </div>
+      <div class="sliderrow">
+        <label for="speedSlider">Sweep Speed <span class="val" id="speedVal">6</span></label>
         <input type="range" id="speedSlider" min="1" max="10" value="6">
       </div>
+      <div class="livegrid">
+        <div class="livecell"><div class="k">Free Stroke</div><div class="v" id="liveFree">0.00 &#181;m</div></div>
+        <div class="livecell"><div class="k">Actual Stroke</div><div class="v" id="liveActual">0.00 &#181;m</div></div>
+        <div class="livecell"><div class="k">Output Force</div><div class="v" id="liveForce">0 N</div></div>
+      </div>
+      <p class="note">Drag Load to 100% and watch stroke collapse to ~0 while force climbs to the blocking value &mdash; a piezo stack can deliver full displacement <em>or</em> full force, never both at once.</p>
+
       <h2>Typical Purposes</h2>
-      <p>Semiconductor wafer alignment, micro-dispensing valves, optical lens focusing, active vibration damping.</p>
+      <div class="stepsbox"><ul>
+        <li>Semiconductor wafer / photomask nano-positioning stages</li>
+        <li>Atomic force &amp; scanning tunneling microscope fine positioning</li>
+        <li>Automotive piezo fuel injectors (fast, high-force valve control)</li>
+        <li>Adaptive-optics mirror correction, lens tip/tilt/focus</li>
+        <li>Active vibration cancellation, micro-dispensing valves</li>
+      </ul></div>
+
       <h2>How It Operates</h2>
-      <div class="stepsbox"><ol><li>An electrical potential is applied across a piezoelectric ceramic (e.g., PZT).</li>
-<li>Internal dipole moments shift, causing the material to expand or contract along its axis.</li>
-<li>Response time is under a millisecond, with positioning resolution in the sub-nanometer to micron range.</li></ol></div>
+      <div class="stepsbox"><ol>
+        <li>A DC drive voltage is applied across alternating internal electrodes bonded between thin (50&ndash;150&#181;m) PZT ceramic disks, enabling low-voltage operation of a mechanically long stack.</li>
+        <li>The converse piezoelectric effect (d33 mode) shifts ferroelectric domains, elongating the stack roughly 0.1&ndash;0.2% of its length along the stacking axis &mdash; sub-millisecond response.</li>
+        <li>A preload spring holds the ceramic in constant compression: PZT is strong under compression but fractures under tension, so the stack must never be pulled.</li>
+        <li>Displacement vs. voltage is nonlinear and path-dependent (hysteresis) &mdash; rising and falling voltage trace different curves, which is why precision systems close the loop with a strain gauge or capacitive sensor instead of trusting voltage alone.</li>
+        <li>Output stroke and output force trade off against each other depending on the stiffness of whatever the actuator is pushing against.</li>
+        <li>After a voltage step, a small additional "creep" drift (a few percent, roughly logarithmic in time) continues for seconds to minutes &mdash; another reason nanometer-stable systems use closed-loop feedback.</li>
+      </ol></div>
+
       <h2>Specifications</h2>
-      <ul class="specs"><li><span>Power source</span><span>High-voltage DC</span></li>
-<li><span>Force output</span><span>Very low</span></li>
-<li><span>Speed</span><span>Ultra high</span></li>
-<li><span>Precision</span><span>Sub-nanometer</span></li></ul>
+      <ul class="specs">
+        <li><span>Power source</span><span>0&ndash;150 V DC driver</span></li>
+        <li><span>Free stroke (typ.)</span><span>&#8776; 40 &#181;m</span></li>
+        <li><span>Blocking force (typ.)</span><span>&#8776; 800&ndash;1000 N</span></li>
+        <li><span>Positioning resolution</span><span>Sub-nanometer</span></li>
+        <li><span>Large-signal response</span><span>&lt; 1 ms</span></li>
+        <li><span>Resonant frequency</span><span>1&ndash;20 kHz (size-dependent)</span></li>
+        <li><span>Open-loop hysteresis</span><span>&#8776; 10&ndash;15% of stroke</span></li>
+        <li><span>Preload required</span><span>Yes (compression only)</span></li>
+      </ul>
     </div>
   </div>
   <footer class="pagefoot">ACT-09 &middot; Piezoelectric Actuator &middot; Manufacturing Floor Reference</footer>
@@ -195,44 +277,225 @@ document.addEventListener('DOMContentLoaded', function(){
   if(btn){ btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? 'LIGHT MODE' : 'DARK MODE'; }
 });
 
-
-function initStage(stageSel, defaultDur){
-  var stage = document.querySelector(stageSel);
-  var btn = document.getElementById('playPauseBtn');
-  var slider = document.getElementById('speedSlider');
-  stage.style.setProperty('--dur', defaultDur + 's');
-  var playing = true;
-  btn.addEventListener('click', function(){
-    playing = !playing;
-    stage.classList.toggle('paused', !playing);
-    btn.textContent = playing ? 'PAUSE CYCLE' : 'RUN CYCLE';
-  });
-  slider.addEventListener('input', function(){
-    var v = (11 - parseFloat(slider.value)) * 0.5;
-    stage.style.setProperty('--dur', v.toFixed(2) + 's');
-  });
-}
-
-document.addEventListener('DOMContentLoaded', function(){ initStage('#stage01', 0.9); });
-
+/* ---------------------------------------------------------------
+   Physical model (simplified, order-of-magnitude accurate):
+   - Converse piezoelectric effect: free displacement scales with
+     drive voltage but is NOT linear -- it follows a different curve
+     depending on whether voltage is rising or falling (ferroelectric
+     hysteresis / "butterfly" behavior).
+   - The actuator is modeled as a stiff spring in series with an
+     external load: increasing mechanical constraint linearly trades
+     free stroke for blocking force (simplified stiffness matching).
+------------------------------------------------------------------*/
 (function(){
- var el = document.getElementById('dispReadout');
- if(!el) return;
- var t0 = performance.now();
- function tick(){
-   var dur = parseFloat(getComputedStyle(document.querySelector('.stage')).getPropertyValue('--dur')) || 1.2;
-   var isPaused = document.querySelector('.stage.paused');
-   if(!isPaused){
-     var t = (performance.now()-t0)/1000 % dur;
-     var frac = t/dur;
-     var v = Math.abs(Math.sin(frac*Math.PI))*2.4;
-     el.textContent = 'Δ: '+v.toFixed(1)+' µm';
-   }
-   requestAnimationFrame(tick);
- }
- requestAnimationFrame(tick);
-})();
 
+  var V_MAX = 150;        // volts, full-scale drive
+  var D_MAX_UM = 40;      // microns, typical free stroke at V_MAX
+  var F_BLOCK_N = 900;    // newtons, typical blocking force at full constraint
+  var MAX_PX = 22;        // px of visual (exaggerated) travel at full stroke
+  var LAYERS = 8;
+
+  var voltageSlider = document.getElementById('voltageSlider');
+  var loadSlider = document.getElementById('loadSlider');
+  var speedSlider = document.getElementById('speedSlider');
+  var playPauseBtn = document.getElementById('playPauseBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var voltageVal = document.getElementById('voltageVal');
+  var loadVal = document.getElementById('loadVal');
+  var speedVal = document.getElementById('speedVal');
+
+  var plateRect = document.getElementById('plateRect');
+  var rodLine = document.getElementById('rodLine');
+  var springPath = document.getElementById('springPath');
+  var capRect = document.getElementById('capRect');
+  var stackLayers = document.getElementById('stackLayers');
+  var sourceIcon = document.getElementById('sourceIcon');
+  var vReadout = document.getElementById('vReadout');
+  var dispReadout = document.getElementById('dispReadout');
+  var forceReadout = document.getElementById('forceReadout');
+
+  var liveFree = document.getElementById('liveFree');
+  var liveActual = document.getElementById('liveActual');
+  var liveForce = document.getElementById('liveForce');
+
+  var risingLine = document.getElementById('risingLine');
+  var fallingLine = document.getElementById('fallingLine');
+  var hystDot = document.getElementById('hystDot');
+  var cycleCountEl = document.getElementById('cycleCount');
+
+  // Build the 8-segment multilayer stack once; positions updated each frame
+  var layerRects = [];
+  for(var i=0;i<LAYERS;i++){
+    var r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x','260');
+    r.setAttribute('width','130');
+    r.setAttribute('fill', i%2===0 ? 'var(--accent)' : 'var(--accent2)');
+    stackLayers.appendChild(r);
+    layerRects.push(r);
+  }
+
+  var voltage = 0;          // current drive voltage, 0-150
+  var direction = 'rising'; // last direction of voltage travel
+  var dispNorm = 0;         // smoothed, normalized (0-1) free displacement
+  var loadRatio = 0;        // 0 (free) - 1 (fully blocked)
+  var playing = false;
+  var cycleDur = 3.4;       // seconds per full up/down sweep
+  var sweepPhase = 0;
+  var cycles = 0;
+  var lastTime = null;
+  var lastFree = 0;
+
+  var risingPoints = [];
+  var fallingPoints = [];
+  var lastRecordedV = -10;
+
+  function d33rise(Vn){ return Math.pow(Vn, 1.15); }
+  function d33fall(Vn){ return Math.pow(Vn, 0.85); }
+
+  function mapV(v){ return 60 + (v/V_MAX) * 540; }
+  function mapD(d){ return 200 - (d/D_MAX_UM) * 180; }
+
+  voltageSlider.addEventListener('input', function(){
+    var v = parseFloat(voltageSlider.value);
+    direction = v >= voltage ? 'rising' : 'falling';
+    voltage = v;
+    if(playing){
+      playing = false;
+      playPauseBtn.textContent = 'Run Auto Sweep';
+    }
+  });
+
+  loadSlider.addEventListener('input', function(){
+    loadRatio = parseFloat(loadSlider.value)/100;
+    loadVal.textContent = loadSlider.value + '%';
+  });
+
+  speedSlider.addEventListener('input', function(){
+    speedVal.textContent = speedSlider.value;
+    cycleDur = (11 - parseFloat(speedSlider.value)) * 0.5;
+  });
+
+  playPauseBtn.addEventListener('click', function(){
+    playing = !playing;
+    playPauseBtn.textContent = playing ? 'Pause Auto Sweep' : 'Run Auto Sweep';
+  });
+
+  clearBtn.addEventListener('click', function(){
+    risingPoints = [];
+    fallingPoints = [];
+    cycles = 0;
+    cycleCountEl.textContent = '0 cycles';
+    drawChart();
+  });
+
+  function buildZigzag(x, y1, y2, teeth, amp){
+    var h = y2 - y1;
+    if(h < 4){ return 'M '+x+' '+y1+' L '+x+' '+y2; }
+    var seg = h/teeth;
+    var d = 'M '+x+' '+y1;
+    for(var i=1;i<teeth;i++){
+      var y = y1 + seg*i;
+      var xOff = (i%2===0) ? x-amp : x+amp;
+      d += ' L '+xOff+' '+y;
+    }
+    d += ' L '+x+' '+y2;
+    return d;
+  }
+
+  function recordPoint(v, d, dir){
+    if(Math.abs(v - lastRecordedV) < 0.75) return;
+    lastRecordedV = v;
+    var arr = dir === 'rising' ? risingPoints : fallingPoints;
+    arr.push({v:v, d:d});
+    if(arr.length > 220) arr.shift();
+  }
+
+  function drawChart(){
+    risingLine.setAttribute('points', risingPoints.map(function(p){return mapV(p.v)+','+mapD(p.d);}).join(' '));
+    fallingLine.setAttribute('points', fallingPoints.map(function(p){return mapV(p.v)+','+mapD(p.d);}).join(' '));
+    hystDot.setAttribute('cx', mapV(voltage));
+    hystDot.setAttribute('cy', mapD(lastFree));
+  }
+
+  function updateDiagram(actualDispUm, V, F){
+    var pxExpansion = (actualDispUm/D_MAX_UM) * MAX_PX;
+    var stackBottom = 245, baseStackHeight = 110;
+    var stackHeight = baseStackHeight + pxExpansion;
+    var stackTop = stackBottom - stackHeight;
+    var segH = stackHeight/LAYERS;
+
+    for(var i=0;i<LAYERS;i++){
+      var y = stackBottom - (i+1)*segH;
+      layerRects[i].setAttribute('y', y.toFixed(2));
+      layerRects[i].setAttribute('height', segH.toFixed(2));
+    }
+
+    var capTop = stackTop - 9;
+    capRect.setAttribute('y', capTop.toFixed(2));
+
+    var plateY = 34 - pxExpansion;
+    plateRect.setAttribute('y', plateY.toFixed(2));
+    rodLine.setAttribute('y1', (plateY+10).toFixed(2));
+    rodLine.setAttribute('y2', capTop.toFixed(2));
+
+    springPath.setAttribute('d', buildZigzag(380, 54, capTop, 6, 7));
+
+    sourceIcon.setAttribute('opacity', (0.3 + 0.7*(V/V_MAX)).toFixed(2));
+
+    vReadout.textContent = 'V: ' + V.toFixed(0) + ' V';
+    dispReadout.textContent = '\u0394: ' + actualDispUm.toFixed(2) + ' \u00B5m';
+    forceReadout.textContent = 'F: ' + F.toFixed(0) + ' N';
+  }
+
+  function tick(timestamp){
+    if(lastTime === null) lastTime = timestamp;
+    var dt = (timestamp - lastTime)/1000;
+    if(dt > 0.1) dt = 0.1;
+    lastTime = timestamp;
+
+    if(playing){
+      var prevPhase = sweepPhase;
+      sweepPhase += dt/cycleDur;
+      if(sweepPhase >= 1){
+        sweepPhase = sweepPhase % 1;
+        cycles++;
+        cycleCountEl.textContent = cycles + (cycles===1 ? ' cycle' : ' cycles');
+      }
+      var v01 = sweepPhase < 0.5 ? sweepPhase*2 : (1-sweepPhase)*2;
+      direction = sweepPhase < 0.5 ? 'rising' : 'falling';
+      voltage = v01 * V_MAX;
+      voltageSlider.value = voltage.toFixed(0);
+    }
+
+    voltageVal.textContent = voltage.toFixed(0) + ' V';
+
+    var Vn = voltage/V_MAX;
+    var target = direction === 'rising' ? d33rise(Vn) : d33fall(Vn);
+    dispNorm += (target - dispNorm) * Math.min(1, dt*8);
+
+    var freeDispUm = dispNorm * D_MAX_UM;
+    var actualDispUm = freeDispUm * (1 - loadRatio);
+    var forceN = F_BLOCK_N * loadRatio;
+    lastFree = freeDispUm;
+
+    updateDiagram(actualDispUm, voltage, forceN);
+    recordPoint(voltage, freeDispUm, direction);
+    drawChart();
+
+    liveFree.textContent = freeDispUm.toFixed(2) + ' \u00B5m';
+    liveActual.textContent = actualDispUm.toFixed(2) + ' \u00B5m';
+    liveForce.textContent = forceN.toFixed(0) + ' N';
+
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    updateDiagram(0,0,0);
+    drawChart();
+    requestAnimationFrame(tick);
+  });
+
+})();
 </script>
 </body>
 </html>
