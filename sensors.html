@@ -1,1408 +1,1497 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Sensor Education Hub</title>
+    <title>Industrial Sensor Simulation & Telemetry Training Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        darkbg: '#090d16',
+                        panelbg: '#111827',
+                        cardbg: '#1f2937',
+                        bordercolor: '#374151'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #06b6d4;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        html.dark body {
+            background-color: #090d16;
+            color: #f3f4f6;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        html.dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #374151;
         }
 
-        .app-container {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            grid-template-rows: auto 1fr;
-            grid-template-areas: 
-                "header header"
-                "sidebar main";
-            min-height: 100vh;
-        }
-
-        .header {
-            grid-area: header;
-            background: var(--surface);
-            box-shadow: var(--shadow);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background: var(--text-primary);
-            margin: 3px 0;
-            transition: 0.3s;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
-        }
-
-        .sidebar {
-            grid-area: sidebar;
-            background: var(--surface);
-            box-shadow: var(--shadow);
-            padding: 2rem 0;
-            transition: transform 0.3s ease;
-        }
-
-        .sensor-list {
-            list-style: none;
-        }
-
-        .sensor-item {
-            padding: 0.75rem 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-
-        .sensor-item:hover {
-            background: #f1f5f9;
-            border-left-color: var(--accent-color);
-        }
-
-        .sensor-item.active {
-            background: #eff6ff;
-            border-left-color: var(--primary-color);
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .main-content {
-            grid-area: main;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .sensor-simulation {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .sensor-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .sensor-title {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .sensor-description {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .simulation-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .controls-panel {
-            background: #f8fafc;
+        /* Custom slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: #cbd5e1;
             border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .output-panel {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .control-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .control-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .control-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .control-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .slider {
-            width: 100%;
             height: 8px;
-            border-radius: 4px;
-            background: var(--border);
-            outline: none;
+        }
+        html.dark input[type=range] {
+            background: #1f2937;
+        }
+        input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
             height: 20px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .output-display {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .output-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        .output-unit {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        .status-indicator {
             width: 20px;
-            height: 20px;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.5rem;
-            transition: all 0.3s ease;
+            background: #0ea5e9;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            border: 2px solid #ffffff;
+            transition: transform 0.1s ease;
         }
-
-        .status-normal { background: var(--success-color); }
-        .status-warning { background: var(--warning-color); }
-        .status-danger { background: var(--danger-color); }
-
-        .visual-display {
-            width: 100%;
-            height: 200px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc),
-                        linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-        }
-
-        .sensor-visual {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
-        }
-
-        .thermometer {
-            width: 20px;
-            height: 100px;
-            background: #e5e7eb;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .thermometer-fill {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: linear-gradient(to top, #ef4444, #f59e0b, #10b981);
-            border-radius: 10px;
-            transition: height 0.5s ease;
-        }
-
-        .proximity-object {
-            width: 40px;
-            height: 40px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            transition: all 0.5s ease;
-        }
-
-        .sensor-beam {
-            position: absolute;
-            width: 100px;
-            height: 2px;
-            background: var(--warning-color);
-            top: 50%;
-            left: 20px;
-            opacity: 0.7;
-        }
-
-        .gas-particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--danger-color);
-            border-radius: 50%;
-            animation: float 3s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-            50% { transform: translateY(-20px) translateX(10px); opacity: 1; }
-        }
-
-        .flame {
-            width: 30px;
-            height: 40px;
-            background: radial-gradient(circle, #ff6b35 0%, #f7931e 50%, #ff0000 100%);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            animation: flicker 0.5s infinite alternate;
-        }
-
-        @keyframes flicker {
-            0% { transform: rotate(-2deg) scale(1); }
-            100% { transform: rotate(2deg) scale(1.05); }
-        }
-
-        .water-level {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: var(--accent-color);
-            border-radius: 0 0 8px 8px;
-            transition: height 0.5s ease;
-        }
-
-        @media (max-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr;
-                grid-template-areas: 
-                    "header"
-                    "main";
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .sidebar {
-                position: fixed;
-                top: 80px;
-                left: 0;
-                width: 280px;
-                height: calc(100vh - 80px);
-                transform: translateX(-100%);
-                z-index: 999;
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .simulation-area {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                padding: 1rem;
-            }
-
-            .sensor-simulation {
-                padding: 1rem;
-            }
-        }
-
-        .hidden {
-            display: none;
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <header class="header">
-            <div class="logo">🔬 Sensor Education Hub</div>
-            <div class="hamburger" onclick="toggleSidebar()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </header>
+<body class="h-screen flex flex-col overflow-hidden text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-950">
 
-        <nav class="sidebar" id="sidebar">
-            <ul class="sensor-list">
-                <li class="sensor-item active" onclick="showSensor('smart')">Smart Sensors</li>
-                <li class="sensor-item" onclick="showSensor('temperature')">Temperature Sensors</li>
-                <li class="sensor-item" onclick="showSensor('humidity')">Humidity Sensors</li>
-                <li class="sensor-item" onclick="showSensor('vibration')">Vibration Sensors</li>
-                <li class="sensor-item" onclick="showSensor('pressure')">Pressure Sensors</li>
-                <li class="sensor-item" onclick="showSensor('proximity')">Proximity Sensors</li>
-                <li class="sensor-item" onclick="showSensor('gas')">Gas Sensors</li>
-                <li class="sensor-item" onclick="showSensor('chemical')">Chemical Sensors</li>
-                <li class="sensor-item" onclick="showSensor('fluid')">Fluid Level Sensors</li>
-                <li class="sensor-item" onclick="showSensor('fire')">Fire Detection Sensors</li>
-            </ul>
-        </nav>
-
-        <main class="main-content">
-            <!-- Smart Sensors -->
-            <div id="smart-sensor" class="sensor-simulation">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Smart Sensors</h1>
-                    <p class="sensor-description">
-                        Smart sensors combine traditional sensing elements with built-in processing capabilities, communication interfaces, and decision-making algorithms. They can process data locally, communicate wirelessly, and adapt their behavior based on environmental conditions.
-                    </p>
+    <!-- Top Header -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between z-30 shrink-0 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <button id="mobile-menu-btn" class="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
+                    <i class="fa-solid fa-microchip text-lg"></i>
                 </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Control Panel</h3>
-                        <div class="control-group">
-                            <label class="control-label">Data Processing Mode</label>
-                            <select class="control-input" id="smart-mode" onchange="updateSmartSensor()">
-                                <option value="basic">Basic Mode</option>
-                                <option value="advanced">Advanced Processing</option>
-                                <option value="ai">AI-Enhanced</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Communication Protocol</label>
-                            <select class="control-input" id="smart-protocol" onchange="updateSmartSensor()">
-                                <option value="wifi">Wi-Fi</option>
-                                <option value="bluetooth">Bluetooth</option>
-                                <option value="zigbee">ZigBee</option>
-                                <option value="lora">LoRa</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Power Management</label>
-                            <input type="range" class="slider" id="smart-power" min="10" max="100" value="75" onchange="updateSmartSensor()">
-                            <span id="smart-power-val">75%</span>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Smart Sensor Output</h3>
-                        <div class="output-display">
-                            <div class="output-value" id="smart-efficiency">85%</div>
-                            <div class="output-unit">Processing Efficiency</div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="smart-latency">12ms</div>
-                            <div class="output-unit">Response Latency</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+                        SensorSim Pro <span class="text-xs px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800 ml-1">v3.5 Enterprise</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Industrial Automation & Telemetry Training Suite</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Telemetry Status & Utility Controls -->
+        <div class="flex items-center space-x-4">
+            <div class="hidden lg:flex items-center space-x-4 bg-slate-50 dark:bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-mono">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-slate-500 dark:text-slate-400">BUS:</span>
+                    <span class="text-emerald-600 dark:text-emerald-400">MODBUS-RTU ONLINE</span>
+                </div>
+                <div class="h-3 w-px bg-slate-200 dark:bg-slate-800"></div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 dark:text-slate-400">SAMPLE RATE:</span>
+                    <span class="text-cyan-600 dark:text-cyan-400" id="global-sample-rate">100 Hz</span>
+                </div>
+                <div class="h-3 w-px bg-slate-200 dark:bg-slate-800"></div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-500 dark:text-slate-400">TELEMETRY:</span>
+                    <span class="text-amber-600 dark:text-amber-400">4-20mA ACTIVE</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <button id="theme-toggle-btn" onclick="toggleTheme()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium border border-slate-300 dark:border-slate-700 transition flex items-center space-x-1.5">
+                    <i id="theme-icon" class="fa-solid fa-sun text-amber-500"></i>
+                    <span id="theme-status-text">Light Mode</span>
+                </button>
+                <button id="audio-toggle-btn" onclick="toggleAudio()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium border border-slate-300 dark:border-slate-700 transition flex items-center space-x-1.5">
+                    <i id="audio-icon" class="fa-solid fa-volume-xmark text-rose-500"></i>
+                    <span id="audio-status-text">Audio Off</span>
+                </button>
+                <button onclick="resetGlobalSimulation()" class="px-3 py-1.5 rounded-lg bg-cyan-600/10 dark:bg-cyan-600/20 hover:bg-cyan-600/20 dark:hover:bg-cyan-600/30 text-cyan-700 dark:text-cyan-300 text-xs font-medium border border-cyan-500/30 transition flex items-center space-x-1">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Reset All</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Container -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="absolute md:relative z-20 w-72 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0 shrink-0">
+            <div class="p-3 border-b border-slate-200 dark:border-slate-800">
+                <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-2 mb-2">Sensor Modules</div>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="sensor-search" placeholder="Search sensors..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md py-1.5 pl-8 pr-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500">
+                </div>
+            </div>
+
+            <!-- Sensor Selection List -->
+            <nav class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar" id="sensor-nav-list">
+                <!-- Navigation Items dynamically rendered -->
+            </nav>
+
+            <!-- Diagnostics Summary Footer -->
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 text-xs">
+                <div class="flex justify-between items-center text-slate-500 dark:text-slate-400 mb-1">
+                    <span>Active Faults:</span>
+                    <span id="fault-count-badge" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">0 Active</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="fault-indicator-bar" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-slate-100 dark:bg-slate-950 p-3 lg:p-6">
+            
+            <!-- Top Controls & Module Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md">
+                <div>
+                    <div class="flex items-center space-x-3">
+                        <div id="sensor-icon-container" class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 text-xl">
+                            <i class="fa-solid fa-microchip"></i>
                         </div>
                         <div>
-                            <span class="status-indicator status-normal" id="smart-status"></span>
-                            <span id="smart-status-text">Optimal Performance</span>
+                            <div class="flex items-center space-x-2">
+                                <h2 id="sensor-title" class="text-xl font-bold text-slate-900 dark:text-white">Smart Sensors Hub</h2>
+                                <span id="sensor-badge" class="px-2 py-0.5 rounded text-xs font-semibold bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800">
+                                    Digital / IIoT
+                                </span>
+                            </div>
+                            <p id="sensor-subtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Microprocessor-integrated sensor node with edge analytics & protocol translation.</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Simulation Tab Switcher -->
+                <div class="flex items-center space-x-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 self-start md:self-auto">
+                    <button onclick="switchTab('simulation')" id="tab-btn-simulation" class="px-3 py-1.5 rounded-md text-xs font-medium transition bg-cyan-600 text-white shadow-md">
+                        <i class="fa-solid fa-sliders mr-1.5"></i>Interactive Simulator
+                    </button>
+                    <button onclick="switchTab('oscilloscope')" id="tab-btn-oscilloscope" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition">
+                        <i class="fa-solid fa-chart-line mr-1.5"></i>Live Signal & DSP
+                    </button>
+                    <button onclick="switchTab('theory')" id="tab-btn-theory" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition">
+                        <i class="fa-solid fa-book-open mr-1.5"></i>Theory & Formulas
+                    </button>
+                    <button onclick="switchTab('faults')" id="tab-btn-faults" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition">
+                        <i class="fa-solid fa-bug mr-1.5"></i>Fault Diagnostics
+                    </button>
                 </div>
             </div>
 
-            <!-- Temperature Sensor -->
-            <div id="temperature-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Temperature Sensors</h1>
-                    <p class="sensor-description">
-                        Temperature sensors measure thermal energy and convert it into electrical signals. They're essential for climate control, industrial processes, and safety monitoring in automated environments.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Environmental Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Ambient Temperature (°C)</label>
-                            <input type="range" class="slider" id="temp-ambient" min="-30" max="50" value="22" onchange="updateTemperature()">
-                            <span id="temp-ambient-val">22°C</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Heat Source</label>
-                            <button class="btn" onclick="toggleHeatSource()">Toggle Heat Source</button>
-                            <span id="heat-status">OFF</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Sensor Type</label>
-                            <select class="control-input" id="temp-type" onchange="updateTemperature()">
-                                <option value="thermocouple">Thermocouple</option>
-                                <option value="rtd">RTD</option>
-                                <option value="thermistor">Thermistor</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Temperature Reading</h3>
-                        <div class="visual-display">
-                            <div class="thermometer">
-                                <div class="thermometer-fill" id="temp-fill"></div>
+            <!-- TAB 1: INTERACTIVE SIMULATION -->
+            <div id="tab-content-simulation" class="tab-page space-y-6">
+                
+                <!-- Main Grid: Visualizer & Controls -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left: Control Panel (5 Cols) -->
+                    <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-md">
+                        <div>
+                            <div class="flex justify-between items-center pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+                                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                                    <i class="fa-solid fa-sliders text-cyan-600 dark:text-cyan-400 mr-2"></i>Physical & Operational Controls
+                                </h3>
+                                <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500">LIVE FEED</span>
+                            </div>
+
+                            <!-- Dynamic Control Sliders Rendered Here -->
+                            <div id="sensor-controls-container" class="space-y-4">
+                                <!-- Dynamic Controls via JS -->
                             </div>
                         </div>
-                        <div class="output-display">
-                            <div class="output-value" id="temp-reading">22.0°C</div>
-                            <div class="output-unit">Current Temperature</div>
+
+                        <!-- Secondary Environment Condition Switches -->
+                        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signal Conditions</div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center justify-between p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer text-xs">
+                                    <span class="text-slate-700 dark:text-slate-300">Add Thermal Noise</span>
+                                    <input type="checkbox" id="chk-noise" onchange="updateSimulationState()" class="rounded bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-cyan-500 focus:ring-0">
+                                </label>
+                                <label class="flex items-center justify-between p-2 rounded bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 cursor-pointer text-xs">
+                                    <span class="text-slate-700 dark:text-slate-300">50Hz AC Interference</span>
+                                    <input type="checkbox" id="chk-hum" onchange="updateSimulationState()" class="rounded bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-cyan-500 focus:ring-0">
+                                </label>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Right: HTML5 Canvas Visualizer + Realtime Output Displays (7 Cols) -->
+                    <div class="lg:col-span-7 flex flex-col space-y-4">
+                        
+                        <!-- Visual Physics Simulation Canvas -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center">
+                                    <i class="fa-solid fa-eye text-cyan-600 dark:text-cyan-400 mr-2"></i>Physics Visualization Model
+                                </span>
+                                <div class="flex items-center space-x-2 text-[10px] font-mono">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">CANVAS 2D 60FPS</span>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Canvas -->
+                            <div class="relative w-full h-64 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center">
+                                <canvas id="sensor-canvas" class="w-full h-full block"></canvas>
+                                
+                                <!-- Canvas Overlay Info Tag -->
+                                <div id="canvas-overlay-tag" class="absolute top-2 left-2 px-2 py-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded text-[11px] font-mono text-cyan-600 dark:text-cyan-400 border border-slate-300 dark:border-slate-700/50 shadow-sm">
+                                    Status: Nominal
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Industrial Telemetry Readout Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Primary Value</div>
+                                <div id="telemetry-primary-val" class="text-xl font-bold font-mono text-cyan-600 dark:text-cyan-400 mt-1">22.5</div>
+                                <div id="telemetry-primary-unit" class="text-[10px] text-slate-500">°C Ambient</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Current Loop</div>
+                                <div id="telemetry-ma-val" class="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1">11.2 mA</div>
+                                <div class="text-[10px] text-slate-500">4 - 20 mA Signal</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Analog Voltage</div>
+                                <div id="telemetry-volt-val" class="text-xl font-bold font-mono text-amber-600 dark:text-amber-400 mt-1">4.50 V</div>
+                                <div class="text-[10px] text-slate-500">0 - 10 V DC</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                                <div class="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Alarm State</div>
+                                <div id="telemetry-alarm-val" class="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-2 flex items-center">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                                    NORMAL
+                                </div>
+                                <div class="text-[10px] text-slate-500">Relay Switch</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Industrial Register & Telemetry Panel -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-md">
+                    <div class="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3 flex items-center">
+                        <i class="fa-solid fa-network-wired text-cyan-600 dark:text-cyan-400 mr-2"></i>Fieldbus Telemetry Data Registers (Modbus / IO-Link)
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <div>
+                                <div class="text-slate-500 text-[10px]">REGISTER 40001 (HOLDING)</div>
+                                <div class="text-slate-700 dark:text-slate-200">Raw ADC Value (12-bit)</div>
+                            </div>
+                            <div id="reg-adc-val" class="text-cyan-600 dark:text-cyan-400 font-bold text-sm">0x074F (1871)</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <div>
+                                <div class="text-slate-500 text-[10px]">REGISTER 40002 (SCALED)</div>
+                                <div class="text-slate-700 dark:text-slate-200">Process Engineering Unit</div>
+                            </div>
+                            <div id="reg-scaled-val" class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">2250 (22.5 °C)</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <div>
+                                <div class="text-slate-500 text-[10px]">REGISTER 40003 (DIAGNOSTIC)</div>
+                                <div class="text-slate-700 dark:text-slate-200">Sensor Health Word</div>
+                            </div>
+                            <div id="reg-diag-val" class="text-amber-600 dark:text-amber-400 font-bold text-sm">0x0000 (OK)</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: LIVE SIGNAL & DSP -->
+            <div id="tab-content-oscilloscope" class="tab-page hidden space-y-6">
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4">
                         <div>
-                            <span class="status-indicator status-normal" id="temp-status"></span>
-                            <span id="temp-status-text">Normal Range</span>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+                                <i class="fa-solid fa-wave-square text-cyan-600 dark:text-cyan-400 mr-2"></i>Digital Signal Processing & Time-Domain Oscilloscope
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Comparing Raw Sensor Output vs Exponential Moving Average (EMA) Digital Filtered Trace.</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-slate-500 dark:text-slate-400">Filter Factor (&alpha;):</span>
+                                <input type="range" id="dsp-alpha-slider" min="0.05" max="1" step="0.05" value="0.2" oninput="updateDSPAlpha(this.value)" class="w-24">
+                                <span id="dsp-alpha-val" class="text-xs font-mono text-cyan-600 dark:text-cyan-400">0.20</span>
+                            </div>
+                            <button onclick="clearOscilloscope()" class="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Oscilloscope Canvas -->
+                    <div class="w-full h-80 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+                        <canvas id="scope-canvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Legend -->
+                        <div class="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded border border-slate-200 dark:border-slate-800 text-[11px] font-mono space-y-1 shadow-md">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-0.5 bg-rose-500"></span>
+                                <span class="text-slate-700 dark:text-slate-300">Raw Sensor Signal (Noise + Drift)</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-0.5 bg-cyan-500"></span>
+                                <span class="text-slate-700 dark:text-slate-300">DSP Filtered Output</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-0.5 bg-amber-500 border-b border-dashed"></span>
+                                <span class="text-slate-700 dark:text-slate-300">High Alarm Threshold</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DSP Analytical Metrics -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-500">SIGNAL NOISE AMPLITUDE</div>
+                            <div id="dsp-noise-peak" class="text-base font-bold font-mono text-rose-600 dark:text-rose-400">±0.45 V</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-500">RESPONSE LATENCY</div>
+                            <div id="dsp-latency-val" class="text-base font-bold font-mono text-cyan-600 dark:text-cyan-400">12.4 ms</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-500">SIGNAL-TO-NOISE RATIO</div>
+                            <div id="dsp-snr-val" class="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">38.2 dB</div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950 p-3 rounded border border-slate-200 dark:border-slate-800 text-center">
+                            <div class="text-[10px] text-slate-500">SAMPLE FREQUENCY</div>
+                            <div class="text-base font-bold font-mono text-amber-600 dark:text-amber-400">100.0 Hz</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Humidity Sensor -->
-            <div id="humidity-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Humidity Sensors</h1>
-                    <p class="sensor-description">
-                        Humidity sensors measure the amount of water vapor in the air. They're crucial for maintaining optimal conditions in manufacturing, storage, and comfort control systems.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Humidity Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Relative Humidity (%)</label>
-                            <input type="range" class="slider" id="humidity-level" min="0" max="100" value="45" onchange="updateHumidity()">
-                            <span id="humidity-val">45%</span>
+            <!-- TAB 3: THEORY & FORMULAS -->
+            <div id="tab-content-theory" class="tab-page hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-graduation-cap text-cyan-600 dark:text-cyan-400 mr-2"></i>Operating Principle & Physics Equations
+                        </h3>
+                        
+                        <div id="theory-description" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                            <!-- Dynamic Theory Text -->
                         </div>
-                        <div class="control-group">
-                            <label class="control-label">Temperature (°C)</label>
-                            <input type="range" class="slider" id="humidity-temp" min="0" max="40" value="23" onchange="updateHumidity()">
-                            <span id="humidity-temp-val">23°C</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Humidifier</label>
-                            <button class="btn" onclick="toggleHumidifier()">Toggle Humidifier</button>
-                            <span id="humidifier-status">OFF</span>
+
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-200 dark:border-slate-800 space-y-2 font-mono text-xs">
+                            <div class="text-cyan-700 dark:text-cyan-400 font-bold uppercase text-[10px]">Mathematical Transfer Function:</div>
+                            <div id="theory-formula" class="text-emerald-700 dark:text-emerald-400 text-sm py-2 px-3 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800">
+                                V_out = V_cc * (R_sensor / (R_sensor + R_fixed))
+                            </div>
+                            <p id="theory-formula-desc" class="text-slate-500 dark:text-slate-400 text-[11px]">
+                                Relates physical change in sensor resistivity to measurable voltage output.
+                            </p>
                         </div>
                     </div>
-                    <div class="output-panel">
-                        <h3>Humidity Readings</h3>
-                        <div class="output-display">
-                            <div class="output-value" id="humidity-reading">45%</div>
-                            <div class="output-unit">Relative Humidity</div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="dew-point">10.9°C</div>
-                            <div class="output-unit">Dew Point</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="humidity-status"></span>
-                            <span id="humidity-status-text">Optimal Range</span>
+
+                    <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-file-contract text-cyan-600 dark:text-cyan-400 mr-2"></i>Typical Engineering Specifications
+                        </h3>
+                        
+                        <div class="bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-800">
+                            <table class="w-full text-left text-xs">
+                                <tbody id="theory-spec-table" class="divide-y divide-slate-200 dark:divide-slate-800 font-mono">
+                                    <!-- Dynamic Spec Table -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Vibration Sensor -->
-            <div id="vibration-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Vibration Sensors</h1>
-                    <p class="sensor-description">
-                        Vibration sensors detect mechanical oscillations and movements. They're essential for machinery monitoring, predictive maintenance, and structural health assessment in industrial automation.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Vibration Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Machinery Speed (RPM)</label>
-                            <input type="range" class="slider" id="vibration-speed" min="0" max="3000" value="1500" onchange="updateVibration()">
-                            <span id="vibration-speed-val">1500 RPM</span>
+            <!-- TAB 4: FAULT DIAGNOSTICS -->
+            <div id="tab-content-faults" class="tab-page hidden space-y-6">
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>Fault Injection & Troubleshooting Simulator
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Inject realistic industrial sensor faults into the simulation to observe telemetry behavior and learn diagnostic procedures.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900 dark:text-white mb-1">Open Circuit / Cable Break</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Simulates physical wire disconnect on 4-20mA loop. Current drops to 0.0mA (NAMUR NE43 error).</p>
+                            </div>
+                            <button onclick="toggleFault('open_circuit')" id="btn-fault-open_circuit" class="mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700">
+                                Inject Open Circuit
+                            </button>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label">Load Factor</label>
-                            <input type="range" class="slider" id="vibration-load" min="10" max="100" value="50" onchange="updateVibration()">
-                            <span id="vibration-load-val">50%</span>
+
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900 dark:text-white mb-1">Zero Calibration Drift</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Introduces a +15% systematic baseline offset due to aging or physical sensor fouling.</p>
+                            </div>
+                            <button onclick="toggleFault('zero_drift')" id="btn-fault-zero_drift" class="mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700">
+                                Inject Zero Drift
+                            </button>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label">Simulate Fault</label>
-                            <button class="btn" onclick="toggleVibrationFault()">Toggle Bearing Fault</button>
-                            <span id="fault-status">Normal</span>
+
+                        <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <div class="font-bold text-xs text-slate-900 dark:text-white mb-1">Ground Loop Interference</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Adds heavy 60Hz AC noise and unpredictable offset caused by improper grounding.</p>
+                            </div>
+                            <button onclick="toggleFault('ground_loop')" id="btn-fault-ground_loop" class="mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700">
+                                Inject Ground Loop
+                            </button>
                         </div>
                     </div>
-                    <div class="output-panel">
-                        <h3>Vibration Analysis</h3>
-                        <div class="output-display">
-                            <div class="output-value" id="vibration-amplitude">2.5</div>
-                            <div class="output-unit">mm/s RMS</div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="vibration-frequency">25</div>
-                            <div class="output-unit">Hz Dominant</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="vibration-status"></span>
-                            <span id="vibration-status-text">Normal Operation</span>
+
+                    <!-- Diagnostic Console -->
+                    <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div class="text-xs font-mono text-cyan-700 dark:text-cyan-400 mb-2">DIAGNOSTIC EVENT LOG:</div>
+                        <div id="diagnostic-log" class="h-32 overflow-y-auto font-mono text-[11px] text-slate-700 dark:text-slate-300 space-y-1 custom-scrollbar">
+                            <div class="text-slate-400 dark:text-slate-500">[SYSTEM] All diagnostic monitors initialized. Normal loop operation detected.</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Pressure Sensor -->
-            <div id="pressure-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Pressure Sensors</h1>
-                    <p class="sensor-description">
-                        Pressure sensors measure force per unit area applied to their sensing element. They're vital for hydraulic systems, pneumatic controls, and process monitoring in automated environments.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Pressure Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">System Pressure (Bar)</label>
-                            <input type="range" class="slider" id="pressure-level" min="0" max="50" value="15" onchange="updatePressure()">
-                            <span id="pressure-val">15 Bar</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Pressure Type</label>
-                            <select class="control-input" id="pressure-type" onchange="updatePressure()">
-                                <option value="gauge">Gauge Pressure</option>
-                                <option value="absolute">Absolute Pressure</option>
-                                <option value="differential">Differential Pressure</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Relief Valve</label>
-                            <button class="btn" onclick="toggleReliefValve()">Open Relief Valve</button>
-                            <span id="relief-status">Closed</span>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Pressure Readings</h3>
-                        <div class="output-display">
-                            <div class="output-value" id="pressure-reading">15.0</div>
-                            <div class="output-unit">Bar</div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="pressure-psi">217.6</div>
-                            <div class="output-unit">PSI</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="pressure-status"></span>
-                            <span id="pressure-status-text">Normal Pressure</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Proximity Sensor -->
-            <div id="proximity-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Proximity Sensors</h1>
-                    <p class="sensor-description">
-                        Proximity sensors detect the presence or absence of objects without physical contact. They're essential for automation, safety systems, and object detection in manufacturing processes.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Proximity Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Object Distance (cm)</label>
-                            <input type="range" class="slider" id="proximity-distance" min="0" max="100" value="50" onchange="updateProximity()">
-                            <span id="proximity-distance-val">50 cm</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Detection Range (cm)</label>
-                            <input type="range" class="slider" id="proximity-range" min="5" max="50" value="20" onchange="updateProximity()">
-                            <span id="proximity-range-val">20 cm</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Sensor Type</label>
-                            <select class="control-input" id="proximity-type" onchange="updateProximity()">
-                                <option value="inductive">Inductive</option>
-                                <option value="capacitive">Capacitive</option>
-                                <option value="ultrasonic">Ultrasonic</option>
-                                <option value="photoelectric">Photoelectric</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Detection Status</h3>
-                        <div class="visual-display">
-                            <div class="sensor-beam"></div>
-                            <div class="proximity-object" id="proximity-object"></div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="proximity-detected">NOT DETECTED</div>
-                            <div class="output-unit">Object Status</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="proximity-status"></span>
-                            <span id="proximity-status-text">Sensor Active</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gas Sensor -->
-            <div id="gas-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Gas Sensors</h1>
-                    <p class="sensor-description">
-                        Gas sensors detect and measure the concentration of gases in the environment. They're critical for safety monitoring, emissions control, and environmental protection in industrial settings.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Gas Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Gas Concentration (PPM)</label>
-                            <input type="range" class="slider" id="gas-concentration" min="0" max="1000" value="50" onchange="updateGas()">
-                            <span id="gas-concentration-val">50 PPM</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Gas Type</label>
-                            <select class="control-input" id="gas-type" onchange="updateGas()">
-                                <option value="co">Carbon Monoxide (CO)</option>
-                                <option value="co2">Carbon Dioxide (CO₂)</option>
-                                <option value="ch4">Methane (CH₄)</option>
-                                <option value="h2s">Hydrogen Sulfide (H₂S)</option>
-                                <option value="no2">Nitrogen Dioxide (NO₂)</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Ventilation</label>
-                            <button class="btn" onclick="toggleVentilation()">Toggle Ventilation</button>
-                            <span id="ventilation-status">OFF</span>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Gas Detection</h3>
-                        <div class="visual-display">
-                            <div class="gas-particles" id="gas-particles"></div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="gas-reading">50</div>
-                            <div class="output-unit">PPM</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="gas-status"></span>
-                            <span id="gas-status-text">Safe Levels</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chemical Sensor -->
-            <div id="chemical-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Chemical Sensors</h1>
-                    <p class="sensor-description">
-                        Chemical sensors detect specific chemical compounds and measure their concentrations. They're essential for process control, quality assurance, and environmental monitoring in chemical industries.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Chemical Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">pH Level</label>
-                            <input type="range" class="slider" id="chemical-ph" min="0" max="14" value="7" step="0.1" onchange="updateChemical()">
-                            <span id="chemical-ph-val">7.0</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Conductivity (μS/cm)</label>
-                            <input type="range" class="slider" id="chemical-conductivity" min="0" max="2000" value="500" onchange="updateChemical()">
-                            <span id="chemical-conductivity-val">500 μS/cm</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Solution Type</label>
-                            <select class="control-input" id="chemical-type" onchange="updateChemical()">
-                                <option value="water">Pure Water</option>
-                                <option value="acid">Acidic Solution</option>
-                                <option value="base">Basic Solution</option>
-                                <option value="salt">Salt Solution</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Chemical Analysis</h3>
-                        <div class="output-display">
-                            <div class="output-value" id="chemical-ph-reading">7.0</div>
-                            <div class="output-unit">pH</div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="chemical-conductivity-reading">500</div>
-                            <div class="output-unit">μS/cm</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="chemical-status"></span>
-                            <span id="chemical-status-text">Neutral Solution</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fluid Level Sensor -->
-            <div id="fluid-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Fluid Level Detection Sensors</h1>
-                    <p class="sensor-description">
-                        Fluid level sensors monitor the level of liquids in tanks, reservoirs, and containers. They're crucial for inventory management, overflow prevention, and automated filling systems.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Tank Controls</h3>
-                        <div class="control-group">
-                            <label class="control-label">Fluid Level (%)</label>
-                            <input type="range" class="slider" id="fluid-level" min="0" max="100" value="60" onchange="updateFluid()">
-                            <span id="fluid-level-val">60%</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Tank Capacity (L)</label>
-                            <input type="range" class="slider" id="fluid-capacity" min="100" max="10000" value="1000" onchange="updateFluid()">
-                            <span id="fluid-capacity-val">1000 L</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Pump Control</label>
-                            <button class="btn" onclick="togglePump()">Toggle Pump</button>
-                            <span id="pump-status">OFF</span>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Level Monitoring</h3>
-                        <div class="visual-display">
-                            <div class="water-level" id="water-level"></div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="fluid-reading">600</div>
-                            <div class="output-unit">Liters</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="fluid-status"></span>
-                            <span id="fluid-status-text">Normal Level</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fire Detection Sensor -->
-            <div id="fire-sensor" class="sensor-simulation hidden">
-                <div class="sensor-header">
-                    <h1 class="sensor-title">Fire Detection Sensors</h1>
-                    <p class="sensor-description">
-                        Fire detection sensors identify the presence of fire through smoke, heat, or flame detection. They're essential for life safety systems and property protection in automated buildings and industrial facilities.
-                    </p>
-                </div>
-                <div class="simulation-area">
-                    <div class="controls-panel">
-                        <h3>Fire Simulation</h3>
-                        <div class="control-group">
-                            <label class="control-label">Smoke Density (%)</label>
-                            <input type="range" class="slider" id="fire-smoke" min="0" max="100" value="0" onchange="updateFire()">
-                            <span id="fire-smoke-val">0%</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Heat Level (°C)</label>
-                            <input type="range" class="slider" id="fire-heat" min="20" max="200" value="25" onchange="updateFire()">
-                            <span id="fire-heat-val">25°C</span>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Fire Simulation</label>
-                            <button class="btn" onclick="simulateFire()">Simulate Fire Event</button>
-                            <button class="btn" onclick="resetFire()">Reset System</button>
-                        </div>
-                    </div>
-                    <div class="output-panel">
-                        <h3>Detection Status</h3>
-                        <div class="visual-display">
-                            <div class="flame hidden" id="flame-visual"></div>
-                        </div>
-                        <div class="output-display">
-                            <div class="output-value" id="fire-risk">LOW</div>
-                            <div class="output-unit">Fire Risk Level</div>
-                        </div>
-                        <div>
-                            <span class="status-indicator status-normal" id="fire-status"></span>
-                            <span id="fire-status-text">System Normal</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
     <script>
-        // Global variables
-        let currentSensor = 'smart';
-        let heatSourceOn = false;
-        let humidifierOn = false;
-        let vibrationFault = false;
-        let reliefValveOpen = false;
-        let ventilationOn = false;
-        let pumpOn = false;
-        let fireSimulation = false;
+        // SENSOR SIMULATION ENGINE STATE & DATA DICTIONARIES
+        // =========================================================================
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            showSensor('smart');
-            updateSmartSensor();
+        let currentSensorId = 'smart';
+        let currentTab = 'simulation';
+        let currentTheme = 'light';
+        let audioEnabled = false;
+        let audioCtx = null;
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+        }
+
+        function applyTheme(theme) {
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-status-text');
+
+            if (theme === 'dark') {
+                htmlEl.classList.add('dark');
+                htmlEl.classList.remove('light');
+                if (themeIcon) themeIcon.className = "fa-solid fa-moon text-cyan-400";
+                if (themeText) themeText.textContent = "Dark Mode";
+            } else {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                if (themeIcon) themeIcon.className = "fa-solid fa-sun text-amber-500";
+                if (themeText) themeText.textContent = "Light Mode";
+            }
+
+            renderSidebarNav();
+            if (typeof updateSimulationState === 'function') {
+                updateSimulationState();
+            }
+        }
+
+        // Global Simulation Modifiers
+        let state = {
+            noiseEnabled: false,
+            humEnabled: false,
+            dspAlpha: 0.2,
+            activeFaults: {
+                open_circuit: false,
+                zero_drift: false,
+                ground_loop: false
+            },
+            values: {} // Keyed by control ID
+        };
+
+        // Oscilloscope History Buffer
+        const SCOPE_POINTS = 200;
+        let rawSignalBuffer = new Array(SCOPE_POINTS).fill(0);
+        let filteredSignalBuffer = new Array(SCOPE_POINTS).fill(0);
+
+        // Sensor Definitions Database
+        const SENSORS = {
+            smart: {
+                title: "Smart Sensors (IIoT Node)",
+                category: "Digital / IIoT",
+                badgeClass: "bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800",
+                icon: "fa-microchip",
+                subtitle: "Edge computing node with embedded microprocessor and multi-protocol networking.",
+                controls: [
+                    { id: "processing_mode", label: "Processing Mode", type: "select", options: [ {val: 1, text: "Basic Sensing"}, {val: 2, text: "DSP Filtering"}, {val: 3, text: "Edge AI Predictive Analytics"} ] },
+                    { id: "protocol", label: "Protocol & Bus", type: "select", options: [ {val: 1, text: "IO-Link (230.4 kBaud)"}, {val: 2, text: "Modbus RTU over RS485"}, {val: 3, text: "MQTT via Wi-Fi"} ] },
+                    { id: "clock_speed", label: "CPU Clock Speed (MHz)", type: "range", min: 8, max: 120, step: 1, val: 64, unit: "MHz" }
+                ],
+                compute: (vals) => {
+                    let mode = vals.processing_mode || 1;
+                    let cpu = vals.clock_speed || 64;
+                    let efficiency = Math.min(99, Math.round(50 + (mode * 12) + (cpu / 4)));
+                    let latency = Math.max(1.2, (35 / mode - (cpu / 20))).toFixed(1);
+                    return { primary: efficiency, primaryUnit: "% Efficiency", latency: latency, isAlarm: efficiency < 40 };
+                },
+                theory: "Smart sensors integrate a physical transducing element with a microcontroller (MCU) that performs analog-to-digital conversion, signal compensation, calibration curve linearization, and fieldbus protocol translation directly at the measurement point.",
+                formula: "Efficiency (%) = 100 * [ 1 - (E_noise + E_latency) / E_ideal ]",
+                formulaDesc: "Calculates overall smart node processing efficiency based on CPU throughput and quantization noise.",
+                specs: [
+                    ["Bus Standard", "IO-Link v1.1 / Modbus"],
+                    ["ADC Resolution", "16-bit Sigma-Delta"],
+                    ["Power Supply", "18 - 30 VDC"],
+                    ["Operating Temp", "-40°C to +85°C"]
+                ]
+            },
+            temperature: {
+                title: "Temperature Sensors (RTD Pt100)",
+                category: "Thermal",
+                badgeClass: "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800",
+                icon: "fa-temperature-high",
+                subtitle: "Platinum resistance temperature detector measuring thermal energy changes.",
+                controls: [
+                    { id: "ambient_temp", label: "Process Fluid Temp (°C)", type: "range", min: -50, max: 250, step: 1, val: 25, unit: "°C" },
+                    { id: "sensor_element", label: "Element Type", type: "select", options: [ {val: 1, text: "Pt100 RTD (α = 0.00385)"}, {val: 2, text: "Type K Thermocouple"}, {val: 3, text: "NTC Thermistor (10k)"} ] },
+                    { id: "heat_element", label: "Heater Coil Toggle", type: "button", text: "Toggle Heat Source", active: false }
+                ],
+                compute: (vals) => {
+                    let temp = vals.ambient_temp || 25;
+                    if (vals.heat_element) temp += 45;
+                    let isAlarm = temp > 100 || temp < -20;
+                    return { primary: temp.toFixed(1), primaryUnit: "°C Temp", isAlarm: isAlarm };
+                },
+                theory: "A Pt100 Resistance Temperature Detector operates on the principle that electrical resistance of platinum increases predictably with temperature according to the Callendar-Van Dusen equation.",
+                formula: "R(T) = R_0 * (1 + A*T + B*T^2)",
+                formulaDesc: "Callendar-Van Dusen equation for RTDs where R_0 = 100Ω at 0°C.",
+                specs: [
+                    ["Element Resistance", "100 Ω at 0°C"],
+                    ["Standard", "IEC 60751 Class A"],
+                    ["Tolerance", "±(0.15 + 0.002*|t|) °C"],
+                    ["Response Time (t90)", "2.5 seconds in water"]
+                ]
+            },
+            humidity: {
+                title: "Capacitive Humidity Sensors",
+                category: "Environmental",
+                badgeClass: "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800",
+                icon: "fa-droplet",
+                subtitle: "Measures dielectric constant change of polymer film exposed to ambient moisture.",
+                controls: [
+                    { id: "rel_humidity", label: "Relative Humidity (%)", type: "range", min: 0, max: 100, step: 1, val: 50, unit: "%" },
+                    { id: "air_temp", label: "Air Temperature (°C)", type: "range", min: 0, max: 60, step: 1, val: 25, unit: "°C" }
+                ],
+                compute: (vals) => {
+                    let rh = vals.rel_humidity || 50;
+                    let temp = vals.air_temp || 25;
+                    let a = 17.27, b = 237.7;
+                    let alpha = ((a * temp) / (b + temp)) + Math.log(rh / 100);
+                    let dewPoint = (b * alpha) / (a - alpha);
+                    let isAlarm = rh > 85 || rh < 20;
+                    return { primary: rh.toFixed(1), primaryUnit: "% RH", secondary: dewPoint.toFixed(1) + " °C DewPt", isAlarm: isAlarm };
+                },
+                theory: "Capacitive humidity sensors utilize a thin polymer dielectric sandwich. Moisture absorption alters dielectric permittivity, proportionally changing electrical capacitance.",
+                formula: "C(RH) = C_0 * [ 1 + k_h * (RH - RH_ref) ]",
+                formulaDesc: "Capacitance shifts linearly with absorbed moisture vapor molecules.",
+                specs: [
+                    ["Accuracy", "±2.0% RH (20-80% range)"],
+                    ["Hysteresis", "< ±1.0% RH"],
+                    ["Response Time", "< 8 seconds"],
+                    ["Capacitance Nominal", "180 pF at 55% RH"]
+                ]
+            },
+            vibration: {
+                title: "Piezoelectric Vibration Sensors",
+                category: "Condition Monitoring",
+                badgeClass: "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-300 dark:border-purple-800",
+                icon: "fa-bolt-lightning",
+                subtitle: "Accelerometers for rotating machinery fault detection and predictive maintenance.",
+                controls: [
+                    { id: "motor_rpm", label: "Motor Shaft Speed (RPM)", type: "range", min: 0, max: 3600, step: 50, val: 1750, unit: "RPM" },
+                    { id: "bearing_fault", label: "Simulate Bearing Fault", type: "button", text: "Toggle Fault Spike", active: false }
+                ],
+                compute: (vals) => {
+                    let rpm = vals.motor_rpm || 1750;
+                    let fault = vals.bearing_fault || false;
+                    let baseVib = (rpm / 3600) * 3.5;
+                    if (fault) baseVib += 8.2;
+                    let isAlarm = baseVib > 7.1;
+                    return { primary: baseVib.toFixed(2), primaryUnit: "mm/s RMS", isAlarm: isAlarm };
+                },
+                theory: "Piezoelectric crystals output an electrical charge proportional to mechanical stress under acceleration. Signal processing derives velocity RMS according to ISO 10816 standards.",
+                formula: "V_rms = sqrt( 1/T * ∫ [ v(t)^2 dt ] )",
+                formulaDesc: "Root Mean Square calculation of vibration velocity waveform.",
+                specs: [
+                    ["Sensitivity", "100 mV/g"],
+                    ["Frequency Range", "0.5 Hz to 10 kHz"],
+                    ["Resonant Frequency", "25 kHz"],
+                    ["ISO Standard", "ISO 10816-3 Vibration Severity"]
+                ]
+            },
+            pressure: {
+                title: "Piezoresistive Pressure Sensors",
+                category: "Hydraulic / Pneumatic",
+                badgeClass: "bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800",
+                icon: "fa-gauge-high",
+                subtitle: "Silicon diaphragm with integrated strain gauge bridge for fluid & gas pressure.",
+                controls: [
+                    { id: "system_bar", label: "Line Pressure (Bar)", type: "range", min: 0, max: 40, step: 0.5, val: 12, unit: "Bar" },
+                    { id: "relief_valve", label: "Safety Relief Valve", type: "button", text: "Open Relief Valve", active: false }
+                ],
+                compute: (vals) => {
+                    let bar = vals.system_bar || 12;
+                    if (vals.relief_valve) bar = Math.max(0, bar - 15);
+                    let psi = bar * 14.5038;
+                    let isAlarm = bar > 30;
+                    return { primary: bar.toFixed(1), primaryUnit: "Bar Pressure", secondary: psi.toFixed(0) + " PSI", isAlarm: isAlarm };
+                },
+                theory: "Pressure applied to a silicon micro-diaphragm creates mechanical strain, altering Wheatstone bridge piezoresistances and generating a proportional differential millivolt output.",
+                formula: "V_out = V_bridge * P * S_sensitivity",
+                formulaDesc: "Voltage output scaled by bridge excitation voltage and diaphragm sensitivity.",
+                specs: [
+                    ["Overpressure Limit", "200% Full Scale"],
+                    ["Non-Linearity", "±0.25% BFSL"],
+                    ["Diaphragm Material", "316L Stainless Steel"],
+                    ["Burst Pressure", "400% Full Scale"]
+                ]
+            },
+            proximity: {
+                title: "Inductive & Ultrasonic Proximity",
+                category: "Presence Detection",
+                badgeClass: "bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-800",
+                icon: "fa-bullseye",
+                subtitle: "Detects presence or exact distance of metallic or solid objects without contact.",
+                controls: [
+                    { id: "target_dist", label: "Target Distance (cm)", type: "range", min: 0, max: 100, step: 1, val: 35, unit: "cm" },
+                    { id: "sensor_tech", label: "Sensor Technology", type: "select", options: [ {val: 1, text: "Inductive (Metal Target)"}, {val: 2, text: "Ultrasonic (Time-of-Flight)"} ] }
+                ],
+                compute: (vals) => {
+                    let dist = vals.target_dist || 35;
+                    let tech = vals.sensor_tech || 1;
+                    let maxRange = tech === 1 ? 25 : 80;
+                    let detected = dist <= maxRange;
+                    return { primary: dist.toFixed(0), primaryUnit: "cm Target", secondary: detected ? "TARGET DETECTED" : "NO TARGET", isAlarm: detected };
+                },
+                theory: "Inductive sensors generate an oscillating eddy-current magnetic field that dampens when metal targets enter range. Ultrasonic sensors measure acoustic echo time-of-flight.",
+                formula: "Distance = ( Speed_of_Sound * t_flight ) / 2",
+                formulaDesc: "Ultrasonic distance calculated from time between pulse emitter and receiver echo.",
+                specs: [
+                    ["Switching Frequency", "1000 Hz (Inductive)"],
+                    ["Sensing Range", "0 to 100 cm"],
+                    ["Hysteresis", "3% to 15% of Sr"],
+                    ["Protection Class", "IP67 / IP69K"]
+                ]
+            },
+            gas: {
+                title: "MQ-Series Gas Concentration",
+                category: "Chemical / Environmental",
+                badgeClass: "bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-800",
+                icon: "fa-smog",
+                subtitle: "Semiconductor SnO2 surface element detecting combustible and toxic gas PPM.",
+                controls: [
+                    { id: "ppm_level", label: "Gas Concentration (PPM)", type: "range", min: 0, max: 1000, step: 10, val: 120, unit: "PPM" },
+                    { id: "ventilation", label: "HVAC Exhaust Fan", type: "button", text: "Toggle Ventilation", active: false }
+                ],
+                compute: (vals) => {
+                    let ppm = vals.ppm_level || 120;
+                    if (vals.ventilation) ppm = Math.max(10, ppm - 250);
+                    let isAlarm = ppm > 300;
+                    return { primary: ppm.toFixed(0), primaryUnit: "PPM Concentration", isAlarm: isAlarm };
+                },
+                theory: "Tin Dioxide (SnO2) semiconductor heated in clean air adsorbs oxygen, creating high resistance. In the presence of reducing gases, oxygen density drops, lowering electrical resistance.",
+                formula: "R_s / R_o = A * (PPM)^(-b)",
+                formulaDesc: "Logarithmic ratio of sensor resistance in gas versus clean air baseline.",
+                specs: [
+                    ["Target Gases", "CO, CH4, LPG, Smoke"],
+                    ["Preheat Time", "24 Hours"],
+                    ["Heater Power", "800 mW"],
+                    ["Detection Threshold", "20 PPM CO"]
+                ]
+            },
+            chemical: {
+                title: "Potentiometric pH Sensor",
+                category: "Analytical",
+                badgeClass: "bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-400 border border-teal-300 dark:border-teal-800",
+                icon: "fa-flask-vial",
+                subtitle: "Glass electrode system measuring hydrogen ion activity in aqueous liquid.",
+                controls: [
+                    { id: "ph_val", label: "Solution pH Level", type: "range", min: 0, max: 14, step: 0.1, val: 7.0, unit: "pH" }
+                ],
+                compute: (vals) => {
+                    let ph = vals.ph_val !== undefined ? vals.ph_val : 7.0;
+                    let isAlarm = ph < 4.0 || ph > 10.0;
+                    return { primary: ph.toFixed(1), primaryUnit: "pH Index", isAlarm: isAlarm };
+                },
+                theory: "A pH probe measures the potential difference between a glass measuring electrode and an Ag/AgCl reference electrode immersed in liquid according to the Nernst Equation.",
+                formula: "E = E_0 - 2.303 * (R*T / F) * pH",
+                formulaDesc: "Nernst equation yielding ~59.16 mV per pH unit change at 25°C.",
+                specs: [
+                    ["Slope Factor", "59.16 mV / pH unit"],
+                    ["Isopotential Point", "pH 7.0 (0 mV)"],
+                    ["Reference Element", "Ag/AgCl double junction"],
+                    ["Glass Impedance", "100 to 300 MΩ"]
+                ]
+            },
+            fluid: {
+                title: "Ultrasonic Fluid Level Sensor",
+                category: "Level Measurement",
+                badgeClass: "bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800",
+                icon: "fa-water",
+                subtitle: "Top-mounted ultrasonic transmitter measuring distance down to liquid surface.",
+                controls: [
+                    { id: "fluid_pct", label: "Tank Fill Level (%)", type: "range", min: 0, max: 100, step: 1, val: 65, unit: "%" },
+                    { id: "pump_switch", label: "Inlet Refill Pump", type: "button", text: "Toggle Fill Pump", active: false }
+                ],
+                compute: (vals) => {
+                    let lvl = vals.fluid_pct || 65;
+                    if (vals.pump_switch) lvl = Math.min(100, lvl + 15);
+                    let volumeLiters = (lvl / 100) * 5000;
+                    let isAlarm = lvl > 90 || lvl < 15;
+                    return { primary: lvl.toFixed(0), primaryUnit: "% Tank Level", secondary: volumeLiters.toFixed(0) + " Liters", isAlarm: isAlarm };
+                },
+                theory: "Ultrasonic pulses beamed downward bounce off liquid interfaces. Microprocessors calculate air gap distance and invert it to compute precise fluid volume.",
+                formula: "Level (%) = [ 1 - (D_measured - D_deadzone) / (Height_tank - D_deadzone) ] * 100",
+                formulaDesc: "Converts pulse transit time into tank percentage filled.",
+                specs: [
+                    ["Beam Angle", "8° conical beam"],
+                    ["Dead Zone", "0.2 meters"],
+                    ["Tank Capacity", "5000 Liters"],
+                    ["Repeatability", "±2 mm"]
+                ]
+            },
+            fire: {
+                title: "Triple-IR Optical Flame Sensor",
+                category: "Safety / Emergency",
+                badgeClass: "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-800",
+                icon: "fa-fire",
+                subtitle: "Multi-spectrum optical infrared detector for instant flame ignition detection.",
+                controls: [
+                    { id: "flame_intensity", label: "Simulated Flame Size", type: "range", min: 0, max: 100, step: 5, val: 0, unit: "%" }
+                ],
+                compute: (vals) => {
+                    let flame = vals.flame_intensity || 0;
+                    let isAlarm = flame > 25;
+                    return { primary: flame > 0 ? flame + "%" : "CLEAR", primaryUnit: "IR Energy", isAlarm: isAlarm };
+                },
+                theory: "Optical fire detectors monitor narrow spectral IR bandwidths specific to hot CO2 emissions (4.3 μm) produced by hydrocarbon combustion, rejecting false sunlight glare.",
+                formula: "Ratio_IR = Energy(4.3μm) / [ Energy(4.0μm) + Energy(4.5μm) ]",
+                formulaDesc: "Discriminates true flickering flames from optical interference sources.",
+                specs: [
+                    ["Spectral Bands", "4.0 μm, 4.3 μm, 4.5 μm IR"],
+                    ["Response Time", "< 0.2 seconds"],
+                    ["Field of View", "90° Cone"],
+                    ["Safety Rating", "SIL-2 Certified"]
+                ]
+            }
+        };
+
+        // Initialize App on DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebarNav();
+            loadSensorModule('smart');
+            setupOscilloscopeCanvas();
+            startMainSimulationLoop();
+
+            // Mobile Menu Drawer Handler
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            });
+
+            // Search filter handler
+            document.getElementById('sensor-search').addEventListener('input', (e) => {
+                filterSensorList(e.target.value);
+            });
         });
 
-        // Sidebar toggle for mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const hamburger = document.querySelector('.hamburger');
-            sidebar.classList.toggle('active');
-            hamburger.classList.toggle('active');
+        function setupOscilloscopeCanvas() {
+            clearOscilloscope();
+            resizeCanvas('scope-canvas');
         }
 
-        // Show selected sensor
-        function showSensor(sensorType) {
-            // Hide all sensors
-            const sensors = document.querySelectorAll('.sensor-simulation');
-            sensors.forEach(sensor => sensor.classList.add('hidden'));
+        // Render Sidebar Sensor Selection List
+        function renderSidebarNav() {
+            const nav = document.getElementById('sensor-nav-list');
+            nav.innerHTML = '';
 
-            // Show selected sensor
-            document.getElementById(sensorType + '-sensor').classList.remove('hidden');
+            Object.keys(SENSORS).forEach(key => {
+                const s = SENSORS[key];
+                const btn = document.createElement('button');
+                const isActive = key === currentSensorId;
+                
+                btn.className = `w-full text-left p-2.5 rounded-lg border transition flex items-center justify-between group ${
+                    isActive 
+                        ? 'bg-cyan-100 dark:bg-cyan-950/60 border-cyan-400 dark:border-cyan-500/50 text-cyan-900 dark:text-white font-semibold' 
+                        : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                }`;
+                btn.id = `nav-item-${key}`;
+                btn.onclick = () => loadSensorModule(key);
 
-            // Update active menu item
-            const menuItems = document.querySelectorAll('.sensor-item');
-            menuItems.forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
-
-            currentSensor = sensorType;
-
-            // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3 truncate">
+                        <div class="w-7 h-7 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-xs group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
+                            <i class="fa-solid ${s.icon}"></i>
+                        </div>
+                        <div class="truncate">
+                            <div class="text-xs leading-none mb-1 truncate">${s.title.split('(')[0]}</div>
+                            <div class="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-tight font-mono">${s.category}</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition"></i>
+                `;
+                nav.appendChild(btn);
+            });
         }
 
-        // Smart Sensor Functions
-        function updateSmartSensor() {
-            const mode = document.getElementById('smart-mode').value;
-            const protocol = document.getElementById('smart-protocol').value;
-            const power = document.getElementById('smart-power').value;
-            
-            document.getElementById('smart-power-val').textContent = power + '%';
-            
-            let efficiency = 50;
-            let latency = 50;
-            
-            // Calculate efficiency based on mode
-            switch(mode) {
-                case 'basic': efficiency = 60; break;
-                case 'advanced': efficiency = 80; break;
-                case 'ai': efficiency = 95; break;
-            }
-            
-            // Adjust for protocol
-            switch(protocol) {
-                case 'wifi': latency = 15; break;
-                case 'bluetooth': latency = 8; break;
-                case 'zigbee': latency = 5; break;
-                case 'lora': latency = 25; break;
-            }
-            
-            // Power affects performance
-            efficiency = Math.min(100, efficiency * (power / 100));
-            latency = latency * (100 / power);
-            
-            document.getElementById('smart-efficiency').textContent = Math.round(efficiency) + '%';
-            document.getElementById('smart-latency').textContent = Math.round(latency) + 'ms';
-            
-            // Update status
-            const status = document.getElementById('smart-status');
-            const statusText = document.getElementById('smart-status-text');
-            
-            if (efficiency > 80 && latency < 20) {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Optimal Performance';
-            } else if (efficiency > 60) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'Reduced Performance';
-            } else {
-                status.className = 'status-indicator status-danger';
-                statusText.textContent = 'Poor Performance';
-            }
-        }
-
-        // Temperature Sensor Functions
-        function updateTemperature() {
-            let temp = parseFloat(document.getElementById('temp-ambient').value);
-            const type = document.getElementById('temp-type').value;
-            
-            if (heatSourceOn) {
-                temp += 15;
-            }
-            
-            // Add sensor-specific characteristics
-            switch(type) {
-                case 'thermocouple':
-                    temp += (Math.random() - 0.5) * 0.5; // ±0.25°C noise
-                    break;
-                case 'rtd':
-                    temp += (Math.random() - 0.5) * 0.2; // ±0.1°C noise
-                    break;
-                case 'thermistor':
-                    temp += (Math.random() - 0.5) * 0.3; // ±0.15°C noise
-                    break;
-            }
-            
-            document.getElementById('temp-ambient-val').textContent = document.getElementById('temp-ambient').value + '°C';
-            document.getElementById('temp-reading').textContent = temp.toFixed(1) + '°C';
-            
-            // Update thermometer visual
-            const fillHeight = Math.max(0, Math.min(100, (temp + 20) / 70 * 100));
-            document.getElementById('temp-fill').style.height = fillHeight + '%';
-            
-            // Update status
-            const status = document.getElementById('temp-status');
-            const statusText = document.getElementById('temp-status-text');
-            
-            if (temp < 0 || temp > 40) {
-                status.className = 'status-indicator status-danger';
-                statusText.textContent = 'Extreme Temperature';
-            } else if (temp < 10 || temp > 30) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'Outside Normal Range';
-            } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Normal Range';
-            }
-        }
-
-        function toggleHeatSource() {
-            heatSourceOn = !heatSourceOn;
-            document.getElementById('heat-status').textContent = heatSourceOn ? 'ON' : 'OFF';
-            updateTemperature();
-        }
-
-        // Humidity Sensor Functions
-        function updateHumidity() {
-            let humidity = parseFloat(document.getElementById('humidity-level').value);
-            const temp = parseFloat(document.getElementById('humidity-temp').value);
-            
-            if (humidifierOn) {
-                humidity = Math.min(100, humidity + 10);
-                document.getElementById('humidity-level').value = humidity;
-            }
-            
-            // Calculate dew point
-            const a = 17.27;
-            const b = 237.7;
-            const alpha = ((a * temp) / (b + temp)) + Math.log(humidity / 100);
-            const dewPoint = (b * alpha) / (a - alpha);
-            
-            document.getElementById('humidity-val').textContent = humidity + '%';
-            document.getElementById('humidity-temp-val').textContent = temp + '°C';
-            document.getElementById('humidity-reading').textContent = humidity.toFixed(1) + '%';
-            document.getElementById('dew-point').textContent = dewPoint.toFixed(1) + '°C';
-            
-            // Update status
-            const status = document.getElementById('humidity-status');
-            const statusText = document.getElementById('humidity-status-text');
-            
-            if (humidity < 30 || humidity > 70) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = humidity < 30 ? 'Too Dry' : 'Too Humid';
-            } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Optimal Range';
-            }
-        }
-
-        function toggleHumidifier() {
-            humidifierOn = !humidifierOn;
-            document.getElementById('humidifier-status').textContent = humidifierOn ? 'ON' : 'OFF';
-            updateHumidity();
-        }
-
-        // Vibration Sensor Functions
-        function updateVibration() {
-            const speed = parseFloat(document.getElementById('vibration-speed').value);
-            const load = parseFloat(document.getElementById('vibration-load').value);
-            
-            let amplitude = (speed / 3000) * (load / 100) * 5;
-            let frequency = speed / 60; // Convert RPM to Hz
-            
-            if (vibrationFault) {
-                amplitude *= 3;
-                frequency += Math.sin(Date.now() / 1000) * 5; // Add irregular component
-            }
-            
-            document.getElementById('vibration-speed-val').textContent = speed + ' RPM';
-            document.getElementById('vibration-load-val').textContent = load + '%';
-            document.getElementById('vibration-amplitude').textContent = amplitude.toFixed(1);
-            document.getElementById('vibration-frequency').textContent = frequency.toFixed(0);
-            
-            // Update status
-            const status = document.getElementById('vibration-status');
-            const statusText = document.getElementById('vibration-status-text');
-            
-            if (amplitude > 10 || vibrationFault) {
-                status.className = 'status-indicator status-danger';
-                statusText.textContent = 'Fault Detected';
-            } else if (amplitude > 5) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'High Vibration';
-            } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Normal Operation';
-            }
-        }
-
-        function toggleVibrationFault() {
-            vibrationFault = !vibrationFault;
-            document.getElementById('fault-status').textContent = vibrationFault ? 'Bearing Fault' : 'Normal';
-            updateVibration();
-        }
-
-        // Pressure Sensor Functions
-        function updatePressure() {
-            let pressure = parseFloat(document.getElementById('pressure-level').value);
-            const type = document.getElementById('pressure-type').value;
-            
-            if (reliefValveOpen) {
-                pressure = Math.max(0, pressure - 5);
-                document.getElementById('pressure-level').value = pressure;
-            }
-            
-            // Convert to PSI
-            const psi = pressure * 14.504;
-            
-            document.getElementById('pressure-val').textContent = pressure + ' Bar';
-            document.getElementById('pressure-reading').textContent = pressure.toFixed(1);
-            document.getElementById('pressure-psi').textContent = psi.toFixed(1);
-            
-            // Update status
-            const status = document.getElementById('pressure-status');
-            const statusText = document.getElementById('pressure-status-text');
-            
-            if (pressure > 40) {
-                status.className = 'status-indicator status-danger';
-                statusText.textContent = 'Overpressure';
-            } else if (pressure > 30) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'High Pressure';
-            } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Normal Pressure';
-            }
-        }
-
-        function toggleReliefValve() {
-            reliefValveOpen = !reliefValveOpen;
-            document.getElementById('relief-status').textContent = reliefValveOpen ? 'Open' : 'Closed';
-            updatePressure();
-        }
-
-        // Proximity Sensor Functions
-        function updateProximity() {
-            const distance = parseFloat(document.getElementById('proximity-distance').value);
-            const range = parseFloat(document.getElementById('proximity-range').value);
-            const type = document.getElementById('proximity-type').value;
-            
-            const detected = distance <= range;
-            
-            document.getElementById('proximity-distance-val').textContent = distance + ' cm';
-            document.getElementById('proximity-range-val').textContent = range + ' cm';
-            document.getElementById('proximity-detected').textContent = detected ? 'DETECTED' : 'NOT DETECTED';
-            
-            // Update visual
-            const object = document.getElementById('proximity-object');
-            const objectPosition = Math.min(80, distance * 0.8);
-            object.style.left = objectPosition + '%';
-            object.style.background = detected ? 'var(--success-color)' : 'var(--accent-color)';
-            
-            // Update status
-            const status = document.getElementById('proximity-status');
-            const statusText = document.getElementById('proximity-status-text');
-            
-            status.className = 'status-indicator status-normal';
-            statusText.textContent = detected ? 'Object Detected' : 'Sensor Active';
-        }
-
-        // Gas Sensor Functions
-        function updateGas() {
-            let concentration = parseFloat(document.getElementById('gas-concentration').value);
-            const gasType = document.getElementById('gas-type').value;
-            
-            if (ventilationOn) {
-                concentration = Math.max(0, concentration - 10);
-                document.getElementById('gas-concentration').value = concentration;
-            }
-            
-            document.getElementById('gas-concentration-val').textContent = concentration + ' PPM';
-            document.getElementById('gas-reading').textContent = concentration;
-            
-            // Update gas particles visual
-            updateGasParticles(concentration);
-            
-            // Gas-specific thresholds
-            let warningLevel, dangerLevel;
-            switch(gasType) {
-                case 'co': warningLevel = 50; dangerLevel = 200; break;
-                case 'co2': warningLevel = 5000; dangerLevel = 40000; break;
-                case 'ch4': warningLevel = 1000; dangerLevel = 5000; break;
-                case 'h2s': warningLevel = 10; dangerLevel = 100; break;
-                case 'no2': warningLevel = 5; dangerLevel = 20; break;
-                default: warningLevel = 100; dangerLevel = 500;
-            }
-            
-            // Update status
-            const status = document.getElementById('gas-status');
-            const statusText = document.getElementById('gas-status-text');
-            
-            if (concentration > dangerLevel) {
-                status.className = 'status-indicator status-danger';
-                statusText.textContent = 'Dangerous Levels';
-            } else if (concentration > warningLevel) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'Warning Levels';
-            } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Safe Levels';
-            }
-        }
-
-        function updateGasParticles(concentration) {
-            const container = document.getElementById('gas-particles');
-            container.innerHTML = '';
-            
-            const particleCount = Math.min(20, concentration / 10);
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 3 + 's';
-                container.appendChild(particle);
-            }
-        }
-
-        function toggleVentilation() {
-            ventilationOn = !ventilationOn;
-            document.getElementById('ventilation-status').textContent = ventilationOn ? 'ON' : 'OFF';
-            updateGas();
-        }
-
-        // Chemical Sensor Functions
-        function updateChemical() {
-            const ph = parseFloat(document.getElementById('chemical-ph').value);
-            const conductivity = parseFloat(document.getElementById('chemical-conductivity').value);
-            const type = document.getElementById('chemical-type').value;
-            
-            document.getElementById('chemical-ph-val').textContent = ph.toFixed(1);
-            document.getElementById('chemical-conductivity-val').textContent = conductivity + ' μS/cm';
-            document.getElementById('chemical-ph-reading').textContent = ph.toFixed(1);
-            document.getElementById('chemical-conductivity-reading').textContent = conductivity;
-            
-            // Update status based on pH
-            const status = document.getElementById('chemical-status');
-            const statusText = document.getElementById('chemical-status-text');
-            
-            if (ph < 6 || ph > 8) {
-                if (ph < 3 || ph > 11) {
-                    status.className = 'status-indicator status-danger';
-                    statusText.textContent = ph < 3 ? 'Highly Acidic' : 'Highly Basic';
+        function filterSensorList(query) {
+            const q = query.toLowerCase();
+            Object.keys(SENSORS).forEach(key => {
+                const item = document.getElementById(`nav-item-${key}`);
+                const title = SENSORS[key].title.toLowerCase();
+                const cat = SENSORS[key].category.toLowerCase();
+                if (title.includes(q) || cat.includes(q)) {
+                    item.classList.remove('hidden');
                 } else {
-                    status.className = 'status-indicator status-warning';
-                    statusText.textContent = ph < 6 ? 'Acidic Solution' : 'Basic Solution';
+                    item.classList.add('hidden');
                 }
+            });
+        }
+
+        // Load Active Sensor Module into Workspace
+        function loadSensorModule(sensorId) {
+            currentSensorId = sensorId;
+            const sensor = SENSORS[sensorId];
+
+            renderSidebarNav();
+
+            // Close mobile menu on select
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+
+            // Header Elements
+            document.getElementById('sensor-title').textContent = sensor.title;
+            document.getElementById('sensor-subtitle').textContent = sensor.subtitle;
+            document.getElementById('sensor-badge').textContent = sensor.category;
+            document.getElementById('sensor-badge').className = `px-2 py-0.5 rounded text-xs font-semibold ${sensor.badgeClass}`;
+            document.getElementById('sensor-icon-container').innerHTML = `<i class="fa-solid ${sensor.icon}"></i>`;
+
+            // Build Controls Container
+            const controlsBox = document.getElementById('sensor-controls-container');
+            controlsBox.innerHTML = '';
+
+            sensor.controls.forEach(ctrl => {
+                const ctrlDiv = document.createElement('div');
+                ctrlDiv.className = "bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-200 dark:border-slate-800";
+
+                if (ctrl.type === 'range') {
+                    state.values[ctrl.id] = ctrl.val;
+                    ctrlDiv.innerHTML = `
+                        <div class="flex justify-between text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            <span>${ctrl.label}</span>
+                            <span id="lbl-val-${ctrl.id}" class="font-mono text-cyan-600 dark:text-cyan-400">${ctrl.val} ${ctrl.unit}</span>
+                        </div>
+                        <input type="range" id="ctrl-${ctrl.id}" min="${ctrl.min}" max="${ctrl.max}" step="${ctrl.step}" value="${ctrl.val}"
+                            oninput="updateControlVal('${ctrl.id}', this.value, '${ctrl.unit}')" class="w-full">
+                    `;
+                } else if (ctrl.type === 'select') {
+                    state.values[ctrl.id] = ctrl.options[0].val;
+                    let optsHTML = ctrl.options.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+                    ctrlDiv.innerHTML = `
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">${ctrl.label}</label>
+                        <select id="ctrl-${ctrl.id}" onchange="updateSelectVal('${ctrl.id}', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-cyan-500">
+                            ${optsHTML}
+                        </select>
+                    `;
+                } else if (ctrl.type === 'button') {
+                    state.values[ctrl.id] = ctrl.active || false;
+                    ctrlDiv.innerHTML = `
+                        <button id="ctrl-btn-${ctrl.id}" onclick="toggleButtonControl('${ctrl.id}')" class="w-full py-2 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition">
+                            ${ctrl.text}: <span id="lbl-btn-state-${ctrl.id}" class="text-rose-500">OFF</span>
+                        </button>
+                    `;
+                }
+                controlsBox.appendChild(ctrlDiv);
+            });
+
+            // Populate Theory & Specs
+            document.getElementById('theory-description').textContent = sensor.theory;
+            document.getElementById('theory-formula').textContent = sensor.formula;
+            document.getElementById('theory-formula-desc').textContent = sensor.formulaDesc;
+
+            const specTable = document.getElementById('theory-spec-table');
+            specTable.innerHTML = '';
+            sensor.specs.forEach(sp => {
+                specTable.innerHTML += `
+                    <tr>
+                        <td class="py-2 px-3 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">${sp[0]}</td>
+                        <td class="py-2 px-3 text-cyan-600 dark:text-cyan-400 font-bold border-b border-slate-200 dark:border-slate-800 text-right">${sp[1]}</td>
+                    </tr>
+                `;
+            });
+
+            updateSimulationState();
+        }
+
+        function updateControlVal(id, val, unit) {
+            state.values[id] = parseFloat(val);
+            const label = document.getElementById(`lbl-val-${id}`);
+            if (label) label.textContent = `${val} ${unit}`;
+            updateSimulationState();
+        }
+
+        function updateSelectVal(id, val) {
+            state.values[id] = parseInt(val);
+            updateSimulationState();
+        }
+
+        function toggleButtonControl(id) {
+            state.values[id] = !state.values[id];
+            const btnLbl = document.getElementById(`lbl-btn-state-${id}`);
+            const btn = document.getElementById(`ctrl-btn-${id}`);
+            if (state.values[id]) {
+                btnLbl.textContent = "ON";
+                btnLbl.className = "text-emerald-500 font-bold";
+                btn.classList.add("border-emerald-500/50", "bg-emerald-50", "dark:bg-emerald-950/30");
             } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Neutral Solution';
+                btnLbl.textContent = "OFF";
+                btnLbl.className = "text-rose-500";
+                btn.classList.remove("border-emerald-500/50", "bg-emerald-50", "dark:bg-emerald-950/30");
+            }
+            updateSimulationState();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-page').forEach(page => page.classList.add('hidden'));
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+
+            ['simulation', 'oscilloscope', 'theory', 'faults'].forEach(t => {
+                const b = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    b.className = "px-3 py-1.5 rounded-md text-xs font-medium transition bg-cyan-600 text-white shadow-md";
+                } else {
+                    b.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition";
+                }
+            });
+
+            if (tabId === 'oscilloscope') {
+                resizeCanvas('scope-canvas');
             }
         }
 
-        // Fluid Level Sensor Functions
-        function updateFluid() {
-            let level = parseFloat(document.getElementById('fluid-level').value);
-            const capacity = parseFloat(document.getElementById('fluid-capacity').value);
-            
-            if (pumpOn) {
-                level = Math.min(100, level + 2);
-                document.getElementById('fluid-level').value = level;
-            }
-            
-            const volume = (level / 100) * capacity;
-            
-            document.getElementById('fluid-level-val').textContent = level + '%';
-            document.getElementById('fluid-capacity-val').textContent = capacity + ' L';
-            document.getElementById('fluid-reading').textContent = Math.round(volume);
-            
-            // Update visual
-            document.getElementById('water-level').style.height = level + '%';
-            
-            // Update status
-            const status = document.getElementById('fluid-status');
-            const statusText = document.getElementById('fluid-status-text');
-            
-            if (level > 90) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'Tank Nearly Full';
-            } else if (level < 10) {
-                status.className = 'status-indicator status-warning';
-                statusText.textContent = 'Low Fluid Level';
+        function toggleFault(faultKey) {
+            state.activeFaults[faultKey] = !state.activeFaults[faultKey];
+            const btn = document.getElementById(`btn-fault-${faultKey}`);
+            const isInject = state.activeFaults[faultKey];
+
+            if (isInject) {
+                btn.className = "mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-rose-600 text-white border border-rose-500 shadow-lg shadow-rose-600/30";
+                btn.textContent = "Active (Click to Clear)";
+                logDiagnostic(`[FAULT INJECTED] ${faultKey.toUpperCase()} engaged on sensor loop.`);
             } else {
-                status.className = 'status-indicator status-normal';
-                statusText.textContent = 'Normal Level';
+                btn.className = "mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700";
+                btn.textContent = `Inject ${faultKey.replace('_', ' ')}`;
+                logDiagnostic(`[FAULT CLEARED] ${faultKey.toUpperCase()} removed. Normal loop restored.`);
             }
+
+            let count = Object.values(state.activeFaults).filter(Boolean).length;
+            document.getElementById('fault-count-badge').textContent = `${count} Active`;
+            document.getElementById('fault-count-badge').className = count > 0 ? "px-1.5 py-0.5 rounded text-[10px] bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 font-bold border border-rose-300 dark:border-rose-800" : "px-1.5 py-0.5 rounded text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold";
+            document.getElementById('fault-indicator-bar').className = count > 0 ? "bg-rose-500 h-full transition-all duration-300" : "bg-emerald-500 h-full w-full transition-all duration-300";
+
+            updateSimulationState();
         }
 
-        function togglePump() {
-            pumpOn = !pumpOn;
-            document.getElementById('pump-status').textContent = pumpOn ? 'ON' : 'OFF';
-            updateFluid();
+        function logDiagnostic(msg) {
+            const consoleBox = document.getElementById('diagnostic-log');
+            const entry = document.createElement('div');
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+            consoleBox.appendChild(entry);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
         }
 
-        // Fire Detection Sensor Functions
-        function updateFire() {
-            const smoke = parseFloat(document.getElementById('fire-smoke').value);
-            const heat = parseFloat(document.getElementById('fire-heat').value);
-            
-            document.getElementById('fire-smoke-val').textContent = smoke + '%';
-            document.getElementById('fire-heat-val').textContent = heat + '°C';
-            
-            let riskLevel = 'LOW';
-            let statusClass = 'status-normal';
-            let statusText = 'System Normal';
-            
-            if (smoke > 50 || heat > 60) {
-                riskLevel = 'HIGH';
-                statusClass = 'status-danger';
-                statusText = 'Fire Detected!';
-            } else if (smoke > 20 || heat > 40) {
-                riskLevel = 'MEDIUM';
-                statusClass = 'status-warning';
-                statusText = 'Smoke/Heat Detected';
+        function resetGlobalSimulation() {
+            state.activeFaults = { open_circuit: false, zero_drift: false, ground_loop: false };
+            ['open_circuit', 'zero_drift', 'ground_loop'].forEach(f => {
+                const btn = document.getElementById(`btn-fault-${f}`);
+                if (btn) {
+                    btn.className = "mt-4 px-3 py-1.5 rounded text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-300 dark:hover:bg-slate-700";
+                    btn.textContent = `Inject ${f.replace('_', ' ')}`;
+                }
+            });
+            document.getElementById('chk-noise').checked = false;
+            document.getElementById('chk-hum').checked = false;
+            loadSensorModule(currentSensorId);
+            logDiagnostic("[SYSTEM RESET] All parameters and fault injections reset to factory defaults.");
+        }
+
+        function updateSimulationState() {
+            state.noiseEnabled = document.getElementById('chk-noise').checked;
+            state.humEnabled = document.getElementById('chk-hum').checked;
+
+            const sensor = SENSORS[currentSensorId];
+            if (!sensor) return;
+
+            let res = sensor.compute(state.values);
+
+            let numPrimary = parseFloat(res.primary) || 0;
+
+            if (state.activeFaults.zero_drift) {
+                numPrimary *= 1.15;
             }
-            
-            document.getElementById('fire-risk').textContent = riskLevel;
-            document.getElementById('fire-status').className = 'status-indicator ' + statusClass;
-            document.getElementById('fire-status-text').textContent = statusText;
-            
-            // Show/hide flame visual
-            const flame = document.getElementById('flame-visual');
-            if (smoke > 30 || heat > 50) {
-                flame.classList.remove('hidden');
+
+            let currentMa = 4 + (numPrimary / 100) * 16;
+            let voltage010 = (numPrimary / 100) * 10;
+
+            if (state.activeFaults.open_circuit) {
+                currentMa = 0.0;
+                voltage010 = 0.0;
+            }
+
+            let isAlarm = res.isAlarm || state.activeFaults.open_circuit;
+
+            document.getElementById('telemetry-primary-val').textContent = typeof res.primary === 'number' ? res.primary.toFixed(1) : res.primary;
+            document.getElementById('telemetry-primary-unit').textContent = res.primaryUnit;
+            document.getElementById('telemetry-ma-val').textContent = `${currentMa.toFixed(2)} mA`;
+            document.getElementById('telemetry-volt-val').textContent = `${voltage010.toFixed(2)} V`;
+
+            const alarmBox = document.getElementById('telemetry-alarm-val');
+            if (isAlarm) {
+                alarmBox.className = "text-sm font-bold font-mono text-rose-500 dark:text-rose-400 mt-2 flex items-center";
+                alarmBox.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5 animate-ping"></span>ALARM TRIP`;
+                playAlarmSound();
             } else {
-                flame.classList.add('hidden');
+                alarmBox.className = "text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-2 flex items-center";
+                alarmBox.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span>NORMAL`;
+            }
+
+            let adcVal = Math.floor((numPrimary / 100) * 4095);
+            if (state.activeFaults.open_circuit) adcVal = 0;
+            document.getElementById('reg-adc-val').textContent = `0x${Math.max(0, adcVal).toString(16).padStart(4, '0').toUpperCase()} (${Math.max(0, adcVal)})`;
+            document.getElementById('reg-scaled-val').textContent = `${Math.round(numPrimary * 100)} (${res.primary} ${res.primaryUnit.split(' ')[0]})`;
+            document.getElementById('reg-diag-val').textContent = state.activeFaults.open_circuit ? "0xE001 (LOOP BREAK)" : (isAlarm ? "0x00F0 (LIMIT EXCEEDED)" : "0x0000 (OK)");
+
+            document.getElementById('canvas-overlay-tag').textContent = `Telemetry: ${res.primary} ${res.primaryUnit} | ${currentMa.toFixed(1)}mA`;
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btnText = document.getElementById('audio-status-text');
+            const icon = document.getElementById('audio-icon');
+
+            if (audioEnabled) {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                btnText.textContent = "Audio On";
+                icon.className = "fa-solid fa-volume-high text-emerald-500";
+            } else {
+                btnText.textContent = "Audio Off";
+                icon.className = "fa-solid fa-volume-xmark text-rose-500";
             }
         }
 
-        function simulateFire() {
-            fireSimulation = true;
-            document.getElementById('fire-smoke').value = 75;
-            document.getElementById('fire-heat').value = 85;
-            updateFire();
+        function playAlarmSound() {
+            if (!audioEnabled || !audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch (e) {}
         }
 
-        function resetFire() {
-            fireSimulation = false;
-            document.getElementById('fire-smoke').value = 0;
-            document.getElementById('fire-heat').value = 25;
-            updateFire();
+        function resizeCanvas(id) {
+            const canvas = document.getElementById(id);
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
         }
 
-        // Auto-update functions for dynamic simulations
-        setInterval(() => {
-            if (currentSensor === 'temperature') updateTemperature();
-            if (currentSensor === 'humidity') updateHumidity();
-            if (currentSensor === 'vibration') updateVibration();
-            if (currentSensor === 'pressure') updatePressure();
-            if (currentSensor === 'gas') updateGas();
-            if (currentSensor === 'fluid') updateFluid();
-        }, 1000);
+        function startMainSimulationLoop() {
+            window.addEventListener('resize', () => {
+                resizeCanvas('sensor-canvas');
+                resizeCanvas('scope-canvas');
+            });
+            resizeCanvas('sensor-canvas');
+            resizeCanvas('scope-canvas');
+
+            function loop() {
+                renderSensorCanvas();
+                renderOscilloscope();
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+
+        function renderSensorCanvas() {
+            const canvas = document.getElementById('sensor-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw Grid
+            ctx.strokeStyle = currentTheme === 'dark' ? '#1e293b' : '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < w; x += 30) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+            }
+            for (let y = 0; y < h; y += 30) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+            }
+
+            const time = Date.now() * 0.003;
+
+            switch(currentSensorId) {
+                case 'smart':
+                    let centerX = w / 2, centerY = h / 2;
+                    ctx.fillStyle = '#0ea5e9';
+                    ctx.beginPath(); ctx.arc(centerX, centerY, 24, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3; ctx.stroke();
+                    ctx.fillStyle = '#ffffff'; ctx.font = '10px JetBrains Mono'; ctx.fillText('MCU NODE', centerX - 24, centerY + 4);
+
+                    let waveR = (time * 40) % 80;
+                    ctx.strokeStyle = `rgba(14, 165, 233, ${1 - waveR / 80})`;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(centerX, centerY, 24 + waveR, 0, Math.PI * 2); ctx.stroke();
+                    break;
+
+                case 'temperature':
+                    let tempVal = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 25;
+                    let fillH = Math.min(h - 40, Math.max(10, ((tempVal + 50) / 300) * (h - 40)));
+
+                    ctx.fillStyle = currentTheme === 'dark' ? '#1e293b' : '#cbd5e1';
+                    ctx.fillRect(w / 2 - 20, 20, 40, h - 40);
+                    let tempColor = tempVal > 80 ? '#f43f5e' : (tempVal < 0 ? '#38bdf8' : '#10b981');
+                    ctx.fillStyle = tempColor;
+                    ctx.fillRect(w / 2 - 16, h - 20 - fillH, 32, fillH);
+
+                    if (state.values.heat_element) {
+                        ctx.fillStyle = 'rgba(244, 63, 94, 0.6)';
+                        for (let i = 0; i < 12; i++) {
+                            let px = w / 2 - 30 + Math.sin(time + i) * 20;
+                            let py = h - 30 - ((time * 50 + i * 20) % (h - 60));
+                            ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+                        }
+                    }
+                    break;
+
+                case 'humidity':
+                    let rh = state.values.rel_humidity || 50;
+                    ctx.fillStyle = currentTheme === 'dark' ? '#1e293b' : '#e2e8f0';
+                    ctx.fillRect(w/2 - 60, h/2 - 50, 120, 100);
+                    ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2;
+                    ctx.strokeRect(w/2 - 60, h/2 - 50, 120, 100);
+
+                    ctx.fillStyle = '#0284c7';
+                    let dropletCount = Math.floor(rh / 5);
+                    for(let i = 0; i < dropletCount; i++) {
+                        let dx = w/2 - 50 + ((i * 17 + Math.sin(time + i)*5) % 100);
+                        let dy = h/2 - 40 + ((i * 23 + time * 20) % 80);
+                        ctx.beginPath(); ctx.arc(dx, dy, 3, 0, Math.PI*2); ctx.fill();
+                    }
+                    ctx.fillStyle = currentTheme === 'dark' ? '#38bdf8' : '#0369a1';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.fillText(`AIR MOISTURE: ${rh}% RH`, w/2 - 55, h/2 + 70);
+                    break;
+
+                case 'vibration':
+                    let vibVal = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 2;
+                    let shakeX = (Math.random() - 0.5) * vibVal * 2;
+                    let shakeY = (Math.random() - 0.5) * vibVal * 2;
+
+                    let cx = w / 2 + shakeX;
+                    let cy = h / 2 + shakeY;
+
+                    ctx.strokeStyle = vibVal > 7.1 ? '#f43f5e' : '#0ea5e9';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath(); ctx.arc(cx, cy, 60, 0, Math.PI * 2); ctx.stroke();
+
+                    ctx.fillStyle = '#334155';
+                    ctx.beginPath(); ctx.arc(cx, cy, 25, 0, Math.PI * 2); ctx.fill();
+
+                    let rotAngle = time * 5;
+                    let kx = cx + Math.cos(rotAngle) * 20;
+                    let ky = cy + Math.sin(rotAngle) * 20;
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath(); ctx.arc(kx, ky, 6, 0, Math.PI * 2); ctx.fill();
+                    break;
+
+                case 'pressure':
+                    let pVal = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 12;
+                    let angle = -Math.PI / 4 + (pVal / 40) * (Math.PI * 1.5);
+
+                    let gX = w / 2, gY = h / 2 + 10;
+                    ctx.strokeStyle = currentTheme === 'dark' ? '#475569' : '#94a3b8'; ctx.lineWidth = 8;
+                    ctx.beginPath(); ctx.arc(gX, gY, 65, Math.PI * 0.75, Math.PI * 2.25); ctx.stroke();
+
+                    ctx.strokeStyle = pVal > 30 ? '#f43f5e' : '#10b981'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(gX, gY); ctx.lineTo(gX + Math.cos(angle) * 55, gY + Math.sin(angle) * 55); ctx.stroke();
+
+                    if (state.values.relief_valve) {
+                        ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+                        for(let i=0; i<8; i++) {
+                            let vx = gX + 70 + (time * 40 + i*10) % 50;
+                            let vy = gY - 20 + Math.sin(time*5 + i) * 10;
+                            ctx.beginPath(); ctx.arc(vx, vy, 4, 0, Math.PI*2); ctx.fill();
+                        }
+                    }
+                    break;
+
+                case 'proximity':
+                    let dist = state.values.target_dist || 35;
+                    let sensorX = 40;
+                    let targetX = sensorX + (dist / 100) * (w - 120);
+
+                    // Sensor Body
+                    ctx.fillStyle = '#475569';
+                    ctx.fillRect(sensorX - 20, h/2 - 25, 30, 50);
+
+                    // Target Block
+                    let isDetected = dist <= (state.values.sensor_tech === 1 ? 25 : 80);
+                    ctx.fillStyle = isDetected ? '#10b981' : '#0ea5e9';
+                    ctx.fillRect(targetX, h/2 - 35, 40, 70);
+
+                    // Reflection Wave Lines
+                    ctx.strokeStyle = 'rgba(14, 165, 233, 0.6)';
+                    ctx.lineWidth = 2;
+                    let arcR = (time * 60) % Math.max(10, (targetX - sensorX));
+                    ctx.beginPath(); ctx.arc(sensorX + 10, h/2, arcR, -Math.PI/3, Math.PI/3); ctx.stroke();
+                    break;
+
+                case 'gas':
+                    let ppmVal = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 100;
+                    let particleCount = Math.min(80, Math.floor(ppmVal / 10));
+
+                    ctx.fillStyle = ppmVal > 300 ? 'rgba(244, 63, 94, 0.7)' : 'rgba(16, 185, 129, 0.7)';
+                    for (let i = 0; i < particleCount; i++) {
+                        let px = (Math.sin(i * 12.3 + time) * 0.5 + 0.5) * (w - 40) + 20;
+                        let py = (Math.cos(i * 45.1 + time * 0.8) * 0.5 + 0.5) * (h - 40) + 20;
+                        ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+                    }
+
+                    if (state.values.ventilation) {
+                        ctx.save();
+                        ctx.translate(w - 40, 40);
+                        ctx.rotate(time * 10);
+                        ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 3;
+                        ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(15, 0); ctx.moveTo(0, -15); ctx.lineTo(0, 15); ctx.stroke();
+                        ctx.restore();
+                    }
+                    break;
+
+                case 'chemical':
+                    let phVal = state.values.ph_val !== undefined ? state.values.ph_val : 7.0;
+                    // pH Color spectrum calculation (Red for acidic, Green neutral, Purple alkaline)
+                    let r = Math.floor(Math.max(0, (7 - phVal) / 7) * 239 + Math.max(0, (phVal - 7) / 7) * 147);
+                    let g = Math.floor(Math.max(0, 1 - Math.abs(phVal - 7) / 7) * 185);
+                    let b = Math.floor(Math.max(0, (phVal - 7) / 7) * 253 + Math.max(0, (7 - phVal) / 7) * 68);
+
+                    // Liquid Container
+                    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                    ctx.fillRect(w/2 - 60, h/2 - 30, 120, 80);
+                    ctx.strokeStyle = currentTheme === 'dark' ? '#94a3b8' : '#475569';
+                    ctx.strokeRect(w/2 - 60, h/2 - 50, 120, 100);
+
+                    // Glass Electrode Probe
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillRect(w/2 - 8, 20, 16, h/2 + 20);
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath(); ctx.arc(w/2, h/2 + 40, 6, 0, Math.PI*2); ctx.fill();
+                    break;
+
+                case 'fluid':
+                    let lvlPct = (parseFloat(document.getElementById('telemetry-primary-val').textContent) || 50) / 100;
+                    let fluidHeight = lvlPct * (h - 60);
+
+                    ctx.fillStyle = 'rgba(14, 165, 233, 0.4)';
+                    ctx.fillRect(40, h - 20 - fluidHeight, w - 80, fluidHeight);
+
+                    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let x = 40; x <= w - 40; x += 10) {
+                        let y = h - 20 - fluidHeight + Math.sin(x * 0.05 + time * 3) * 3;
+                        if (x === 40) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#64748b'; ctx.fillRect(w / 2 - 15, 10, 30, 15);
+                    let pulseY = 25 + ((time * 80) % Math.max(10, (h - 45 - fluidHeight)));
+                    ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
+                    ctx.beginPath(); ctx.arc(w / 2, pulseY, 12, 0, Math.PI); ctx.stroke();
+                    break;
+
+                case 'fire':
+                    let flameSize = state.values.flame_intensity || 0;
+                    if (flameSize > 0) {
+                        let fH = (flameSize / 100) * (h - 40);
+                        let fX = w / 2;
+                        let fY = h - 20;
+
+                        let grad = ctx.createRadialGradient(fX, fY - fH / 2, 5, fX, fY - fH / 2, fH);
+                        grad.addColorStop(0, '#fef08a');
+                        grad.addColorStop(0.4, '#f97316');
+                        grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        ctx.moveTo(fX - fH / 2 + Math.sin(time * 10) * 10, fY);
+                        ctx.quadraticCurveTo(fX + Math.cos(time * 12) * 15, fY - fH, fX + fH / 2, fY);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#475569';
+                        ctx.font = '12px JetBrains Mono';
+                        ctx.fillText('NO OPTICAL FLAME DETECTED', w / 2 - 80, h / 2);
+                    }
+                    break;
+
+                default:
+                    let val = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 0;
+                    ctx.fillStyle = '#0ea5e9';
+                    ctx.fillRect(30, h / 2 - 15, (val / 100) * (w - 60), 30);
+                    ctx.strokeStyle = '#475569'; ctx.strokeRect(30, h / 2 - 15, w - 60, 30);
+                    break;
+            }
+        }
+
+        function renderOscilloscope() {
+            if (currentTab !== 'oscilloscope') return;
+
+            const canvas = document.getElementById('scope-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            let curVal = parseFloat(document.getElementById('telemetry-primary-val').textContent) || 0;
+
+            let noise = state.noiseEnabled ? (Math.random() - 0.5) * 6 : 0;
+            let hum = state.humEnabled ? Math.sin(Date.now() * 0.05) * 4 : 0;
+            let groundNoise = state.activeFaults.ground_loop ? (Math.random() - 0.5) * 18 : 0;
+
+            let rawVal = curVal + noise + hum + groundNoise;
+
+            let alpha = state.dspAlpha;
+            let prevFiltered = filteredSignalBuffer[filteredSignalBuffer.length - 1] || rawVal;
+            let filteredVal = (alpha * rawVal) + ((1 - alpha) * prevFiltered);
+
+            rawSignalBuffer.push(rawVal);
+            filteredSignalBuffer.push(filteredVal);
+            if (rawSignalBuffer.length > SCOPE_POINTS) {
+                rawSignalBuffer.shift();
+                filteredSignalBuffer.shift();
+            }
+
+            // Update Metrics in UI
+            let peakNoise = (Math.abs(noise) + Math.abs(groundNoise)).toFixed(2);
+            let snr = curVal > 0 ? (20 * Math.log10(curVal / (Math.abs(noise) + 0.1))).toFixed(1) : "0.0";
+            let latencyMs = (1 / alpha * 2.5).toFixed(1);
+
+            let nElem = document.getElementById('dsp-noise-peak');
+            if (nElem) nElem.textContent = `±${peakNoise} V`;
+            let lElem = document.getElementById('dsp-latency-val');
+            if (lElem) lElem.textContent = `${latencyMs} ms`;
+            let sElem = document.getElementById('dsp-snr-val');
+            if (sElem) sElem.textContent = `${snr} dB`;
+
+            // Draw Scope Grid
+            ctx.fillStyle = currentTheme === 'dark' ? '#020617' : '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = currentTheme === 'dark' ? '#0f172a' : '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < w; x += 25) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+            for (let y = 0; y < h; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+            ctx.strokeStyle = currentTheme === 'dark' ? '#1e293b' : '#cbd5e1';
+            ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+
+            const stepX = w / SCOPE_POINTS;
+            const centerY = h / 2;
+            const scaleY = (h / 2.2) / 100;
+
+            // Raw Signal (Red)
+            ctx.strokeStyle = '#f43f5e';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            for (let i = 0; i < rawSignalBuffer.length; i++) {
+                let x = i * stepX;
+                let y = centerY - (rawSignalBuffer[i] * scaleY);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Filtered Signal (Cyan/Blue)
+            ctx.strokeStyle = currentTheme === 'dark' ? '#38bdf8' : '#0284c7';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < filteredSignalBuffer.length; i++) {
+                let x = i * stepX;
+                let y = centerY - (filteredSignalBuffer[i] * scaleY);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        function updateDSPAlpha(val) {
+            state.dspAlpha = parseFloat(val);
+            document.getElementById('dsp-alpha-val').textContent = state.dspAlpha.toFixed(2);
+        }
+
+        function clearOscilloscope() {
+            rawSignalBuffer.fill(0);
+            filteredSignalBuffer.fill(0);
+        }
     </script>
 </body>
 </html>
