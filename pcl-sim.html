@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,6 +38,7 @@
         body {
             background-color: #090d16;
             color: #f1f5f9;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -49,6 +51,72 @@
             background: #475569;
             border-radius: 3px;
         }
+
+        /* ================= LIGHT THEME OVERRIDES =================
+           The app is built dark-first with hardcoded Tailwind slate/accent
+           utility classes. Rather than re-author every class with dark:
+           variants, body.theme-light remaps the specific classes in use to a
+           light-mode palette. !important is required because Tailwind's CDN
+           stylesheet is injected after this block. */
+        body.theme-light { background-color: #f4f6fb; color: #0f172a; }
+        body.theme-light .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; }
+        body.theme-light .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; }
+
+        body.theme-light .bg-slate-950,
+        body.theme-light .bg-slate-950\/40,
+        body.theme-light .bg-slate-950\/80 { background-color: #eef1f7 !important; }
+        body.theme-light .bg-slate-900,
+        body.theme-light .bg-slate-900\/60,
+        body.theme-light .bg-slate-900\/90 { background-color: #ffffff !important; }
+        body.theme-light .bg-slate-800 { background-color: #e5e9f2 !important; }
+        body.theme-light .bg-slate-700 { background-color: #cbd5e1 !important; }
+        body.theme-light .bg-slate-400 { background-color: #64748b !important; }
+        body.theme-light .hover\:bg-slate-700:hover { background-color: #d5dbe6 !important; }
+        body.theme-light .hover\:bg-slate-500:hover { background-color: #94a3b8 !important; }
+        body.theme-light .hover\:bg-red-900\/40:hover { background-color: #fee2e2 !important; }
+        body.theme-light .hover\:text-red-400:hover { color: #dc2626 !important; }
+
+        body.theme-light .border-slate-800,
+        body.theme-light .border-slate-700,
+        body.theme-light .border-slate-300 { border-color: #d7dde8 !important; }
+
+        body.theme-light .text-white { color: #0f172a !important; }
+        body.theme-light .text-slate-200 { color: #1e293b !important; }
+        body.theme-light .text-slate-300 { color: #334155 !important; }
+        body.theme-light .text-slate-400 { color: #64748b !important; }
+        body.theme-light .text-slate-500 { color: #7c8aa0 !important; }
+        body.theme-light .text-slate-600 { color: #94a3b8 !important; }
+
+        body.theme-light .bg-cyan-950 { background-color: #e0f2fe !important; }
+        body.theme-light .bg-emerald-950 { background-color: #dcfce7 !important; }
+        body.theme-light .bg-amber-950 { background-color: #fef3c7 !important; }
+        body.theme-light .bg-purple-950 { background-color: #f3e8ff !important; }
+        body.theme-light .border-cyan-800 { border-color: #7dd3fc !important; }
+        body.theme-light .border-emerald-800 { border-color: #6ee7b7 !important; }
+        body.theme-light .border-amber-800 { border-color: #fcd34d !important; }
+        body.theme-light .border-purple-800 { border-color: #d8b4fe !important; }
+        body.theme-light .text-cyan-400 { color: #0284c7 !important; }
+        body.theme-light .text-emerald-400 { color: #059669 !important; }
+        body.theme-light .text-amber-400 { color: #b45309 !important; }
+        body.theme-light .text-purple-400 { color: #7e22ce !important; }
+        body.theme-light .text-blue-400 { color: #2563eb !important; }
+
+        body.theme-light .led-off { background-color: #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.15); }
+        body.theme-light input[type="range"] { background-color: #d5dbe6 !important; }
+
+        /* Theme toggle switch */
+        .theme-toggle-btn {
+            width: 2.75rem; height: 1.5rem; border-radius: 999px; position: relative;
+            background: #1e293b; border: 1px solid #334155; cursor: pointer; transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .theme-toggle-btn .knob {
+            position: absolute; top: 1px; left: 1px; width: 1.15rem; height: 1.15rem; border-radius: 999px;
+            background: #f59e0b; color: #1e293b; font-size: 9px; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s ease, background 0.2s ease; transform: translateX(0);
+        }
+        body.theme-light .theme-toggle-btn { background: #cbd5e1; border-color: #94a3b8; }
+        body.theme-light .theme-toggle-btn .knob { transform: translateX(1.25rem); background: #0ea5e9; color: #fff; }
         .power-rail-left {
             box-shadow: 2px 0 10px rgba(56, 189, 248, 0.5);
         }
@@ -86,6 +154,16 @@
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-sm">
+    <script>
+        // Apply saved theme immediately (before paint) to avoid a flash of the wrong theme.
+        // Default is LIGHT when no preference has been saved yet.
+        (function () {
+            const saved = localStorage.getItem('plcSimStudioTheme');
+            if (saved === 'light' || saved === null) {
+                document.body.classList.add('theme-light');
+            }
+        })();
+    </script>
 
     <!-- Application Header -->
     <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shrink-0">
@@ -104,13 +182,13 @@
         <!-- Simulation Controls -->
         <div class="flex items-center bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 space-x-3">
             <div class="flex items-center space-x-1">
-                <button id="btn-run" onclick="toggleRun(true)" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-emerald-600 hover:bg-emerald-500 text-white shadow">
+                <button id="btn-run" onclick="toggleRun(true)" title="Resume continuous scanning" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-emerald-600 hover:bg-emerald-500 text-white shadow">
                     <i class="fa-solid fa-play text-xs"></i> RUN
                 </button>
-                <button id="btn-stop" onclick="toggleRun(false)" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <button id="btn-stop" onclick="toggleRun(false)" title="Pause the scan cycle" class="px-3 py-1 rounded font-medium text-xs flex items-center gap-1.5 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
                     <i class="fa-solid fa-stop text-xs"></i> STOP
                 </button>
-                <button id="btn-step" onclick="singleStep()" class="px-2.5 py-1 rounded font-medium text-xs flex items-center gap-1 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <button id="btn-step" onclick="singleStep()" title="Pause and execute exactly one scan cycle - useful for tracing logic step by step" class="px-2.5 py-1 rounded font-medium text-xs flex items-center gap-1 transition bg-slate-800 hover:bg-slate-700 text-slate-300">
                     <i class="fa-solid fa-forward-step text-xs"></i> STEP
                 </button>
             </div>
@@ -148,6 +226,18 @@
                 <i class="fa-solid fa-book-open text-purple-400"></i> Theory & SME Guide
             </button>
         </div>
+
+        <!-- Theme Toggle & Reset -->
+        <div class="flex items-center space-x-3">
+            <button onclick="resetSimulator()" title="Reset all I/O, timers, counters and scan count to default state"
+                class="px-2.5 py-1.5 rounded-md font-medium text-xs text-slate-400 hover:text-white bg-slate-950 hover:bg-slate-800 border border-slate-800 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-rotate-left text-xs"></i> Reset Sim
+            </button>
+            <button id="theme-toggle" class="theme-toggle-btn" role="switch" aria-checked="false"
+                aria-label="Toggle light or dark interface theme" onclick="toggleTheme()" title="Switch light / dark theme">
+                <span class="knob"><i id="theme-icon" class="fa-solid fa-sun"></i></span>
+            </button>
+        </div>
     </header>
 
     <!-- Main Content Area -->
@@ -179,16 +269,22 @@
                 <!-- Palette / Quick Component Adder -->
                 <div class="bg-slate-950/80 px-4 py-2 border-b border-slate-800 flex items-center gap-2 overflow-x-auto text-xs shrink-0 custom-scrollbar">
                     <span class="text-slate-400 font-mono text-[11px] whitespace-nowrap">Add Elements:</span>
-                    <button onclick="insertInstruction('NO')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
+                    <button onclick="insertInstruction('NO')" title="Normally-Open (Examine-If-Closed) contact: passes power when the tag's bit is 1/true" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
                         <span class="text-cyan-400 font-bold">-[ ]-</span> NO Contact
                     </button>
-                    <button onclick="insertInstruction('NC')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
+                    <button onclick="insertInstruction('NC')" title="Normally-Closed (Examine-If-Open) contact: passes power when the tag's bit is 0/false" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-cyan-500 transition">
                         <span class="text-cyan-400 font-bold">-[/]-</span> NC Contact
                     </button>
-                    <button onclick="insertInstruction('COIL')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-emerald-500 transition">
+                    <button onclick="insertInstruction('COIL')" title="Direct coil: energized output tracks rung power exactly (de-energizes the instant rung power is lost)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-emerald-500 transition">
                         <span class="text-emerald-400 font-bold">-( )-</span> Coil
                     </button>
-                    <button onclick="insertInstruction('TON')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-amber-500 transition">
+                    <button onclick="insertInstruction('SET')" title="Latching (Set) coil: energizes output and holds it ON even after rung power is lost. Pair with a RESET coil to turn it back off — this is how real seal-in / start-stop circuits are built." class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-emerald-500 transition">
+                        <span class="text-emerald-400 font-bold">-(S)-</span> Set/Latch
+                    </button>
+                    <button onclick="insertInstruction('RESET')" title="Unlatching (Reset) coil: de-energizes and holds the output OFF until Set again" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-red-500 transition">
+                        <span class="text-red-400 font-bold">-(R)-</span> Reset/Unlatch
+                    </button>
+                    <button onclick="insertInstruction('TON')" title="On-delay timer: output goes true a set number of seconds after the rung has continuous power" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-amber-500 transition">
                         <span class="text-amber-400 font-bold">[TON]</span> On-Timer
                     </button>
                     <button onclick="insertInstruction('CTU')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded font-mono flex items-center gap-1 hover:border-purple-400 transition">
@@ -305,7 +401,7 @@
                             </div>
                             <h3 class="font-bold text-base text-white mb-2">Motor Three-Wire Seal-In Circuit (Start/Stop)</h3>
                             <p class="text-slate-400 text-xs leading-relaxed mb-4">
-                                Learn how to construct standard industrial latching (seal-in) logic using discrete Normally Open (Start) and Normally Closed (Stop) pushbuttons to safely energize a motor starter relay.
+                                Learn how to construct standard industrial latching (seal-in) logic using discrete Normally Open (Start) and Normally Closed (Stop) pushbuttons, implemented here with Set/Reset latching coils, to safely energize and hold a motor starter relay.
                             </p>
                             <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
                                 <div><strong class="text-cyan-400">Inputs:</strong> I:0/0 (Stop NC), I:0/1 (Start NO)</div>
@@ -326,7 +422,7 @@
                             </div>
                             <h3 class="font-bold text-base text-white mb-2">Automated Level Control with Hysteresis</h3>
                             <p class="text-slate-400 text-xs leading-relaxed mb-4">
-                                Process tank control using an Analog Level Sensor (4-20mA). Program compare blocks to activate the fill pump when tank level drops below 25% and turn off when level exceeds 85%.
+                                Process tank control using an Analog Level Sensor (4-20mA). Two compare blocks set the fill valve on below 25% and reset it off above 85%, so the pump doesn't chatter on and off right at one threshold.
                             </p>
                             <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs space-y-1 mb-4 font-mono text-slate-300">
                                 <div><strong class="text-cyan-400">Analog Input:</strong> AI:0 (Level Transmitter 0-100%)</div>
@@ -575,7 +671,43 @@
         let scopeCanvas, scopeCtx;
         let scopeHistory = { ai0: [], ao0: [] };
 
+        // ============== THEME MANAGEMENT ==============
+        // Canvas drawing (process diagram + scope) uses raw hex colors that
+        // Tailwind classes can't reach, so we keep a small palette per theme
+        // and re-draw whenever the theme changes.
+        const THEME_PALETTES = {
+            dark: { grid: '#1e293b', tankOutline: '#94a3b8', labelText: '#ffffff', fluid: 'rgba(14, 165, 233, 0.6)', scopeGrid: '#1e293b' },
+            light: { grid: '#dbe3ef', tankOutline: '#334155', labelText: '#0f172a', fluid: 'rgba(2, 132, 199, 0.55)', scopeGrid: '#d7dee9' }
+        };
+        function isLightTheme() { return document.body.classList.contains('theme-light'); }
+        function currentPalette() { return isLightTheme() ? THEME_PALETTES.light : THEME_PALETTES.dark; }
+
+        function toggleTheme() {
+            const light = document.body.classList.toggle('theme-light');
+            localStorage.setItem('plcSimStudioTheme', light ? 'light' : 'dark');
+            const toggleBtn = document.getElementById('theme-toggle');
+            const icon = document.getElementById('theme-icon');
+            toggleBtn.setAttribute('aria-checked', String(!light));
+            icon.className = light ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            drawProcessCanvas();
+            drawScope();
+        }
+
+        function resetSimulator() {
+            if (!confirm('Reset all inputs, outputs, timers and counters to their default state?')) return;
+            plcState.scanCount = 0;
+            plcState.timers = { 'TON_1': { pt: 3.0, et: 0.0, dn: false, en: false }, 'TON_2': { pt: 5.0, et: 0.0, dn: false, en: false } };
+            plcState.counters = { 'CTU_1': { pv: 5, cv: 0, dn: false } };
+            scopeHistory = { ai0: [], ao0: [] };
+            loadLab(plcState.activeLab || 1);
+            document.getElementById('scan-count').innerText = 'Scan: 0';
+        }
+
         window.onload = function() {
+            // Set the moon/sun icon to match whatever theme init already applied to <body>.
+            document.getElementById('theme-icon').className = isLightTheme() ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            document.getElementById('theme-toggle').setAttribute('aria-checked', String(!isLightTheme()));
+
             initIOPanels();
             setupProcessCanvas();
             setupScopeCanvas();
@@ -599,13 +731,14 @@
                     </div>
                     ${item.type === 'push' ? `
                         <button onmousedown="setDiscreteInput(${idx}, true)" onmouseup="setDiscreteInput(${idx}, false)" onmouseleave="setDiscreteInput(${idx}, false)"
-                            class="px-2 py-1 bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-300 active:text-white rounded text-[10px] font-mono border border-slate-700 select-none">
+                            title="${item.desc} - press and hold" aria-label="Press ${item.name}"
+                            class="px-2 py-1 bg-slate-800 hover:bg-slate-700 active:bg-cyan-600 text-slate-300 active:text-white rounded text-[10px] font-mono border border-slate-700 select-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none">
                             PRESS
                         </button>
                     ` : `
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" ${item.val ? 'checked' : ''} onchange="toggleDiscreteInput(${idx}, this.checked)" class="sr-only peer">
-                            <div class="w-7 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-600"></div>
+                        <label class="relative inline-flex items-center cursor-pointer" title="${item.desc}">
+                            <input type="checkbox" ${item.val ? 'checked' : ''} onchange="toggleDiscreteInput(${idx}, this.checked)" aria-label="Toggle ${item.name} (${item.id})" class="sr-only peer">
+                            <div class="w-7 h-4 bg-slate-800 peer-focus:ring-2 peer-focus:ring-cyan-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-600"></div>
                         </label>
                     `}
                 </div>
@@ -637,7 +770,8 @@
                         <span class="font-mono text-slate-300 font-bold text-xs" id="val-${item.id}">${item.val.toFixed(1)} ${item.unit} (${(4 + (item.val/100)*16).toFixed(1)} mA)</span>
                     </div>
                     <input type="range" min="${item.min}" max="${item.max}" step="0.5" value="${item.val}"
-                        oninput="updateAnalogInput(${idx}, this.value)" class="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+                        oninput="updateAnalogInput(${idx}, this.value)" aria-label="${item.name} (${item.id}) value in ${item.unit}"
+                        class="w-full accent-cyan-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:outline-none">
                 </div>
             `).join('');
 
@@ -756,27 +890,68 @@
             }
         }
 
+        // ============== LADDER SOLVER (series-parallel / branch-aware) ==============
+        // Each rung is now { branches: [ {instructions:[...]}, ... ], coils: [...] }.
+        // Every branch is a series (AND) chain of contacts (NO/NC/CMP). The branches
+        // themselves OR together to form the rung's combined power flow, which then
+        // drives every coil/output instruction in the rung's coils list. This is what
+        // lets a rung express real parallel logic - e.g. a seal-in auxiliary contact
+        // wired in parallel with a Start pushbutton - instead of only a single series
+        // chain (which cannot represent an OR condition at all).
         function solveLadderLogic() {
             plcState.rungs.forEach((rung) => {
-                let rungPower = true; // Left Power Rail is always TRUE (24VDC)
+                let orResult = false;
 
-                rung.instructions.forEach((inst) => {
-                    if (inst.type === 'NO') {
-                        const bitVal = getBitValue(inst.tag);
-                        rungPower = rungPower && bitVal;
-                        inst.active = rungPower;
-                    } 
-                    else if (inst.type === 'NC') {
-                        const bitVal = getBitValue(inst.tag);
-                        rungPower = rungPower && (!bitVal);
-                        inst.active = rungPower;
-                    } 
-                    else if (inst.type === 'COIL') {
-                        setBitValue(inst.tag, rungPower);
-                        inst.active = rungPower;
+                rung.branches.forEach((branch) => {
+                    let branchPower = true; // Left rail is always TRUE (24VDC) at the start of each branch
+
+                    branch.instructions.forEach((inst) => {
+                        if (inst.type === 'NO') {
+                            const bitVal = getBitValue(inst.tag);
+                            branchPower = branchPower && bitVal;
+                            inst.active = branchPower;
+                        }
+                        else if (inst.type === 'NC') {
+                            const bitVal = getBitValue(inst.tag);
+                            branchPower = branchPower && (!bitVal);
+                            inst.active = branchPower;
+                        }
+                        else if (inst.type === 'CMP') {
+                            const ainVal = plcState.analogInputs[0].val; // Read AI:0
+                            let compResult = false;
+                            if (inst.op === 'LESS') compResult = ainVal < inst.val;
+                            if (inst.op === 'GREATER') compResult = ainVal > inst.val;
+                            branchPower = branchPower && compResult;
+                            inst.active = branchPower;
+                        }
+                    });
+
+                    branch.energized = branchPower;
+                    orResult = orResult || branchPower;
+                });
+
+                // Combined branch power (after the OR) is what actually reaches the coils.
+                const rungPower = orResult;
+                rung.energized = rungPower;
+
+                rung.coils.forEach((coil) => {
+                    if (coil.type === 'COIL') {
+                        setBitValue(coil.tag, rungPower);
+                        coil.active = rungPower;
                     }
-                    else if (inst.type === 'TON') {
-                        const timer = plcState.timers[inst.tag] || { pt: 3.0, et: 0.0, dn: false };
+                    else if (coil.type === 'SET') {
+                        // Latching coil: only ever writes TRUE, and only when rung has power.
+                        // Once true, the bit holds until a matching RESET coil fires elsewhere.
+                        if (rungPower) setBitValue(coil.tag, true);
+                        coil.active = getBitValue(coil.tag);
+                    }
+                    else if (coil.type === 'RESET') {
+                        // Unlatching coil: only ever writes FALSE, and only when rung has power.
+                        if (rungPower) setBitValue(coil.tag, false);
+                        coil.active = getBitValue(coil.tag);
+                    }
+                    else if (coil.type === 'TON') {
+                        const timer = plcState.timers[coil.tag] || { pt: 3.0, et: 0.0, dn: false };
                         if (rungPower) {
                             if (!timer.dn) {
                                 timer.et += plcState.scanRateMs / 1000.0;
@@ -789,34 +964,26 @@
                             timer.et = 0.0;
                             timer.dn = false;
                         }
-                        plcState.timers[inst.tag] = timer;
-                        inst.active = timer.dn;
+                        plcState.timers[coil.tag] = timer;
+                        coil.active = timer.dn;
                     }
-                    else if (inst.type === 'CTU') {
-                        const counter = plcState.counters[inst.tag] || { pv: 5, cv: 0, dn: false };
+                    else if (coil.type === 'CTU') {
+                        const counter = plcState.counters[coil.tag] || { pv: 5, cv: 0, dn: false };
                         // Edge detection for count pulse
-                        if (rungPower && !inst.prevRungState) {
+                        if (rungPower && !coil.prevRungState) {
                             counter.cv++;
                             if (counter.cv >= counter.pv) counter.dn = true;
                         }
-                        inst.prevRungState = rungPower;
-                        
+                        coil.prevRungState = rungPower;
+
                         // Check if Reset Button I:0/3 pressed
                         if (getBitValue('I:0/3')) {
                             counter.cv = 0;
                             counter.dn = false;
                         }
 
-                        plcState.counters[inst.tag] = counter;
-                        inst.active = counter.dn;
-                    }
-                    else if (inst.type === 'CMP') {
-                        const ainVal = plcState.analogInputs[0].val; // Read AI:0
-                        let compResult = false;
-                        if (inst.op === 'LESS') compResult = ainVal < inst.val;
-                        if (inst.op === 'GREATER') compResult = ainVal > inst.val;
-                        rungPower = rungPower && compResult;
-                        inst.active = rungPower;
+                        plcState.counters[coil.tag] = counter;
+                        coil.active = counter.dn;
                     }
                 });
             });
@@ -849,6 +1016,28 @@
             }
         }
 
+        // Renders one contact/coil/timer/counter/compare instruction box. Used for
+        // both branch contacts and rung coils - only the click/delete handlers differ.
+        function instructionNodeHTML(inst, editCall, deleteCall) {
+            const symbol =
+                inst.type === 'NO' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[ ]-</span>` :
+                inst.type === 'NC' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[/]-</span>` :
+                inst.type === 'COIL' ? `<span class="${inst.active ? 'text-emerald-400 font-extrabold' : 'text-slate-400'}">-( )-</span>` :
+                inst.type === 'SET' ? `<span class="${inst.active ? 'text-emerald-400 font-extrabold' : 'text-slate-400'}">-(S)-</span>` :
+                inst.type === 'RESET' ? `<span class="${inst.active ? 'text-slate-400' : 'text-red-400 font-extrabold'}">-(R)-</span>` :
+                inst.type === 'TON' ? `<span class="text-amber-400 text-xs">[TON ${plcState.timers[inst.tag]?.et.toFixed(1) || 0}s]</span>` :
+                inst.type === 'CTU' ? `<span class="text-purple-400 text-xs">[CTU ${plcState.counters[inst.tag]?.cv || 0}/${plcState.counters[inst.tag]?.pv || 5}]</span>` :
+                inst.type === 'CMP' ? `<span class="text-blue-400 text-xs">[AI:0 ${inst.op === 'LESS' ? '<' : '>'} ${inst.val}%]</span>` : '';
+
+            return `
+                <div onclick="${editCall}" title="Click to edit this instruction's address/setpoint" class="bg-slate-950 border ${inst.active ? 'border-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 'border-slate-800'} p-2 rounded flex flex-col items-center min-w-[75px] relative group cursor-pointer hover:border-cyan-500 transition">
+                    <span class="text-[9px] font-mono ${inst.active ? 'text-emerald-400 font-bold' : 'text-cyan-400'} mb-1">${inst.tag}</span>
+                    <div class="text-sm font-mono font-bold my-0.5">${symbol}</div>
+                    <span class="text-[9px] text-slate-500 font-mono">${inst.type}</span>
+                    <button onclick="event.stopPropagation(); ${deleteCall}" title="Delete this instruction" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white w-4 h-4 rounded-full text-[9px] hidden group-hover:flex items-center justify-center z-20">×</button>
+                </div>`;
+        }
+
         function renderLadder() {
             const canvas = document.getElementById('ladder-canvas');
             if (!canvas) return;
@@ -864,46 +1053,55 @@
             }
 
             canvas.innerHTML = plcState.rungs.map((rung, rIdx) => `
-                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 relative flex items-center shadow-lg">
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 relative flex items-stretch shadow-lg">
                     <!-- Left Power Rail (24VDC) -->
-                    <div class="w-2 h-16 bg-cyan-500 rounded-l power-rail-left"></div>
+                    <div class="w-2 rounded-l power-rail-left transition-colors ${rung.energized ? 'bg-emerald-400' : 'bg-cyan-500'}"></div>
 
-                    <!-- Rung Wire Container -->
-                    <div class="flex-1 flex items-center px-4 space-x-2 relative min-h-[60px]">
-                        <!-- Wire line behind instructions -->
-                        <div class="absolute inset-x-0 h-0.5 bg-slate-700 top-1/2 -translate-y-1/2 z-0"></div>
+                    <!-- Rung Energized/De-energized Status Badge -->
+                    <span class="absolute -top-2 left-6 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border ${rung.energized ? 'bg-emerald-950 text-emerald-400 border-emerald-700' : 'bg-slate-950 text-slate-500 border-slate-700'}" title="Whether power is actually flowing rail-to-rail on this rung right now">
+                        RUNG ${rIdx} ${rung.energized ? '● ENERGIZED' : '○ DE-ENERGIZED'}
+                    </span>
 
-                        <!-- Instructions List -->
-                        <div class="flex items-center justify-between w-full z-10 space-x-2">
-                            ${rung.instructions.map((inst, iIdx) => `
-                                <div class="bg-slate-950 border ${inst.active ? 'border-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 'border-slate-800'} p-2 rounded flex flex-col items-center min-w-[75px] relative group">
-                                    <span class="text-[9px] font-mono ${inst.active ? 'text-emerald-400 font-bold' : 'text-cyan-400'} mb-1">${inst.tag}</span>
-                                    
-                                    <div class="text-sm font-mono font-bold my-0.5">
-                                        ${inst.type === 'NO' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[ ]-</span>` : ''}
-                                        ${inst.type === 'NC' ? `<span class="${inst.active ? 'text-emerald-400' : 'text-slate-400'}">-[/]-</span>` : ''}
-                                        ${inst.type === 'COIL' ? `<span class="${inst.active ? 'text-emerald-400 font-extrabold' : 'text-slate-400'}">-( )-</span>` : ''}
-                                        ${inst.type === 'TON' ? `<span class="text-amber-400 text-xs">[TON ${plcState.timers[inst.tag]?.et.toFixed(1) || 0}s]</span>` : ''}
-                                        ${inst.type === 'CTU' ? `<span class="text-purple-400 text-xs">[CTU ${plcState.counters[inst.tag]?.cv || 0}/${plcState.counters[inst.tag]?.pv || 5}]</span>` : ''}
-                                        ${inst.type === 'CMP' ? `<span class="text-blue-400 text-xs">[AI:0 ${inst.op === 'LESS' ? '<' : '>'} ${inst.val}%]</span>` : ''}
-                                    </div>
-
-                                    <span class="text-[9px] text-slate-500 font-mono">${inst.type}</span>
-
-                                    <!-- Instruction Delete Overlay -->
-                                    <button onclick="removeInstruction(${rIdx}, ${iIdx})" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white w-4 h-4 rounded-full text-[9px] hidden group-hover:flex items-center justify-center">
-                                        ×
-                                    </button>
+                    <!-- Branches (parallel legs OR together, drawn as stacked rows) -->
+                    <div class="flex-1 flex flex-col justify-center px-4 py-2 relative min-h-[60px] space-y-1.5">
+                        ${rung.branches.map((branch, bIdx) => `
+                            <div class="flex items-center gap-2 relative ${rung.branches.length > 1 ? 'border-l-2 border-dashed border-slate-700 pl-3 -ml-3' : ''}">
+                                ${rung.branches.length > 1 ? `<span class="text-[9px] font-mono ${branch.energized ? 'text-emerald-400' : 'text-slate-600'} w-6 shrink-0" title="Branch ${bIdx} - branches OR together">${bIdx === 0 ? 'MAIN' : 'OR ' + bIdx}</span>` : ''}
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    ${branch.instructions.map((inst, iIdx) => instructionNodeHTML(
+                                        inst,
+                                        `editInstruction(${rIdx}, ${bIdx}, ${iIdx})`,
+                                        `removeInstruction(${rIdx}, ${bIdx}, ${iIdx})`
+                                    )).join('')}
                                 </div>
-                            `).join('')}
-                        </div>
+                                ${rung.branches.length > 1 ? `
+                                    <button onclick="removeBranch(${rIdx}, ${bIdx})" title="Delete this parallel branch" class="text-slate-600 hover:text-red-400 text-[10px] ml-1">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>` : ''}
+                            </div>
+                        `).join('')}
+                        <button onclick="addBranch(${rIdx})" title="Add a parallel OR branch to this rung - e.g. a seal-in auxiliary contact wired around the Start pushbutton" class="text-[9px] font-mono text-slate-500 hover:text-cyan-400 flex items-center gap-1 pl-1 mt-1">
+                            <i class="fa-solid fa-code-branch"></i> Add OR Branch
+                        </button>
+                    </div>
+
+                    <!-- Coils / Outputs (driven by the OR of all branches above) -->
+                    <div class="flex flex-col justify-center items-center gap-1.5 px-3 border-l border-slate-800">
+                        ${rung.coils.map((coil, cIdx) => instructionNodeHTML(
+                            coil,
+                            `editCoil(${rIdx}, ${cIdx})`,
+                            `removeCoil(${rIdx}, ${cIdx})`
+                        )).join('')}
+                        <button onclick="addCoilToRung(${rIdx})" title="Add another coil/output driven by this same rung" class="text-[9px] font-mono text-slate-500 hover:text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Coil
+                        </button>
                     </div>
 
                     <!-- Right Power Rail (0VDC Ground) -->
-                    <div class="w-2 h-16 bg-red-500 rounded-r power-rail-right"></div>
+                    <div class="w-2 rounded-r power-rail-right transition-colors ${rung.energized ? 'bg-emerald-400' : 'bg-red-500'}"></div>
 
                     <!-- Delete Rung Button -->
-                    <button onclick="deleteRung(${rIdx})" class="ml-2 text-slate-600 hover:text-red-400 p-1">
+                    <button onclick="deleteRung(${rIdx})" title="Delete this entire rung" class="ml-2 text-slate-600 hover:text-red-400 p-1 self-center">
                         <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
@@ -943,9 +1141,10 @@
             const h = processCanvas.height;
 
             ctx.clearRect(0, 0, w, h);
+            const pal = currentPalette();
 
             // Draw Background Grid
-            ctx.strokeStyle = '#1e293b';
+            ctx.strokeStyle = pal.grid;
             ctx.lineWidth = 1;
             for (let x = 0; x < w; x += 20) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
@@ -965,16 +1164,16 @@
             const fluidH = tankH * levelPct;
 
             // Draw Fluid
-            ctx.fillStyle = 'rgba(14, 165, 233, 0.6)';
+            ctx.fillStyle = pal.fluid;
             ctx.fillRect(tankX + 4, tankY + tankH - fluidH, tankW - 8, fluidH);
 
             // Draw Tank Outline
-            ctx.strokeStyle = '#94a3b8';
+            ctx.strokeStyle = pal.tankOutline;
             ctx.lineWidth = 4;
             ctx.strokeRect(tankX, tankY, tankW, tankH);
 
             // Tank Level % Label
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = pal.labelText;
             ctx.font = '12px JetBrains Mono';
             ctx.fillText(`Level: ${plcState.analogInputs[0].val.toFixed(1)}%`, tankX + 10, tankY + 25);
             ctx.fillText(`Temp: ${plcState.analogInputs[1].val.toFixed(1)}°C`, tankX + 10, tankY + 45);
@@ -993,7 +1192,7 @@
             ctx.beginPath();
             ctx.arc(tankX - 40, tankY + 30, 14, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = pal.labelText;
             ctx.font = '10px Inter';
             ctx.fillText('SOL1', tankX - 52, tankY + 50);
 
@@ -1051,9 +1250,10 @@
             const h = scopeCanvas.height;
 
             scopeCtx.clearRect(0, 0, w, h);
+            const pal = currentPalette();
 
             // Scope Grid lines
-            scopeCtx.strokeStyle = '#1e293b';
+            scopeCtx.strokeStyle = pal.scopeGrid;
             scopeCtx.lineWidth = 1;
             for (let y = 0; y < h; y += 30) {
                 scopeCtx.beginPath(); scopeCtx.moveTo(0, y); scopeCtx.lineTo(w, y); scopeCtx.stroke();
@@ -1128,60 +1328,82 @@
 
             if (labId === 1) {
                 // Lab 1: Motor Seal-In Circuit
-                document.getElementById('process-title').innerText = 'Lab 01: Three-Wire Motor Seal-In Circuit';
-                plcState.discreteInputs[0].val = true; // Stop switch NC
-                plcState.discreteInputs[1].val = false; // Start PB
+                // This now uses a REAL parallel branch, the classic textbook seal-in:
+                // an auxiliary contact of the motor coil itself (O:0/0) is wired in
+                // parallel (OR) with the Start pushbutton, so once the motor energizes
+                // it holds itself in through its own contact even after Start is
+                // released - exactly how a hardwired 3-wire start/stop circuit works.
+                // The Stop contact is replicated into both branches (Stop AND Start)
+                // OR (Stop AND Aux) = Stop AND (Start OR Aux) - so releasing Stop
+                // immediately drops power through either path. This also uses the
+                // industry convention of a software NO (XIC) instruction reading the
+                // field-wired NC Stop contact, so a broken field wire fails safe.
+                document.getElementById('process-title').innerText = 'Lab 01: Three-Wire Motor Seal-In Circuit (Parallel Branch)';
+                plcState.discreteInputs[0].val = true;  // Stop switch NC field contact: 1 = healthy/not pressed
+                plcState.discreteInputs[1].val = false; // Start PB: 1 = pressed
 
-                // Rung 0: (Stop NC AND Start NO) OR Motor Contact -> Motor Coil O:0/0
                 plcState.rungs.push({
-                    instructions: [
-                        { type: 'NC', tag: 'I:0/0', active: true },
-                        { type: 'NO', tag: 'I:0/1', active: false },
+                    branches: [
+                        { instructions: [ // MAIN: Stop healthy AND Start pressed
+                            { type: 'NO', tag: 'I:0/0', active: false },
+                            { type: 'NO', tag: 'I:0/1', active: false }
+                        ]},
+                        { instructions: [ // OR: Stop healthy AND Motor already sealed in (its own aux contact)
+                            { type: 'NO', tag: 'I:0/0', active: false },
+                            { type: 'NO', tag: 'O:0/0', active: false }
+                        ]}
+                    ],
+                    coils: [
                         { type: 'COIL', tag: 'O:0/0', active: false }
                     ]
                 });
-            } 
+            }
             else if (labId === 2) {
                 // Lab 2: Automated Level Control
-                document.getElementById('process-title').innerText = 'Lab 02: Tank Fill Automation (Analog Sensor Compare)';
+                // Hysteresis via two rungs: fill below 25%, stop above 85%, using
+                // Set/Reset latching coils so the pump doesn't chatter at one setpoint.
+                document.getElementById('process-title').innerText = 'Lab 02: Tank Fill Automation (Analog Hysteresis)';
                 plcState.analogInputs[0].val = 15.0; // Tank at 15%
 
-                // Rung 0: If AI:0 < 25% -> Turn ON Solenoid Fill Valve O:0/1
                 plcState.rungs.push({
-                    instructions: [
-                        { type: 'CMP', op: 'LESS', val: 25, tag: 'AI:0 < 25%', active: true },
-                        { type: 'COIL', tag: 'O:0/1', active: true }
-                    ]
+                    branches: [{ instructions: [
+                        { type: 'CMP', op: 'LESS', val: 25, tag: 'AI:0 < 25%', active: true }
+                    ]}],
+                    coils: [ { type: 'SET', tag: 'O:0/1', active: true } ]
+                });
+                plcState.rungs.push({
+                    branches: [{ instructions: [
+                        { type: 'CMP', op: 'GREATER', val: 85, tag: 'AI:0 > 85%', active: false }
+                    ]}],
+                    coils: [ { type: 'RESET', tag: 'O:0/1', active: false } ]
                 });
             }
             else if (labId === 3) {
                 // Lab 3: Bottle Fill Conveyor Line
                 document.getElementById('process-title').innerText = 'Lab 03: Timed Bottle Fill & Counter Line';
-                
-                // Rung 0: Proximity Switch I:0/2 triggers Timer TON_1 (3 Secs)
+
                 plcState.rungs.push({
-                    instructions: [
-                        { type: 'NO', tag: 'I:0/2', active: false },
-                        { type: 'TON', tag: 'TON_1', active: false }
-                    ]
+                    branches: [{ instructions: [
+                        { type: 'NO', tag: 'I:0/2', active: false }
+                    ]}],
+                    coils: [ { type: 'TON', tag: 'TON_1', active: false } ]
                 });
-                // Rung 1: TON_1 Done triggers Bottle Count CTU_1
                 plcState.rungs.push({
-                    instructions: [
-                        { type: 'NO', tag: 'TON_1', active: false },
-                        { type: 'CTU', tag: 'CTU_1', active: false }
-                    ]
+                    branches: [{ instructions: [
+                        { type: 'NO', tag: 'TON_1', active: false }
+                    ]}],
+                    coils: [ { type: 'CTU', tag: 'CTU_1', active: false } ]
                 });
             }
             else if (labId === 4) {
                 // Lab 4: Batch Heat & Agitation Loop
                 document.getElementById('process-title').innerText = 'Lab 04: Chemical Batch Reactor Heating Loop';
-                
+
                 plcState.rungs.push({
-                    instructions: [
-                        { type: 'NO', tag: 'I:0/6', active: true }, // Auto Switch
-                        { type: 'COIL', tag: 'O:0/5', active: true } // Agitator Motor
-                    ]
+                    branches: [{ instructions: [
+                        { type: 'NO', tag: 'I:0/6', active: true } // Auto Switch
+                    ]}],
+                    coils: [ { type: 'COIL', tag: 'O:0/5', active: true } ] // Agitator Motor
                 });
             }
 
@@ -1260,10 +1482,8 @@
 
         function addRung() {
             plcState.rungs.push({
-                instructions: [
-                    { type: 'NO', tag: 'I:0/1', active: false },
-                    { type: 'COIL', tag: 'O:0/0', active: false }
-                ]
+                branches: [{ instructions: [ { type: 'NO', tag: 'I:0/1', active: false } ] }],
+                coils: [ { type: 'COIL', tag: 'O:0/0', active: false } ]
             });
             renderLadder();
         }
@@ -1273,23 +1493,120 @@
             renderLadder();
         }
 
+        // Adds a new empty parallel (OR) branch to a rung - e.g. a seal-in
+        // auxiliary contact wired around a Start pushbutton.
+        function addBranch(rIdx) {
+            const rung = plcState.rungs[rIdx];
+            if (!rung) return;
+            rung.branches.push({ instructions: [ { type: 'NO', tag: 'I:0/1', active: false } ] });
+            renderLadder();
+        }
+
+        function removeBranch(rIdx, bIdx) {
+            const rung = plcState.rungs[rIdx];
+            if (!rung || rung.branches.length <= 1) return; // always keep at least one branch
+            rung.branches.splice(bIdx, 1);
+            renderLadder();
+        }
+
+        function addCoilToRung(rIdx) {
+            const rung = plcState.rungs[rIdx];
+            if (!rung) return;
+            rung.coils.push({ type: 'COIL', tag: 'O:0/0', active: false });
+            renderLadder();
+        }
+
+        function removeCoil(rIdx, cIdx) {
+            const rung = plcState.rungs[rIdx];
+            if (!rung || rung.coils.length <= 1) return; // a rung needs at least one output to mean anything
+            rung.coils.splice(cIdx, 1);
+            renderLadder();
+        }
+
+        // Quick-add from the palette: contacts (NO/NC/CMP) go into the last branch of
+        // the last rung; outputs (COIL/SET/RESET/TON/CTU) go into that rung's coil list.
+        // Use "Add OR Branch" in a rung to start a new parallel leg for contacts instead.
         function insertInstruction(type) {
             if (plcState.rungs.length === 0) addRung();
             const targetRung = plcState.rungs[plcState.rungs.length - 1];
+            const targetBranch = targetRung.branches[targetRung.branches.length - 1];
 
-            if (type === 'NO') targetRung.instructions.unshift({ type: 'NO', tag: 'I:0/1', active: false });
-            if (type === 'NC') targetRung.instructions.unshift({ type: 'NC', tag: 'I:0/0', active: true });
-            if (type === 'COIL') targetRung.instructions.push({ type: 'COIL', tag: 'O:0/0', active: false });
-            if (type === 'TON') targetRung.instructions.unshift({ type: 'TON', tag: 'TON_1', active: false });
-            if (type === 'CTU') targetRung.instructions.unshift({ type: 'CTU', tag: 'CTU_1', active: false });
-            if (type === 'CMP') targetRung.instructions.unshift({ type: 'CMP', op: 'LESS', val: 50, tag: 'AI:0 < 50%', active: false });
+            if (type === 'NO') targetBranch.instructions.push({ type: 'NO', tag: 'I:0/1', active: false });
+            if (type === 'NC') targetBranch.instructions.push({ type: 'NC', tag: 'I:0/0', active: true });
+            if (type === 'CMP') targetBranch.instructions.push({ type: 'CMP', op: 'LESS', val: 50, tag: 'AI:0 < 50%', active: false });
+            if (type === 'COIL') targetRung.coils.push({ type: 'COIL', tag: 'O:0/0', active: false });
+            if (type === 'SET') targetRung.coils.push({ type: 'SET', tag: 'O:0/0', active: false });
+            if (type === 'RESET') targetRung.coils.push({ type: 'RESET', tag: 'O:0/0', active: false });
+            if (type === 'TON') targetRung.coils.push({ type: 'TON', tag: 'TON_1', active: false });
+            if (type === 'CTU') targetRung.coils.push({ type: 'CTU', tag: 'CTU_1', active: false });
 
             renderLadder();
         }
 
-        function removeInstruction(rungIdx, instIdx) {
-            plcState.rungs[rungIdx].instructions.splice(instIdx, 1);
+        function removeInstruction(rIdx, bIdx, iIdx) {
+            const branch = plcState.rungs[rIdx]?.branches[bIdx];
+            if (!branch) return;
+            branch.instructions.splice(iIdx, 1);
+            // A branch with zero contacts would pass power unconditionally (vacuously
+            // true), which is surprising rather than useful in a teaching tool -
+            // remove the empty branch itself, unless it's the last one on the rung.
+            if (branch.instructions.length === 0 && plcState.rungs[rIdx].branches.length > 1) {
+                plcState.rungs[rIdx].branches.splice(bIdx, 1);
+            }
             renderLadder();
+        }
+
+        // Click-to-edit for a placed contact instruction (lives inside a branch).
+        // Previously every inserted instruction was stuck at its hardcoded default
+        // address/preset, which made the "builder" unusable for anything beyond the
+        // four canned labs. This lets students actually wire up their own logic.
+        function editInstruction(rIdx, bIdx, iIdx) {
+            const inst = plcState.rungs[rIdx]?.branches[bIdx]?.instructions[iIdx];
+            if (!inst) return;
+            editInstructionCommon(inst);
+            renderLadder();
+        }
+
+        // Click-to-edit for a placed coil/output instruction (lives in the rung's coil list).
+        function editCoil(rIdx, cIdx) {
+            const coil = plcState.rungs[rIdx]?.coils[cIdx];
+            if (!coil) return;
+            editInstructionCommon(coil);
+            renderLadder();
+        }
+
+        // Shared edit-prompt logic for both contacts and coils - the same instruction
+        // types (NO/NC/COIL/SET/RESET/TON/CTU/CMP) can appear in either list.
+        function editInstructionCommon(inst) {
+            if (['NO', 'NC', 'COIL', 'SET', 'RESET'].includes(inst.type)) {
+                const newTag = prompt(
+                    `Address for this ${inst.type} instruction.\nValid tags: I:0/0-I:0/7 (inputs), O:0/0-O:0/7 (outputs/coils), TON_1 or TON_2 (timer done bit), CTU_1 (counter done bit)`,
+                    inst.tag
+                );
+                if (newTag && newTag.trim()) inst.tag = newTag.trim();
+            } else if (inst.type === 'TON') {
+                if (!plcState.timers[inst.tag]) plcState.timers[inst.tag] = { pt: 3.0, et: 0.0, dn: false };
+                const newPreset = prompt('Timer preset (PT) in seconds:', plcState.timers[inst.tag].pt);
+                if (newPreset !== null && !isNaN(parseFloat(newPreset))) {
+                    plcState.timers[inst.tag].pt = Math.max(0.1, parseFloat(newPreset));
+                }
+            } else if (inst.type === 'CTU') {
+                if (!plcState.counters[inst.tag]) plcState.counters[inst.tag] = { pv: 5, cv: 0, dn: false };
+                const newPreset = prompt('Counter preset (PV) - counts needed to trip DN:', plcState.counters[inst.tag].pv);
+                if (newPreset !== null && !isNaN(parseInt(newPreset))) {
+                    plcState.counters[inst.tag].pv = Math.max(1, parseInt(newPreset));
+                }
+            } else if (inst.type === 'CMP') {
+                const newOp = prompt('Operator - type LESS or GREATER:', inst.op);
+                if (newOp && ['LESS', 'GREATER'].includes(newOp.trim().toUpperCase())) {
+                    inst.op = newOp.trim().toUpperCase();
+                }
+                const newVal = prompt('Setpoint (0-100%) compared against AI:0 Level Transmitter:', inst.val);
+                if (newVal !== null && !isNaN(parseFloat(newVal))) {
+                    inst.val = Math.min(100, Math.max(0, parseFloat(newVal)));
+                }
+                inst.tag = `AI:0 ${inst.op === 'LESS' ? '<' : '>'} ${inst.val}%`;
+            }
         }
 
         function clearLadder() {
